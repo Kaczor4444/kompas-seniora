@@ -1,15 +1,41 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Placowka {
+  id               Int      @id @default(autoincrement())
+  nazwa            String
+  typ_placowki     String   // "DPS" | "SDS" | "DPS/SDS"
+  prowadzacy       String
+  ulica            String?
+  miejscowosc      String
+  kod_pocztowy     String?
+  gmina            String
+  powiat           String
+  wojewodztwo      String
+  // TERYT codes
+  teryt_wojewodztwo_kod String?
+  teryt_powiat_kod      String?
+  teryt_gmina_kod       String?
+  teryt_gmina_nazwa     String?
+  // Geo
+  geo_lat          Float?
+  geo_lng          Float?
+  // Contact
+  telefon          String?
+  email            String?
+  www              String?
+  // Details
+  liczba_miejsc    Int?
+  profil_opieki    String?
+  koszt_pobytu     Float?
+  data_aktualizacji DateTime @default(now())
+  zrodlo           String?
+  
+  @@map("placowki")
 }
