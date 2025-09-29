@@ -1,21 +1,66 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme inline {
+  /* Warm Amber - ciepły bursztyn (primary) */
+  --color-primary-50: #FFFBEB;
+  --color-primary-100: #FEF3C7;
+  --color-primary-200: #FDE68A;
+  --color-primary-300: #FCD34D;
+  --color-primary-400: #FBBF24;
+  --color-primary-500: #F59E0B;
+  --color-primary-600: #D97706;
+  --color-primary-700: #B45309;
+  --color-primary-800: #92400E;
+  --color-primary-900: #78350F;
+  
+  /* Soft Peach - delikatny brzoskwiniowy (secondary) */
+  --color-secondary-50: #FFF7ED;
+  --color-secondary-100: #FFEDD5;
+  --color-secondary-200: #FED7AA;
+  --color-secondary-300: #FDBA74;
+  --color-secondary-500: #FB923C;
+  
+  /* Coral - łososiowy akcent */
+  --color-accent-50: #FFF1F2;
+  --color-accent-100: #FFE4E6;
+  --color-accent-200: #FECDD3;
+  --color-accent-300: #FDA4AF;
+  --color-accent-500: #FB7185;
+  --color-accent-600: #F43F5E;
+  --color-accent-700: #E11D48;
+  
+  /* Warm Neutrals - ciepłe szarości */
+  --color-neutral-50: #FAFAF9;
+  --color-neutral-100: #F5F5F4;
+  --color-neutral-200: #E7E5E4;
+  --color-neutral-300: #D6D3D1;
+  --color-neutral-400: #A8A29E;
+  --color-neutral-500: #78716C;
+  --color-neutral-600: #57534E;
+  --color-neutral-700: #44403C;
+  --color-neutral-800: #292524;
+  --color-neutral-900: #1C1917;
+  
+  /* Success - turkusowy zielony */
+  --color-success-50: #F0FDFA;
+  --color-success-100: #CCFBF1;
+  --color-success-500: #14B8A6;
+  --color-success-700: #0F766E;
+  
+  /* Warning - bursztynowy (używamy primary) */
+  --color-warning-500: #F59E0B;
+  --color-warning-700: #D97706;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --background: #ffffff;
+  --foreground: #1C1917;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1C1917;
+    --foreground: #FAFAF9;
   }
 }
 
