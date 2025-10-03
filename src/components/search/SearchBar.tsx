@@ -22,8 +22,7 @@ export default function SearchBar() {
     
     setLoading(true);
     try {
-      const params = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : '';
-      const response = await fetch(`/api/placowki${params}`);
+      const response = await fetch(`/api/placowki?search=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
       
       if (data.success) {
@@ -59,7 +58,7 @@ export default function SearchBar() {
           </button>
         </div>
         <p className="text-sm text-neutral-500 text-center mt-3">
-          💡 Nie musisz znać powiatu - wpisz po prostu nazwę miejscowości
+          Nie musisz znać powiatu - wpisz po prostu nazwę miejscowości
         </p>
       </form>
 
@@ -76,8 +75,8 @@ export default function SearchBar() {
                 <div className="text-neutral-700 space-y-2">
                   <p><span className="font-medium">Typ:</span> {placowka.typ_placowki}</p>
                   <p><span className="font-medium">Miejscowość:</span> {placowka.miejscowosc}</p>
-                  {placowka.koszt_pobytu && (
-                    <p><span className="font-medium">Koszt:</span> {placowka.koszt_pobytu} zł/miesiąc</p>
+                  {placowka.koszt_pobytu !== null && (
+                    <p><span className="font-medium">Koszt:</span> {placowka.koszt_pobytu === 0 ? 'Bezpłatne' : `${placowka.koszt_pobytu} zł/miesiąc`}</p>
                   )}
                   {placowka.telefon && (
                     <p><span className="font-medium">Telefon:</span> 
