@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "import-data": "tsx lib/importData.ts"
+    "import": "tsx scripts/import-csv.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
@@ -15,6 +15,7 @@
     "fuse.js": "^7.1.0",
     "leaflet": "^1.9.4",
     "next": "15.5.4",
+    "papaparse": "^5.5.3",
     "prisma": "^6.16.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -24,6 +25,7 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/papaparse": "^5.3.16",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

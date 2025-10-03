@@ -1,0 +1,1511 @@
+
+> kompas-seniora@0.1.0 import
+> tsx scripts/import-csv.ts
+
+🔄 Czyszczenie bazy danych...
+📂 Wczytywanie pliku CSV...
+🔍 Debug pierwszego rekordu: {
+  "id": "1",
+  "nazwa": "Środowiskowy Dom Samopomocy Biecz (Nadzieja)",
+  "typ_placowki": "ŚDS",
+  "prowadzacy": "Burmistrz Biecza zlecil Stowarzyszeniu na Rzecz Pomocy Rodzinie \"Nadzieja",
+  "data_aktualizacji": "01/09/2025",
+  "zrodlo": "MUW Kraków",
+  "wojewodztwo": "Małopolskie",
+  "powiat": "gorlicki ",
+  "gmina": "Biecz",
+  "miasto_wies": "Biecz",
+  "ulica": "ul. Parkowa 1",
+  "kod_pocztowy": "38-340",
+  "geo_lat": "49.73398118",
+  "geo_long": "21.25609674",
+  "telefon": "18 440 61 22",
+  "email": "sds.biecz@gmail.com",
+  "www": "https://nadziejabiecz.pl/sds-w-bieczu-z-filia-w-gorlicach/",
+  "liczba_miejsc": "21",
+  "profil_opieki": "B,C",
+  "koszt_pobytu": "Bezpłatne",
+  "opis": "tu bedzie opis\r"
+}
+📊 Znaleziono 38 rekordów
+❌ Błąd przy: Środowiskowy Dom Samopomocy Biecz (Nadzieja) 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Biecz (Nadzieja)",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Burmistrz Biecza zlecil Stowarzyszeniu na Rzecz Pomocy Rodzinie \"Nadzieja",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "gorlicki",
+             gmina: "Biecz",
+             miejscowosc: "Biecz",
+             ulica: "ul. Parkowa 1",
+             kod_pocztowy: "38-340",
+             geo_latitude: 49.73398118,
+             ~~~~~~~~~~~~
+             geo_longitude: 21.25609674,
+             telefon: "18 440 61 22",
+             email: "sds.biecz@gmail.com",
+             www: "https://nadziejabiecz.pl/sds-w-bieczu-z-filia-w-gorlicach/",
+             liczba_miejsc: 21,
+             profil_opieki: "B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Biecz - Filia w Gorlicach (Nadzieja) 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Biecz - Filia w Gorlicach (Nadzieja)",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Burmistrz Biecza zlecil Stowarzyszeniu na Rzecz Pomocy Rodzinie \"Nadzieja",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "gorlicki",
+             gmina: "Biecz",
+             miejscowosc: "Gorlice",
+             ulica: "ul.Wyszynskiego 18",
+             kod_pocztowy: "38-300",
+             geo_latitude: 49.67731845,
+             ~~~~~~~~~~~~
+             geo_longitude: 21.16822015,
+             telefon: "18 534v61 01",
+             email: "sds.gorlice@gmail.com",
+             www: "https://nadziejabiecz.pl/sds-w-bieczu-z-filia-w-gorlicach/",
+             liczba_miejsc: 19,
+             profil_opieki: "B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Tomaszkowice 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Tomaszkowice",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Wójt Gminy Biskupice",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "wielicki",
+             gmina: "Biskupice",
+             miejscowosc: "Wieliczka",
+             ulica: "Tomaszowice 455",
+             kod_pocztowy: "32-020",
+             geo_latitude: 49.97663214,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.0986488,
+             telefon: "12 250 79 00",
+             email: "sdstomaszkowice@biskupice.pl",
+             www: "https://sdstomaszkowice.pl/",
+             liczba_miejsc: 38,
+             profil_opieki: "A,B",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Chełmek 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Chełmek",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Burmistrz Chełmka",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "oswiecimski",
+             gmina: "Chełmek",
+             miejscowosc: "Chełmek",
+             ulica: "ul. Kochanowskiego 1",
+             kod_pocztowy: "32-660",
+             geo_latitude: 50.10290056,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.25058491,
+             telefon: "33 84614 72",
+             email: "sds@chelmek.pl",
+             www: "https://sds.chelmek.pl/",
+             liczba_miejsc: 30,
+             profil_opieki: "A",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Jelcza 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Jelcza",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Wójt Gminy Charsznica",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "miechowski",
+             gmina: "Charsznica",
+             miejscowosc: "Charsznica",
+             ulica: "Jelcza 219",
+             kod_pocztowy: "32-250 ",
+             geo_latitude: 50.44262754,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.8777404,
+             telefon: "41 382 74 05",
+             email: "sds@charsznica.pl",
+             www: "http://www.sdsjelcza.charsznica.pl/",
+             liczba_miejsc: 30,
+             profil_opieki: "A,B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Chrzanów 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Chrzanów",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Burmistrz Miasta Chrzanowa",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "chrzanowski",
+             gmina: "Chrzanów",
+             miejscowosc: "Chrzanów",
+             ulica: "ul. Kolonia Stella 11",
+             kod_pocztowy: "32-500",
+             geo_latitude: 50.4426617,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.87777259,
+             telefon: "32 623 52 60 wew.21",
+             email: "sds@chrzanow.pl",
+             www: "TBC",
+             liczba_miejsc: 44,
+             profil_opieki: "A,B",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Dobroczyce 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Dobroczyce",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Burmistrz Gminy i Miasta Dobczyce ",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "myslenicki",
+             gmina: "Dobroczyce",
+             miejscowosc: "Dobroczyce",
+             ulica: "ul. Jagiellońska 2",
+             kod_pocztowy: "32-410 ",
+             geo_latitude: 49.88023629,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.09146985,
+             telefon: "501 814 113",
+             email: "sds@sds.dobczyce.pl",
+             www: "https://sds.dobczyce.pl/",
+             liczba_miejsc: 39,
+             profil_opieki: "A,B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Zagórzany 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Zagórzany",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Wójt Gminy Gdów",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "wielicki",
+             gmina: "Gdów",
+             miejscowosc: "Gdów",
+             ulica: "Zagórzany 109",
+             kod_pocztowy: "32-420",
+             geo_latitude: 49.87565351,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.23367658,
+             telefon: "12 251 40 41",
+             email: "sds@sdszagorzany.pl",
+             www: "https://www.sdszagorzany.pl/",
+             liczba_miejsc: 41,
+             profil_opieki: "A,B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Jabłonka (Barka)  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Jabłonka (Barka) ",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Wójt Gminy Jabłonka zlecił Polskiemu Stowarzyszeniu na Rzecz Osób z Niepełnosprawnością Jabłonce \"BARKA\" ",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "nowatorski",
+             gmina: "Jabłonka",
+             miejscowosc: "Jabłonka",
+             ulica: "ul. Tetmajera 4,",
+             kod_pocztowy: "34-480",
+             geo_latitude: 49.4813996,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.6976874,
+             telefon: "18 265 24 90",
+             email: "zk.jablonka@psouu.org.pl ",
+             www: "http://www.barka.jablonka.pl/www/sdsonas.html",
+             liczba_miejsc: 26,
+             profil_opieki: "A",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy - Ognisko Terapeutyczne Jerzmanowice  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy - Ognisko Terapeutyczne Jerzmanowice ",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Wójt Gminy Jabłonka zlecił Stowarzyszeniu Rodziców i Przyjaciół Osób Niepełnosprawnych,",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "krakowski",
+             gmina: "Jerzmanowice",
+             miejscowosc: "Jerzmanowice",
+             ulica: "ul. Rajska 26",
+             kod_pocztowy: "32-048",
+             geo_latitude: 50.21534994,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.74559207,
+             telefon: "12 389 50 98",
+             email: "sripon@wp.pl",
+             www: "http://ognisko.jerzmanowice-przeginia.pl/index.html",
+             liczba_miejsc: 25,
+             profil_opieki: "A,B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy - Kalwaria Zebrzydowska 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy - Kalwaria Zebrzydowska",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Burmistrz Kalwarii Zebrzydowskiej",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "wadowicki",
+             gmina: "Kalwaria Zebrzydowska",
+             miejscowosc: "Kalwaria Zebrzydowska",
+             ulica: "Al. Jana Pawła II 7a",
+             kod_pocztowy: "34 -130 ",
+             geo_latitude: 49.86952463,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.68574604,
+             telefon: "798 818 317",
+             email: "biuro@sdskalwaria.pl",
+             www: "https://www.facebook.com/sdskalwaria",
+             liczba_miejsc: 30,
+             profil_opieki: "A,B,C,D",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Kolbark 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Kolbark",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Stowarzyszeniu na Rzecz Zrównoważonego Rozwoju Społeczno-Gospodarczego \"Klucz\" / Wójt Gminy Klucze ",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "olkuski",
+             gmina: "Klucze",
+             miejscowosc: "Kolbark",
+             ulica: "ul. Źródlana 3, ",
+             kod_pocztowy: "32-310 ",
+             geo_latitude: 50.36672487,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.6419282,
+             telefon: "32 647 80 50",
+             email: "biuro@stowarzyszenie-klucz.pl",
+             www: "https://www.stowarzyszenie-klucz.pl/",
+             liczba_miejsc: 35,
+             profil_opieki: "A,B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Klucze 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Klucze",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Polskiemu Stowarzyszeniu na Rzecz Osób zNiepełnosprawnością Intelektualną Koło w Wolbromiu /  Wójt Gminy Klucze ",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "olkuski",
+             gmina: "Klucze",
+             miejscowosc: "Klucze",
+             ulica: "Osada 15",
+             kod_pocztowy: "32-310",
+             geo_latitude: 50.35342983,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.56257442,
+             telefon: "32 706 50 77",
+             email: "sdsklucze@psoni-wolbrom.pl",
+             www: "https://psoni-wolbrom.pl/",
+             liczba_miejsc: 24,
+             profil_opieki: "B,D",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy Kozłów 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy Kozłów",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Wójt Gminy Kozłów",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "miechowski",
+             gmina: "Kozłów",
+             miejscowosc: "Kozłów",
+             ulica: "Kępie 16",
+             kod_pocztowy: "32-241",
+             geo_latitude: 50.45614942,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.93535377,
+             telefon: "41 230 72 39",
+             email: "sds@kozlow.pl",
+             www: "https://www.facebook.com/sds.kozlow/",
+             liczba_miejsc: 25,
+             profil_opieki: "A,B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy  Kraków os. Wandy 23 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy  Kraków os. Wandy 23",
+             typ_placowki: "ŚDS",
+             prowadzacy: "Stowarzyszeniu Rodziców i Przyjaciół Osób z Zespołem Downa \"Tęcza\"  / Prezydent Miasta Krakowa",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "krakowski",
+             gmina: "Kraków",
+             miejscowosc: "Kraków",
+             ulica: "os. Wandy 23",
+             kod_pocztowy: "31-907",
+             geo_latitude: 50.07097602,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.05115109,
+             telefon: "887 131 288 ",
+             email: "sds@stowarzyszenietecza.org,",
+             www: "https://stowarzyszenietecza.org/nasze-dzialania/srodowiskowy-dom-samopomocy/",
+             liczba_miejsc: 15,
+             profil_opieki: "B,C",
+             koszt_pobytu: 0,
+             opis: "tu bedzie opis\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy  Kraków "Vita" os. Młodości 8  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy  Kraków \"Vita\" os. Młodości 8 ",
+             typ_placowki: "ŚDS",
+             prowadzacy: "MOPS ul. Józefińska 14 / Prezydent Miasta Krakowa ",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "krakowski",
+             gmina: "Kraków",
+             miejscowosc: "Kraków",
+             ulica: "os. Młodości 8 ",
+             kod_pocztowy: "31-908 ",
+             geo_latitude: 50.06745303,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.05013027,
+             telefon: "12 686 91 21",
+             email: "sekretariat@sdsvita.pl",
+             www: "http://sdsvita.pl/",
+             liczba_miejsc: 999,
+             profil_opieki: "A",
+             koszt_pobytu: 0,
+             opis: "dla osób przewlekle psychicznie chorych, dla osób z niepełnoprawnością intelektualną oraz dla osób cierpiących na inne przewlekłe zaburzenia czynności psychicznych",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy  Kraków "Vita" filia os. Słoneczne 15 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy  Kraków \"Vita\" filia os. Słoneczne 15",
+             typ_placowki: "ŚDS",
+             prowadzacy: "MOPS ul. Józefińska 14 / Prezydent Miasta Krakowa ",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "krakowski",
+             gmina: "Kraków",
+             miejscowosc: "Kraków",
+             ulica: "os. Słoneczne 15",
+             kod_pocztowy: "31-958",
+             geo_latitude: 50.07769688,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.03983407,
+             telefon: "12 359 29 00",
+             email: "sekretariat@sdsvita.pl",
+             www: "http://sdsvita.pl/",
+             liczba_miejsc: 999,
+             profil_opieki: "C",
+             koszt_pobytu: 0,
+             opis: "dedykowany osobom wykazującym inne przewlekłe zaburzenia psychiczne tj. osobom z chorobą Alzheimera i innymi zaburzeniami otępiennymi.\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Środowiskowy Dom Samopomocy  Kraków "Vita" filia al. Grottgera 3 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Środowiskowy Dom Samopomocy  Kraków \"Vita\" filia al. Grottgera 3",
+             typ_placowki: "ŚDS",
+             prowadzacy: "MOPS ul. Józefińska 14 / Prezydent Miasta Krakowa ",
+             data_aktualizacji: new Date("2025-09-01T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "krakowski",
+             gmina: "Kraków",
+             miejscowosc: "Kraków",
+             ulica: "al. Grottgera 3",
+             kod_pocztowy: "30-035 ",
+             geo_latitude: 50.07236878,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.9292494,
+             telefon: "12 686 91 21",
+             email: "sekretariat@sdsvita.pl",
+             www: "http://sdsvita.pl/",
+             liczba_miejsc: 22,
+             profil_opieki: "B",
+             koszt_pobytu: 0,
+             opis: "opieką terapeutyczną są otoczone osoby w spektrum autyzmu, z niepełnosprawnością intelektualną oraz z niepełnosprawnościami sprzężonymi",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej w Bochni 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej w Bochni",
+             typ_placowki: "DPS",
+             prowadzacy: "Powiat Bocheński ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "bocheński",
+             gmina: "powiatowy",
+             miejscowosc: "Bochnia ",
+             ulica: "ul. Karolina 14G ",
+             kod_pocztowy: "32-700 ",
+             geo_latitude: 49.97990995,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.44223302,
+             telefon: "14 612 59 90 ",
+             email: "dps@powiatbochenski.pl",
+             www: "https://dpsbochnia.pl/",
+             liczba_miejsc: 157,
+             profil_opieki: "dla osób w podeszłym wieku, dla osób przewlekle psychicznie chorych",
+             koszt_pobytu: 6,
+             opis: "dla osób w podeszłym wieku - 90 miejsc dla osób przewlekle psychicznie chorych - 67 miejsc osoby w podeszłym wieku oraz osoby przewlekle psychicznie chore przebywają w odrębnych budynkach\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej w Brzesku 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej w Brzesku",
+             typ_placowki: "DPS",
+             prowadzacy: "Zgromadzenie Sióstr Służebniczek NMP NP. Prowincja Tarnowska / Powiat Brzeski",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "brzeski",
+             gmina: "powiatowy",
+             miejscowosc: "Brzesko",
+             ulica: "ul. Starowiejska 6 ",
+             kod_pocztowy: "32-800 ",
+             geo_latitude: 49.975705,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.61770023,
+             telefon: "14 663 05 84 ",
+             email: "sekretariat@brzeskodps.pl",
+             www: "https://brzeskodps.pl/",
+             liczba_miejsc: 50,
+             profil_opieki: "dzieci, młodzieży niepełnosprawnych intelektualnie",
+             koszt_pobytu: 7,
+             opis: "dla dzieci i młodzieży niepełnosprawnych intelektualnie\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej w Porąbce Uszewskiej 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej w Porąbce Uszewskiej",
+             typ_placowki: "DPS",
+             prowadzacy: "Zgromadzenie Sióstr Służebniczek NMP NP. Prowincja Tarnowska / Powiat Brzeski",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "brzeski",
+             gmina: "powiatowy",
+             miejscowosc: "Brzesko",
+             ulica: "Uszewska 272",
+             kod_pocztowy: "32-854",
+             geo_latitude: 49.93251403,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.68063352,
+             telefon: "14 66 568 60 ",
+             email: "porabka@interia.pl",
+             www: "https://dps-pu.pl/",
+             liczba_miejsc: 25,
+             profil_opieki: "dla osób w w podeszłym wieku",
+             koszt_pobytu: 5,
+             opis: "dla osób w w podeszłym wieku\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej-Regionalne Centrum Rehabilitacji i Pomocy Społecznej w Borzęcinie 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej-Regionalne Centrum Rehabilitacji i Pomocy Społecznej w Borzęcinie",
+             typ_placowki: "DPS",
+             prowadzacy: "Gmina Borzęcin ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "brzeski",
+             gmina: "powiatowy",
+             miejscowosc: "Borzęcin ",
+             ulica: "Borzęcin 591 ",
+             kod_pocztowy: "32-825 ",
+             geo_latitude: 50.06523851,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.70917118,
+             telefon: "14 674 05 50 ",
+             email: "rcrips@rcrips.pl",
+             www: "https://rcrips.pl/",
+             liczba_miejsc: 100,
+             profil_opieki: "dla osób w podeszłym wieku , niepełnosprawnych fizycznie",
+             koszt_pobytu: 6,
+             opis: "dla osób w podeszłym wieku , niepełnosprawnych fizycznie",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Powiatowy Dom Pomocy Społecznej im. Adama Starzeńskiego w Płazie  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Powiatowy Dom Pomocy Społecznej im. Adama Starzeńskiego w Płazie ",
+             typ_placowki: "DPS",
+             prowadzacy: "Powiat Chrzanowski ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "chrzanowski",
+             gmina: "powiatowy",
+             miejscowosc: "Płaza ",
+             ulica: "ul. Wiosny Ludów 4 ",
+             kod_pocztowy: "32-552",
+             geo_latitude: 50.09898993,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.46742246,
+             telefon: "603 888 147 ",
+             email: "pdpsplaza@dpsplaza.pl",
+             www: "https://www.dpsplaza.pl/",
+             liczba_miejsc: 101,
+             profil_opieki: "dla osób przewlekle psychicznie chorych ",
+             koszt_pobytu: 7,
+             opis: "dla osób przewlekle psychicznie chorych \r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Radosnej Starości im. Jana Pawła II w Kupieninie 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Radosnej Starości im. Jana Pawła II w Kupieninie",
+             typ_placowki: "DPS",
+             prowadzacy: "Zgromadzenie Sióstr Benedyktynek Wynagradzających Najświętszemu Obliczu Pana Naszego Jezus Chrystusa w Kupieninie",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "dąbrowski",
+             gmina: "powiatowy",
+             miejscowosc: "Mędrzechów ",
+             ulica: "Kupienin 35 ",
+             kod_pocztowy: "33-221",
+             geo_latitude: 50.30630619,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.96032457,
+             telefon: "14 643 73 10 ",
+             email: "drs_kupienin@tarnow.opoka.org.pl",
+             www: "https://drskupienin.pl/",
+             liczba_miejsc: 70,
+             profil_opieki: "dla osób w podeszłym wieku, dorosłych niepełnosprawnych intelektualnie, dzieci i młodzieży niepełnosporawnych intelektualnie, ",
+             koszt_pobytu: 5,
+             opis: "dla osób w podeszłym wieku\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej Św. Brata Alberta Chmielowskiego Caritas Diecezji Tarnowskiej w Dąbrowie Tarnowskiej 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej Św. Brata Alberta Chmielowskiego Caritas Diecezji Tarnowskiej w Dąbrowie Tarnowskiej",
+             typ_placowki: "DPS",
+             prowadzacy: "Caritas Diecezji Tarnowskiej ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "dąbrowski",
+             gmina: "powiatowy",
+             miejscowosc: "Dąbrowa Tarnowska",
+             ulica: "ul. Św. Br. A. Chmielowskiego 16 ",
+             kod_pocztowy: "33-200",
+             geo_latitude: 50.17279231,
+             ~~~~~~~~~~~~
+             geo_longitude: 20.99969312,
+             telefon: "14 642 44 51 ",
+             email: "hospicjum.dabrowa@gmail.com ",
+             www: "https://caritas.diecezja.tarnow.pl/index.php/pl/placowki/dom-pomocy-spolecznej-sw-br-alberta-w-dabrowie-tarnowskiej",
+             liczba_miejsc: 35,
+             profil_opieki: "dla osób przewlekle somatycznie chorych ",
+             koszt_pobytu: 6,
+             opis: "dla osób przewlekle somatycznie chorych \r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej w Gorlicach ul. Michalusa 14 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej w Gorlicach ul. Michalusa 14",
+             typ_placowki: "DPS",
+             prowadzacy: "Powiat Gorlicki ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "gorlicki",
+             gmina: "powiatowy",
+             miejscowosc: "Gorlice",
+             ulica: "ul. Michalusa 14 ",
+             kod_pocztowy: "38-300",
+             geo_latitude: 49.66918815,
+             ~~~~~~~~~~~~
+             geo_longitude: 21.17258331,
+             telefon: "18 353 54 08 ",
+             email: "dpsgorlice_m@pro.onet.pl",
+             www: "https://www.dpsmichalusagorlice.pl/",
+             liczba_miejsc: 120,
+             profil_opieki: "dla osób przewlekle somatycznie chorych ",
+             koszt_pobytu: 6,
+             opis: "dla osób przewlekle somatycznie chorych \r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej w Gorlicach ul. Sienkiewicza 30 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej w Gorlicach ul. Sienkiewicza 30",
+             typ_placowki: "DPS",
+             prowadzacy: "Powiat Gorlicki ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "gorlicki",
+             gmina: "powiatowy",
+             miejscowosc: "Gorlice",
+             ulica: "ul. Sienkiewicza 30 ",
+             kod_pocztowy: "38-300",
+             geo_latitude: 49.65356482,
+             ~~~~~~~~~~~~
+             geo_longitude: 21.1681791,
+             telefon: "18 352 67 08 ",
+             email: "sekretariat@dpsgorlice.pl",
+             www: "https://dpsgorlice.pl/",
+             liczba_miejsc: 86,
+             profil_opieki: "dla osób w podeszłym wieku",
+             koszt_pobytu: 6,
+             opis: "dla osób w podeszłym wieku \r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej w Klimkówce  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej w Klimkówce ",
+             typ_placowki: "DPS",
+             prowadzacy: "Powiat Gorlicki ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "gorlicki",
+             gmina: "powiatowy",
+             miejscowosc: "Ropa",
+             ulica: "Klimkówka 67 ",
+             kod_pocztowy: "38-312",
+             geo_latitude: 49.55668823,
+             ~~~~~~~~~~~~
+             geo_longitude: 21.07488974,
+             telefon: "18 351 61 72 ",
+             email: "sekretariat@dpsklimkowka.pl",
+             www: "http://www.dpsklimkowka.cba.pl/",
+             liczba_miejsc: 78,
+             profil_opieki: "dla osób przewlekle psychicznie chorych",
+             koszt_pobytu: 6,
+             opis: "dla osób przewlekle psychicznie chorych\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej w Wapiennem 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej w Wapiennem",
+             typ_placowki: "DPS",
+             prowadzacy: "Stowarzyszenie „NOWA PERSPEKTYWA” w Bieczu / Gmina Sękowa",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "gorlicki",
+             gmina: "powiatowy",
+             miejscowosc: "Sękowa ",
+             ulica: "Wapienne 70",
+             kod_pocztowy: "38-307 ",
+             geo_latitude: 49.63003531,
+             ~~~~~~~~~~~~
+             geo_longitude: 21.2831401,
+             telefon: "18 447 90 16 ",
+             email: " dpswapienne@op.p",
+             www: "https://domwczasowy-maria.pl/dom-opieki-dom-spokojnej-starosci/",
+             liczba_miejsc: 25,
+             profil_opieki: "dla osób w podeszłym wieku, dla osób przewlekle somatycznie chorych",
+             koszt_pobytu: 5,
+             opis: "dla osób w podeszłym wieku, dla osób przewlekle somatycznie chorych",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej ul. Kluzeka 6  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej ul. Kluzeka 6 ",
+             typ_placowki: "DPS",
+             prowadzacy: "Miasto Kraków ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "Kraków",
+             gmina: "powiatowy",
+             miejscowosc: "Kraków ",
+             ulica: "ul. Kluzeka 6 ",
+             kod_pocztowy: "31-222 ",
+             geo_latitude: 50.09293783,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.93569955,
+             telefon: "12 415 25 92 ",
+             email: "dpskluzeka@dpskluzeka.pl",
+             www: "https://www.dpskluzeka.pl/",
+             liczba_miejsc: 90,
+             profil_opieki: "dla osób w podeszłym wieku, dla osób przewlekle somatycznie chorych ",
+             koszt_pobytu: 9,
+             opis: "dla osób w podeszłym wieku, dla osób przewlekle somatycznie chorych ",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej m. św. Jana Pawła II ul. Praska 25 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej m. św. Jana Pawła II ul. Praska 25",
+             typ_placowki: "DPS",
+             prowadzacy: "Miasto Kraków ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "Kraków",
+             gmina: "powiatowy",
+             miejscowosc: "Kraków ",
+             ulica: "ul. Praska 25 ",
+             kod_pocztowy: "30-329",
+             geo_latitude: 50.04782163,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.91276666,
+             telefon: "12 266 03 64 ",
+             email: "sekretariat@dpspraska.pl",
+             www: "https://mops.krakow.pl/start/259695,artykul,dps_dla_osob_przewlekle_somatycznie_chorych__ul__praska_25.html",
+             liczba_miejsc: 100,
+             profil_opieki: " dla osób przewlekle somatycznie chorych, dorosłych niepełnosprawnych intelektualnie, zieci i młodzieży niepełnosporawnych intelektualnie, ",
+             koszt_pobytu: 11,
+             opis: " dla osób przewlekle somatycznie chorych, dorosłych niepełnosprawnych intelektualnie, zieci i młodzieży niepełnosporawnych intelektualnie, ",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy: Dom Pomocy Społecznej  ul. Praska 27 
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "Dom Pomocy Społecznej  ul. Praska 27",
+             typ_placowki: "DPS",
+             prowadzacy: "Miasto Kraków ",
+             data_aktualizacji: new Date("2025-09-03T00:00:00.000Z"),
+             zrodlo: "MUW Kraków",
+             wojewodztwo: "Małopolskie",
+             powiat: "Kraków",
+             gmina: "powiatowy",
+             miejscowosc: "Kraków ",
+             ulica: "ul. Praska 27",
+             kod_pocztowy: "30-329",
+             geo_latitude: 50.04794554,
+             ~~~~~~~~~~~~
+             geo_longitude: 19.91191126,
+             telefon: "12 421 15 16 ",
+             email: "sekretariat@dpspraska27.pl",
+             www: "https://mops.krakow.pl/start/259784,artykul,dps_dla_osob_przewlekle_somatycznie_chorych__ul__radziwillowska_8.html",
+             liczba_miejsc: 100,
+             profil_opieki: "dla osób przewlekle psychicznie chorych",
+             koszt_pobytu: 10,
+             opis: "dla osób przewlekle psychicznie chorych\r",
+         ?   teryt_wojewodztwo_kod?: String | Null,
+         ?   teryt_powiat_kod?: String | Null,
+         ?   teryt_gmina_kod?: String | Null,
+         ?   teryt_gmina_nazwa?: String | Null,
+         ?   geo_lat?: Float | Null,
+         ?   geo_lng?: Float | Null
+           }
+         })
+
+Unknown argument `geo_latitude`. Available options are marked with ?.
+❌ Błąd przy:  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "",
+             typ_placowki: "",
+             prowadzacy: "",
+             zrodlo: null,
+             wojewodztwo: "",
+             powiat: "",
+             gmina: "",
+             miejscowosc: "",
+             ulica: null,
+             kod_pocztowy: null,
+             geo_latitude: null,
+             geo_longitude: null,
+             telefon: null,
+             email: null,
+             www: null,
+             liczba_miejsc: null,
+             profil_opieki: null,
+             koszt_pobytu: 0,
+             opis: "\r",
+         +   data_aktualizacji: DateTime
+           }
+         })
+
+Argument `data_aktualizacji` must not be null.
+❌ Błąd przy:  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "",
+             typ_placowki: "",
+             prowadzacy: "",
+             zrodlo: null,
+             wojewodztwo: "",
+             powiat: "",
+             gmina: "",
+             miejscowosc: "",
+             ulica: null,
+             kod_pocztowy: null,
+             geo_latitude: null,
+             geo_longitude: null,
+             telefon: null,
+             email: null,
+             www: null,
+             liczba_miejsc: null,
+             profil_opieki: null,
+             koszt_pobytu: 0,
+             opis: "\r",
+         +   data_aktualizacji: DateTime
+           }
+         })
+
+Argument `data_aktualizacji` must not be null.
+❌ Błąd przy:  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "",
+             typ_placowki: "",
+             prowadzacy: "",
+             zrodlo: null,
+             wojewodztwo: "",
+             powiat: "",
+             gmina: "",
+             miejscowosc: "",
+             ulica: null,
+             kod_pocztowy: null,
+             geo_latitude: null,
+             geo_longitude: null,
+             telefon: null,
+             email: null,
+             www: null,
+             liczba_miejsc: null,
+             profil_opieki: null,
+             koszt_pobytu: 0,
+             opis: "\r",
+         +   data_aktualizacji: DateTime
+           }
+         })
+
+Argument `data_aktualizacji` must not be null.
+❌ Błąd przy:  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "",
+             typ_placowki: "",
+             prowadzacy: "",
+             zrodlo: null,
+             wojewodztwo: "",
+             powiat: "",
+             gmina: "",
+             miejscowosc: "",
+             ulica: null,
+             kod_pocztowy: null,
+             geo_latitude: null,
+             geo_longitude: null,
+             telefon: null,
+             email: null,
+             www: null,
+             liczba_miejsc: null,
+             profil_opieki: null,
+             koszt_pobytu: 0,
+             opis: "\r",
+         +   data_aktualizacji: DateTime
+           }
+         })
+
+Argument `data_aktualizacji` must not be null.
+❌ Błąd przy:  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "",
+             typ_placowki: "",
+             prowadzacy: "",
+             zrodlo: null,
+             wojewodztwo: "",
+             powiat: "",
+             gmina: "",
+             miejscowosc: "",
+             ulica: null,
+             kod_pocztowy: null,
+             geo_latitude: null,
+             geo_longitude: null,
+             telefon: null,
+             email: null,
+             www: null,
+             liczba_miejsc: null,
+             profil_opieki: null,
+             koszt_pobytu: 0,
+             opis: "\r",
+         +   data_aktualizacji: DateTime
+           }
+         })
+
+Argument `data_aktualizacji` must not be null.
+❌ Błąd przy:  
+Invalid `prisma.placowka.create()` invocation in
+/Users/iwona/Documents/Projekty/kompas-seniora/scripts/import-csv.ts:79:31
+
+  76 
+  77 for (const row of rows) {
+  78   try {
+→ 79     await prisma.placowka.create({
+           data: {
+             nazwa: "",
+             typ_placowki: "",
+             prowadzacy: "",
+             zrodlo: "sds",
+             wojewodztwo: "krakow",
+             powiat: "https://mops.krakow.pl/?dok_id=212217",
+             gmina: "",
+             miejscowosc: "",
+             ulica: null,
+             kod_pocztowy: null,
+             geo_latitude: null,
+             geo_longitude: null,
+             telefon: null,
+             email: null,
+             www: null,
+             liczba_miejsc: null,
+             profil_opieki: null,
+             koszt_pobytu: 0,
+             opis: null,
+         +   data_aktualizacji: DateTime
+           }
+         })
+
+Argument `data_aktualizacji` must not be null.
+
+🎉 Sukces! Zaimportowano 0 placówek
+⚠️  Błędy: 38 rekordów

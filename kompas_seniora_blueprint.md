@@ -566,6 +566,9 @@ Claude: "Krok 3: ..."
 
 ---
 
+
+
+
 ## 17. Development Milestones & Git History
 
 ### Commit History
@@ -659,7 +662,74 @@ c552516 - Add location search section and newsletter signup (29.09.2025)
 
 ---
 
-## 18. GitHub Repository & Version Control
+## 18. Competitive Moat Strategy
+
+### Problem
+Landing page musi sprzedawać wartość BEZ pokazywania "jak to działa" konkurencji.
+
+### Zasady Content Strategy
+
+**Golden Rule: Benefits > Methods**
+
+Każdy element public-facing content musi przejść test:
+1. **Czy to pokazuje BENEFIT czy METODĘ?**
+2. **Czy konkurencja może to skopiować po przeczytaniu?**
+3. **Czy user NAPRAWDĘ potrzebuje wiedzieć JAK to działa?**
+
+Odpowiedź na #3 jest prawie zawsze: **NIE**
+
+### Przykłady BAD vs GOOD
+
+❌ **BAD (Landing Page):**
+> "Używamy fuzzy search z biblioteką fuse.js i bazy TERYT z GUS"
+
+✅ **GOOD (Landing Page):**
+> "Wpisz 'Kamienica' - znajdziemy dom opieki koło Limanowej"
+
+---
+
+❌ **BAD:**
+> "Integrujemy się z API TERYT używając kodu gminy i powiatu"
+
+✅ **GOOD:**
+> "Nie musisz znać powiatów - po prostu wpisz miejscowość"
+
+---
+
+❌ **BAD:**
+> "Scraping'ujemy PDFy z MOPS i normalizujemy dane przez CSV pipeline"
+
+✅ **GOOD:**
+> "Oficjalne ceny z urzędów miast - zawsze aktualne"
+
+### Gdzie MOŻNA pokazać metodę
+
+- **Blog posts** dla SEO (ale generyczne: "Jak budować wyszukiwarkę")
+- **Dokumentacja techniczna** (zamknięta dla partnerów)
+- **Pitch deck** dla inwestorów (NDA)
+
+### Gdzie NIE WOLNO pokazać metody
+
+- ❌ Landing page
+- ❌ Marketing copy
+- ❌ FAQ publiczne
+- ❌ Social media posts
+- ❌ Case studies (focus na wyniki, nie process)
+
+### Implementation Checklist
+
+Przed publikacją KAŻDEGO contentu:
+- [ ] Usunąłem nazwy technologii (fuse.js, TERYT, Prisma)
+- [ ] Skoncentrowałem się na user outcome, nie na procesie
+- [ ] Konkurencja czytając to NIE wie jak to zrobić
+- [ ] Content brzmi jak magia, nie jak tutorial
+
+**Pamiętaj:** Twoja przewaga to execution + data + TERYT integration. Nie dawaj roadmap konkurencji za darmo.
+
+
+---
+
+## 19. GitHub Repository & Version Control
 
 **Repository URL:** https://github.com/Kaczor4444/kompas-seniora  
 **Setup Date:** 29 września 2025  
