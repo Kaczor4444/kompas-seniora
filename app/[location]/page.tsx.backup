@@ -1,0 +1,186 @@
+// app/[location]/page.tsx
+import { notFound } from 'next/navigation';
+import SearchResultCard from '../../components/SearchResultCard'; // Zmień ścieżkę jeśli stworzyłeś /components
+
+// --- MOCK DATA (PRZYKŁADOWE DANE Z TWOJEJ BAZY) ---
+// W realnej aplikacji zastąpisz to pobieraniem danych z API
+const MOCK_RESULTS = [
+    { id: 1, name: "DPS im. Św. Rodziny", type: "DPS", address: "ul. Długa 5", phone: "123-456-789", profile: "dla osób starszych", officialCost: 5843.00, isAvailable: true },
+    { id: 2, name: "ŚDS Słoneczko", type: "ŚDS", address: "ul. Krótka 12", phone: "987-654-321", profile: "dla osób z zaburzeniami psychicznymi", officialCost: 0, isAvailable: true },
+    { id: 3, name: "DPS Zacisze", type: "DPS", address: "ul. Cicha 22", phone: "111-222-333", profile: "dla przewlekle chorych", officialCost: 6100.00, isAvailable: false },
+];
+
+// --- MOCK KOMPONENTU KARTY (W realnej aplikacji zaimportujesz go!) ---
+// Ponieważ nie masz folderu /components, wkleimy go ponownie dla celów testowych
+interface ResultCardProps {
+    name: string; type: 'DPS' | 'ŚDS' | 'ZOL'; address: string; phone: string; profile: string; 
+    officialCost: number; userContribution: number; isAvailable: boolean;
+}
+
+const getCardStyle = (type: ResultCardProps['type']) => {
+    switch (type) {
+        case 'DPS': return { icon: '🏠', color: 'bg-accent-500 text-white' };
+        case 'ŚDS': return { icon: '👥', color: 'bg-primary-500 text-white' };
+        default: return { icon: '🏠', color: 'bg-neutral-500 text-white' };
+    }
+};
+
+const SearchResultCard: React.FC<ResultCardProps> = ({
+    name, type, address, phone, profile, officialCost, userContribution, isAvailable,
+}) => {
+    const { icon: TypeSymbol, color: typeColor } = getCardStyle(type);
+    const difference = (officialCost - userContribution).toFixed(2);
+
+    return (
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+            <div className="p-5 border-b border-neutral-200">
+                <div className="flex justify-between items-start">
+                    <h3 className="text-2xl font-bold text-neutral-900 leading-snug">{name}</h3>
+                    <span className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${isAvailable ? 'bg-success-100 text-success-700' : 'bg-red-100 text-red-700'}`}>
+                        <span className="mr-1">✅</span>
+                        {isAvailable ? 'Są wolne miejsca' : 'Brak miejsc'}
+                    </span>
+                </div>
+                <div className="flex items-center space-x-2 mt-2">
+                    <span className={`w-5 h-5 flex items-center justify-center ${type === 'DPS' ? 'text-accent-500' : 'text-primary-500'} text-lg`}>{TypeSymbol}</span>
+                    <span className={`text-sm font-semibold ${type === 'DPS' ? 'text-accent-500' : 'text-primary-500'}`}>{type} – {profile}</span>
+                </div>
+            </div>
+            
+            <div className="p-5 bg-neutral-50 border-b border-neutral-200">
+                <p className="text-sm font-semibold text-neutral-700 mb-2 flex items-center">
+                    <span className="w-4 h-4 mr-1 text-neutral-500 text-lg">$</span> Transparentne Koszty (OFICJALNE)
+                </p>
+                <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-accent-100 mb-2">
+                    <span className="text-base text-neutral-600">Miesięczny Koszt (Pełny):</span>
+                    <span className="text-lg font-bold text-neutral-900">{officialCost.toFixed(2)} zł</span>
+                </div>
+
+                <div className="flex justify-between items-center p-3 rounded-lg border border-neutral-300 bg-white">
+                    <span className="text-base text-neutral-600">Udział Mieszkańca ({userContribution > 0 ? 'Maksymalnie' : 'Obliczona'}):</span>
+                    <span className="text-lg font-bold text-accent-500">{userContribution.toFixed(2)} zł</span>
+                </div>
+                <p className="text-xs text-neutral-500 mt-2">
+                    *Różnicę ({difference} zł) pokrywa gmina lub rodzina. Kwota {userContribution > 0 ? 'z Twojego kalkulatora.' : 'do obliczenia.'}
+                </p>
+            </div>
+
+            <div className="p-5 flex justify-between items-center">
+                <div className="space-y-2 text-sm text-neutral-700">
+                    <div className="flex items-center"><span className="w-4 h-4 mr-2 text-neutral-400">📍</span><span>{address}</span></div>
+                    <div className="flex items-center"><span className="w-4 h-4 mr-2 text-neutral-400">📞</span><span>{phone}</span></div>
+                </div>
+                <a href={`/details/${name.toLowerCase().replace(/\s/g, '-')}`} className={`px-5 py-2 text-white font-semibold rounded-lg transition-colors duration-200 ${typeColor.split(' ')[0]}`}>
+                    Zobacz szczegóły
+                </a>
+            </div>
+        </div>
+    );
+};
+// --- KONIEC MOCK KOMPONENTU KARTY ---
+
+
+// Definicja głównej strony Next.js
+export default function SearchResultsPage({ params, searchParams }: {
+    params: { location: string };
+    searchParams: { max_oplata?: string };
+}) {
+    // 1. POBIERANIE PARAMETRÓW URL
+    const locationName = params.location.replace(/-/g, ' '); // np. 'malopolska' -> 'malopolska'
+    const userContributionRaw = searchParams.max_oplata;
+
+    // 2. OBLICZANIE WYNIKU Z KALKULATORA
+    // Jeśli max_oplata istnieje w URL, używamy jej. Jeśli nie, ustawiamy 0.
+    const userContribution = userContributionRaw ? parseFloat(userContributionRaw) : 0;
+    
+    // Używamy dużej litery na początku dla nagłówka
+    const formattedLocation = locationName.charAt(0).toUpperCase() + locationName.slice(1);
+
+    // W realnej aplikacji: if (error) return notFound();
+    if (!formattedLocation) {
+        return notFound();
+    }
+
+    // 3. WSTĘPNE FILTROWANIE (Na razie używamy całego MOCK_RESULTS)
+    const filteredResults = MOCK_RESULTS.filter(r => r.type === 'DPS' || r.type === 'ŚDS'); // Zawsze pokazujemy DPS i ŚDS
+    
+    return (
+        <div className="min-h-screen bg-neutral-50 pt-16">
+            
+            {/* Nagłówek i Podsumowanie */}
+            <div className="max-w-6xl mx-auto px-6 mb-10">
+                <h1 className="text-4xl font-extrabold text-neutral-900 mb-2">
+                    Wyniki wyszukiwania dla: <span className="text-accent-500">{formattedLocation}</span>
+                </h1>
+                
+                {userContribution > 0 ? (
+                    <p className="text-xl text-neutral-700 font-semibold bg-success-100 p-4 rounded-lg border border-success-200">
+                        Twoja maksymalna opłata miesięczna: <span className="text-success-700">{userContribution.toFixed(2)} zł</span>. Filtrujemy wyniki, aby to pokazać!
+                    </p>
+                ) : (
+                    <p className="text-lg text-neutral-600">
+                        Znaleziono {filteredResults.length} placówek DPS i ŚDS. Aby zobaczyć Twoją maksymalną opłatę, <a href="#" className="text-primary-500 font-semibold hover:underline">przejdź do Kalkulatora Kosztów</a>.
+                    </p>
+                )}
+            </div>
+
+            {/* Główna Treść (Lista Wyników i Filtry) */}
+            <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
+                
+                {/* Kolumna 1: Filtry (Placeholder) */}
+                <div className="md:col-span-1 space-y-6">
+                    <div className="bg-white p-6 rounded-xl shadow-lg border border-neutral-200">
+                        <h3 className="text-xl font-bold mb-4 text-neutral-900">Filtrowanie</h3>
+                        <div className="space-y-3">
+                            {/* Przykład: Sortowanie */}
+                            <label className="block text-sm font-medium text-neutral-700">Sortuj wg:</label>
+                            <select className="w-full p-2 border border-neutral-300 rounded-lg">
+                                <option>Najniższy koszt pełny</option>
+                                <option>Najwyższy koszt pełny</option>
+                                <option>Alfabetycznie (A-Z)</option>
+                                <option>Dostępność miejsc</option>
+                            </select>
+                            
+                            {/* Przykład: Typ Placówki */}
+                            <label className="block text-sm font-medium text-neutral-700 pt-4">Typ placówki:</label>
+                            <div className="space-y-1">
+                                <label className="flex items-center"><input type="checkbox" className="mr-2" defaultChecked /> DPS (Dom Pomocy Społecznej)</label>
+                                <label className="flex items-center"><input type="checkbox" className="mr-2" defaultChecked /> ŚDS (Środowiskowy Dom Samopomocy)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Kolumny 2-4: Lista Wyników */}
+                <div className="md:col-span-3 space-y-6">
+                    {filteredResults.map(result => (
+                        <SearchResultCard 
+                            key={result.id}
+                            name={result.name}
+                            type={result.type}
+                            address={result.address}
+                            phone={result.phone}
+                            profile={result.profile}
+                            officialCost={result.officialCost}
+                            // KLUCZOWY ELEMENT: dynamiczne przekazanie lub 0
+                            userContribution={userContribution} 
+                            isAvailable={result.isAvailable}
+                        />
+                    ))}
+
+                    {/* Jeśli brak wyników */}
+                    {filteredResults.length === 0 && (
+                        <div className="bg-white p-8 text-center rounded-xl shadow-lg">
+                            <p className="text-xl text-neutral-600">Brak wyników spełniających Twoje kryteria.</p>
+                        </div>
+                    )}
+                </div>
+
+            </div>
+            
+            {/* Miejsce na stopkę (zwykle renderowane w Layout) */}
+            <div className="h-20"></div>
+
+        </div>
+    );
+}
