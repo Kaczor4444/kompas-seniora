@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Placowka {
   id: number;
@@ -11,18 +11,28 @@ interface Placowka {
   telefon: string | null;
 }
 
-export default function SearchBar() {
+interface SearchBarProps {
+  selectedType?: string;
+}
+
+export default function SearchBar({ selectedType = 'WSZYSTKIE' }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [placowki, setPlacowki] = useState<Placowka[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!searchQuery.trim()) return;
     
     setLoading(true);
     try {
-      const response = await fetch(`/api/placowki?search=${encodeURIComponent(searchQuery)}`);
+      const params = new URLSearchParams();
+      params.append('search', searchQuery);
+      if (selectedType !== 'WSZYSTKIE') {
+        params.append('type', selectedType);
+      }
+      
+      const response = await fetch(`/api/placowki?${params.toString()}`);
       const data = await response.json();
       
       if (data.success) {
@@ -34,6 +44,13 @@ export default function SearchBar() {
       setLoading(false);
     }
   };
+
+  // Re-search when selectedType changes
+  useEffect(() => {
+    if (searchQuery.trim() && placowki.length > 0) {
+      handleSearch();
+    }
+  }, [selectedType]);
 
   return (
     <div className="max-w-4xl mx-auto">
