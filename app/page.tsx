@@ -6,6 +6,7 @@ import SearchBar from '../src/components/search/SearchBar';
 import KnowledgeCenter from '../src/components/knowledge/KnowledgeCenter';
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('WSZYSTKIE');
 
   return (
@@ -90,8 +91,33 @@ export default function Home() {
               Środowiskowe Domy Samopomocy (ŚDS)
             </button>
           </div>
-          
-          <SearchBar selectedType={selectedType} />
+          <form onSubmit={(e) => {
+           e.preventDefault();
+           const params = new URLSearchParams();
+           if (searchQuery.trim()) params.append('q', searchQuery.trim());
+           if (selectedType !== 'WSZYSTKIE') params.append('typ', selectedType);
+           window.location.href = `/search?${params.toString()}`;
+         }} className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-lg border border-neutral-200 flex items-center overflow-hidden">
+           <input
+             type="text"
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
+             placeholder="Wpisz miejscowość, np. Kamienica, Kraków, Limanowa..."
+             className="flex-1 px-6 py-4 text-lg focus:outline-none"
+           />
+          <button
+            type="submit"
+            disabled={!searchQuery.trim()}
+            className="bg-accent-500 hover:bg-accent-600 disabled:bg-neutral-300 text-white px-8 py-4 font-semibold transition-colors"
+          >
+            Szukaj
+          </button>
+        </div>
+        <p className="text-sm text-neutral-500 text-center mt-3">
+           Nie musisz znać powiatu - wpisz po prostu nazwę miejscowości
+        </p>
+     </form>
         </div>
       </section>
 
