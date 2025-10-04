@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   MapPin, 
   Banknote, 
@@ -65,6 +66,7 @@ function formatAddress(placowka: Placowka): string {
 }
 
 export default function SearchBar({ selectedType = 'WSZYSTKIE' }: SearchBarProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [placowki, setPlacowki] = useState<Placowka[]>([]);
   const [loading, setLoading] = useState(false);
@@ -290,11 +292,7 @@ export default function SearchBar({ selectedType = 'WSZYSTKIE' }: SearchBarProps
 
                     {/* Przycisk szczegółów */}
                     <button
-                      onClick={() => {
-                        // TODO: Routing do strony szczegółów
-                        console.log('Navigate to placowka:', placowka.id);
-                        alert(`TODO: Strona szczegółów dla ${placowka.nazwa}`);
-                      }}
+                      onClick={() => router.push(`/placowka/${placowka.id}`)}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-accent-500 text-white hover:bg-accent-600 rounded-lg font-medium transition-colors ml-auto"
                     >
                       Zobacz szczegóły
