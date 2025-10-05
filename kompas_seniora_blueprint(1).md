@@ -876,3 +876,111 @@ Claude będzie przypominał o wykorzystaniu tokenów:
 📝 Następny chat: Dodaj kalkulator kosztów
 
 
+---
+
+## 20. Development Lessons Learned
+
+### Session 2025-10-05: TERYT Integration
+
+#### Debugging Best Practices
+**Problem:** "olkusz" nie znajdował "olkuski" mimo logiki prefix matching
+**Rozwiązanie:** Debug logi bezpośrednio w funkcji pokazały że `.includes('olkusz')` = false
+**Lekcja:** 
+- Przy string matching testuj edge cases natychmiast: `node -e "console.log('test')"`
+- Dodawaj debug logi w core funkcjach, nie tylko w API endpoints
+- Nie zakładaj - weryfikuj zachowanie funkcji built-in (includes, startsWith)
+
+#### Git Workflow
+**Problem:** Tylko 3 commity podczas 2h+ sesji
+**Lepiej:** Commit po każdym working feature:
+```bash
+git commit -m "feat: Add TERYT normalization function"
+git commit -m "feat: Implement prefix matching for Polish grammar"
+git commit -m "feat: Add TERYT database schema"
+git commit -m "feat: Add UI for TERYT suggestions"
+
+Korzyść: Łatwiejszy rollback, czytelniejsza historia
+Data Testing
+Problem: Ręczne dodawanie testowych danych przez SQLite
+Lepiej: Stwórz data/test-teryt.csv z przykładowymi lokalizacjami
+
+nazwa,typ,gmina,powiat,wojewodztwo
+Kamienica,gmina,Kamienica,limanowski,małopolskie
+Zarzecze,miejscowosc,Zarzecze,krakowski,małopolskie
+
+nazwa,typ,gmina,powiat,wojewodztwo
+Kamienica,gmina,Kamienica,limanowski,małopolskie
+Zarzecze,miejscowosc,Zarzecze,krakowski,małopolskie
+
+Korzyść: Reprodukowalne testy, łatwe czyszczenie
+Consistency in Scripts
+
+Problem: Mix TypeScript (import-csv.ts) i JavaScript (import-teryt.js) Decyzja: Unifikuj - wszystko .ts dla consistency Plan: Rename import-teryt.js → import-teryt.ts w następnej sesji
+Production Thinking
+
+Dobre pytania zadane podczas sesji:
+
+    "Czy miejscowość musi być w bazie żeby ją znaleźć?" → Wykryto lukę w TERYT coverage
+    "Jak dodać nowe dane - import uaktualni bazę?" → Myślenie o maintenance
+
+Token Management
+
+Wykorzystanie: ~95k/190k (50%) Przypomnienia:
+
+    50% → moment na podsumowanie
+    80%+ → nie zaczynaj nowych features Dla przyszłości: Kompleksowe zadania (deploy, refactoring) zostawiaj na świeże sesje
+
+21. Quick Reference Commands
+Development
+bash
+
+# Start dev server
+npm run dev
+
+# Database operations
+npx prisma db push              # Apply schema changes
+npx prisma studio               # Open database GUI
+sqlite3 prisma/dev.db "query"   # Direct SQL query
+
+# Import data
+node scripts/import-teryt.js    # TERYT locations
+npx ts-node scripts/import-csv.ts  # Placówki
+
+# Git workflow
+git status
+git add .
+git commit -m "type: description"
+git push
+
+Testing Locations
+bash
+
+# Check database
+sqlite3 prisma/dev.db "SELECT COUNT(*) FROM placowki;"
+sqlite3 prisma/dev.db "SELECT DISTINCT powiat FROM teryt_locations;"
+
+# Test URLs
+http://localhost:3000/api/search?q=kamienica
+http://localhost:3000/search?q=olkusz
+http://localhost:3000/placowka/297
+
+Debug String Matching
+bash
+
+# Quick REPL tests
+node -e "console.log('olkuski'.includes('olkusz'))"
+node -e "console.log('olkuski'.startsWith('olkus'))"
+
+22. Next Session TODO
+
+    Rozszerz TERYT o wszystkie miejscowości Małopolski (~3000)
+    Deploy na Vercel (kompaseniora.pl)
+    Unifikuj scripts do TypeScript
+    Dodaj data/test-teryt.csv dla reproduced testing
+    Fix: usuń błędny wpis "https://mops.krakow.pl/..." z powiatu
+
+
+
+
+
+

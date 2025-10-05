@@ -27,7 +27,9 @@ interface TerytSuggestion {
   nazwa: string;
   typ: string;
   powiat: string;
+  locationsCount?: number;
   message: string;
+  nearbyPowiaty?: Array<{ powiat: string; count: number }>;
 }
 
 interface SearchResponse {
@@ -55,6 +57,48 @@ export default function SearchPage() {
   const [results, setResults] = useState<Placowka[]>([]);
   const [terytSuggestion, setTerytSuggestion] = useState<TerytSuggestion | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Helper functions for typ-specific messages
+  const getSuccessMessage = (typ: string) => {
+    if (typ === 'DPS') return 'Znaleźliśmy DPS w Twojej okolicy';
+    if (typ === 'ŚDS' || typ === 'SDS') return 'Znaleźliśmy ŚDS w Twojej okolicy';
+    return 'Znaleźliśmy domy opieki w Twojej okolicy';
+  };
+
+  const getNoResultsMessage = (typ: string) => {
+    if (typ === 'DPS') return 'Brak DPS w tym miejscu';
+    if (typ === 'ŚDS' || typ === 'SDS') return 'Brak ŚDS w tym miejscu';
+    return 'Brak domów opieki w tym miejscu';
+  };
+
+  const getDetailedMessage = (suggestion: TerytSuggestion, hasResults: boolean, typ: string) => {
+    const locationName = suggestion.nazwa;
+    const locationCount = suggestion.locationsCount || 1;
+    
+    if (hasResults) {
+      // Z wynikami
+      if (locationCount > 1) {
+        const typeName = typ === 'DPS' ? 'DPS' : typ === 'ŚDS' || typ === 'SDS' ? 'ŚDS' : 'domy opieki';
+        return `Jest ${locationCount} ${locationCount < 5 ? 'miejscowości' : 'miejscowości'} ${locationName} w Małopolsce. Znaleźliśmy ${typeName} w kilku z nich.`;
+      } else {
+        return `To jest ${locationName} w powiecie ${suggestion.powiat}.`;
+      }
+    } else {
+      // Bez wyników
+      const typeName = typ === 'DPS' ? 'DPS' : typ === 'ŚDS' || typ === 'SDS' ? 'ŚDS' : 'domów opieki';
+      if (locationCount > 1) {
+        return `Jest ${locationCount} ${locationCount < 5 ? 'miejscowości' : 'miejscowości'} ${locationName} w Małopolsce, ale żadna nie ma ${typeName}.`;
+      } else {
+        return `W ${locationName} nie ma ${typeName}.`;
+      }
+    }
+  };
+
+  const getNearbyMessage = (typ: string) => {
+    if (typ === 'DPS') return 'Najbliższe DPS znajdziesz w sąsiednich powiatach:';
+    if (typ === 'ŚDS' || typ === 'SDS') return 'Najbliższe ŚDS znajdziesz w sąsiednich powiatach:';
+    return 'Najbliższe domy opieki znajdziesz w sąsiednich powiatach:';
+  };
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -118,22 +162,45 @@ export default function SearchPage() {
           </div>
         ) : (
           <>
-            {/* TERYT Suggestion - pokazuj gdy brak wyników ale znaleziono lokalizację */}
-            {results.length === 0 && terytSuggestion && (
-              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-6">
+            {/* TERYT Suggestion */}
+            {terytSuggestion && (
+              <div className={`mb-6 rounded-xl p-6 ${
+                results.length > 0 
+                  ? 'bg-green-50 border border-green-200' 
+                  : 'bg-blue-50 border border-blue-200'
+              }`}>
                 <div className="flex items-start gap-3">
-                  <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Info className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
+                    results.length > 0 ? 'text-green-600' : 'text-blue-600'
+                  }`} />
                   <div>
-                    <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                      Rozpoznano lokalizację
+                    <h3 className={`text-lg font-semibold mb-2 ${
+                      results.length > 0 ? 'text-green-900' : 'text-blue-900'
+                    }`}>
+                      {results.length > 0 
+                        ? getSuccessMessage(typ)
+                        : getNoResultsMessage(typ)
+                      }
                     </h3>
-                    <p className="text-blue-800 mb-3">
-                      <span className="font-medium">{terytSuggestion.nazwa}</span>
-                      {' '}({terytSuggestion.typ}, powiat {terytSuggestion.powiat})
+                    <p className={results.length > 0 ? 'text-green-800' : 'text-blue-800'}>
+                      {getDetailedMessage(terytSuggestion, results.length > 0, typ)}
                     </p>
-                    <p className="text-blue-700">
-                      Nie znaleziono placówek w tej lokalizacji. Spróbuj wyszukać w sąsiednich miejscowościach lub powiatach.
-                    </p>
+                    
+                    {/* Nearby powiaty - gdy brak wyników */}
+                    {results.length === 0 && terytSuggestion.nearbyPowiaty && terytSuggestion.nearbyPowiaty.length > 0 && (
+                      <div className="mt-4">
+                        <p className="text-blue-700 font-medium mb-2">
+                          {getNearbyMessage(typ)}
+                        </p>
+                        <ul className="space-y-1">
+                          {terytSuggestion.nearbyPowiaty.map((p: any) => (
+                            <li key={p.powiat} className="text-blue-700">
+                              • <span className="font-medium">{p.powiat}</span> ({p.count} {p.count === 1 ? 'placówka' : p.count < 5 ? 'placówki' : 'placówek'})
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
