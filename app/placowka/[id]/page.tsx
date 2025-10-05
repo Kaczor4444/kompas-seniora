@@ -4,8 +4,9 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export default async function PlacowkaPage({ params }: { params: { id: string } }) {
-  const id = parseInt(params.id);
+export default async function PlacowkaPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: idParam } = await params;
+  const id = parseInt(idParam);
   
   if (isNaN(id)) {
     notFound();
