@@ -978,6 +978,35 @@ node -e "console.log('olkuski'.startsWith('olkus'))"
     Unifikuj scripts do TypeScript
     Dodaj data/test-teryt.csv dla reproduced testing
     Fix: usuń błędny wpis "https://mops.krakow.pl/..." z powiatu
+    
+ ## 23. Lessons Learned - Session 2025-10-05 (TERYT Full Database)
+
+### Achieved
+- ✅ Imported full TERYT database for Małopolska (13,322 locations from GUS SIMC)
+- ✅ Multi-location handling (23 places named "Zarzecze" correctly recognized)
+- ✅ Type-aware search messaging (DPS/ŚDS/all with different UX copy)
+- ✅ Smart suggestions for nearby powiaty when no facilities found
+- ✅ User-friendly language tailored to seniors + caregivers 30-50
+
+### Technical Decisions
+**Data Source:** Official GUS TERYT database (SIMC_Adresowy_20250922.csv)
+- 95,262 total locations → filtered to 13,833 Małopolska → imported 13,322
+- CSV format with semicolon separator, UTF-8 encoding
+- Powiat code mapping required (12 digits → text names)
+
+**Import Strategy:**
+- Single-use script: `scripts/import-teryt-full.js`
+- Upsert approach (prevents duplicates on re-import)
+- Manual powiat mapping in code (POWIATY_MAP object)
+
+**Search Logic:**
+- TERYT match → check all matched powiaty for facilities
+- If found → show facilities from all matching powiaty
+- If not found → suggest 5 nearest powiaty with facilities
+- Type filter respected in all TERYT queries
+
+### Code Quality Improvements
+
 
 
 

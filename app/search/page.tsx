@@ -1,302 +1,212 @@
-'use client';
+import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
+import SearchResults from '@/components/SearchResults';
 
-import { useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { 
-  MapPin, 
-  Banknote, 
-  Phone, 
-  ChevronRight,
-  ArrowLeft,
-  Info
-} from 'lucide-react';
-
-interface Placowka {
-  id: number;
-  nazwa: string;
-  typ_placowki: string;
-  miejscowosc: string;
-  powiat: string;
-  telefon: string | null;
-  koszt_pobytu: number | null;
+interface SearchPageProps {
+  searchParams: Promise<{ q?: string; type?: string }>;
 }
 
-interface TerytSuggestion {
-  found: boolean;
-  nazwa: string;
-  typ: string;
-  powiat: string;
-  locationsCount?: number;
-  message: string;
-  nearbyPowiaty?: Array<{ powiat: string; count: number }>;
+// Normalizacja polskich znaków
+function normalizePolish(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0142]/g, 'l')
+    .replace(/[\u0141]/g, 'l')
+    .replace(/[\u0105]/g, 'a')
+    .replace(/[\u0104]/g, 'a')
+    .replace(/[\u0119]/g, 'e')
+    .replace(/[\u0118]/g, 'e')
+    .replace(/[\u015B]/g, 's')
+    .replace(/[\u015A]/g, 's')
+    .replace(/[\u0107]/g, 'c')
+    .replace(/[\u0106]/g, 'c')
+    .replace(/[\u017C\u017A]/g, 'z')
+    .replace(/[\u017B\u0179]/g, 'z')
+    .replace(/[\u0144]/g, 'n')
+    .replace(/[\u0143]/g, 'n')
+    .replace(/[\u00F3]/g, 'o')
+    .replace(/[\u00D3]/g, 'o');
 }
 
-interface SearchResponse {
-  results: Placowka[];
-  terytSuggestion: TerytSuggestion | null;
-  query: string;
-}
+export default async function SearchPage({ searchParams }: SearchPageProps) {
+  const params = await searchParams;
+  const query = params.q || '';
+  const type = params.type || 'all';
 
-function formatPrice(amount: number | null): string {
-  if (amount === null) return 'Brak danych';
-  if (amount === 0) return 'Bezpłatne';
-  
-  return new Intl.NumberFormat('pl-PL', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount) + ' zł';
-}
+  let results: any[] = [];
+  let terytMatches: any[] = [];
+  let message = '';
 
-export default function SearchPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const query = searchParams.get('q') || '';
-  const typ = searchParams.get('typ') || 'all';
-  
-  const [results, setResults] = useState<Placowka[]>([]);
-  const [terytSuggestion, setTerytSuggestion] = useState<TerytSuggestion | null>(null);
-  const [loading, setLoading] = useState(true);
+  if (query) {
+    const normalizedQuery = normalizePolish(query.trim());
 
-  // Helper functions for typ-specific messages
-  const getSuccessMessage = (typ: string) => {
-    if (typ === 'DPS') return 'Znaleźliśmy DPS w Twojej okolicy';
-    if (typ === 'ŚDS' || typ === 'SDS') return 'Znaleźliśmy ŚDS w Twojej okolicy';
-    return 'Znaleźliśmy domy opieki w Twojej okolicy';
-  };
+    // 1. Szukaj w TERYT
+    terytMatches = await prisma.terytLocation.findMany({
+      where: {
+        nazwa: {
+          contains: normalizedQuery,
+        },
+      },
+      select: {
+        powiat: true,
+        gmina: true,
+        nazwa: true,
+      },
+    });
 
-  const getNoResultsMessage = (typ: string) => {
-    if (typ === 'DPS') return 'Brak DPS w tym miejscu';
-    if (typ === 'ŚDS' || typ === 'SDS') return 'Brak ŚDS w tym miejscu';
-    return 'Brak domów opieki w tym miejscu';
-  };
+    // 2. Zbierz unikalne powiaty
+    const uniquePowiaty = [...new Set(terytMatches.map(t => normalizePolish(t.powiat)))];
 
-  const getDetailedMessage = (suggestion: TerytSuggestion, hasResults: boolean, typ: string) => {
-    const locationName = suggestion.nazwa;
-    const locationCount = suggestion.locationsCount || 1;
-    
-    if (hasResults) {
-      // Z wynikami
-      if (locationCount > 1) {
-        const typeName = typ === 'DPS' ? 'DPS' : typ === 'ŚDS' || typ === 'SDS' ? 'ŚDS' : 'domy opieki';
-        return `Jest ${locationCount} ${locationCount < 5 ? 'miejscowości' : 'miejscowości'} ${locationName} w Małopolsce. Znaleźliśmy ${typeName} w kilku z nich.`;
+    if (uniquePowiaty.length > 0) {
+      // 3. Szukaj placówek w znalezionych powiatach
+      const typeFilter = type === 'dps' 
+        ? { typ_placowki: { contains: 'DPS' } }
+        : type === 'sds'
+        ? { typ_placowki: { contains: 'ŚDS' } }
+        : {};
+
+      // Pobierz wszystkie placówki z tym filtrem typu
+      const allFacilities = await prisma.placowka.findMany({
+        where: typeFilter,
+        orderBy: { nazwa: 'asc' },
+      });
+
+      // Filtruj po znormalizowanych powiatach (w pamięci)
+      results = allFacilities.filter(facility => {
+        const normalizedFacilityPowiat = normalizePolish(facility.powiat);
+        return uniquePowiaty.some(powiat => 
+          normalizedFacilityPowiat.includes(powiat) || powiat.includes(normalizedFacilityPowiat)
+        );
+      });
+
+      // 4. Komunikaty
+      const locationCount = terytMatches.length;
+      const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
+
+      if (results.length > 0) {
+        if (locationCount > 1) {
+          message = `Jest ${locationCount} ${locationCount === 1 ? 'miejscowość' : locationCount < 5 ? 'miejscowości' : 'miejscowości'} ${query} w Małopolsce. Znaleźliśmy ${facilityWord} w kilku z nich.`;
+        } else {
+          message = `Znaleźliśmy ${facilityWord} w okolicy miejscowości ${terytMatches[0].nazwa}.`;
+        }
       } else {
-        return `To jest ${locationName} w powiecie ${suggestion.powiat}.`;
+        // Brak placówek - sugeruj sąsiednie powiaty
+        const nearbyFacilities = await prisma.placowka.findMany({
+          where: typeFilter,
+          select: { powiat: true },
+          distinct: ['powiat'],
+          take: 5,
+        });
+
+        const suggestions = nearbyFacilities.map(f => f.powiat).join(', ');
+        message = `Nie znaleźliśmy ${facilityWord} w okolicy miejscowości ${query}. Spróbuj wyszukać w pobliskich powiatach: ${suggestions}.`;
       }
     } else {
-      // Bez wyników
-      const typeName = typ === 'DPS' ? 'DPS' : typ === 'ŚDS' || typ === 'SDS' ? 'ŚDS' : 'domów opieki';
-      if (locationCount > 1) {
-        return `Jest ${locationCount} ${locationCount < 5 ? 'miejscowości' : 'miejscowości'} ${locationName} w Małopolsce, ale żadna nie ma ${typeName}.`;
-      } else {
-        return `W ${locationName} nie ma ${typeName}.`;
-      }
+      message = `Nie znaleźliśmy miejscowości "${query}" w Małopolsce. Spróbuj wpisać inną nazwę.`;
     }
-  };
+  }
 
-  const getNearbyMessage = (typ: string) => {
-    if (typ === 'DPS') return 'Najbliższe DPS znajdziesz w sąsiednich powiatach:';
-    if (typ === 'ŚDS' || typ === 'SDS') return 'Najbliższe ŚDS znajdziesz w sąsiednich powiatach:';
-    return 'Najbliższe domy opieki znajdziesz w sąsiednich powiatach:';
-  };
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (query) params.append('q', query);
-        if (typ !== 'all') params.append('typ', typ);
-
-        const response = await fetch(`/api/search?${params}`);
-        const data = await response.json();
-        
-        // Handle both old format (array) and new format (object with results)
-        if (Array.isArray(data)) {
-          setResults(data);
-          setTerytSuggestion(null);
-        } else {
-          setResults(data.results || []);
-          setTerytSuggestion(data.terytSuggestion || null);
-        }
-      } catch (error) {
-        console.error('Search error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, [query, typ]);
+  const typeLabel = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'wszystkie';
+  const resultsCount = results.length;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="border-b border-neutral-200 bg-white sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <button
-            onClick={() => router.push('/')}
-            className="inline-flex items-center gap-2 text-neutral-700 hover:text-neutral-900 font-medium"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Powrót do strony głównej
-          </button>
+      <header className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-4">
+          <Link href="/" className="text-2xl font-bold text-accent-600">
+            kompaseniora.pl
+          </Link>
+        </div>
+      </header>
+
+      {/* Search Bar */}
+      <div className="bg-white border-b border-gray-200 py-6">
+        <div className="container mx-auto px-4">
+          <form action="/search" method="GET" className="flex gap-3">
+            <input
+              type="text"
+              name="q"
+              defaultValue={query}
+              placeholder="Wpisz miejscowość..."
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
+            />
+            <input type="hidden" name="type" value={type} />
+            <button
+              type="submit"
+              className="px-6 py-3 bg-accent-600 text-white rounded-lg hover:bg-accent-700 font-medium"
+            >
+              Szukaj
+            </button>
+          </form>
+
+          {/* Type filters */}
+          <div className="mt-4 flex gap-2">
+            <Link
+              href={`/search?q=${query}&type=all`}
+              className={`px-4 py-2 rounded-lg ${
+                type === 'all'
+                  ? 'bg-accent-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              Wszystkie
+            </Link>
+            <Link
+              href={`/search?q=${query}&type=dps`}
+              className={`px-4 py-2 rounded-lg ${
+                type === 'dps'
+                  ? 'bg-accent-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              DPS
+            </Link>
+            <Link
+              href={`/search?q=${query}&type=sds`}
+              className={`px-4 py-2 rounded-lg ${
+                type === 'sds'
+                  ? 'bg-accent-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              ŚDS
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-            {query ? `Wyniki dla: "${query}"` : 'Wszystkie placówki'}
-          </h1>
-          <p className="text-neutral-600">
-            {typ !== 'all' && `Typ: ${typ} • `}
-            {loading ? 'Szukam...' : `Znaleziono ${results.length} placówek`}
-          </p>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-accent-500"></div>
-            <p className="mt-4 text-neutral-600">Ładowanie wyników...</p>
-          </div>
-        ) : (
+      {/* Results */}
+      <div className="container mx-auto px-4 py-8">
+        {query && (
           <>
-            {/* TERYT Suggestion */}
-            {terytSuggestion && (
-              <div className={`mb-6 rounded-xl p-6 ${
-                results.length > 0 
-                  ? 'bg-green-50 border border-green-200' 
-                  : 'bg-blue-50 border border-blue-200'
-              }`}>
-                <div className="flex items-start gap-3">
-                  <Info className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
-                    results.length > 0 ? 'text-green-600' : 'text-blue-600'
-                  }`} />
-                  <div>
-                    <h3 className={`text-lg font-semibold mb-2 ${
-                      results.length > 0 ? 'text-green-900' : 'text-blue-900'
-                    }`}>
-                      {results.length > 0 
-                        ? getSuccessMessage(typ)
-                        : getNoResultsMessage(typ)
-                      }
-                    </h3>
-                    <p className={results.length > 0 ? 'text-green-800' : 'text-blue-800'}>
-                      {getDetailedMessage(terytSuggestion, results.length > 0, typ)}
-                    </p>
-                    
-                    {/* Nearby powiaty - gdy brak wyników */}
-                    {results.length === 0 && terytSuggestion.nearbyPowiaty && terytSuggestion.nearbyPowiaty.length > 0 && (
-                      <div className="mt-4">
-                        <p className="text-blue-700 font-medium mb-2">
-                          {getNearbyMessage(typ)}
-                        </p>
-                        <ul className="space-y-1">
-                          {terytSuggestion.nearbyPowiaty.map((p: any) => (
-                            <li key={p.powiat} className="text-blue-700">
-                              • <span className="font-medium">{p.powiat}</span> ({p.count} {p.count === 1 ? 'placówka' : p.count < 5 ? 'placówki' : 'placówek'})
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Header */}
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Wyniki dla: &ldquo;{query}&rdquo;
+                {type !== 'all' && (
+                  <span className="text-accent-600"> • Typ: {typeLabel}</span>
+                )}
+              </h1>
+              <p className="text-gray-600">
+                Znaleziono {resultsCount} {resultsCount === 1 ? 'placówkę' : 'placówek'}
+              </p>
+            </div>
 
-            {/* No results - bez TERYT suggestion */}
-            {results.length === 0 && !terytSuggestion && (
-              <div className="text-center py-12 bg-neutral-50 rounded-xl">
-                <p className="text-neutral-500 text-lg mb-4">Nie znaleziono placówek</p>
-                <button
-                  onClick={() => router.push('/')}
-                  className="text-accent-600 hover:text-accent-700 font-medium"
-                >
-                  Wróć i spróbuj ponownie
-                </button>
-              </div>
-            )}
-
-            {/* Results */}
-            {results.length > 0 && (
-              <div className="grid gap-6">
-                {results.map((placowka) => (
-                  <div 
-                    key={placowka.id} 
-                    className="bg-white p-4 md:p-6 rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    {/* Header */}
-                    <div className="mb-4">
-                      <h3 className="text-base md:text-xl font-semibold text-neutral-900 mb-1 leading-tight">
-                        {placowka.nazwa}
-                      </h3>
-                      <p className="text-xs md:text-sm text-neutral-600">
-                        {placowka.typ_placowki} • {placowka.powiat}
-                      </p>
-                    </div>
-
-                    {/* Main Info Grid */}
-                    <div className="grid md:grid-cols-2 gap-4 mb-4">
-                      {/* Left Column */}
-                      <div className="space-y-2">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <MapPin className="w-4 h-4 text-accent-500" />
-                            <p className="text-xs md:text-sm font-medium text-neutral-500">Lokalizacja</p>
-                          </div>
-                          <p className="text-sm md:text-base text-neutral-900 ml-6">{placowka.miejscowosc}</p>
-                          <p className="text-xs md:text-sm text-neutral-600 ml-6">Powiat: {placowka.powiat}</p>
-                        </div>
-                      </div>
-
-                      {/* Right Column */}
-                      <div className="space-y-2">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <Banknote className="w-4 h-4 text-green-600" />
-                            <p className="text-xs md:text-sm font-medium text-neutral-500">Koszt miesięczny</p>
-                          </div>
-                          <p className="text-lg md:text-2xl font-bold ml-6">
-                            <span className={placowka.koszt_pobytu === 0 ? "text-green-600" : "text-accent-600"}>
-                              {formatPrice(placowka.koszt_pobytu)}
-                            </span>
-                            {placowka.koszt_pobytu !== null && placowka.koszt_pobytu > 0 && (
-                              <span className="text-xs md:text-sm font-normal text-neutral-600">/mc</span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Contact Bar */}
-                    <div className="flex flex-wrap gap-3 pt-4 border-t border-neutral-200">
-                      {placowka.telefon && (
-                        <a 
-                          href={`tel:${placowka.telefon}`}
-                          className="inline-flex items-center gap-2 px-3 md:px-4 py-2 bg-accent-50 text-accent-700 hover:bg-accent-100 rounded-lg text-sm md:text-base font-medium transition-colors"
-                        >
-                          <Phone className="w-4 h-4" />
-                          <span className="text-xs md:text-sm">{placowka.telefon}</span>
-                        </a>
-                      )}
-
-                      <div className="flex-1"></div>
-
-                      <button
-                        onClick={() => router.push(`/placowka/${placowka.id}`)}
-                        className="inline-flex items-center gap-2 px-3 md:px-4 py-2 bg-accent-500 text-white hover:bg-accent-600 rounded-lg text-sm md:text-base font-medium transition-colors ml-auto"
-                      >
-                        <span className="text-xs md:text-sm">Zobacz szczegóły</span>
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Client Component z mapą */}
+            <SearchResults 
+              results={results}
+              message={message}
+              resultsCount={resultsCount}
+            />
           </>
+        )}
+
+        {!query && (
+          <div className="text-center py-12">
+            <p className="text-gray-600">Wpisz miejscowość aby wyszukać placówki</p>
+          </div>
         )}
       </div>
     </div>

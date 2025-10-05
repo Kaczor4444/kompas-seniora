@@ -1,331 +1,331 @@
 "use client";
-
 import { useRouter } from 'next/navigation';
-import { 
-  MapPin, 
-  Banknote, 
-  Bed, 
-  Users, 
-  Building2, 
-  Phone, 
-  Mail, 
+import { getProfileOpiekiNazwy } from '@/src/data/profileOpieki';
+import {
+  MapPin,
+  Banknote,
+  Bed,
+  Users,
+  Building2,
+  Phone,
+  Mail,
   Globe,
   ArrowLeft,
   Info,
   FileText
 } from 'lucide-react';
-import { getProfileOpiekiNazwy } from '../../data/profileOpieki';
+import dynamic from 'next/dynamic';
+
+const FacilityMap = dynamic(() => import('@/components/FacilityMap'), {
+  ssr: false,
+  loading: () => <div className="h-[400px] bg-gray-100 rounded-lg animate-pulse" />
+});
 
 interface Placowka {
   id: number;
   nazwa: string;
   typ_placowki: string;
   prowadzacy: string;
-  miejscowosc: string;
   ulica: string | null;
+  miejscowosc: string;
   kod_pocztowy: string | null;
   gmina: string;
   powiat: string;
   wojewodztwo: string;
-  koszt_pobytu: number | null;
   telefon: string | null;
   email: string | null;
   www: string | null;
   liczba_miejsc: number | null;
   profil_opieki: string | null;
-  zrodlo: string | null;
+  koszt_pobytu: number | null;
   data_aktualizacji: Date;
+  zrodlo: string | null;
+  geo_lat: number | null;
+  geo_lng: number | null;
 }
 
-interface PlacowkaDetailsProps {
-  placowka: Placowka;
-  onBack?: () => void;
-}
-
-function formatPrice(amount: number | null): string {
-  if (amount === null) return 'Brak danych';
-  if (amount === 0) return 'Bezpłatne';
-  
-  return new Intl.NumberFormat('pl-PL', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount) + ' zł';
-}
-
-function formatAddress(placowka: Placowka): string {
-  const parts = [];
-  
-  if (placowka.ulica) parts.push(placowka.ulica);
-  if (placowka.kod_pocztowy || placowka.miejscowosc) {
-    const cityPart = [placowka.kod_pocztowy, placowka.miejscowosc]
-      .filter(Boolean)
-      .join(' ');
-    parts.push(cityPart);
-  }
-  
-  return parts.join(', ') || placowka.miejscowosc;
-}
-
-export default function PlacowkaDetails({ placowka }: PlacowkaDetailsProps) {
+export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
   const router = useRouter();
-  
+
+  const profiles = getProfileOpiekiNazwy(placowka.profil_opieki);
+
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Navigation */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-4">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-2 text-neutral-600 hover:text-neutral-900 font-medium"
+            className="flex items-center gap-2 text-accent-600 hover:text-accent-700 mb-4"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Powrót do wyników
+            <ArrowLeft className="w-5 h-5" />
+            Wróć do wyników
           </button>
+          <h1 className="text-3xl font-bold text-gray-900">{placowka.nazwa}</h1>
+          <p className="text-lg text-gray-600 mt-2">
+            {placowka.typ_placowki} • {placowka.miejscowosc}
+          </p>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
-        {/* Hero Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 md:p-8 mb-6">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
-            <div className="flex-1">
-              <h1 className="text-xl md:text-3xl font-bold text-neutral-900 mb-2 leading-tight">
-                {placowka.nazwa}
-              </h1>
-              <p className="text-sm md:text-lg text-neutral-600">
-                {placowka.typ_placowki} • {placowka.miejscowosc}
-              </p>
-            </div>
-            
-            {/* Koszt - prominent display */}
-            <div className="text-left md:text-right">
-              <p className="text-xs md:text-sm text-neutral-500 mb-1">Koszt miesięczny</p>
-              <p className={`text-2xl md:text-4xl font-bold ${placowka.koszt_pobytu === 0 ? 'text-green-600' : 'text-accent-600'}`}>
-                {formatPrice(placowka.koszt_pobytu)}
-                {placowka.koszt_pobytu !== null && placowka.koszt_pobytu > 0 && (
-                  <span className="text-sm md:text-lg font-normal text-neutral-600">/mc</span>
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Info Grid */}
-        <div className="grid md:grid-cols-3 gap-4 md:gap-6 mb-6">
-          {/* Liczba miejsc */}
-          {placowka.liczba_miejsc && (
-            <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 md:p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-accent-50 rounded-lg">
-                  <Bed className="w-5 h-5 text-accent-600" />
+      {/* Main content */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main info - 2 columns */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Koszty */}
+            <section className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-start gap-3">
+                <Banknote className="w-6 h-6 text-accent-600 mt-1" />
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    Koszt miesięczny
+                  </h2>
+                  <p className="text-3xl font-bold text-accent-600">
+                    {placowka.koszt_pobytu
+                      ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł/mc`
+                      : 'Bezpłatne'}
+                  </p>
                 </div>
-                <p className="text-xs md:text-sm font-medium text-neutral-500">Liczba miejsc</p>
               </div>
-              <p className="text-xl md:text-2xl font-bold text-neutral-900">{placowka.liczba_miejsc}</p>
-            </div>
-          )}
+            </section>
 
-          {/* Prowadzący */}
-          {placowka.prowadzacy && (
-            <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 md:p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-blue-50 rounded-lg">
-                  <Building2 className="w-5 h-5 text-blue-600" />
-                </div>
-                <p className="text-xs md:text-sm font-medium text-neutral-500">Prowadzący</p>
-              </div>
-              <p className="text-xs md:text-sm text-neutral-900 leading-relaxed">{placowka.prowadzacy}</p>
-            </div>
-          )}
-
-          {/* Region */}
-          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 md:p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <MapPin className="w-5 h-5 text-green-600" />
-              </div>
-              <p className="text-xs md:text-sm font-medium text-neutral-500">Lokalizacja</p>
-            </div>
-            <p className="text-xs md:text-sm text-neutral-900">Powiat: {placowka.powiat}</p>
-            <p className="text-xs md:text-sm text-neutral-900">Gmina: {placowka.gmina}</p>
-          </div>
-        </div>
-
-        {/* Profile opieki - jeśli istnieją */}
-        {placowka.profil_opieki && (
-          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 md:p-6 mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Users className="w-5 h-5 text-accent-600" />
-              <h2 className="text-lg md:text-xl font-semibold text-neutral-900">Profile opieki</h2>
-            </div>
-            <div className="grid md:grid-cols-2 gap-3">
-              {(() => {
-                const profil = placowka.profil_opieki.trim();
-                const isKody = /^[A-I](,[A-I])*$/.test(profil);
-                
-                if (isKody) {
-                  return getProfileOpiekiNazwy(profil).map((nazwa, idx) => (
-                    <div key={idx} className="flex items-start gap-2 p-3 bg-accent-50 rounded-lg">
-                      <span className="text-accent-600 font-bold mt-0.5">•</span>
-                      <p className="text-neutral-800 text-xs md:text-sm font-medium">{nazwa}</p>
+            {/* Miejsca i prowadzący */}
+            <section className="bg-white rounded-lg shadow-sm p-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                {placowka.liczba_miejsc && (
+                  <div className="flex items-start gap-3">
+                    <Bed className="w-6 h-6 text-accent-600 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">
+                        Liczba miejsc
+                      </h3>
+                      <p className="text-gray-700">{placowka.liczba_miejsc}</p>
                     </div>
-                  ));
-                } else {
-                  return profil.split(',')
-                    .map(opis => opis.trim())
-                    .filter(opis => opis.length > 0)
-                    .map((opis, idx) => (
-                      <div key={idx} className="flex items-start gap-2 p-3 bg-accent-50 rounded-lg">
-                        <span className="text-accent-600 font-bold mt-0.5">•</span>
-                        <p className="text-neutral-800 text-xs md:text-sm font-medium">{opis}</p>
-                      </div>
-                    ));
-                }
-              })()}
-            </div>
-          </div>
-        )}
+                  </div>
+                )}
 
-        {/* Kontakt */}
-        <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 md:p-6 mb-6">
-          <h2 className="text-lg md:text-xl font-semibold text-neutral-900 mb-4">Kontakt</h2>
-          
-          {/* Adres */}
-          <div className="mb-4 pb-4 border-b border-neutral-200">
-            <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 text-accent-600 mt-1" />
-              <div>
-                <p className="font-medium text-neutral-900 mb-1 text-sm md:text-base">Adres</p>
-                <p className="text-neutral-700 text-sm md:text-base">{formatAddress(placowka)}</p>
-                <p className="text-xs md:text-sm text-neutral-600 mt-1">
+                <div className="flex items-start gap-3">
+                  <Building2 className="w-6 h-6 text-accent-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">
+                      Prowadzący
+                    </h3>
+                    <p className="text-gray-700">{placowka.prowadzacy}</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Lokalizacja */}
+            <section className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-6 h-6 text-accent-600 mt-1" />
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                    Lokalizacja
+                  </h2>
+                  <div className="space-y-2">
+                    <p className="text-gray-700">
+                      <span className="font-medium">Powiat:</span> {placowka.powiat}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-medium">Gmina:</span> {placowka.gmina}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Profile opieki */}
+            {profiles.length > 0 && (
+              <section className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-start gap-3">
+                  <Users className="w-6 h-6 text-accent-600 mt-1" />
+                  <div className="flex-1">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                      Profile opieki
+                    </h2>
+                    <ul className="space-y-2">
+                      {profiles.map((profile, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="text-accent-600 mt-1">•</span>
+                          <span className="text-gray-700">{profile}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            )}
+          </div>
+
+          {/* Sidebar - 1 column */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Kontakt */}
+            <section className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Kontakt
+              </h2>
+
+              {/* Adres */}
+              <div className="mb-4 pb-4 border-b border-gray-200">
+                <h3 className="font-semibold text-gray-900 mb-2">Adres</h3>
+                <p className="text-gray-700">
+                  {placowka.ulica && `${placowka.ulica}, `}
+                  {placowka.kod_pocztowy} {placowka.miejscowosc}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
                   Gmina: {placowka.gmina} • Powiat: {placowka.powiat}
                 </p>
               </div>
-            </div>
-          </div>
 
-          {/* Przyciski kontaktowe */}
-          <div className="flex flex-wrap gap-3">
-            {placowka.telefon && (
-              <a 
-                href={`tel:${placowka.telefon}`}
-                className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 bg-accent-500 text-white hover:bg-accent-600 rounded-lg text-sm md:text-base font-medium transition-colors"
-              >
-                <Phone className="w-4 h-4" />
-                <span className="text-xs md:text-sm">{placowka.telefon}</span>
-              </a>
-            )}
+              {/* Telefon */}
+              {placowka.telefon && (
+                <div className="flex items-start gap-3 mb-3">
+                  <Phone className="w-5 h-5 text-accent-600 mt-0.5" />
+                  
+                  <a href={`tel:${placowka.telefon}`}
+                    className="text-accent-600 hover:text-accent-700 hover:underline"
+                  >
+                    {placowka.telefon}
+                  </a>
+                </div>
+              )}
 
-            {placowka.email && (
-              <a 
-                href={`mailto:${placowka.email}`}
-                className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 rounded-lg text-sm md:text-base font-medium transition-colors"
-              >
-                <Mail className="w-4 h-4" />
-                <span className="text-xs md:text-sm">Wyślij email</span>
-              </a>
-            )}
+              {/* Email */}
+              {placowka.email && (
+                <div className="flex items-start gap-3 mb-3">
+                  <Mail className="w-5 h-5 text-accent-600 mt-0.5" />
+                  
+                  <a href={`mailto:${placowka.email}`}
+                    className="text-accent-600 hover:text-accent-700 hover:underline break-all"
+                  >
+                    Wyślij email
+                  </a>
+                </div>
+              )}
 
-            {placowka.www && (
-              <a 
-                href={placowka.www}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 rounded-lg text-sm md:text-base font-medium transition-colors"
-              >
-                <Globe className="w-4 h-4" />
-                <span className="text-xs md:text-sm">Strona WWW</span>
-              </a>
-            )}
-          </div>
-        </div>
+              {/* Strona WWW */}
+              {placowka.www && (
+                <div className="flex items-start gap-3">
+                  <Globe className="w-5 h-5 text-accent-600 mt-0.5" />
+                  
+                  <a href={placowka.www}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent-600 hover:text-accent-700 hover:underline break-all"
+                  >
+                    Strona WWW
+                  </a>
+                </div>
+              )}
+            </section>
 
-        {/* Jak uzyskać miejsce? */}
-        <div className="bg-gradient-to-br from-accent-50 to-blue-50 rounded-xl border border-accent-200 p-4 md:p-6 mb-6">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="p-2 bg-white rounded-lg shadow-sm">
-              <Info className="w-5 h-5 text-accent-600" />
-            </div>
-            <div>
-              <h2 className="text-lg md:text-xl font-semibold text-neutral-900 mb-2">
-                Jak uzyskać miejsce w tej placówce?
-              </h2>
-              <p className="text-xs md:text-sm text-neutral-600">
-                Informacje o dostępności miejsc zmieniają się regularnie. Skontaktuj się bezpośrednio z placówką.
+            {/* Jak uzyskać miejsce */}
+            <section className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+              <div className="flex items-start gap-3 mb-4">
+                <Info className="w-6 h-6 text-blue-600 mt-1" />
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Jak uzyskać miejsce w tej placówce?
+                </h2>
+              </div>
+
+              <p className="text-gray-700 mb-4">
+                Informacje o dostępności miejsc zmieniają się regularnie.
+                Skontaktuj się bezpośrednio z placówką.
               </p>
-            </div>
-          </div>
 
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3 md:p-4 bg-white rounded-lg">
-              <div className="flex-shrink-0 w-6 h-6 bg-accent-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                1
-              </div>
-              <div>
-                <p className="font-medium text-neutral-900 mb-1 text-sm md:text-base">Zadzwoń do placówki</p>
-                <p className="text-xs md:text-sm text-neutral-600">
-                  Zapytaj o dostępność miejsc i listę oczekujących. {placowka.telefon && `Tel: ${placowka.telefon}`}
-                </p>
-              </div>
-            </div>
+              <ol className="space-y-4">
+                <li className="flex gap-3">
+                  <span className="flex-shrink-0 w-8 h-8 bg-accent-600 text-white rounded-full flex items-center justify-center font-semibold">
+                    1
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">
+                      Zadzwoń do placówki
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Zapytaj o dostępność miejsc i listę oczekujących.
+                      {placowka.telefon && ` Tel: ${placowka.telefon}`}
+                    </p>
+                  </div>
+                </li>
 
-            <div className="flex items-start gap-3 p-3 md:p-4 bg-white rounded-lg">
-              <div className="flex-shrink-0 w-6 h-6 bg-accent-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                2
-              </div>
-              <div>
-                <p className="font-medium text-neutral-900 mb-1 text-sm md:text-base">Przygotuj dokumenty</p>
-                <p className="text-xs md:text-sm text-neutral-600">
-                  Skierowanie z MOPS/GOPS, zaświadczenie lekarskie, dokumenty potwierdzające dochód
-                </p>
-              </div>
-            </div>
+                <li className="flex gap-3">
+                  <span className="flex-shrink-0 w-8 h-8 bg-accent-600 text-white rounded-full flex items-center justify-center font-semibold">
+                    2
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">
+                      Przygotuj dokumenty
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Skierowanie z MOPS/GOPS, zaświadczenie lekarskie, dokumenty
+                      potwierdzające dochód
+                    </p>
+                  </div>
+                </li>
 
-            <div className="flex items-start gap-3 p-3 md:p-4 bg-white rounded-lg">
-              <div className="flex-shrink-0 w-6 h-6 bg-accent-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                3
-              </div>
-              <div>
-                <p className="font-medium text-neutral-900 mb-1 text-sm md:text-base">Złóż wniosek</p>
-                <p className="text-xs md:text-sm text-neutral-600">
-                  Postępuj zgodnie z instrukcjami placówki i lokalnego MOPS/GOPS
-                </p>
-              </div>
-            </div>
-          </div>
+                <li className="flex gap-3">
+                  <span className="flex-shrink-0 w-8 h-8 bg-accent-600 text-white rounded-full flex items-center justify-center font-semibold">
+                    3
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">
+                      Złóż wniosek
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Postępuj zgodnie z instrukcjami placówki i lokalnego MOPS/GOPS
+                    </p>
+                  </div>
+                </li>
+              </ol>
 
-          {/* Link do poradnika - TODO */}
-          <div className="mt-4 pt-4 border-t border-accent-200">
-            <a 
-              href="#"
-              className="inline-flex items-center gap-2 text-accent-700 hover:text-accent-800 font-medium text-xs md:text-sm"
-            >
-              <FileText className="w-4 h-4" />
-              Przeczytaj pełny poradnik (wkrótce)
-            </a>
+              
+              <a href="#"
+                className="inline-flex items-center gap-2 mt-4 text-accent-600 hover:text-accent-700 font-medium"
+              >
+                <FileText className="w-5 h-5" />
+                Przeczytaj pełny poradnik (wkrótce)
+              </a>
+            </section>
           </div>
         </div>
+
+        {/* Lokalizacja na mapie */}
+        <section className="bg-white rounded-lg shadow-sm p-6 mt-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Lokalizacja na mapie
+          </h2>
+          <FacilityMap 
+            facilities={[placowka]} 
+            mode="single" 
+            showDirections={true} 
+          />
+        </section>
 
         {/* Źródło danych */}
-        {placowka.zrodlo && (
-          <div className="bg-neutral-100 rounded-lg p-3 md:p-4 text-xs md:text-sm text-neutral-600">
-            <p>
-              <strong>Źródło danych:</strong> {placowka.zrodlo}
-              {placowka.data_aktualizacji && (
-                <span className="ml-2">
-                  • Ostatnia aktualizacja: {new Date(placowka.data_aktualizacji).toLocaleDateString('pl-PL')}
-                </span>
-              )}
-            </p>
-          </div>
-        )}
-
-        {/* TODO: Mapa - placeholder */}
-        <div className="mt-6 bg-white rounded-xl shadow-sm border border-neutral-200 p-4 md:p-6">
-          <h2 className="text-lg md:text-xl font-semibold text-neutral-900 mb-4">Lokalizacja na mapie</h2>
-          <div className="h-64 bg-neutral-100 rounded-lg flex items-center justify-center">
-            <p className="text-neutral-500 text-sm">Mapa z lokalizacją - wkrótce</p>
-          </div>
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <p className="text-sm text-gray-500">
+            <strong>Źródło danych:</strong>{' '}
+            {placowka.zrodlo ? (
+              
+              <a href={placowka.zrodlo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent-600 hover:underline"
+              >
+                {placowka.zrodlo.includes('muw.pl')
+                  ? 'MUW Kraków'
+                  : 'Urząd Miasta/Gminy'}
+              </a>
+            ) : (
+              'Urząd Miasta/Gminy'
+            )}
+            • Ostatnia aktualizacja:{' '}
+            {new Date(placowka.data_aktualizacji).toLocaleDateString('pl-PL')}
+          </p>
         </div>
       </div>
     </div>
