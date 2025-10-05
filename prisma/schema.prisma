@@ -39,3 +39,16 @@ model Placowka {
   
   @@map("placowki")
 }
+
+model TerytLocation {
+  id            Int     @id @default(autoincrement())
+  nazwa         String  
+  typ           String  // "gmina" | "miejscowosc" | "powiat"
+  gmina         String?
+  powiat        String
+  wojewodztwo   String  @default("małopolskie")
+  
+  @@index([nazwa])
+  @@index([powiat])
+  @@map("teryt_locations")
+}

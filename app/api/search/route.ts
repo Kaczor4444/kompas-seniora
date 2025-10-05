@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       whereClause.typ_placowki = { contains: typ };
     }
 
-    // Get all matching placówki (filter by type first)
+    // Get all matching placówki
     const allPlacowki = await prisma.placowka.findMany({
       where: whereClause,
       select: {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // If no search query, return all (sorted by name)
+    // If no search query, return all
     if (!query || query.trim() === '') {
       await prisma.$disconnect();
       return NextResponse.json(allPlacowki.sort((a, b) => a.nazwa.localeCompare(b.nazwa)));
@@ -54,13 +54,46 @@ export async function GET(request: NextRequest) {
           powiat: placowka.powiat,
         }),
       }))
-      .filter(result => result.score > 0) // Only matches
-      .sort((a, b) => b.score - a.score); // Best matches first
+      .filter(result => result.score > 0)
+      .sort((a, b) => b.score - a.score);
+
+    // If no results, check TERYT database for suggestions
+    let terytSuggestion = null;
+    
+    if (scoredResults.length === 0) {
+      const terytLocations = await prisma.terytLocation.findMany();
+      
+      const terytMatches = terytLocations
+        .map(loc => ({
+          ...loc,
+          score: calculateMatchScore(query, {
+            nazwa: loc.nazwa,
+            gmina: loc.gmina || undefined,
+            powiat: loc.powiat,
+          }),
+        }))
+        .filter(result => result.score > 0)
+        .sort((a, b) => b.score - a.score);
+
+      if (terytMatches.length > 0) {
+        const match = terytMatches[0];
+        terytSuggestion = {
+          found: true,
+          nazwa: match.nazwa,
+          typ: match.typ,
+          powiat: match.powiat,
+          message: `Rozpoznano lokalizację: ${match.nazwa} (${match.typ}, powiat ${match.powiat}). Nie znaleziono placówek w tej lokalizacji.`
+        };
+      }
+    }
 
     await prisma.$disconnect();
     
-    // Return without score field
-    return NextResponse.json(scoredResults.map(({ score, ...placowka }) => placowka));
+    return NextResponse.json({
+      results: scoredResults.map(({ score, ...placowka }) => placowka),
+      terytSuggestion,
+      query: query
+    });
 
   } catch (error) {
     console.error('Search API error:', error);
