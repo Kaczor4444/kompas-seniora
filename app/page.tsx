@@ -95,8 +95,7 @@ export default function Home() {
            e.preventDefault();
            const params = new URLSearchParams();
            if (searchQuery.trim()) params.append('q', searchQuery.trim());
-           if (selectedType !== 'WSZYSTKIE') params.append('typ', selectedType);
-           window.location.href = `/search?${params.toString()}`;
+if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase());           window.location.href = `/search?${params.toString()}`;
          }} className="max-w-4xl mx-auto">
           <div className="bg-white rounded-xl shadow-lg border border-neutral-200 flex items-center overflow-hidden">
            <input

@@ -1,54 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 model Placowka {
-  id               Int      @id @default(autoincrement())
-  nazwa            String
-  typ_placowki     String   // "DPS" | "SDS" | "DPS/SDS"
-  prowadzacy       String
-  ulica            String?
-  miejscowosc      String
-  kod_pocztowy     String?
-  gmina            String
-  powiat           String
-  wojewodztwo      String
-  // TERYT codes
-  teryt_wojewodztwo_kod String?
-  teryt_powiat_kod      String?
-  teryt_gmina_kod       String?
-  teryt_gmina_nazwa     String?
-  // Geo
-  geo_lat          Float?
-  geo_lng          Float?
-  // Contact
-  telefon          String?
-  email            String?
-  www              String?
-  // Details
-  liczba_miejsc    Int?
-  profil_opieki    String?
-  koszt_pobytu     Float?
-  data_aktualizacji DateTime @default(now())
-  zrodlo           String?
-  
-  @@map("placowki")
+  id                Int      @id @default(autoincrement())
+  nazwa             String
+  typ_placowki      String
+  prowadzacy        String?
+  ulica             String?
+  miejscowosc       String
+  kod_pocztowy      String?
+  gmina             String?
+  powiat            String
+  wojewodztwo       String
+  telefon           String?
+  email             String?
+  www               String?
+  liczba_miejsc     Int?
+  profil_opieki     String?
+  koszt_pobytu      Float?
+  data_aktualizacji DateTime?
+  zrodlo            String?
+  latitude          Float?
+  longitude         Float?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([powiat])
+  @@index([wojewodztwo])
+  @@index([typ_placowki])
 }
 
 model TerytLocation {
-  id            Int     @id @default(autoincrement())
-  nazwa         String  
-  typ           String  // "gmina" | "miejscowosc" | "powiat"
-  gmina         String?
-  powiat        String
-  wojewodztwo   String  @default("małopolskie")
-  
-  @@index([nazwa])
+  id                 Int     @id @default(autoincrement())
+  nazwa              String
+  nazwa_normalized   String  // ✅ NOWE POLE - znormalizowana nazwa bez polskich znaków
+  typ                String
+  gmina              String?
+  powiat             String
+  wojewodztwo        String
+
+  @@index([nazwa_normalized])  // ✅ Index dla szybkiego wyszukiwania
   @@index([powiat])
-  @@map("teryt_locations")
+  @@index([wojewodztwo])
 }
