@@ -16,17 +16,18 @@ interface Facility {
   miejscowosc: string;
   koszt_pobytu: number | null;
   telefon: string | null;
-  geo_lat: number | null;
-  geo_lng: number | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface SearchResultsProps {
+  query: string;
+  type: string;
   results: Facility[];
   message: string;
-  resultsCount: number;
 }
 
-export default function SearchResults({ results, message, resultsCount }: SearchResultsProps) {
+export default function SearchResults({ query, type, results, message }: SearchResultsProps) {
   return (
     <>
       {/* Message */}
@@ -78,8 +79,8 @@ export default function SearchResults({ results, message, resultsCount }: Search
                     Zobacz szczegóły
                   </Link>
                   {facility.telefon && (
-                    
-                     <a href={`tel:${facility.telefon.replace(/\s/g, '')}`}
+                    <a 
+                      href={`tel:${facility.telefon.replace(/\s/g, '')}`}
                       className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
                     >
                       📞 {facility.telefon}

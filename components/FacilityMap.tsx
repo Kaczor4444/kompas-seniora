@@ -20,8 +20,8 @@ interface Facility {
   miejscowosc: string;
   koszt_pobytu: number | null;
   telefon: string | null;
-  geo_lat: number | null;
-  geo_lng: number | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface FacilityMapProps {
@@ -37,7 +37,7 @@ export default function FacilityMap({
 }: FacilityMapProps) {
   // Filtruj placówki z geo coordinates
   const facilitiesWithCoords = facilities.filter(
-    f => f.geo_lat && f.geo_lng
+    f => f.latitude && f.longitude
   );
 
   if (facilitiesWithCoords.length === 0) {
@@ -50,10 +50,10 @@ export default function FacilityMap({
 
   // Oblicz centrum mapy
   const center: [number, number] = mode === 'single'
-    ? [facilitiesWithCoords[0].geo_lat!, facilitiesWithCoords[0].geo_lng!]
+    ? [facilitiesWithCoords[0].latitude!, facilitiesWithCoords[0].longitude!]
     : [
-        facilitiesWithCoords.reduce((sum, f) => sum + f.geo_lat!, 0) / facilitiesWithCoords.length,
-        facilitiesWithCoords.reduce((sum, f) => sum + f.geo_lng!, 0) / facilitiesWithCoords.length,
+        facilitiesWithCoords.reduce((sum, f) => sum + f.latitude!, 0) / facilitiesWithCoords.length,
+        facilitiesWithCoords.reduce((sum, f) => sum + f.longitude!, 0) / facilitiesWithCoords.length,
       ];
 
   const zoom = mode === 'single' ? 13 : 9;
@@ -75,7 +75,7 @@ export default function FacilityMap({
           {facilitiesWithCoords.map((facility) => (
             <Marker
               key={facility.id}
-              position={[facility.geo_lat!, facility.geo_lng!]}
+              position={[facility.latitude!, facility.longitude!]}
             >
               <Popup>
                 <div className="p-2 min-w-[200px]">
@@ -90,15 +90,13 @@ export default function FacilityMap({
                     }
                   </p>
                   <div className="flex gap-2">
-                    
                     <a href={`/placowka/${facility.id}`}
                       className="text-xs bg-accent-600 text-white px-3 py-1 rounded hover:bg-accent-700"
                     >
                       Zobacz szczegóły
                     </a>
                     {facility.telefon && (
-                      
-                       <a href={`tel:${facility.telefon.replace(/\s/g, '')}`}
+                      <a href={`tel:${facility.telefon.replace(/\s/g, '')}`}
                         className="text-xs bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 md:hidden"
                       >
                         Zadzwoń
@@ -113,8 +111,7 @@ export default function FacilityMap({
       </div>
       
       {showDirections && mode === 'single' && facilitiesWithCoords[0] && (
-        
-        <a href={`https://www.google.com/maps/dir/?api=1&destination=${facilitiesWithCoords[0].geo_lat},${facilitiesWithCoords[0].geo_lng}`}
+        <a href={`https://www.google.com/maps/dir/?api=1&destination=${facilitiesWithCoords[0].latitude},${facilitiesWithCoords[0].longitude}`}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-3 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
