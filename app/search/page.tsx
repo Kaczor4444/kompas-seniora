@@ -28,12 +28,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   if (query) {
     const normalizedQuery = normalizePolish(query.trim());
 
-    // Szukaj w TERYT po znormalizowanej nazwie
+    // Szukaj w TERYT po znormalizowanej nazwie - EXACT MATCH
     terytMatches = await prisma.terytLocation.findMany({
       where: {
-        nazwa_normalized: {
-          contains: normalizedQuery,
-        },
+        nazwa_normalized: normalizedQuery,
       },
       select: {
         powiat: true,
@@ -43,7 +41,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     });
 
     // Zbierz unikalne powiaty
-    const uniquePowiaty = [...new Set(terytMatches.map(t => normalizePolish(t.powiat)))];
+    let uniquePowiaty = [...new Set(terytMatches.map(t => normalizePolish(t.powiat)))];
+
+    // Mapowanie wariantów powiatów - Kraków miasto + powiat
+    const powiatMapping: Record<string, string[]> = {
+      'krakow': ['krakow', 'krakowski'],
+      'm. krakow': ['krakow', 'krakowski'],
+      'krakowski': ['krakow', 'krakowski'],
+    };
+
+    // Rozszerz uniquePowiaty o wszystkie warianty
+    uniquePowiaty = [...new Set(uniquePowiaty.flatMap(p => 
+      powiatMapping[p] || [p]
+    ))];
 
     if (uniquePowiaty.length > 0) {
       // Filtr typu placówki - exact match zamiast contains
@@ -59,11 +69,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         orderBy: { nazwa: 'asc' },
       });
 
-      // Filtruj po powiatach
+      // Filtruj po powiatach - EXACT MATCH
       results = allFacilities.filter(facility => {
         const normalizedFacilityPowiat = normalizePolish(facility.powiat);
         return uniquePowiaty.some(powiat => 
-          normalizedFacilityPowiat.includes(powiat) || powiat.includes(normalizedFacilityPowiat)
+          normalizedFacilityPowiat === powiat
         );
       });
 
@@ -73,7 +83,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       
       if (results.length > 0) {
         if (locationCount > 1) {
-          message = `Jest ${locationCount} ${locationCount === 1 ? 'miejscowość' : locationCount < 5 ? 'miejscowości' : 'miejscowości'} ${query} w Małopolsce. Znaleźliśmy ${facilityWord} w kilku z nich.`;
+          // Policz placówki per powiat
+          const facilitiesPerPowiat = uniquePowiaty
+            .map(powiat => {
+              const count = results.filter(r => 
+                normalizePolish(r.powiat) === powiat
+              ).length;
+              return count > 0 ? `${powiat} (${count})` : null;
+            })
+            .filter(Boolean)
+            .join(', ');
+          
+          message = `Miejscowość "${query}" znaleziona w ${locationCount} powiatach. Pokazujemy ${facilityWord} ze wszystkich lokalizacji: ${facilitiesPerPowiat}.`;
         } else {
           message = `Znaleźliśmy ${facilityWord} w okolicy miejscowości ${terytMatches[0].nazwa}.`;
         }
