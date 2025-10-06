@@ -63,9 +63,9 @@ export default function SearchResults({ query, type, results, message }: SearchR
 
                   <div>
                     <span className="font-medium text-gray-700">Koszt miesięczny</span>
-                    <p className="text-lg font-semibold text-accent-600">
+                    <p className={`text-lg font-semibold ${facility.koszt_pobytu ? 'text-accent-600' : 'text-green-600'}`}>
                       {facility.koszt_pobytu
-                        ? `${facility.koszt_pobytu.toLocaleString('pl-PL')} zł/mc`
+                        ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
                         : 'Bezpłatne'}
                     </p>
                   </div>
