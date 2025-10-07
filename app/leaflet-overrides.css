@@ -1,0 +1,18 @@
+/* Leaflet Popup Overrides - bardziej specyficzne */
+.leaflet-popup-content a,
+.leaflet-popup-content-wrapper a,
+div.leaflet-popup-content a {
+  background-color: #F43F5E !important;
+  color: white !important;
+  text-decoration: none !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 0.25rem !important;
+  font-size: 0.75rem !important;
+  display: inline-block !important;
+}
+
+.leaflet-popup-content a:hover,
+.leaflet-popup-content-wrapper a:hover,
+div.leaflet-popup-content a:hover {
+  background-color: #E11D48 !important;
+}

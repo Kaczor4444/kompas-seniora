@@ -12,6 +12,25 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
+// Custom ikony - DPS (czerwony) i ŚDS (niebieski)
+const dpsIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const sdsIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 interface Facility {
   id: number;
   nazwa: string;
@@ -76,6 +95,7 @@ export default function FacilityMap({
             <Marker
               key={facility.id}
               position={[facility.latitude!, facility.longitude!]}
+              icon={facility.typ_placowki === 'DPS' ? dpsIcon : sdsIcon}
             >
               <Popup>
                 <div className="p-2 min-w-[200px]">
@@ -83,16 +103,15 @@ export default function FacilityMap({
                   <p className="text-xs text-gray-600 mb-2">
                     {facility.typ_placowki} • {facility.powiat}
                   </p>
-                  <p className="text-sm font-medium mb-2">
+                  <p className={`text-sm font-medium mb-2 ${facility.koszt_pobytu ? 'text-gray-900' : 'text-green-600'}`}>
                     {facility.koszt_pobytu 
-                      ? `${facility.koszt_pobytu.toLocaleString('pl-PL')} zł/mc`
+                      ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
                       : 'Bezpłatne'
                     }
                   </p>
                   <div className="flex gap-2">
                     <a href={`/placowka/${facility.id}`}
-                      className="text-xs bg-accent-600 text-white px-3 py-1 rounded hover:bg-accent-700"
-                    >
+                      className="text-xs text-white px-3 py-1 rounded"                    >
                       Zobacz szczegóły
                     </a>
                     {facility.telefon && (
@@ -114,8 +133,7 @@ export default function FacilityMap({
         <a href={`https://www.google.com/maps/dir/?api=1&destination=${facilitiesWithCoords[0].latitude},${facilitiesWithCoords[0].longitude}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
+          className="mt-3 inline-block bg-accent-600 text-white px-4 py-2 rounded hover:bg-accent-700"        >
           Otwórz w Google Maps
         </a>
       )}
