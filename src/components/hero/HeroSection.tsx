@@ -1,0 +1,255 @@
+// src/components/hero/HeroSection.tsx
+'use client';
+import { useState } from 'react';
+
+export default function HeroSection() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedType, setSelectedType] = useState('WSZYSTKIE');
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      const params = new URLSearchParams();
+      params.append('q', searchQuery.trim());
+      if (selectedType !== 'WSZYSTKIE') {
+        params.append('type', selectedType.toLowerCase());
+      }
+      window.location.href = `/search?${params.toString()}`;
+    }
+  };
+
+  const handleGeolocation = () => {
+    if (!navigator.geolocation) {
+      alert('Twoja przeglądarka nie obsługuje geolokalizacji');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        window.location.href = `/search?lat=${latitude}&lng=${longitude}&near=true`;
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        alert('Nie udało się pobrać lokalizacji.');
+      }
+    );
+  };
+
+  return (
+    <section className="py-16 md:py-20 bg-gradient-to-b from-accent-50 to-white">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Trust Badge */}
+        <div className="flex justify-center mb-8">
+          <div className="bg-white px-6 py-2 rounded-lg shadow-sm border border-neutral-200">
+            <span className="text-sm text-neutral-700">⭐⭐⭐⭐⭐ Zaufana platforma</span>
+          </div>
+        </div>
+
+        {/* Headline */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4 leading-tight">
+            Znajdź najlepszy dom opieki
+            <br />w Twojej okolicy
+          </h1>
+          <p className="text-xl text-neutral-700 max-w-3xl mx-auto">
+            Transparentna wyszukiwarka publicznych domów pomocy społecznej z oficjalnymi cenami
+          </p>
+        </div>
+
+        {/* Category Tabs */}
+        <div className="flex justify-center gap-2 mb-6 flex-wrap">
+          <button
+            onClick={() => setSelectedType('WSZYSTKIE')}
+            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+              selectedType === 'WSZYSTKIE'
+                ? 'bg-white border-2 border-accent-500 text-neutral-900'
+                : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
+            }`}
+          >
+            Wszystkie
+          </button>
+          <button
+            onClick={() => setSelectedType('DPS')}
+            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+              selectedType === 'DPS'
+                ? 'bg-white border-2 border-accent-500 text-neutral-900'
+                : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
+            }`}
+          >
+            Domy Pomocy Społecznej (DPS)
+          </button>
+          <button
+            onClick={() => setSelectedType('ŚDS')}
+            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+              selectedType === 'ŚDS'
+                ? 'bg-white border-2 border-accent-500 text-neutral-900'
+                : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
+            }`}
+          >
+            Środowiskowe Domy Samopomocy (ŚDS)
+          </button>
+        </div>
+
+        {/* Multi-Segment Search Bar */}
+        <div className="max-w-5xl mx-auto">
+          {/* Desktop version */}
+          <div className="hidden md:flex bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
+            {/* Segment 1: Miejscowość */}
+            <div className="flex-1 px-4 py-4 border-r border-neutral-200">
+              <label className="block text-xs text-neutral-500 mb-1">Miejscowość</label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                placeholder="np. Bochnia, Kraków"
+                className="w-full text-base focus:outline-none"
+              />
+            </div>
+
+            {/* Segment 2: Województwo */}
+            <div className="flex-1 px-4 py-4 border-r border-neutral-200">
+              <label className="block text-xs text-neutral-500 mb-1">Województwo</label>
+              <select className="w-full text-base focus:outline-none bg-transparent cursor-pointer">
+                <option value="malopolskie">Małopolskie</option>
+                <option value="slaskie">Śląskie (Beta)</option>
+                <option value="" disabled>
+                  Mazowieckie - Wkrótce
+                </option>
+                <option value="" disabled>
+                  Dolnośląskie - Wkrótce
+                </option>
+                <option value="" disabled>
+                  Wielkopolskie - Wkrótce
+                </option>
+              </select>
+            </div>
+
+            {/* Segment 3: Powiat */}
+            <div className="flex-1 px-4 py-4 border-r border-neutral-200">
+              <label className="block text-xs text-neutral-500 mb-1">Powiat</label>
+              <select className="w-full text-base focus:outline-none bg-transparent cursor-pointer">
+                <option value="">Wszystkie powiaty</option>
+                <option value="bochenski">bocheński</option>
+                <option value="krakowski">krakowski</option>
+                <option value="limanowski">limanowski</option>
+                <option value="nowosadecki">nowosądecki</option>
+                <option value="nowotarski">nowotarski</option>
+                <option value="oswiecimski">oświęcimski</option>
+                <option value="tatrzanski">tatrzański</option>
+                <option value="tarnowski">tarnowski</option>
+                <option value="wadowicki">wadowicki</option>
+              </select>
+            </div>
+
+            {/* Segment 4: Geo Button */}
+            <button
+              onClick={handleGeolocation}
+              className="px-6 bg-green-50 hover:bg-green-100 transition-colors flex items-center justify-center border-r border-neutral-200"
+              title="Szukaj w okolicy"
+            >
+              <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+
+            {/* Segment 5: Search Button */}
+            <button
+              onClick={handleSearch}
+              className="px-8 bg-accent-500 hover:bg-accent-600 transition-colors flex items-center justify-center"
+            >
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Mobile version */}
+          <div className="md:hidden bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
+            {/* Miejscowość */}
+            <div className="px-4 py-4 border-b border-neutral-200">
+              <label className="block text-xs text-neutral-500 mb-2">Miejscowość</label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="np. Bochnia, Kraków"
+                className="w-full text-base focus:outline-none"
+              />
+            </div>
+
+            {/* Województwo */}
+            <div className="px-4 py-4 border-b border-neutral-200">
+              <label className="block text-xs text-neutral-500 mb-2">Województwo</label>
+              <select className="w-full text-base focus:outline-none bg-transparent">
+                <option value="malopolskie">Małopolskie</option>
+                <option value="slaskie">Śląskie (Beta)</option>
+                <option value="" disabled>
+                  Mazowieckie - Wkrótce
+                </option>
+                <option value="" disabled>
+                  Dolnośląskie - Wkrótce
+                </option>
+                <option value="" disabled>
+                  Wielkopolskie - Wkrótce
+                </option>
+              </select>
+            </div>
+
+            {/* Powiat */}
+            <div className="px-4 py-4 border-b border-neutral-200">
+              <label className="block text-xs text-neutral-500 mb-2">Powiat</label>
+              <select className="w-full text-base focus:outline-none bg-transparent">
+                <option value="">Wszystkie powiaty</option>
+                <option value="bochenski">bocheński</option>
+                <option value="krakowski">krakowski</option>
+                <option value="limanowski">limanowski</option>
+                <option value="nowosadecki">nowosądecki</option>
+                <option value="nowotarski">nowotarski</option>
+              </select>
+            </div>
+
+            {/* Buttons */}
+            <button
+              onClick={handleGeolocation}
+              className="w-full px-4 py-4 bg-green-50 hover:bg-green-100 transition-colors flex items-center justify-center gap-2 border-b border-neutral-200 text-green-800 font-medium"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Szukaj w okolicy
+            </button>
+
+            <button
+              onClick={handleSearch}
+              className="w-full px-4 py-4 bg-accent-500 hover:bg-accent-600 transition-colors text-white font-semibold"
+            >
+              Szukaj
+            </button>
+          </div>
+
+          {/* Helper Text */}
+          <p className="text-sm text-neutral-500 text-center mt-3">
+            💡 Wpisz miejscowość - system automatycznie dopasuje województwo i powiat
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}

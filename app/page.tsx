@@ -1,14 +1,10 @@
 "use client";
 
-import { useState } from 'react';
 import MiniFAQSection from '../src/components/faq/MiniFAQSection';
-import SearchBar from '../src/components/search/SearchBar';
 import KnowledgeCenter from '../src/components/knowledge/KnowledgeCenter';
+import HeroSection from '../src/components/hero/HeroSection';
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('WSZYSTKIE');
-
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -41,84 +37,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-b from-accent-50 to-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-center mb-8">
-            <div className="bg-white px-6 py-2 rounded-lg shadow-sm border border-neutral-200">
-              <span className="text-sm text-neutral-700">⭐⭐⭐⭐⭐ Zaufana platforma</span>
-            </div>
-          </div>
-          
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4 leading-tight">
-              Znajdź najlepszy dom opieki<br />w Twojej okolicy
-            </h1>
-            <p className="text-xl text-neutral-700 max-w-3xl mx-auto">
-              Transparentna wyszukiwarka publicznych domów pomocy społecznej z oficjalnymi cenami
-            </p>
-          </div>
-          
-          {/* Category Tabs */}
-          <div className="flex justify-center gap-2 mb-6">
-            <button 
-              onClick={() => setSelectedType('WSZYSTKIE')}
-              className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-                selectedType === 'WSZYSTKIE' 
-                  ? 'bg-white border-2 border-accent-500 text-neutral-900' 
-                  : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
-              }`}
-            >
-              Wszystkie
-            </button>
-            <button 
-              onClick={() => setSelectedType('DPS')}
-              className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-                selectedType === 'DPS' 
-                  ? 'bg-white border-2 border-accent-500 text-neutral-900' 
-                  : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
-              }`}
-            >
-              Domy Pomocy Społecznej (DPS)
-            </button>
-            <button 
-              onClick={() => setSelectedType('ŚDS')}
-              className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-                selectedType === 'ŚDS' 
-                  ? 'bg-white border-2 border-accent-500 text-neutral-900' 
-                  : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
-              }`}
-            >
-              Środowiskowe Domy Samopomocy (ŚDS)
-            </button>
-          </div>
-          <form onSubmit={(e) => {
-           e.preventDefault();
-           const params = new URLSearchParams();
-           if (searchQuery.trim()) params.append('q', searchQuery.trim());
-if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase());           window.location.href = `/search?${params.toString()}`;
-         }} className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg border border-neutral-200 flex items-center overflow-hidden">
-           <input
-             type="text"
-             value={searchQuery}
-             onChange={(e) => setSearchQuery(e.target.value)}
-             placeholder="Wpisz miejscowość, np. Kamienica, Kraków, Limanowa..."
-             className="flex-1 px-6 py-4 text-lg focus:outline-none"
-           />
-          <button
-            type="submit"
-            disabled={!searchQuery.trim()}
-            className="bg-accent-500 hover:bg-accent-600 disabled:bg-neutral-300 text-white px-8 py-4 font-semibold transition-colors"
-          >
-            Szukaj
-          </button>
-        </div>
-        <p className="text-sm text-neutral-500 text-center mt-3">
-           Nie musisz znać powiatu - wpisz po prostu nazwę miejscowości
-        </p>
-     </form>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Stats Section */}
       <section className="py-16 bg-white">
@@ -150,6 +69,7 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
           </div>
         </div>
       </section>
+
       {/* Features Section */}
       <section className="py-12 md:py-16 bg-neutral-50">
         <div className="max-w-6xl mx-auto">
@@ -157,7 +77,7 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
             <div className="hidden md:grid md:grid-cols-3 gap-8 px-4">
               <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
                 <div className="w-20 h-20 bg-secondary-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <img src="/icons/search-intelligent.png" alt="Inteligentna wyszukiwarka" className="w-16 h-16 object-contain" />
+                  <span className="text-4xl">🔍</span>
                 </div>
                 <h3 className="text-xl font-semibold text-neutral-900 mb-3 text-center">Inteligentna wyszukiwarka</h3>
                 <p className="text-neutral-700 text-center">Wpisz "Kamienica" - system znajdzie powiat limanowski</p>
@@ -165,7 +85,7 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
               
               <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
                 <div className="w-20 h-20 bg-success-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <img src="/icons/prices-transparent.png" alt="Transparentne ceny" className="w-16 h-16 object-contain" />
+                  <span className="text-4xl">💰</span>
                 </div>
                 <h3 className="text-xl font-semibold text-neutral-900 mb-3 text-center">Transparentne ceny</h3>
                 <p className="text-neutral-700 text-center">Oficjalne dane z MOPS. Koniec z dziesiątkami PDFów</p>
@@ -173,7 +93,7 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
               
               <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
                 <div className="w-20 h-20 bg-accent-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <img src="/icons/calculator-costs.png" alt="Kalkulator kosztów" className="w-16 h-16 object-contain" />
+                  <span className="text-4xl">🧮</span>
                 </div>
                 <h3 className="text-xl font-semibold text-neutral-900 mb-3 text-center">Kalkulator kosztów</h3>
                 <p className="text-neutral-700 text-center">Zaplanuj budżet opieki i porównaj różne opcje</p>
@@ -184,7 +104,7 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
               <div className="flex gap-4 px-4 pb-4" style={{ width: 'max-content' }}>
                 <div className="bg-white rounded-xl p-6 shadow-sm" style={{ width: '280px' }}>
                   <div className="w-16 h-16 bg-secondary-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <img src="/icons/search-intelligent.png" alt="Inteligentna wyszukiwarka" className="w-12 h-12 object-contain" />
+                    <span className="text-3xl">🔍</span>
                   </div>
                   <h3 className="text-lg font-semibold text-neutral-900 mb-2 text-center">Inteligentna wyszukiwarka</h3>
                   <p className="text-sm text-neutral-700 text-center">Wpisz miejscowość - znajdziemy odpowiedni powiat</p>
@@ -192,7 +112,7 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
                 
                 <div className="bg-white rounded-xl p-6 shadow-sm" style={{ width: '280px' }}>
                   <div className="w-16 h-16 bg-success-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <img src="/icons/prices-transparent.png" alt="Transparentne ceny" className="w-12 h-12 object-contain" />
+                    <span className="text-3xl">💰</span>
                   </div>
                   <h3 className="text-lg font-semibold text-neutral-900 mb-2 text-center">Transparentne ceny</h3>
                   <p className="text-sm text-neutral-700 text-center">Oficjalne dane MOPS bez ukrytych kosztów</p>
@@ -200,7 +120,7 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
                 
                 <div className="bg-white rounded-xl p-6 shadow-sm" style={{ width: '280px' }}>
                   <div className="w-16 h-16 bg-accent-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <img src="/icons/calculator-costs.png" alt="Kalkulator kosztów" className="w-12 h-12 object-contain" />
+                    <span className="text-3xl">🧮</span>
                   </div>
                   <h3 className="text-lg font-semibold text-neutral-900 mb-2 text-center">Kalkulator kosztów</h3>
                   <p className="text-sm text-neutral-700 text-center">Zaplanuj budżet opieki dla bliskiej osoby</p>
@@ -218,12 +138,17 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
           <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">Rozpocznij poszukiwania już dziś</h2>
           <p className="text-xl text-neutral-700 mb-8">Pomożemy Ci znaleźć najlepszą opiekę dla Twojego bliskiego</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-accent-500 hover:bg-accent-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-sm hover:shadow-md">Znajdź dom opieki</button>
-            <button className="bg-white hover:bg-neutral-50 text-neutral-900 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-neutral-300 transition-colors">Użyj kalkulatora</button>
+            <a href="/search" className="bg-accent-500 hover:bg-accent-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-sm hover:shadow-md">
+              Znajdź dom opieki
+            </a>
+            <button className="bg-white hover:bg-neutral-50 text-neutral-900 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-neutral-300 transition-colors">
+              Użyj kalkulatora
+            </button>
           </div>
         </div>
       </section>
-      {/* Location Search - BEZ przycisków filtrów */}
+
+      {/* Location Search */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-8">
@@ -236,19 +161,19 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
           <div className="bg-white rounded-xl border border-neutral-200 p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-4">
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=krakow" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Kraków</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=limanowa" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Limanowa</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=nowy+targ" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Nowy Targ</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -257,19 +182,19 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
               </div>
               
               <div className="space-y-4">
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=nowy+sacz" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Nowy Sącz</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=wadowice" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Wadowice</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=oswiecim" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Oświęcim</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -278,19 +203,19 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
               </div>
               
               <div className="space-y-4">
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=tarnow" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Tarnów</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=zakopane" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Zakopane</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
-                <a href="#" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <a href="/search?q=myslenice" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Myślenice</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -300,12 +225,12 @@ if (selectedType !== 'WSZYSTKIE') params.append('type', selectedType.toLowerCase
             </div>
             
             <div className="mt-8 text-center">
-              <button className="inline-flex items-center gap-2 bg-accent-100 hover:bg-accent-200 text-accent-700 px-6 py-3 rounded-lg font-medium transition-colors">
+              <a href="/search" className="inline-flex items-center gap-2 bg-accent-100 hover:bg-accent-200 text-accent-700 px-6 py-3 rounded-lg font-medium transition-colors">
                 Zobacz wszystkie lokalizacje
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </button>
+              </a>
             </div>
           </div>
         </div>
