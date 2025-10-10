@@ -1,37 +1,11 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
-
-// Type dla suggestion z API
-interface Suggestion {
-  nazwa: string;
-  powiat: string;
-  wojewodztwo: string;
-  facilitiesCount: number;
-}
-
-interface SuggestResponse {
-  suggestions: Suggestion[];
-  totalCount: number;
-  showAll: boolean;
-}
+import { useState } from 'react';
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('WSZYSTKIE');
-  const [selectedVoivodeship, setSelectedVoivodeship] = useState(''); // ZMIENIONE: pusty string
+  const [selectedVoivodeship, setSelectedVoivodeship] = useState('malopolskie');
   const [selectedPowiat, setSelectedPowiat] = useState('');
-
-  // NEW: Autocomplete state
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  
-  // Refs for click outside detection
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const inputRefDesktop = useRef<HTMLInputElement>(null);
-  const inputRefMobile = useRef<HTMLInputElement>(null);
 
   // Mapa powiatów dla każdego województwa
   const powiatyByVoivodeship: Record<string, string[]> = {
@@ -88,158 +62,6 @@ export default function HeroSection() {
   // Dostępne powiaty dla wybranego województwa
   const availablePowiaty = powiatyByVoivodeship[selectedVoivodeship] || [];
 
-  // Helper function for Polish pluralization
-  const getPluralForm = (count: number): string => {
-    if (count === 1) return 'placówka';
-    const lastDigit = count % 10;
-    const lastTwoDigits = count % 100;
-    
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return 'placówek';
-    if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
-    return 'placówek';
-  };
-
-  // NEW: Debounced fetch autocomplete suggestions
-  useEffect(() => {
-    console.log('⚡ useEffect triggered:', { searchQuery, length: searchQuery.length });
-    
-    // Reset suggestions if query too short
-    if (searchQuery.length < 2) {
-      console.log('⏸️ Query too short, resetting');
-      setSuggestions([]);
-      setShowDropdown(false);
-      return;
-    }
-
-    // Debounce: 300ms
-    const timer = setTimeout(async () => {
-      console.log('🔍 Fetching suggestions for:', searchQuery);
-      setIsLoading(true);
-      
-      try {
-        const params = new URLSearchParams({
-          q: searchQuery,
-        });
-        
-        if (selectedVoivodeship) {
-          params.append('woj', selectedVoivodeship);
-        }
-        if (selectedPowiat) {
-          params.append('powiat', selectedPowiat);
-        }
-        if (selectedType !== 'WSZYSTKIE') {
-          params.append('typ', selectedType);
-        }
-
-        const apiUrl = `/api/teryt/suggest?${params}`;
-        console.log('🌐 API URL:', apiUrl);
-        
-        const response = await fetch(apiUrl);
-        const data: SuggestResponse = await response.json();
-
-        console.log('✅ API Response:', data);
-        console.log('📊 Suggestions count:', data.suggestions?.length || 0);
-        console.log('🎯 showDropdown will be:', (data.suggestions?.length || 0) > 0);
-
-        setSuggestions(data.suggestions || []);
-        setTotalCount(data.totalCount || 0);
-        setShowDropdown((data.suggestions?.length || 0) > 0);
-        setHighlightedIndex(-1);
-        
-        console.log('✨ State updated - dropdown should show');
-      } catch (error) {
-        console.error('❌ Autocomplete error:', error);
-        setSuggestions([]);
-        setShowDropdown(false);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 300);
-
-    return () => {
-      console.log('🧹 Cleanup timer');
-      clearTimeout(timer);
-    };
-  }, [searchQuery, selectedVoivodeship, selectedPowiat, selectedType]);
-
-  // NEW: Click outside to close dropdown
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !inputRefDesktop.current?.contains(event.target as Node) &&
-        !inputRefMobile.current?.contains(event.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // NEW: Handle suggestion click
-  const handleSuggestionClick = (suggestion: Suggestion) => {
-    setSearchQuery(suggestion.nazwa);
-    setShowDropdown(false);
-    
-    // Auto-search
-    const params = new URLSearchParams();
-    params.append('q', suggestion.nazwa);
-    if (selectedType !== 'WSZYSTKIE') {
-      params.append('type', selectedType.toLowerCase());
-    }
-    if (selectedVoivodeship && selectedVoivodeship !== 'malopolskie') {
-      params.append('woj', selectedVoivodeship);
-    }
-    if (selectedPowiat) {
-      params.append('powiat', selectedPowiat);
-    }
-    
-    window.location.href = `/search?${params.toString()}`;
-  };
-
-  // NEW: Handle "Show All" click
-  const handleShowAllClick = () => {
-    setShowDropdown(false);
-    handleSearch();
-  };
-
-  // NEW: Keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showDropdown || suggestions.length === 0) {
-      if (e.key === 'Enter') {
-        handleSearch();
-      }
-      return;
-    }
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setHighlightedIndex(prev => 
-          prev < suggestions.length - 1 ? prev + 1 : prev
-        );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1));
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (highlightedIndex >= 0) {
-          handleSuggestionClick(suggestions[highlightedIndex]);
-        } else {
-          handleSearch();
-        }
-        break;
-      case 'Escape':
-        setShowDropdown(false);
-        break;
-    }
-  };
-
   const handleSearch = () => {
     if (searchQuery.trim()) {
       const params = new URLSearchParams();
@@ -249,8 +71,8 @@ export default function HeroSection() {
         params.append('type', selectedType.toLowerCase());
       }
 
-      // Dodaj województwo jeśli wybrane i nie Małopolskie
-      if (selectedVoivodeship && selectedVoivodeship !== 'malopolskie') {
+      // Dodaj województwo jeśli nie Małopolskie
+      if (selectedVoivodeship !== 'malopolskie') {
         params.append('woj', selectedVoivodeship);
       }
 
@@ -277,72 +99,6 @@ export default function HeroSection() {
         console.error('Geolocation error:', error);
         alert('Nie udało się pobrać lokalizacji.');
       }
-    );
-  };
-
-  // NEW: Autocomplete Dropdown Component
-  const AutocompleteDropdown = () => {
-    console.log('🎨 Rendering dropdown:', { showDropdown, suggestionsLength: suggestions.length });
-    
-    if (!showDropdown || suggestions.length === 0) return null;
-
-    return (
-      <div
-        ref={dropdownRef}
-        className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-2xl border border-neutral-300 max-h-96 overflow-y-auto"
-        style={{ 
-          boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-          width: '500px',
-          zIndex: 10000,
-          position: 'absolute',
-        }}
-        onMouseDown={(e) => {
-          // Zapobiega zamknięciu dropdown przed kliknięciem
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      >
-        {/* Suggestions list */}
-        {suggestions.map((suggestion, index) => (
-          <button
-            key={`${suggestion.nazwa}-${suggestion.powiat}`}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleSuggestionClick(suggestion);
-            }}
-            className={`w-full px-4 py-3 text-left border-b border-neutral-100 last:border-b-0 hover:bg-accent-50 transition-colors cursor-pointer ${
-              highlightedIndex === index ? 'bg-accent-50' : ''
-            }`}
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="font-medium text-neutral-900">
-                  {suggestion.nazwa}
-                </div>
-                <div className="text-sm text-neutral-500">
-                  {suggestion.powiat}, {suggestion.wojewodztwo}
-                </div>
-              </div>
-              <div className="text-sm text-accent-600 font-medium">
-                {suggestion.facilitiesCount} {getPluralForm(suggestion.facilitiesCount)}
-              </div>
-            </div>
-          </button>
-        ))}
-
-        {/* "Show All" button if more results */}
-        {totalCount > 5 && (
-          <button
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleShowAllClick();
-            }}
-            className="w-full px-4 py-3 text-center text-accent-600 hover:bg-accent-50 font-medium transition-colors border-t border-neutral-200 cursor-pointer"
-          >
-            📋 Pokaż wszystkie ({totalCount})
-          </button>
-        )}
-      </div>
     );
   };
 
@@ -403,34 +159,19 @@ export default function HeroSection() {
 
         {/* Multi-Segment Search Bar */}
         <div className="max-w-5xl mx-auto">
-          {/* Desktop version - IMPORTANT: overflow visible for dropdown */}
-          <div className="hidden md:flex bg-white rounded-xl shadow-lg border border-neutral-200 relative">
-            {/* Segment 1: Miejscowość - WITH AUTOCOMPLETE */}
-            <div className="flex-1 px-4 py-4 border-r border-neutral-200 relative" style={{ zIndex: 100 }}>
+          {/* Desktop version */}
+          <div className="hidden md:flex bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
+            {/* Segment 1: Miejscowość */}
+            <div className="flex-1 px-4 py-4 border-r border-neutral-200">
               <label className="block text-xs text-neutral-500 mb-1">Miejscowość</label>
               <input
-                ref={inputRefDesktop}
                 type="text"
                 value={searchQuery}
-                onChange={(e) => {
-                  console.log('📝 Input changed:', e.target.value);
-                  setSearchQuery(e.target.value);
-                }}
-                onKeyDown={handleKeyDown}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="np. Bochnia, Kraków"
                 className="w-full text-base focus:outline-none"
-                autoComplete="off"
               />
-              
-              {/* Loading indicator */}
-              {isLoading && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  <div className="animate-spin h-4 w-4 border-2 border-accent-500 border-t-transparent rounded-full" />
-                </div>
-              )}
-              
-              {/* Autocomplete Dropdown */}
-              <AutocompleteDropdown />
             </div>
 
             {/* Segment 2: Województwo */}
@@ -444,7 +185,6 @@ export default function HeroSection() {
                 }}
                 className="w-full text-base focus:outline-none bg-transparent cursor-pointer"
               >
-                <option value="">Wybierz województwo</option>
                 <option value="malopolskie">Małopolskie</option>
                 <option value="slaskie">Śląskie (Beta)</option>
                 <option value="" disabled>
@@ -466,7 +206,6 @@ export default function HeroSection() {
                 value={selectedPowiat}
                 onChange={(e) => setSelectedPowiat(e.target.value)}
                 className="w-full text-base focus:outline-none bg-transparent cursor-pointer"
-                disabled={!selectedVoivodeship}
               >
                 <option value="">Wszystkie powiaty</option>
                 {availablePowiaty.map((powiat) => (
@@ -497,7 +236,7 @@ export default function HeroSection() {
             {/* Segment 5: Search Button */}
             <button
               onClick={handleSearch}
-              className="px-8 bg-accent-500 hover:bg-accent-600 transition-colors flex items-center justify-center rounded-r-xl"
+              className="px-8 bg-accent-500 hover:bg-accent-600 transition-colors flex items-center justify-center"
             >
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -512,32 +251,16 @@ export default function HeroSection() {
 
           {/* Mobile version */}
           <div className="md:hidden bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
-            {/* Miejscowość - WITH AUTOCOMPLETE */}
-            <div className="px-4 py-4 border-b border-neutral-200 relative">
+            {/* Miejscowość */}
+            <div className="px-4 py-4 border-b border-neutral-200">
               <label className="block text-xs text-neutral-500 mb-2">Miejscowość</label>
               <input
-                ref={inputRefMobile}
                 type="text"
                 value={searchQuery}
-                onChange={(e) => {
-                  console.log('📝 Mobile input changed:', e.target.value);
-                  setSearchQuery(e.target.value);
-                }}
-                onKeyDown={handleKeyDown}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="np. Bochnia, Kraków"
                 className="w-full text-base focus:outline-none"
-                autoComplete="off"
               />
-              
-              {/* Loading indicator */}
-              {isLoading && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  <div className="animate-spin h-4 w-4 border-2 border-accent-500 border-t-transparent rounded-full" />
-                </div>
-              )}
-              
-              {/* Autocomplete Dropdown */}
-              <AutocompleteDropdown />
             </div>
 
             {/* Województwo */}
@@ -551,7 +274,6 @@ export default function HeroSection() {
                 }}
                 className="w-full text-base focus:outline-none bg-transparent"
               >
-                <option value="">Wybierz województwo</option>
                 <option value="malopolskie">Małopolskie</option>
                 <option value="slaskie">Śląskie (Beta)</option>
                 <option value="" disabled>
@@ -573,7 +295,6 @@ export default function HeroSection() {
                 value={selectedPowiat}
                 onChange={(e) => setSelectedPowiat(e.target.value)}
                 className="w-full text-base focus:outline-none bg-transparent"
-                disabled={!selectedVoivodeship}
               >
                 <option value="">Wszystkie powiaty</option>
                 {availablePowiaty.map((powiat) => (

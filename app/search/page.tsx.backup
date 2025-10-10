@@ -3,12 +3,7 @@ import Link from 'next/link';
 import SearchResults from '@/components/SearchResults';
 
 interface SearchPageProps {
-  searchParams: Promise<{ 
-    q?: string; 
-    type?: string;
-    woj?: string;
-    powiat?: string;
-  }>;
+  searchParams: Promise<{ q?: string; type?: string }>;
 }
 
 // Normalizacja polskich znaków - uniwersalna dla całej Polski
@@ -25,8 +20,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params.q || '';
   const type = params.type || 'all';
-  const wojewodztwo = params.woj || 'malopolskie';
-  const powiatParam = params.powiat || '';
 
   let results: any[] = [];
   let terytMatches: any[] = [];
@@ -36,27 +29,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const normalizedQuery = normalizePolish(query.trim());
 
     // Szukaj w TERYT po znormalizowanej nazwie - EXACT MATCH
-    const terytWhere: any = {
-      nazwa_normalized: normalizedQuery,
-    };
-
-    // Filtr województwa
-    if (wojewodztwo) {
-      terytWhere.wojewodztwo = wojewodztwo;
-    }
-
-    // Filtr powiatu (jeśli wybrany)
-    if (powiatParam) {
-      terytWhere.powiat = powiatParam;
-    }
-
     terytMatches = await prisma.terytLocation.findMany({
-      where: terytWhere,
+      where: {
+        nazwa_normalized: normalizedQuery,
+      },
       select: {
         powiat: true,
         gmina: true,
         nazwa: true,
-        wojewodztwo: true,
       },
     });
 
@@ -100,7 +80,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // Komunikaty
       const locationCount = terytMatches.length;
       const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
-      const wojewodztwoName = wojewodztwo === 'slaskie' ? 'Śląskie' : 'Małopolskie';
       
       if (results.length > 0) {
         if (locationCount > 1) {
@@ -115,28 +94,24 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             .filter(Boolean)
             .join(', ');
           
-          message = `Miejscowość "${query}" znaleziona w ${locationCount} powiatach (${wojewodztwoName}). Pokazujemy ${facilityWord} ze wszystkich lokalizacji: ${facilitiesPerPowiat}.`;
+          message = `Miejscowość "${query}" znaleziona w ${locationCount} powiatach. Pokazujemy ${facilityWord} ze wszystkich lokalizacji: ${facilitiesPerPowiat}.`;
         } else {
-          message = `Znaleźliśmy ${facilityWord} w okolicy miejscowości ${terytMatches[0].nazwa} (${wojewodztwoName}).`;
+          message = `Znaleźliśmy ${facilityWord} w okolicy miejscowości ${terytMatches[0].nazwa}.`;
         }
       } else {
         // Brak placówek - sugeruj sąsiednie powiaty
-        const nearbyWhere: any = typeFilter;
-        
-        // Szukaj w tym samym województwie
         const nearbyFacilities = await prisma.placowka.findMany({
-          where: nearbyWhere,
+          where: typeFilter,
           select: { powiat: true },
           distinct: ['powiat'],
           take: 5,
         });
 
         const powiatySuggestions = nearbyFacilities.map(f => f.powiat).join(', ');
-        message = `Nie znaleźliśmy ${facilityWord} w ${uniquePowiaty.join(', ')} (${wojewodztwoName}). Spróbuj wyszukać w: ${powiatySuggestions}`;
+        message = `Nie znaleźliśmy ${facilityWord} w ${uniquePowiaty.join(', ')}. Spróbuj wyszukać w: ${powiatySuggestions}`;
       }
     } else {
-      const wojewodztwoName = wojewodztwo === 'slaskie' ? 'Śląskim' : 'Małopolsce';
-      message = `Nie znaleźliśmy miejscowości "${query}" w ${wojewodztwoName}. Spróbuj wpisać inną nazwę.`;
+      message = `Nie znaleźliśmy miejscowości "${query}" w Małopolsce. Spróbuj wpisać inną nazwę.`;
     }
   }
 
