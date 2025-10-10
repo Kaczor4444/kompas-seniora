@@ -39,7 +39,15 @@ export async function GET(request: NextRequest) {
 
     // Dodaj filtry jeśli wybrane
     if (wojewodztwo) {
-      terytWhere.wojewodztwo = wojewodztwo;
+      // Mapowanie URL param → nazwa w bazie (polskie znaki)
+      const wojewodztwoMap: Record<string, string> = {
+        'malopolskie': 'małopolskie',
+        'slaskie': 'śląskie',
+        'mazowieckie': 'mazowieckie',
+        'dolnoslaskie': 'dolnośląskie',
+        'wielkopolskie': 'wielkopolskie',
+      };
+      terytWhere.wojewodztwo = wojewodztwoMap[wojewodztwo] || wojewodztwo;
     }
     if (powiat) {
       terytWhere.powiat = powiat;
