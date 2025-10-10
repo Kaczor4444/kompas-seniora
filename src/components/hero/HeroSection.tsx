@@ -307,7 +307,8 @@ export default function HeroSection() {
         className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-2xl border border-neutral-300 max-h-96 overflow-y-auto"
         style={{ 
           boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-          width: '500px',
+          width: typeof window !== 'undefined' && window.innerWidth < 768 ? '100%' : '500px',
+          minWidth: '280px',
           zIndex: 10000,
           position: 'absolute',
         }}
@@ -391,6 +392,7 @@ export default function HeroSection() {
                 ? 'bg-white border-2 border-accent-500 text-neutral-900'
                 : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
             }`}
+            title="Wszystkie typy placówek - zarówno DPS jak i ŚDS"
           >
             Wszystkie
           </button>
@@ -401,8 +403,9 @@ export default function HeroSection() {
                 ? 'bg-white border-2 border-accent-500 text-neutral-900'
                 : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
             }`}
+            title="Domy Pomocy Społecznej - całodobowa opieka dla osób starszych i niepełnosprawnych"
           >
-            Domy Pomocy Społecznej (DPS)
+            Domy Pomocy Społecznej (DPS) <span className="text-neutral-400 ml-1">ⓘ</span>
           </button>
           <button
             onClick={() => setSelectedType('ŚDS')}
@@ -411,8 +414,9 @@ export default function HeroSection() {
                 ? 'bg-white border-2 border-accent-500 text-neutral-900'
                 : 'bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700'
             }`}
+            title="Środowiskowe Domy Samopomocy - wsparcie dla osób z zaburzeniami psychicznymi"
           >
-            Środowiskowe Domy Samopomocy (ŚDS)
+            Środowiskowe Domy Samopomocy (ŚDS) <span className="text-neutral-400 ml-1">ⓘ</span>
           </button>
         </div>
 
@@ -422,7 +426,9 @@ export default function HeroSection() {
           <div className="hidden md:flex bg-white rounded-xl shadow-lg border border-neutral-200 relative">
             {/* Segment 1: Miejscowość - WITH AUTOCOMPLETE */}
             <div className="flex-1 px-4 py-4 border-r border-neutral-200 relative" style={{ zIndex: 100 }}>
-              <label className="block text-xs text-neutral-500 mb-1">Miejscowość</label>
+              <label className="block text-xs text-neutral-500 mb-1">
+                Miejscowość <span className="text-neutral-400" title="Wpisz co najmniej 2 znaki aby zobaczyć sugestie">ⓘ</span>
+              </label>
               <input
                 ref={inputRefDesktop}
                 type="text"
@@ -432,7 +438,7 @@ export default function HeroSection() {
                   setSearchQuery(e.target.value);
                 }}
                 onKeyDown={handleKeyDown}
-                placeholder="np. Bochnia, Kraków"
+                placeholder="np. Bochnia, Kraków, Nowy Sącz..."
                 className="w-full text-base focus:outline-none"
                 autoComplete="off"
               />
@@ -529,7 +535,9 @@ export default function HeroSection() {
           <div className="md:hidden bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
             {/* Miejscowość - WITH AUTOCOMPLETE */}
             <div className="px-4 py-4 border-b border-neutral-200 relative">
-              <label className="block text-xs text-neutral-500 mb-2">Miejscowość</label>
+              <label className="block text-xs text-neutral-500 mb-2">
+                Miejscowość <span className="text-neutral-400" title="Wpisz co najmniej 2 znaki">ⓘ</span>
+              </label>
               <input
                 ref={inputRefMobile}
                 type="text"
@@ -539,7 +547,7 @@ export default function HeroSection() {
                   setSearchQuery(e.target.value);
                 }}
                 onKeyDown={handleKeyDown}
-                placeholder="np. Bochnia, Kraków"
+                placeholder="np. Bochnia, Kraków, Nowy Sącz..."
                 className="w-full text-base focus:outline-none"
                 autoComplete="off"
               />
