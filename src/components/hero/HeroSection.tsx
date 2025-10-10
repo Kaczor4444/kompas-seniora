@@ -203,7 +203,22 @@ export default function HeroSection() {
   // NEW: Handle "Show All" click
   const handleShowAllClick = () => {
     setShowDropdown(false);
-    handleSearch();
+    
+    const params = new URLSearchParams();
+    params.append('q', searchQuery);
+    params.append('partial', 'true'); // NOWE - oznacz jako partial search
+    
+    if (selectedType !== 'WSZYSTKIE') {
+      params.append('type', selectedType.toLowerCase());
+    }
+    if (selectedVoivodeship && selectedVoivodeship !== 'malopolskie') {
+      params.append('woj', selectedVoivodeship);
+    }
+    if (selectedPowiat) {
+      params.append('powiat', selectedPowiat);
+    }
+    
+    window.location.href = `/search?${params.toString()}`;
   };
 
   // NEW: Keyboard navigation
@@ -330,8 +345,8 @@ export default function HeroSection() {
           </button>
         ))}
 
-        {/* "Show All" button if more results */}
-        {totalCount > 5 && (
+        {/* "Show All" button if more results than displayed AND query is long enough */}
+        {totalCount > suggestions.length && searchQuery.length >= 4 && (
           <button
             onMouseDown={(e) => {
               e.preventDefault();
