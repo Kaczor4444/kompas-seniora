@@ -1,0 +1,52 @@
+id,nazwa,typ_placowki,prowadzacy,data_aktualizacji,zrodlo,wojewodztwo,powiat,gmina,miasto_wies,ulica,kod_pocztowy,geo_lat,geo_long,telefon,email,www,liczba_miejsc,profil_opieki,koszt_pobytu,opis,zrodlo_typ,zrodlo_szczegoly,kontakt_osoba,kontakt_notatki
+1,"DPS Przyjaźń","DPS","Powiat Tarnogórski","2025-10-11","https://bip.tarnowskiegory.pl/uchwaly/2025/ceny-dps.pdf","śląskie","tarnogórski","Tarnowskie Góry","Tarnowskie Góry","ul. Przykładowa 1","42-600",50.445,18.861,"+48 32 123 45 67","kontakt@dps-przyjaźń.pl","https://dps-tg.pl",130,"alzheimer|osoby-starsze|lezacy","7226.14","Filia w Zbrosławicach. Specjalizacja w opiece nad osobami z alzheimerem.","BIP-Uchwała","Strona 3, Tabela 1, wiersz 2","Pani Anna Kowalska, MOPS Tarnowskie Góry","Bardzo pomocna, email: a.kowalska@mops.tg.pl"
+2,"ŚDS Nadzieja","ŚDS","Gmina Katowice","2025-10-11","a.nowak@mops.katowice.pl","śląskie","katowicki","Katowice","Katowice","ul. Testowa 5","40-001",50.264,19.023,"+48 32 999 88 77","info@sds-nadzieja.pl","https://sds-nadzieja.pl",85,"przewlekle-chore|osoby-starsze","5800.00","","Email","Email z 2025-10-11, temat: Cennik ŚDS 2025","Pan Adam Nowak, MOPS Katowice","Odpowiedział w 2 dni, email najlepszy"
+3,"DPS Słoneczny","DPS","Fundacja Słoneczna Przyszłość","2025-10-12","+48 32 888 77 66","śląskie","gliwicki","Gliwice","Gliwice","ul. Kolejowa 12","44-100",50.294,18.678,"+48 32 888 77 66","kontakt@dps-sloneczny.pl","",95,"demencja|parkinson|osoby-starsze|lezacy","6100.50","Specjalizacja w chorobie Parkinsona i demencji","Telefon","Rozmowa z Panią Ewą z księgowości, 2025-10-12 o 10:30","Pani Ewa Wiśniewska, księgowość DPS","Dzwonić rano 9-11, bardzo miła i pomocna"
+4,"ŚDS Senior+","ŚDS","Gmina Bytom","2025-10-12","https://senior-plus.bytom.pl/cennik","śląskie","bytomski","Bytom","Bytom","al. Pokoju 45","41-902",50.348,18.911,"+48 32 777 66 55","kontakt@senior-plus.pl","https://senior-plus.bytom.pl",60,"osoby-starsze|rehabilitacja","5200.00","Nowa placówka od 2024, nowoczesne wyposażenie","Strona-WWW","Sekcja Cennik, zakładka Opłaty 2025","","Cennik na stronie aktualizowany w styczniu każdego roku"
+
+UWAGI DO KOLUMN:
+================
+
+PODSTAWOWE (identyczne jak w dane/placowki.csv):
+- id: unikalny numer (ciągła numeracja od ostatniego w Małopolskim)
+- nazwa: pełna oficjalna nazwa
+- typ_placowki: DPS | ŚDS | DPS+ŚDS
+- prowadzacy: kto prowadzi (powiat, gmina, fundacja)
+- data_aktualizacji: YYYY-MM-DD
+- zrodlo: główny link/email/telefon
+- wojewodztwo: śląskie (z polskimi znakami!)
+- powiat: bez polskich znaków (tarnogórski nie tarnogórski)
+- gmina: nazwa gminy
+- miasto_wies: nazwa miasta/wsi
+- ulica: dokładny adres
+- kod_pocztowy: XX-XXX
+- geo_lat: współrzędne (Google Maps)
+- geo_long: współrzędne
+- telefon: +48 XX XXX XX XX
+- email: kontakt
+- www: pełny URL (https://)
+- liczba_miejsc: liczba całkowita
+- profil_opieki: tagi oddzielone | (alzheimer|demencja|osoby-starsze)
+- koszt_pobytu: cena w PLN (7226.14 nie 7226)
+- opis: dodatkowe informacje
+
+NOWE KOLUMNY (tracking źródeł):
+- zrodlo_typ: BIP-Uchwała | Email | Telefon | Strona-WWW | PDF-MOPS
+- zrodlo_szczegoly: gdzie dokładnie (strona PDF, sekcja, temat emaila)
+- kontakt_osoba: Imię Nazwisko, stanowisko/instytucja
+- kontakt_notatki: jak kontaktować, kiedy najlepiej, helpful tips
+
+TAGI PROFIL_OPIEKI (oddzielone |):
+- alzheimer
+- demencja
+- po-udarze
+- osoby-starsze
+- przewlekle-chore
+- lezacy
+- parkinson
+- niepelnosprawni
+- psychiatryczna
+- rehabilitacja
+
+TEMPLATE dla nowego wiersza (skopiuj i wypełnij):
+X,"[NAZWA]","DPS","[PROWADZĄCY]","YYYY-MM-DD","[ŹRÓDŁO]","śląskie","[powiat]","[gmina]","[miasto]","[ulica]","[kod]",XX.XXX,XX.XXX,"+48 XX XXX XX XX","[email]","[www]",XXX,"[tagi]","XXXX.XX","[opis]","[typ]","[szczegóły]","[osoba]","[notatki]"
