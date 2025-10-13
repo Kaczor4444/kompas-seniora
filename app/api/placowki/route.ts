@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     // Kombinacja search + type
     if (searchNormalized && type && type !== 'WSZYSTKIE') {
       placowki = await prisma.$queryRawUnsafe(`
-        SELECT * FROM placowki 
+        SELECT * FROM Placowka 
         WHERE (
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(miejscowosc, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(gmina, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     // Tylko search, bez typu
     else if (searchNormalized) {
       placowki = await prisma.$queryRawUnsafe(`
-        SELECT * FROM placowki 
+        SELECT * FROM Placowka
         WHERE 
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(miejscowosc, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(gmina, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     // Tylko typ, bez search
     else if (type && type !== 'WSZYSTKIE') {
       placowki = await prisma.$queryRawUnsafe(`
-        SELECT * FROM placowki 
+        SELECT * FROM Placowka 
         WHERE typ_placowki = '${type}'
         ORDER BY nazwa ASC
       `)
