@@ -14,6 +14,7 @@ interface SearchPageProps {
     min?: string;
     max?: string;
     free?: string;
+    care?: string; // ✅ DODANE
   }>;
 }
 
@@ -242,7 +243,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     }
   }
 
-  // FILTROWANIE PO CENIE
+  // ✅ FILTROWANIE PO CENIE
   const minPrice = params.min ? parseInt(params.min) : undefined;
   const maxPrice = params.max ? parseInt(params.max) : undefined;
   const showFree = params.free === 'true';
@@ -268,6 +269,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       });
       console.log('  Filtered by price range →', filteredResults.length);
     }
+  }
+
+  // ✅ FILTROWANIE PO PROFILU OPIEKI (NOWE!)
+  const selectedCareTypes = params.care ? params.care.split(',') : [];
+  
+  console.log('🏥 CARE PROFILE FILTERS:', selectedCareTypes);
+
+  if (selectedCareTypes.length > 0) {
+    filteredResults = filteredResults.filter(facility => {
+      if (!facility.profil_opieki) return false;
+      
+      const facilityProfiles = facility.profil_opieki.split(',').map((p: string) => p.trim());
+      
+      // OR logic - placówka musi mieć przynajmniej jeden z wybranych profili
+      const hasMatch = selectedCareTypes.some(selectedType => 
+        facilityProfiles.includes(selectedType)
+      );
+      
+      if (hasMatch) {
+        console.log('  ✓ Care match:', facility.nazwa, 'has', facilityProfiles, 'matches', selectedCareTypes);
+      }
+      
+      return hasMatch;
+    });
+    console.log('  Filtered by care profiles →', filteredResults.length);
   }
 
   if (filteredResults.length === 0 && results.length > 0) {
