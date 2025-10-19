@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SearchResults from '@/components/SearchResults';
+import FilterSidebar from '@/src/components/filters/FilterSidebar';
+import MobileFilterDrawer from '@/src/components/filters/MobileFilterDrawer';
 
 interface SearchPageProps {
   searchParams: Promise<{ 
@@ -9,6 +11,9 @@ interface SearchPageProps {
     woj?: string;
     powiat?: string;
     partial?: string;
+    min?: string;
+    max?: string;
+    free?: string;
   }>;
 }
 
@@ -26,7 +31,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params.q || '';
   const type = params.type || 'all';
-  const wojewodztwo = params.woj || 'all'; // ✅ CHANGED: domyślnie 'all' zamiast 'malopolskie'
+  const wojewodztwo = params.woj || 'all';
   const powiatParam = params.powiat || '';
   const isPartialSearch = params.partial === 'true';
 
@@ -45,7 +50,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const normalizedQuery = normalizePolish(query.trim());
     console.log('  normalizedQuery:', normalizedQuery);
 
-    // ✅ NEW: Sprawdź czy województwo ma dane TERYT
+    // Mapowanie województw
     const wojewodztwoMap: Record<string, string> = {
       'malopolskie': 'małopolskie',
       'slaskie': 'śląskie',
@@ -60,27 +65,22 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                            wojewodztwoDbName;
 
     // Sprawdź czy są dane TERYT dla tego województwa
-    const hasTerytData = wojewodztwo === 'malopolskie' || wojewodztwo === 'all';
+    const hasTerytData = wojewodztwo === 'malopolskie';
 
-    console.log('  hasTerytData:', hasTerytData);
+    console.log('  hasTerytData:', hasTerytData, '(wojewodztwo:', wojewodztwo, ')');
 
-    // ✅ TRYB 1: Z TERYT (Małopolskie)
+    // TRYB 1: Z TERYT (Małopolskie)
     if (hasTerytData && wojewodztwo !== 'all') {
-      // Szukaj w TERYT - EXACT lub PARTIAL match
-      const terytWhere: any = isPartialSearch 
-        ? {
-            nazwa_normalized: { contains: normalizedQuery }
-          }
-        : {
-            nazwa_normalized: normalizedQuery
-          };
+      console.log('  Mode: TERYT');
 
-      // Filtr województwa
+      const terytWhere: any = isPartialSearch 
+        ? { nazwa_normalized: { contains: normalizedQuery } }
+        : { nazwa_normalized: normalizedQuery };
+
       if (wojewodztwo !== 'all') {
         terytWhere.wojewodztwo = wojewodztwoDbName;
       }
 
-      // Filtr powiatu (jeśli wybrany)
       if (powiatParam) {
         terytWhere.powiat = powiatParam;
       }
@@ -102,25 +102,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         console.log('🔍 First match:', terytMatches[0]);
       }
 
-      // Zbierz unikalne powiaty
       let uniquePowiaty = [...new Set(terytMatches.map(t => normalizePolish(t.powiat)))];
       console.log('🔍 Unique powiaty:', uniquePowiaty);
 
-      // Mapowanie wariantów powiatów - Kraków miasto + powiat
       const powiatMapping: Record<string, string[]> = {
         'krakow': ['krakow', 'krakowski'],
         'm. krakow': ['krakow', 'krakowski'],
         'krakowski': ['krakow', 'krakowski'],
       };
 
-      // Rozszerz uniquePowiaty o wszystkie warianty
       uniquePowiaty = [...new Set(uniquePowiaty.flatMap(p => 
         powiatMapping[p] || [p]
       ))];
       console.log('🔍 Unique powiaty (expanded):', uniquePowiaty);
 
       if (uniquePowiaty.length > 0) {
-        // Filtr typu placówki
         const typeFilter = type === 'dps' 
           ? { typ_placowki: 'DPS' }
           : (type === 'sds' || type === 'śds')
@@ -129,7 +125,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         console.log('🔍 Type filter:', typeFilter);
 
-        // Pobierz placówki z filtrem typu
         const allFacilities = await prisma.placowka.findMany({
           where: typeFilter,
           orderBy: { nazwa: 'asc' },
@@ -137,7 +132,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         console.log('🔍 All facilities (before powiat filter):', allFacilities.length);
 
-        // Filtruj po powiatach - CONTAINS zamiast EXACT
         results = allFacilities.filter(facility => {
           const normalizedFacilityPowiat = normalizePolish(facility.powiat);
           
@@ -157,7 +151,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         console.log('🔍 Results after powiat filter:', results.length);
 
-        // Komunikaty
         const locationCount = terytMatches.length;
         const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
         
@@ -179,7 +172,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             message = `Znaleźliśmy ${facilityWord} w okolicy miejscowości ${terytMatches[0].nazwa} (${wojewodztwoName}).`;
           }
         } else {
-          // Brak placówek - sugeruj sąsiednie powiaty
           const nearbyFacilities = await prisma.placowka.findMany({
             where: typeFilter,
             select: { powiat: true },
@@ -195,11 +187,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         message = `Nie znaleźliśmy miejscowości ${searchType} "${query}" w ${wojewodztwoName}. Spróbuj wpisać inną nazwę.`;
       }
     } 
-    // ✅ TRYB 2: BEZ TERYT (Śląskie lub 'all') - bezpośrednie szukanie w miejscowosc
+    // TRYB 2: BEZ TERYT (Śląskie lub 'all')
     else {
       console.log('🔍 NO TERYT MODE - Direct search in Placowka.miejscowosc');
 
-      // Filtr typu placówki
       const where: any = type === 'dps' 
         ? { typ_placowki: 'DPS' }
         : (type === 'sds' || type === 'śds')
@@ -208,7 +199,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       console.log('🔍 Direct WHERE (before woj filter):', JSON.stringify(where, null, 2));
 
-      // ✅ FIX: Pobierz wszystkie placówki NAJPIERW (bez filtra woj)
       const allFacilities = await prisma.placowka.findMany({
         where,
         orderBy: { nazwa: 'asc' },
@@ -216,23 +206,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       console.log('🔍 All facilities (total):', allFacilities.length);
 
-      // Pokaż przykładowe województwa w bazie (debug)
       const uniqueWoj = [...new Set(allFacilities.map(f => f.wojewodztwo))];
       console.log('🔍 Unique wojewodztwa in DB:', uniqueWoj);
 
-      // ✅ FIX: Filtruj po województwie I miejscowości (case-insensitive)
       results = allFacilities.filter(facility => {
-        // Filtr województwa (case-insensitive)
         if (wojewodztwo !== 'all') {
           const normalizedFacilityWoj = normalizePolish(facility.wojewodztwo);
           const normalizedTargetWoj = normalizePolish(wojewodztwoDbName);
           
           if (normalizedFacilityWoj !== normalizedTargetWoj) {
-            return false; // Nie pasuje województwo
+            return false;
           }
         }
 
-        // Filtr miejscowości - CONTAINS match
         const normalizedMiejscowosc = normalizePolish(facility.miejscowosc);
         const matches = normalizedMiejscowosc.includes(normalizedQuery);
         
@@ -244,7 +230,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       console.log('🔍 Results after miejscowosc filter:', results.length);
 
-      // Komunikaty
       const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
       
       if (results.length > 0) {
@@ -257,8 +242,40 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     }
   }
 
+  // FILTROWANIE PO CENIE
+  const minPrice = params.min ? parseInt(params.min) : undefined;
+  const maxPrice = params.max ? parseInt(params.max) : undefined;
+  const showFree = params.free === 'true';
+
+  console.log('💰 PRICE FILTERS:', { minPrice, maxPrice, showFree });
+
+  let filteredResults = results;
+
+  if (showFree) {
+    filteredResults = filteredResults.filter(f => 
+      f.koszt_pobytu === null || f.koszt_pobytu === 0
+    );
+    console.log('  Filtered by: Bezpłatne only →', filteredResults.length);
+  } else {
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      filteredResults = filteredResults.filter(f => {
+        if (f.koszt_pobytu === null || f.koszt_pobytu === 0) return false;
+        
+        const price = f.koszt_pobytu;
+        if (minPrice && price < minPrice) return false;
+        if (maxPrice && price > maxPrice) return false;
+        return true;
+      });
+      console.log('  Filtered by price range →', filteredResults.length);
+    }
+  }
+
+  if (filteredResults.length === 0 && results.length > 0) {
+    message = `Znaleziono ${results.length} placówek, ale żadna nie spełnia wybranych filtrów. Zmień kryteria wyszukiwania.`;
+  }
+
   console.log('🔍 DEBUG Search Page END');
-  console.log('  Final results:', results.length);
+  console.log('  Final results:', filteredResults.length);
   console.log('  Message:', message);
   console.log('---');
 
@@ -275,12 +292,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <SearchResults 
-          query={query}
-          type={type}
-          results={results}
-          message={message}
-        />
+        <div className="flex flex-col lg:flex-row gap-6">
+          
+          {/* LEFT: Sidebar z filtrami (tylko desktop) */}
+          <div className="hidden lg:block lg:w-80 flex-shrink-0">
+            <FilterSidebar totalResults={filteredResults.length} />
+          </div>
+
+          {/* RIGHT: Wyniki wyszukiwania */}
+          <div className="flex-1 min-w-0">
+            {/* Mobile: Filter drawer */}
+            <div className="lg:hidden mb-4">
+              <MobileFilterDrawer totalResults={filteredResults.length} />
+            </div>
+
+            {/* Search Results */}
+            <SearchResults 
+              query={query}
+              type={type}
+              results={filteredResults}
+              message={message}
+            />
+          </div>
+
+        </div>
       </main>
     </div>
   );
