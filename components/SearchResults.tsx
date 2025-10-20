@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { getProfileOpiekiNazwy, profileOpiekiKody } from '@/src/data/profileopieki';
+import SortDropdown from '@/src/components/search/SortDropdown'; // ✅ DODANE
 
 const FacilityMap = dynamic(() => import('@/components/FacilityMap'), {
   ssr: false,
@@ -195,6 +196,11 @@ export default function SearchResults({ query, type, results, message, activeFil
             )}
           </div>
         </div>
+      )}
+
+      {/* ✅ SORTOWANIE - DODANE */}
+      {results.length > 0 && (
+        <SortDropdown totalResults={results.length} />
       )}
 
       {/* Layout: Lista + Mapa */}

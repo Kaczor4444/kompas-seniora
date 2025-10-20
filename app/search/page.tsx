@@ -15,6 +15,7 @@ interface SearchPageProps {
     max?: string;
     free?: string;
     care?: string;
+    sort?: string; // ✅ DODANE: parametr sortowania
   }>;
 }
 
@@ -326,6 +327,46 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   console.log('  Message:', message);
   console.log('---');
 
+  // ========== ✅ SORTOWANIE - DODANE ========== 
+  const sortParam = params.sort || 'default';
+
+  let sortedResults = [...filteredResults]; // Kopia żeby nie mutować
+
+  switch (sortParam) {
+    case 'name_asc':
+      sortedResults.sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'));
+      break;
+    
+    case 'name_desc':
+      sortedResults.sort((a, b) => b.nazwa.localeCompare(a.nazwa, 'pl'));
+      break;
+    
+    case 'price_asc':
+      sortedResults.sort((a, b) => {
+        // Bezpłatne na końcu
+        if (a.koszt_pobytu === null || a.koszt_pobytu === 0) return 1;
+        if (b.koszt_pobytu === null || b.koszt_pobytu === 0) return -1;
+        return a.koszt_pobytu - b.koszt_pobytu;
+      });
+      break;
+    
+    case 'price_desc':
+      sortedResults.sort((a, b) => {
+        // Bezpłatne na końcu
+        if (a.koszt_pobytu === null || a.koszt_pobytu === 0) return 1;
+        if (b.koszt_pobytu === null || b.koszt_pobytu === 0) return -1;
+        return b.koszt_pobytu - a.koszt_pobytu;
+      });
+      break;
+    
+    default: // 'default'
+      // Pozostaw w kolejności z bazy
+      break;
+  }
+
+  console.log('🔀 SORTING:', sortParam, '→', sortedResults.length, 'results');
+  // ========== KONIEC SORTOWANIA ==========
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -344,7 +385,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           {/* LEFT: Sidebar z filtrami (tylko desktop) */}
           <div className="hidden lg:block lg:w-80 flex-shrink-0">
             <FilterSidebar 
-              totalResults={filteredResults.length}
+              totalResults={sortedResults.length}
               careProfileCounts={careProfileCounts}
             />
           </div>
@@ -354,7 +395,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             {/* Mobile: Filter drawer */}
             <div className="lg:hidden mb-4">
               <MobileFilterDrawer 
-                totalResults={filteredResults.length}
+                totalResults={sortedResults.length}
                 careProfileCounts={careProfileCounts}
               />
             </div>
@@ -363,7 +404,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <SearchResults 
               query={query}
               type={type}
-              results={filteredResults}
+              results={sortedResults}
               message={message}
               activeFilters={{
                 wojewodztwo: wojewodztwo !== 'all' ? wojewodztwo : undefined,
