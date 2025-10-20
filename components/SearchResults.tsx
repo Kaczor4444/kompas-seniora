@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { getProfileOpiekiNazwy } from '@/src/data/profileopieki';
+import { getProfileOpiekiNazwy, profileOpiekiKody } from '@/src/data/profileopieki';
 
 const FacilityMap = dynamic(() => import('@/components/FacilityMap'), {
   ssr: false,
@@ -22,20 +23,177 @@ interface Facility {
   profil_opieki?: string | null;
 }
 
+interface ActiveFilters {
+  wojewodztwo?: string;
+  powiat?: string;
+  type?: string;
+  careTypes?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  showFree?: boolean;
+}
+
 interface SearchResultsProps {
   query: string;
   type: string;
   results: Facility[];
   message: string;
+  activeFilters?: ActiveFilters;
 }
 
-export default function SearchResults({ query, type, results, message }: SearchResultsProps) {
+export default function SearchResults({ query, type, results, message, activeFilters }: SearchResultsProps) {
+  const router = useRouter();
+
+  // Funkcja do usuwania pojedynczego filtra
+  const removeFilter = (filterType: string, value?: string) => {
+    const params = new URLSearchParams(window.location.search);
+    
+    switch (filterType) {
+      case 'wojewodztwo':
+        params.delete('woj');
+        params.delete('powiat'); // Clear powiat when removing wojewodztwo
+        break;
+      case 'powiat':
+        params.delete('powiat');
+        break;
+      case 'type':
+        params.delete('type');
+        break;
+      case 'care':
+        if (value && activeFilters?.careTypes) {
+          const remaining = activeFilters.careTypes.filter(t => t !== value);
+          if (remaining.length > 0) {
+            params.set('care', remaining.join(','));
+          } else {
+            params.delete('care');
+          }
+        } else {
+          params.delete('care');
+        }
+        break;
+      case 'price':
+        params.delete('min');
+        params.delete('max');
+        break;
+      case 'free':
+        params.delete('free');
+        break;
+    }
+    
+    router.push(`/search?${params.toString()}`);
+  };
+
+  // Mapowanie nazw
+  const wojewodztwaLabels: Record<string, string> = {
+    'malopolskie': 'Małopolskie',
+    'slaskie': 'Śląskie',
+    'all': 'Wszystkie',
+  };
+
+  const typeLabels: Record<string, string> = {
+    'dps': 'DPS',
+    'sds': 'ŚDS',
+    'all': 'Wszystkie',
+  };
+
+  // Sprawdź czy są aktywne filtry
+  const hasActiveFilters = activeFilters && (
+    activeFilters.wojewodztwo ||
+    activeFilters.powiat ||
+    activeFilters.type ||
+    (activeFilters.careTypes && activeFilters.careTypes.length > 0) ||
+    activeFilters.minPrice ||
+    activeFilters.maxPrice ||
+    activeFilters.showFree
+  );
+
   return (
     <>
       {/* Message */}
       {message && (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-blue-800">{message}</p>
+        </div>
+      )}
+
+      {/* AKTYWNE FILTRY JAKO BADGES */}
+      {hasActiveFilters && (
+        <div className="mb-6 p-4 bg-white border border-neutral-200 rounded-lg">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium text-neutral-700">Aktywne filtry:</span>
+            
+            {/* Województwo */}
+            {activeFilters?.wojewodztwo && (
+              <button
+                onClick={() => removeFilter('wojewodztwo')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
+              >
+                {wojewodztwaLabels[activeFilters.wojewodztwo] || activeFilters.wojewodztwo}
+                <span className="text-accent-600">×</span>
+              </button>
+            )}
+
+            {/* Powiat */}
+            {activeFilters?.powiat && (
+              <button
+                onClick={() => removeFilter('powiat')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
+              >
+                {activeFilters.powiat}
+                <span className="text-accent-600">×</span>
+              </button>
+            )}
+
+            {/* Typ placówki */}
+            {activeFilters?.type && (
+              <button
+                onClick={() => removeFilter('type')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
+              >
+                {typeLabels[activeFilters.type] || activeFilters.type}
+                <span className="text-accent-600">×</span>
+              </button>
+            )}
+
+            {/* Profile opieki */}
+            {activeFilters?.careTypes && activeFilters.careTypes.map((code) => (
+              <button
+                key={code}
+                onClick={() => removeFilter('care', code)}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
+              >
+                {profileOpiekiKody[code as keyof typeof profileOpiekiKody]}
+                <span className="text-accent-600">×</span>
+              </button>
+            ))}
+
+            {/* Cena */}
+            {(activeFilters?.minPrice || activeFilters?.maxPrice) && (
+              <button
+                onClick={() => removeFilter('price')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
+              >
+                {activeFilters.minPrice && activeFilters.maxPrice
+                  ? `${activeFilters.minPrice.toLocaleString('pl-PL')} - ${activeFilters.maxPrice.toLocaleString('pl-PL')} zł`
+                  : activeFilters.minPrice
+                  ? `od ${activeFilters.minPrice.toLocaleString('pl-PL')} zł`
+                  : `do ${activeFilters.maxPrice?.toLocaleString('pl-PL')} zł`
+                }
+                <span className="text-accent-600">×</span>
+              </button>
+            )}
+
+            {/* Bezpłatne */}
+            {activeFilters?.showFree && (
+              <button
+                onClick={() => removeFilter('free')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
+              >
+                Tylko bezpłatne
+                <span className="text-accent-600">×</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -46,7 +204,7 @@ export default function SearchResults({ query, type, results, message }: SearchR
           {/* Lista placówek - 2/3 szerokości na desktop */}
           <div className="lg:col-span-2 space-y-4">
             {results.map((facility) => {
-              // ✅ Mapowanie kodów na czytelne nazwy
+              // Mapowanie kodów na czytelne nazwy
               const profileNazwy = facility.profil_opieki 
                 ? getProfileOpiekiNazwy(facility.profil_opieki)
                 : [];
@@ -72,7 +230,7 @@ export default function SearchResults({ query, type, results, message }: SearchR
                       <p className="text-sm text-gray-500">Powiat: {facility.powiat}</p>
                     </div>
 
-                    {/* ✅ PROFIL OPIEKI - Z MAPOWANIEM */}
+                    {/* PROFIL OPIEKI - Z MAPOWANIEM */}
                     {profileNazwy.length > 0 && (
                       <div>
                         <span className="font-medium text-gray-700">Profil opieki</span>

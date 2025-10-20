@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 interface FilterSidebarProps {
   totalResults: number;
+  careProfileCounts: Record<string, number>;
 }
 
 // Wszystkie województwa Polski
@@ -57,7 +58,7 @@ const CARE_TYPES = [
   { value: 'I', label: 'Niepełnosprawność fizyczna (motoryczna)' },
 ];
 
-export default function FilterSidebar({ totalResults }: FilterSidebarProps) {
+export default function FilterSidebar({ totalResults, careProfileCounts }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -106,6 +107,21 @@ export default function FilterSidebar({ totalResults }: FilterSidebarProps) {
   const availablePowiaty = selectedWojewodztwo !== 'all' 
     ? POWIATY_MAP[selectedWojewodztwo] || []
     : [];
+
+  // Sprawdź czy są aktywne filtry
+  const hasActiveFilters = 
+    localType !== 'all' ||
+    selectedWojewodztwo !== 'all' ||
+    selectedPowiat !== 'all' ||
+    selectedCareTypes.length > 0 ||
+    minPrice !== '' ||
+    maxPrice !== '' ||
+    showFree;
+
+  // Handler do czyszczenia filtrów
+  const handleClearFilters = () => {
+    router.push(`/search?${searchParams.get('q') ? 'q=' + searchParams.get('q') : ''}`);
+  };
 
   // Handler dla zmiany filtrów
   const handleFilterChange = (updates: {
@@ -200,11 +216,21 @@ export default function FilterSidebar({ totalResults }: FilterSidebarProps) {
 
   return (
     <aside className="w-full lg:w-80 space-y-4 lg:sticky lg:top-6 lg:self-start">
-      {/* Header z liczbą wyników */}
+      {/* Header z liczbą wyników + Wyczyść */}
       <div className="bg-white rounded-lg shadow-sm p-3 border border-neutral-200">
-        <p className="text-sm text-neutral-600">
-          Znaleziono <span className="font-semibold text-neutral-900">{totalResults}</span> placówek
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-neutral-600">
+            Znaleziono <span className="font-semibold text-neutral-900">{totalResults}</span> placówek
+          </p>
+          {hasActiveFilters && (
+            <button
+              onClick={handleClearFilters}
+              className="text-xs text-accent-600 hover:text-accent-700 font-medium"
+            >
+              Wyczyść filtry
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Typ placówki - ALWAYS VISIBLE */}
@@ -328,32 +354,54 @@ export default function FilterSidebar({ totalResults }: FilterSidebarProps) {
         
         {isCareTypeOpen && (
           <div className="px-4 pb-4 space-y-2">
-            {CARE_TYPES.map((careType) => (
-              <label key={careType.value} className="flex items-center space-x-2 cursor-pointer group">
-                <div className="relative flex items-center justify-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedCareTypes.includes(careType.value)}
-                    onChange={() => handleCareTypeToggle(careType.value)}
-                    className="sr-only"
-                  />
-                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                    selectedCareTypes.includes(careType.value)
-                      ? 'border-accent-600 bg-accent-50' 
-                      : 'border-neutral-300 bg-white group-hover:border-accent-400'
-                  }`}>
-                    {selectedCareTypes.includes(careType.value) && (
-                      <svg className="w-3 h-3 text-accent-600" fill="currentColor" viewBox="0 0 12 12">
-                        <path d="M10.28 2.28L4.5 8.06 2.22 5.78a.75.75 0 00-1.06 1.06l2.75 2.75a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06z"/>
-                      </svg>
-                    )}
+            {CARE_TYPES.map((careType) => {
+              const count = careProfileCounts[careType.value] || 0;
+              const isDisabled = count === 0;
+              
+              return (
+                <label 
+                  key={careType.value}
+                  className={`flex items-center justify-between space-x-2 ${
+                    isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                  } group`}
+                >
+                  <div className="flex items-center space-x-2 flex-1">
+                    <div className="relative flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedCareTypes.includes(careType.value)}
+                        onChange={() => !isDisabled && handleCareTypeToggle(careType.value)}
+                        disabled={isDisabled}
+                        className="sr-only"
+                      />
+                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                        selectedCareTypes.includes(careType.value)
+                          ? 'border-accent-600 bg-accent-50' 
+                          : isDisabled
+                          ? 'border-neutral-200 bg-neutral-50'
+                          : 'border-neutral-300 bg-white group-hover:border-accent-400'
+                      }`}>
+                        {selectedCareTypes.includes(careType.value) && (
+                          <svg className="w-3 h-3 text-accent-600" fill="currentColor" viewBox="0 0 12 12">
+                            <path d="M10.28 2.28L4.5 8.06 2.22 5.78a.75.75 0 00-1.06 1.06l2.75 2.75a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06z"/>
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <span className={`text-sm ${
+                      isDisabled ? 'text-neutral-400' : 'text-neutral-700 group-hover:text-neutral-900'
+                    }`}>
+                      {careType.label}
+                    </span>
                   </div>
-                </div>
-                <span className="text-sm text-neutral-700 group-hover:text-neutral-900">
-                  {careType.label}
-                </span>
-              </label>
-            ))}
+                  <span className={`text-xs font-medium ${
+                    isDisabled ? 'text-neutral-300' : 'text-neutral-500'
+                  }`}>
+                    ({count})
+                  </span>
+                </label>
+              );
+            })}
           </div>
         )}
       </div>

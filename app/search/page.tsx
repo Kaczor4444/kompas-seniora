@@ -14,7 +14,7 @@ interface SearchPageProps {
     min?: string;
     max?: string;
     free?: string;
-    care?: string; // ✅ DODANE
+    care?: string;
   }>;
 }
 
@@ -243,7 +243,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     }
   }
 
-  // ✅ FILTROWANIE PO CENIE
+  // FILTROWANIE PO CENIE
   const minPrice = params.min ? parseInt(params.min) : undefined;
   const maxPrice = params.max ? parseInt(params.max) : undefined;
   const showFree = params.free === 'true';
@@ -271,7 +271,28 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     }
   }
 
-  // ✅ FILTROWANIE PO PROFILU OPIEKI (NOWE!)
+  // OBLICZANIE LICZNIKÓW DLA PROFILI OPIEKI
+  const careProfileCounts: Record<string, number> = {
+    'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0
+  };
+
+  // Liczymy na podstawie wyników PRZED filtrowaniem po profilu
+  const resultsBeforeCareFilter = filteredResults;
+
+  resultsBeforeCareFilter.forEach(facility => {
+    if (facility.profil_opieki) {
+      const profiles = facility.profil_opieki.split(',').map((p: string) => p.trim());
+      profiles.forEach((code: string) => {
+        if (code in careProfileCounts) {
+          careProfileCounts[code]++;
+        }
+      });
+    }
+  });
+
+  console.log('📊 CARE PROFILE COUNTS:', careProfileCounts);
+
+  // FILTROWANIE PO PROFILU OPIEKI
   const selectedCareTypes = params.care ? params.care.split(',') : [];
   
   console.log('🏥 CARE PROFILE FILTERS:', selectedCareTypes);
@@ -322,14 +343,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           
           {/* LEFT: Sidebar z filtrami (tylko desktop) */}
           <div className="hidden lg:block lg:w-80 flex-shrink-0">
-            <FilterSidebar totalResults={filteredResults.length} />
+            <FilterSidebar 
+              totalResults={filteredResults.length}
+              careProfileCounts={careProfileCounts}
+            />
           </div>
 
           {/* RIGHT: Wyniki wyszukiwania */}
           <div className="flex-1 min-w-0">
             {/* Mobile: Filter drawer */}
             <div className="lg:hidden mb-4">
-              <MobileFilterDrawer totalResults={filteredResults.length} />
+              <MobileFilterDrawer 
+                totalResults={filteredResults.length}
+                careProfileCounts={careProfileCounts}
+              />
             </div>
 
             {/* Search Results */}
@@ -338,6 +365,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               type={type}
               results={filteredResults}
               message={message}
+              activeFilters={{
+                wojewodztwo: wojewodztwo !== 'all' ? wojewodztwo : undefined,
+                powiat: powiatParam || undefined,
+                type: type !== 'all' ? type : undefined,
+                careTypes: selectedCareTypes.length > 0 ? selectedCareTypes : undefined,
+                minPrice,
+                maxPrice,
+                showFree: showFree || undefined,
+              }}
             />
           </div>
 
