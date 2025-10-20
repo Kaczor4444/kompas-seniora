@@ -3,6 +3,7 @@ import Link from 'next/link';
 import SearchResults from '@/components/SearchResults';
 import FilterSidebar from '@/src/components/filters/FilterSidebar';
 import MobileFilterDrawer from '@/src/components/filters/MobileFilterDrawer';
+import { calculateDistance } from '@/src/utils/distance';
 
 interface SearchPageProps {
   searchParams: Promise<{ 
@@ -15,7 +16,10 @@ interface SearchPageProps {
     max?: string;
     free?: string;
     care?: string;
-    sort?: string; // ✅ DODANE: parametr sortowania
+    sort?: string;
+    lat?: string;    // ✅ DODANE: geolocation
+    lng?: string;    // ✅ DODANE: geolocation
+    near?: string;   // ✅ DODANE: geolocation flag
   }>;
 }
 
@@ -37,18 +41,44 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const powiatParam = params.powiat || '';
   const isPartialSearch = params.partial === 'true';
 
+  // ✅ GEOLOCATION PARAMS
+  const userLat = params.lat ? parseFloat(params.lat) : null;
+  const userLng = params.lng ? parseFloat(params.lng) : null;
+  const isNearSearch = params.near === 'true';
+
   console.log('🔍 DEBUG Search Page START:');
   console.log('  query:', query);
   console.log('  type:', type);
   console.log('  wojewodztwo:', wojewodztwo);
   console.log('  powiatParam:', powiatParam);
   console.log('  isPartialSearch:', isPartialSearch);
+  console.log('  🗺️ Geolocation:', { userLat, userLng, isNearSearch });
 
   let results: any[] = [];
   let terytMatches: any[] = [];
   let message = '';
 
-  if (query) {
+  // ✅ TRYB 3: GEOLOCATION SEARCH (bez query)
+  if (isNearSearch && userLat && userLng && !query) {
+    console.log('🗺️ Mode: GEOLOCATION SEARCH');
+
+    const typeFilter = type === 'dps' 
+      ? { typ_placowki: 'DPS' }
+      : (type === 'sds' || type === 'śds')
+      ? { typ_placowki: 'ŚDS' }
+      : {};
+
+    results = await prisma.placowka.findMany({
+      where: typeFilter,
+      orderBy: { nazwa: 'asc' },
+    });
+
+    console.log('🗺️ All facilities for geolocation:', results.length);
+
+    message = `Placówki w Twojej okolicy - sortuj po "Najbliższe" aby zobaczyć kolejność.`;
+  }
+  // TRYB 1: Z QUERY
+  else if (query) {
     const normalizedQuery = normalizePolish(query.trim());
     console.log('  normalizedQuery:', normalizedQuery);
 
@@ -327,10 +357,32 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   console.log('  Message:', message);
   console.log('---');
 
-  // ========== ✅ SORTOWANIE - DODANE ========== 
+  // ========== ✅ OBLICZANIE DYSTANSU ==========
+  let resultsWithDistance = filteredResults.map(facility => {
+    let distance: number | null = null;
+
+    // Jeśli mamy user location i facility ma coords
+    if (userLat && userLng && facility.latitude && facility.longitude) {
+      distance = calculateDistance(
+        userLat,
+        userLng,
+        parseFloat(facility.latitude),
+        parseFloat(facility.longitude)
+      );
+    }
+
+    return {
+      ...facility,
+      distance, // Dodaj pole distance do każdej placówki
+    };
+  });
+
+  console.log('🗺️ Distance calculated for', resultsWithDistance.filter(r => r.distance !== null).length, 'facilities');
+
+  // ========== ✅ SORTOWANIE - ROZSZERZONE O DISTANCE ========== 
   const sortParam = params.sort || 'default';
 
-  let sortedResults = [...filteredResults]; // Kopia żeby nie mutować
+  let sortedResults = [...resultsWithDistance]; // Kopia żeby nie mutować
 
   switch (sortParam) {
     case 'name_asc':
@@ -356,6 +408,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         if (a.koszt_pobytu === null || a.koszt_pobytu === 0) return 1;
         if (b.koszt_pobytu === null || b.koszt_pobytu === 0) return -1;
         return b.koszt_pobytu - a.koszt_pobytu;
+      });
+      break;
+    
+    case 'distance': // ✅ NOWA OPCJA
+      sortedResults.sort((a, b) => {
+        // Placówki bez distance na końcu
+        if (a.distance === null) return 1;
+        if (b.distance === null) return -1;
+        return a.distance - b.distance; // Najbliższe pierwsze
       });
       break;
     
@@ -406,6 +467,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               type={type}
               results={sortedResults}
               message={message}
+              userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined} // ✅ DODANE
               activeFilters={{
                 wojewodztwo: wojewodztwo !== 'all' ? wojewodztwo : undefined,
                 powiat: powiatParam || undefined,

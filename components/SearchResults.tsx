@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getProfileOpiekiNazwy, profileOpiekiKody } from '@/src/data/profileopieki';
 import SortDropdown from '@/src/components/search/SortDropdown';
+import { formatDistance } from '@/src/utils/distance'; // ✅ IMPORT
 
 const FacilityMap = dynamic(() => import('@/components/FacilityMap'), {
   ssr: false,
@@ -23,6 +24,7 @@ interface Facility {
   latitude: number | null;
   longitude: number | null;
   profil_opieki?: string | null;
+  distance?: number | null; // ✅ NOWE POLE
 }
 
 interface ActiveFilters {
@@ -41,6 +43,7 @@ interface SearchResultsProps {
   results: Facility[];
   message: string;
   activeFilters?: ActiveFilters;
+  userLocation?: { lat: number; lng: number }; // ✅ NOWY PROP
 }
 
 const cardVariants = {
@@ -54,7 +57,7 @@ const badgeVariants = {
   exit: { opacity: 0, scale: 0.8 }
 };
 
-export default function SearchResults({ query, type, results, message, activeFilters }: SearchResultsProps) {
+export default function SearchResults({ query, type, results, message, activeFilters, userLocation }: SearchResultsProps) {
   const router = useRouter();
 
   const removeFilter = (filterType: string, value?: string) => {
@@ -264,9 +267,12 @@ export default function SearchResults({ query, type, results, message, activeFil
         )}
       </AnimatePresence>
 
-      {/* SORTOWANIE */}
+      {/* SORTOWANIE - ✅ Przekazujemy hasUserLocation */}
       {results.length > 0 && (
-        <SortDropdown totalResults={results.length} />
+        <SortDropdown 
+          totalResults={results.length} 
+          hasUserLocation={!!userLocation} 
+        />
       )}
 
       {/* Layout: Lista + Mapa */}
@@ -297,10 +303,18 @@ export default function SearchResults({ query, type, results, message, activeFil
                       scale: 1.01,
                       boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
                     }}
-                    className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 transition"
+                    className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 transition relative"
                   >
+                    {/* ✅ DISTANCE BADGE - górny prawy róg */}
+                    {facility.distance !== null && facility.distance !== undefined && (
+                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 px-2.5 py-1 bg-green-100 text-green-800 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-1">
+                        <span>📍</span>
+                        <span>{formatDistance(facility.distance)}</span>
+                      </div>
+                    )}
+
                     {/* ✅ MOBILE: Większy, wyraźniejszy tytuł */}
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug pr-20">
                       {facility.nazwa}
                     </h2>
                     

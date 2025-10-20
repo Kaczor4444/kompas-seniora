@@ -1,13 +1,13 @@
 // src/components/search/SortDropdown.tsx
 'use client';
-
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface SortDropdownProps {
   totalResults: number;
+  hasUserLocation?: boolean; // ✅ NOWE: czy user udostępnił lokalizację
 }
 
-export default function SortDropdown({ totalResults }: SortDropdownProps) {
+export default function SortDropdown({ totalResults, hasUserLocation = false }: SortDropdownProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSort = searchParams.get('sort') || 'default';
@@ -24,12 +24,15 @@ export default function SortDropdown({ totalResults }: SortDropdownProps) {
     router.push(`/search?${params.toString()}`);
   };
 
+  // ✅ OPCJA "Najbliższe" tylko gdy mamy geolocation
   const sortOptions = [
     { value: 'default', label: 'Domyślnie' },
     { value: 'name_asc', label: 'Alfabetycznie A-Z' },
     { value: 'name_desc', label: 'Alfabetycznie Z-A' },
     { value: 'price_asc', label: 'Najtańsze' },
     { value: 'price_desc', label: 'Najdroższe' },
+    // Opcja "Najbliższe" tylko gdy user udostępnił lokalizację
+    ...(hasUserLocation ? [{ value: 'distance', label: 'Najbliższe' }] : []),
   ];
 
   // Polski plural dla "placówka/placówki/placówek"
@@ -37,6 +40,7 @@ export default function SortDropdown({ totalResults }: SortDropdownProps) {
     if (count === 1) return 'placówka';
     const lastDigit = count % 10;
     const lastTwoDigits = count % 100;
+    
     if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return 'placówek';
     if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
     return 'placówek';
@@ -45,7 +49,6 @@ export default function SortDropdown({ totalResults }: SortDropdownProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6 border border-neutral-200">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        
         {/* Left: Results count */}
         <p className="text-sm text-neutral-600">
           <span className="font-semibold text-neutral-900">{totalResults}</span> {getPlacowkaText(totalResults)}
