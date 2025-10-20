@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getProfileOpiekiNazwy, profileOpiekiKody } from '@/src/data/profileopieki';
-import SortDropdown from '@/src/components/search/SortDropdown'; // ✅ DODANE
+import SortDropdown from '@/src/components/search/SortDropdown';
 
 const FacilityMap = dynamic(() => import('@/components/FacilityMap'), {
   ssr: false,
@@ -42,17 +43,27 @@ interface SearchResultsProps {
   activeFilters?: ActiveFilters;
 }
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
+const badgeVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.8 }
+};
+
 export default function SearchResults({ query, type, results, message, activeFilters }: SearchResultsProps) {
   const router = useRouter();
 
-  // Funkcja do usuwania pojedynczego filtra
   const removeFilter = (filterType: string, value?: string) => {
     const params = new URLSearchParams(window.location.search);
     
     switch (filterType) {
       case 'wojewodztwo':
         params.delete('woj');
-        params.delete('powiat'); // Clear powiat when removing wojewodztwo
+        params.delete('powiat');
         break;
       case 'powiat':
         params.delete('powiat');
@@ -84,7 +95,6 @@ export default function SearchResults({ query, type, results, message, activeFil
     router.push(`/search?${params.toString()}`);
   };
 
-  // Mapowanie nazw
   const wojewodztwaLabels: Record<string, string> = {
     'malopolskie': 'Małopolskie',
     'slaskie': 'Śląskie',
@@ -97,7 +107,6 @@ export default function SearchResults({ query, type, results, message, activeFil
     'all': 'Wszystkie',
   };
 
-  // Sprawdź czy są aktywne filtry
   const hasActiveFilters = activeFilters && (
     activeFilters.wojewodztwo ||
     activeFilters.powiat ||
@@ -110,185 +119,259 @@ export default function SearchResults({ query, type, results, message, activeFil
 
   return (
     <>
-      {/* Message */}
-      {message && (
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-blue-800">{message}</p>
-        </div>
-      )}
+      {/* Message - ✅ MOBILE OPTIMIZED */}
+      <AnimatePresence>
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg"
+          >
+            <p className="text-sm sm:text-base text-blue-800 leading-relaxed">{message}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* AKTYWNE FILTRY JAKO BADGES */}
-      {hasActiveFilters && (
-        <div className="mb-6 p-4 bg-white border border-neutral-200 rounded-lg">
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-medium text-neutral-700">Aktywne filtry:</span>
-            
-            {/* Województwo */}
-            {activeFilters?.wojewodztwo && (
-              <button
-                onClick={() => removeFilter('wojewodztwo')}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
-              >
-                {wojewodztwaLabels[activeFilters.wojewodztwo] || activeFilters.wojewodztwo}
-                <span className="text-accent-600">×</span>
-              </button>
-            )}
+      {/* AKTYWNE FILTRY - ✅ MOBILE OPTIMIZED */}
+      <AnimatePresence>
+        {hasActiveFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white border border-neutral-200 rounded-lg overflow-hidden"
+          >
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-xs sm:text-sm font-medium text-neutral-700 w-full sm:w-auto mb-1 sm:mb-0">
+                Aktywne filtry:
+              </span>
+              
+              {/* Badges - ✅ TOUCH-FRIENDLY */}
+              <AnimatePresence>
+                {activeFilters?.wojewodztwo && (
+                  <motion.button
+                    variants={badgeVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.2 }}
+                    onClick={() => removeFilter('wojewodztwo')}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors min-h-[44px] touch-manipulation"
+                  >
+                    {wojewodztwaLabels[activeFilters.wojewodztwo] || activeFilters.wojewodztwo}
+                    <span className="text-accent-600 text-lg">×</span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
 
-            {/* Powiat */}
-            {activeFilters?.powiat && (
-              <button
-                onClick={() => removeFilter('powiat')}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
-              >
-                {activeFilters.powiat}
-                <span className="text-accent-600">×</span>
-              </button>
-            )}
+              <AnimatePresence>
+                {activeFilters?.powiat && (
+                  <motion.button
+                    variants={badgeVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.2 }}
+                    onClick={() => removeFilter('powiat')}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors min-h-[44px] touch-manipulation"
+                  >
+                    {activeFilters.powiat}
+                    <span className="text-accent-600 text-lg">×</span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
 
-            {/* Typ placówki */}
-            {activeFilters?.type && (
-              <button
-                onClick={() => removeFilter('type')}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
-              >
-                {typeLabels[activeFilters.type] || activeFilters.type}
-                <span className="text-accent-600">×</span>
-              </button>
-            )}
+              <AnimatePresence>
+                {activeFilters?.type && (
+                  <motion.button
+                    variants={badgeVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.2 }}
+                    onClick={() => removeFilter('type')}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors min-h-[44px] touch-manipulation"
+                  >
+                    {typeLabels[activeFilters.type] || activeFilters.type}
+                    <span className="text-accent-600 text-lg">×</span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
 
-            {/* Profile opieki */}
-            {activeFilters?.careTypes && activeFilters.careTypes.map((code) => (
-              <button
-                key={code}
-                onClick={() => removeFilter('care', code)}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
-              >
-                {profileOpiekiKody[code as keyof typeof profileOpiekiKody]}
-                <span className="text-accent-600">×</span>
-              </button>
-            ))}
+              <AnimatePresence>
+                {activeFilters?.careTypes && activeFilters.careTypes.map((code) => (
+                  <motion.button
+                    key={code}
+                    variants={badgeVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.2 }}
+                    onClick={() => removeFilter('care', code)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors min-h-[44px] touch-manipulation"
+                  >
+                    <span className="line-clamp-1">{profileOpiekiKody[code as keyof typeof profileOpiekiKody]}</span>
+                    <span className="text-accent-600 text-lg flex-shrink-0">×</span>
+                  </motion.button>
+                ))}
+              </AnimatePresence>
 
-            {/* Cena */}
-            {(activeFilters?.minPrice || activeFilters?.maxPrice) && (
-              <button
-                onClick={() => removeFilter('price')}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
-              >
-                {activeFilters.minPrice && activeFilters.maxPrice
-                  ? `${activeFilters.minPrice.toLocaleString('pl-PL')} - ${activeFilters.maxPrice.toLocaleString('pl-PL')} zł`
-                  : activeFilters.minPrice
-                  ? `od ${activeFilters.minPrice.toLocaleString('pl-PL')} zł`
-                  : `do ${activeFilters.maxPrice?.toLocaleString('pl-PL')} zł`
-                }
-                <span className="text-accent-600">×</span>
-              </button>
-            )}
+              <AnimatePresence>
+                {(activeFilters?.minPrice || activeFilters?.maxPrice) && (
+                  <motion.button
+                    variants={badgeVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.2 }}
+                    onClick={() => removeFilter('price')}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors min-h-[44px] touch-manipulation"
+                  >
+                    <span className="whitespace-nowrap">
+                      {activeFilters.minPrice && activeFilters.maxPrice
+                        ? `${activeFilters.minPrice.toLocaleString('pl-PL')} - ${activeFilters.maxPrice.toLocaleString('pl-PL')} zł`
+                        : activeFilters.minPrice
+                        ? `od ${activeFilters.minPrice.toLocaleString('pl-PL')} zł`
+                        : `do ${activeFilters.maxPrice?.toLocaleString('pl-PL')} zł`
+                      }
+                    </span>
+                    <span className="text-accent-600 text-lg">×</span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
 
-            {/* Bezpłatne */}
-            {activeFilters?.showFree && (
-              <button
-                onClick={() => removeFilter('free')}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors"
-              >
-                Tylko bezpłatne
-                <span className="text-accent-600">×</span>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+              <AnimatePresence>
+                {activeFilters?.showFree && (
+                  <motion.button
+                    variants={badgeVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.2 }}
+                    onClick={() => removeFilter('free')}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors min-h-[44px] touch-manipulation"
+                  >
+                    Tylko bezpłatne
+                    <span className="text-accent-600 text-lg">×</span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* ✅ SORTOWANIE - DODANE */}
+      {/* SORTOWANIE */}
       {results.length > 0 && (
         <SortDropdown totalResults={results.length} />
       )}
 
       {/* Layout: Lista + Mapa */}
       {results.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           
-          {/* Lista placówek - 2/3 szerokości na desktop */}
-          <div className="lg:col-span-2 space-y-4">
-            {results.map((facility) => {
-              // Mapowanie kodów na czytelne nazwy
-              const profileNazwy = facility.profil_opieki 
-                ? getProfileOpiekiNazwy(facility.profil_opieki)
-                : [];
+          {/* Lista placówek - ✅ MOBILE OPTIMIZED */}
+          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
+            <AnimatePresence mode="popLayout">
+              {results.map((facility, index) => {
+                const profileNazwy = facility.profil_opieki 
+                  ? getProfileOpiekiNazwy(facility.profil_opieki)
+                  : [];
 
-              return (
-                <div
-                  key={facility.id}
-                  className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition"
-                >
-                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                    {facility.nazwa}
-                  </h2>
-                  
-                  <p className="text-sm text-gray-600 mb-4">
-                    {facility.typ_placowki} • {facility.powiat}
-                  </p>
+                return (
+                  <motion.div
+                    key={facility.id}
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    transition={{ 
+                      duration: 0.4,
+                      delay: index * 0.05,
+                      ease: [0.22, 1, 0.36, 1]
+                    }}
+                    whileHover={{ 
+                      scale: 1.01,
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+                    }}
+                    className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 transition"
+                  >
+                    {/* ✅ MOBILE: Większy, wyraźniejszy tytuł */}
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug">
+                      {facility.nazwa}
+                    </h2>
+                    
+                    {/* ✅ MOBILE: Lepsze spacing */}
+                    <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+                      {facility.typ_placowki} • {facility.powiat}
+                    </p>
 
-                  <div className="space-y-2 mb-4">
-                    {/* Lokalizacja */}
-                    <div>
-                      <span className="font-medium text-gray-700">Lokalizacja</span>
-                      <p className="text-gray-600">{facility.miejscowosc}</p>
-                      <p className="text-sm text-gray-500">Powiat: {facility.powiat}</p>
-                    </div>
-
-                    {/* PROFIL OPIEKI - Z MAPOWANIEM */}
-                    {profileNazwy.length > 0 && (
+                    <div className="space-y-3 sm:space-y-2 mb-4">
+                      {/* Lokalizacja */}
                       <div>
-                        <span className="font-medium text-gray-700">Profil opieki</span>
-                        <div className="mt-1 space-y-1">
-                          {profileNazwy.map((nazwa, idx) => (
-                            <span
-                              key={idx}
-                              className="inline-block px-2 py-1 mr-2 mb-1 text-xs bg-accent-50 text-accent-700 rounded-md"
-                            >
-                              {nazwa}
-                            </span>
-                          ))}
-                        </div>
+                        <span className="font-medium text-gray-700 text-sm sm:text-base">Lokalizacja</span>
+                        <p className="text-sm sm:text-base text-gray-600 mt-0.5">{facility.miejscowosc}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">Powiat: {facility.powiat}</p>
                       </div>
-                    )}
 
-                    {/* Koszt miesięczny */}
-                    <div>
-                      <span className="font-medium text-gray-700">Koszt miesięczny</span>
-                      <p className={`text-lg font-semibold ${facility.koszt_pobytu ? 'text-accent-600' : 'text-green-600'}`}>
-                        {facility.koszt_pobytu
-                          ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
-                          : 'Bezpłatne'}
-                      </p>
+                      {/* PROFIL OPIEKI - ✅ MOBILE OPTIMIZED */}
+                      {profileNazwy.length > 0 && (
+                        <div>
+                          <span className="font-medium text-gray-700 text-sm sm:text-base">Profil opieki</span>
+                          <div className="mt-1.5 flex flex-wrap gap-1.5">
+                            {profileNazwy.map((nazwa, idx) => (
+                              <span
+                                key={idx}
+                                className="inline-block px-2 py-1 text-xs sm:text-xs bg-accent-50 text-accent-700 rounded-md leading-tight"
+                              >
+                                {nazwa}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Koszt miesięczny - ✅ MOBILE: Wyraźniejszy */}
+                      <div>
+                        <span className="font-medium text-gray-700 text-sm sm:text-base">Koszt miesięczny</span>
+                        <p className={`text-xl sm:text-lg font-semibold mt-0.5 ${facility.koszt_pobytu ? 'text-accent-600' : 'text-green-600'}`}>
+                          {facility.koszt_pobytu
+                            ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
+                            : 'Bezpłatne'}
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex gap-3">
-                    <Link
-                      href={`/placowka/${facility.id}`}
-                      className="px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700"
-                    >
-                      Zobacz szczegóły
-                    </Link>
-                    {facility.telefon && (
-                      <a
-                        href={`tel:${facility.telefon.replace(/\s/g, '')}`}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                    {/* ✅ MOBILE: Touch-friendly buttons, stack on small screens */}
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                      <Link
+                        href={`/placowka/${facility.id}`}
+                        className="flex-1 px-4 py-3 sm:py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors text-center font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center touch-manipulation"
                       >
-                        📞 {facility.telefon}
-                      </a>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                        Zobacz szczegóły
+                      </Link>
+                      {facility.telefon && (
+                        <a
+                          href={`tel:${facility.telefon.replace(/\s/g, '')}`}
+                          className="flex-1 px-4 py-3 sm:py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-center font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center touch-manipulation"
+                        >
+                          📞 {facility.telefon}
+                        </a>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
 
-          {/* Mapa - 1/3 szerokości na desktop, sticky */}
-          <div className="lg:col-span-1">
+          {/* Mapa - ✅ MOBILE: Ukryta na bardzo małych ekranach, widoczna od 640px */}
+          <div className="hidden sm:block lg:col-span-1">
             <div className="lg:sticky lg:top-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
                 Lokalizacja na mapie
               </h3>
               <FacilityMap facilities={results} mode="multiple" />
