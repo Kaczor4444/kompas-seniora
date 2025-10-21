@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Compass } from 'lucide-react'; // ✅ NOWY IMPORT - ikona kompasu
 import { getProfileOpiekiNazwy, profileOpiekiKody } from '@/src/data/profileopieki';
 import SortDropdown from '@/src/components/search/SortDropdown';
 import { formatDistance } from '@/src/utils/distance'; // ✅ IMPORT
@@ -305,16 +306,16 @@ export default function SearchResults({ query, type, results, message, activeFil
                     }}
                     className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 transition relative"
                   >
-                    {/* ✅ DISTANCE BADGE - górny prawy róg */}
+                    {/* 🧭 DISTANCE BADGE - górny prawy róg z ikoną kompasu */}
                     {facility.distance !== null && facility.distance !== undefined && (
-                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 px-2.5 py-1 bg-green-100 text-green-800 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-1">
-                        <span>📍</span>
-                        <span>{formatDistance(facility.distance)}</span>
+                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 px-2 py-1 bg-accent-50 text-gray-800 rounded-full text-[10px] sm:text-xs font-semibold flex items-center gap-1 shadow-sm">
+                        <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                        <span>{formatDistance(facility.distance)} od Ciebie</span>
                       </div>
                     )}
 
                     {/* ✅ MOBILE: Większy, wyraźniejszy tytuł */}
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug pr-20">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug pr-20 sm:pr-32">
                       {facility.nazwa}
                     </h2>
                     
