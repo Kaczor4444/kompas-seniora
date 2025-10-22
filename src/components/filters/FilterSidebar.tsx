@@ -8,6 +8,7 @@ interface FilterSidebarProps {
   totalResults: number;
   careProfileCounts: Record<string, number>;
   hasUserLocation?: boolean; // ✅ NOWE: czy user użył geolokalizacji
+  showSorting?: boolean; // Czy pokazać sortowanie (desktop: true, mobile: false)
 }
 
 // ✅ NOWE: Typy dla autocomplete
@@ -73,7 +74,7 @@ const CARE_TYPES = [
   { value: 'I', label: 'Niepełnosprawność fizyczna (motoryczna)' },
 ];
 
-export default function FilterSidebar({ totalResults, careProfileCounts, hasUserLocation = false }: FilterSidebarProps) {
+export default function FilterSidebar({ totalResults, careProfileCounts, hasUserLocation = false, showSorting = false }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -413,8 +414,10 @@ export default function FilterSidebar({ totalResults, careProfileCounts, hasUser
             </button>
           )}
         </div>
+      </div>
 
-        {/* 🆕 SORTOWANIE - Dodane tutaj! */}
+      {/* Sortowanie - tylko na desktop */}
+      {showSorting && (
         <div className="pt-4 border-t border-neutral-200">
           <label htmlFor="sort-select-sidebar" className="block text-sm font-medium text-neutral-700 mb-2">
             Sortuj wyniki:
@@ -432,7 +435,7 @@ export default function FilterSidebar({ totalResults, careProfileCounts, hasUser
             ))}
           </select>
         </div>
-      </div>
+      )}
 
       {/* Lokalizacja - COLLAPSIBLE */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200">

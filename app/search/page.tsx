@@ -377,6 +377,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               totalResults={sortedResults.length}
               careProfileCounts={careProfileCounts}
               hasUserLocation={!!(userLat && userLng)}
+              showSorting={true}
             />
           </div>
 
