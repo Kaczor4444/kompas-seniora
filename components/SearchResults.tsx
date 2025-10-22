@@ -379,7 +379,7 @@ export default function SearchResults({ query, type, results, message, activeFil
 
           {/* Mapa - ✅ MOBILE: Ukryta na bardzo małych ekranach, widoczna od 640px */}
           <div className="hidden md:block lg:col-span-1">
-            <div className="lg:sticky lg:top-6">
+            <div className="lg:sticky lg:top-20">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
                 Lokalizacja na mapie
               </h3>

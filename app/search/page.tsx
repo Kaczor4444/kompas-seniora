@@ -357,13 +357,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Link href="/" className="text-2xl font-bold text-primary-600 hover:text-primary-700">
-            KompasSeniora.pl
-          </Link>
-        </div>
-      </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -372,7 +365,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <div className="flex flex-col lg:flex-row gap-6">
           
           {/* LEFT: Sidebar z filtrami (tylko desktop) */}
-          <div className="hidden lg:block lg:w-80 flex-shrink-0">
+          <div className="hidden lg:block lg:w-80 flex-shrink-0 sticky top-20 h-screen overflow-y-auto">
             <FilterSidebar 
               totalResults={sortedResults.length}
               careProfileCounts={careProfileCounts}
