@@ -1,21 +1,48 @@
 // src/components/filters/MobileFilterDrawer.tsx
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import FilterSidebar from './FilterSidebar';
 
 interface MobileFilterDrawerProps {
   totalResults: number;
   careProfileCounts: Record<string, number>;
+  hasUserLocation?: boolean; // ✅ DODANE: dla sortowania
 }
 
 export default function MobileFilterDrawer({ 
   totalResults,
-  careProfileCounts
+  careProfileCounts,
+  hasUserLocation = false
 }: MobileFilterDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const searchParams = useSearchParams();
+
+  // ✅ NOWE: Body scroll lock - blokuje scrollowanie strony gdy drawer otwarty
+  useEffect(() => {
+    if (isOpen) {
+      // Zapisz aktualną pozycję scrolla
+      const scrollY = window.scrollY;
+      
+      // Zablokuj body scroll
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        // Przywróć scroll
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        
+        // Przywróć pozycję scrolla
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
 
   // ✅ NOWE: Obliczamy liczbę aktywnych filtrów
   const activeFiltersCount = useMemo(() => {
@@ -46,25 +73,14 @@ export default function MobileFilterDrawer({
 
   return (
     <>
-      {/* ✅ UPDATED: Trigger Button z badge */}
+      {/* ✅ UPDATED: Trigger Button z badge + data attribute dla sticky bara */}
+      {/* Ukryty button do triggerowania przez MobileStickyBar */}
       <button
+        data-mobile-filter-trigger
         onClick={() => setIsOpen(true)}
-        className="relative w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-        <span className="font-medium">Filtry</span>
-        
-        {/* ✅ NOWE: Badge z licznikiem aktywnych filtrów */}
-        {activeFiltersCount > 0 && (
-          <span className="absolute -top-2 -right-2 flex items-center justify-center min-w-[24px] h-6 px-2 bg-accent-600 text-white text-xs font-bold rounded-full shadow-lg">
-            {activeFiltersCount}
-          </span>
-        )}
-        
-        <span className="text-sm text-gray-500">({totalResults})</span>
-      </button>
+        className="sr-only"
+        aria-label="Otwórz filtry"
+      />
 
       {/* ✅ UPDATED: Backdrop z blur effect */}
       {isOpen && (
@@ -87,7 +103,10 @@ export default function MobileFilterDrawer({
           flex flex-col
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}
         `}
-        style={{ touchAction: 'pan-y' }}
+        style={{ 
+          touchAction: 'pan-y',
+          overscrollBehavior: 'contain' // ✅ Zapobiega scroll chaining
+        }}
       >
         {/* Handle (drag indicator) */}
         <div className="flex justify-center pt-3 pb-2 bg-white rounded-t-2xl">
@@ -121,6 +140,7 @@ export default function MobileFilterDrawer({
           <FilterSidebar 
             totalResults={totalResults} 
             careProfileCounts={careProfileCounts}
+            hasUserLocation={hasUserLocation}
           />
         </div>
 

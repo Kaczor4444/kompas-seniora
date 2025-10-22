@@ -3,6 +3,8 @@ import Link from 'next/link';
 import SearchResults from '@/components/SearchResults';
 import FilterSidebar from '@/src/components/filters/FilterSidebar';
 import MobileFilterDrawer from '@/src/components/filters/MobileFilterDrawer';
+import MobileStickyBar from '@/src/components/mobile/MobileStickyBar';
+// ✅ USUNIĘTO: import SearchBarCompact
 import { calculateDistance } from '@/src/utils/distance';
 
 interface SearchPageProps {
@@ -17,13 +19,13 @@ interface SearchPageProps {
     free?: string;
     care?: string;
     sort?: string;
-    lat?: string;    // ✅ DODANE: geolocation
-    lng?: string;    // ✅ DODANE: geolocation
-    near?: string;   // ✅ DODANE: geolocation flag
+    lat?: string;
+    lng?: string;
+    near?: string;
   }>;
 }
 
-// Normalizacja polskich znaków - uniwersalna dla całej Polski
+// Normalizacja polskich znaków
 function normalizePolish(str: string): string {
   return str
     .toLowerCase()
@@ -41,7 +43,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const powiatParam = params.powiat || '';
   const isPartialSearch = params.partial === 'true';
 
-  // ✅ GEOLOCATION PARAMS
   const userLat = params.lat ? parseFloat(params.lat) : null;
   const userLng = params.lng ? parseFloat(params.lng) : null;
   const isNearSearch = params.near === 'true';
@@ -58,7 +59,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   let terytMatches: any[] = [];
   let message = '';
 
-  // ✅ TRYB 3: GEOLOCATION SEARCH (bez query)
+  // TRYB 3: GEOLOCATION SEARCH
   if (isNearSearch && userLat && userLng && !query) {
     console.log('🗺️ Mode: GEOLOCATION SEARCH');
 
@@ -74,15 +75,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     });
 
     console.log('🗺️ All facilities for geolocation:', results.length);
-
-    message = `Placówki w Twojej okolicy - sortuj po "Najbliższe" aby zobaczyć kolejność.`;
+    // ✅ USUNIĘTO: Niebieski banner z message - user widzi 🧭 na kartach
+    message = '';
   }
   // TRYB 1: Z QUERY
   else if (query) {
     const normalizedQuery = normalizePolish(query.trim());
     console.log('  normalizedQuery:', normalizedQuery);
 
-    // Mapowanie województw
     const wojewodztwoMap: Record<string, string> = {
       'malopolskie': 'małopolskie',
       'slaskie': 'śląskie',
@@ -96,12 +96,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                            wojewodztwo === 'malopolskie' ? 'Małopolskie' : 
                            wojewodztwoDbName;
 
-    // Sprawdź czy są dane TERYT dla tego województwa
     const hasTerytData = wojewodztwo === 'malopolskie';
-
     console.log('  hasTerytData:', hasTerytData, '(wojewodztwo:', wojewodztwo, ')');
 
-    // TRYB 1: Z TERYT (Małopolskie)
+    // Z TERYT (Małopolskie)
     if (hasTerytData && wojewodztwo !== 'all') {
       console.log('  Mode: TERYT');
 
@@ -117,8 +115,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         terytWhere.powiat = powiatParam;
       }
 
-      console.log('🔍 TERYT WHERE:', JSON.stringify(terytWhere, null, 2));
-
       terytMatches = await prisma.terytLocation.findMany({
         where: terytWhere,
         select: {
@@ -129,13 +125,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         },
       });
 
-      console.log('🔍 TERYT matches found:', terytMatches.length);
-      if (terytMatches.length > 0) {
-        console.log('🔍 First match:', terytMatches[0]);
-      }
-
       let uniquePowiaty = [...new Set(terytMatches.map(t => normalizePolish(t.powiat)))];
-      console.log('🔍 Unique powiaty:', uniquePowiaty);
 
       const powiatMapping: Record<string, string[]> = {
         'krakow': ['krakow', 'krakowski'],
@@ -146,7 +136,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       uniquePowiaty = [...new Set(uniquePowiaty.flatMap(p => 
         powiatMapping[p] || [p]
       ))];
-      console.log('🔍 Unique powiaty (expanded):', uniquePowiaty);
 
       if (uniquePowiaty.length > 0) {
         const typeFilter = type === 'dps' 
@@ -155,33 +144,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           ? { typ_placowki: 'ŚDS' }
           : {};
 
-        console.log('🔍 Type filter:', typeFilter);
-
         const allFacilities = await prisma.placowka.findMany({
           where: typeFilter,
           orderBy: { nazwa: 'asc' },
         });
 
-        console.log('🔍 All facilities (before powiat filter):', allFacilities.length);
-
         results = allFacilities.filter(facility => {
           const normalizedFacilityPowiat = normalizePolish(facility.powiat);
-          
-          const matches = uniquePowiaty.some(powiat => {
-            const powiatContainsFacility = normalizedFacilityPowiat.includes(powiat);
-            const facilityContainsPowiat = powiat.includes(normalizedFacilityPowiat);
-            
-            if (powiatContainsFacility || facilityContainsPowiat) {
-              console.log('  ✓ Matched facility:', facility.nazwa, 'in', facility.powiat, '(matched with:', powiat, ')');
-              return true;
-            }
-            return false;
+          return uniquePowiaty.some(powiat => {
+            return normalizedFacilityPowiat.includes(powiat) || powiat.includes(normalizedFacilityPowiat);
           });
-          
-          return matches;
         });
-
-        console.log('🔍 Results after powiat filter:', results.length);
 
         const locationCount = terytMatches.length;
         const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
@@ -199,9 +172,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               .join(', ');
             
             const searchType = isPartialSearch ? 'zawierających' : 'o nazwie';
-            message = `Miejscowości ${searchType} "${query}" znalezione w ${locationCount} lokalizacjach (${wojewodztwoName}). Pokazujemy ${facilityWord} ze wszystkich: ${facilitiesPerPowiat}.`;
+            message = '';
           } else {
-            message = `Znaleźliśmy ${facilityWord} w okolicy miejscowości ${terytMatches[0].nazwa} (${wojewodztwoName}).`;
+            message = '';
           }
         } else {
           const nearbyFacilities = await prisma.placowka.findMany({
@@ -219,9 +192,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         message = `Nie znaleźliśmy miejscowości ${searchType} "${query}" w ${wojewodztwoName}. Spróbuj wpisać inną nazwę.`;
       }
     } 
-    // TRYB 2: BEZ TERYT (Śląskie lub 'all')
+    // BEZ TERYT (Śląskie lub 'all')
     else {
-      console.log('🔍 NO TERYT MODE - Direct search in Placowka.miejscowosc');
+      console.log('🔍 NO TERYT MODE');
 
       const where: any = type === 'dps' 
         ? { typ_placowki: 'DPS' }
@@ -229,17 +202,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         ? { typ_placowki: 'ŚDS' }
         : {};
 
-      console.log('🔍 Direct WHERE (before woj filter):', JSON.stringify(where, null, 2));
-
       const allFacilities = await prisma.placowka.findMany({
         where,
         orderBy: { nazwa: 'asc' },
       });
-
-      console.log('🔍 All facilities (total):', allFacilities.length);
-
-      const uniqueWoj = [...new Set(allFacilities.map(f => f.wojewodztwo))];
-      console.log('🔍 Unique wojewodztwa in DB:', uniqueWoj);
 
       results = allFacilities.filter(facility => {
         if (wojewodztwo !== 'all') {
@@ -252,21 +218,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         }
 
         const normalizedMiejscowosc = normalizePolish(facility.miejscowosc);
-        const matches = normalizedMiejscowosc.includes(normalizedQuery);
-        
-        if (matches) {
-          console.log('  ✓ Matched facility:', facility.nazwa, 'in', facility.miejscowosc, '(woj:', facility.wojewodztwo + ')');
-        }
-        return matches;
+        return normalizedMiejscowosc.includes(normalizedQuery);
       });
-
-      console.log('🔍 Results after miejscowosc filter:', results.length);
 
       const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
       
       if (results.length > 0) {
         const wojewodztwoInfo = wojewodztwo === 'all' ? 'we wszystkich województwach' : `w województwie ${wojewodztwoName}`;
-        message = `Znaleźliśmy ${results.length} ${facilityWord} w okolicy "${query}" ${wojewodztwoInfo}.`;
+        message = '';
       } else {
         const wojewodztwoInfo = wojewodztwo === 'all' ? 'w żadnym województwie' : `w województwie ${wojewodztwoName}`;
         message = `Nie znaleźliśmy ${facilityWord} w okolicy "${query}" ${wojewodztwoInfo}. Spróbuj wpisać inną nazwę miejscowości.`;
@@ -279,15 +238,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const maxPrice = params.max ? parseInt(params.max) : undefined;
   const showFree = params.free === 'true';
 
-  console.log('💰 PRICE FILTERS:', { minPrice, maxPrice, showFree });
-
   let filteredResults = results;
 
   if (showFree) {
     filteredResults = filteredResults.filter(f => 
       f.koszt_pobytu === null || f.koszt_pobytu === 0
     );
-    console.log('  Filtered by: Bezpłatne only →', filteredResults.length);
   } else {
     if (minPrice !== undefined || maxPrice !== undefined) {
       filteredResults = filteredResults.filter(f => {
@@ -298,7 +254,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         if (maxPrice && price > maxPrice) return false;
         return true;
       });
-      console.log('  Filtered by price range →', filteredResults.length);
     }
   }
 
@@ -307,7 +262,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0
   };
 
-  // Liczymy na podstawie wyników PRZED filtrowaniem po profilu
   const resultsBeforeCareFilter = filteredResults;
 
   resultsBeforeCareFilter.forEach(facility => {
@@ -321,12 +275,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     }
   });
 
-  console.log('📊 CARE PROFILE COUNTS:', careProfileCounts);
-
   // FILTROWANIE PO PROFILU OPIEKI
   const selectedCareTypes = params.care ? params.care.split(',') : [];
-  
-  console.log('🏥 CARE PROFILE FILTERS:', selectedCareTypes);
 
   if (selectedCareTypes.length > 0) {
     filteredResults = filteredResults.filter(facility => {
@@ -334,34 +284,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       
       const facilityProfiles = facility.profil_opieki.split(',').map((p: string) => p.trim());
       
-      // OR logic - placówka musi mieć przynajmniej jeden z wybranych profili
-      const hasMatch = selectedCareTypes.some(selectedType => 
+      return selectedCareTypes.some(selectedType => 
         facilityProfiles.includes(selectedType)
       );
-      
-      if (hasMatch) {
-        console.log('  ✓ Care match:', facility.nazwa, 'has', facilityProfiles, 'matches', selectedCareTypes);
-      }
-      
-      return hasMatch;
     });
-    console.log('  Filtered by care profiles →', filteredResults.length);
   }
 
   if (filteredResults.length === 0 && results.length > 0) {
     message = `Znaleziono ${results.length} placówek, ale żadna nie spełnia wybranych filtrów. Zmień kryteria wyszukiwania.`;
   }
 
-  console.log('🔍 DEBUG Search Page END');
-  console.log('  Final results:', filteredResults.length);
-  console.log('  Message:', message);
-  console.log('---');
-
-  // ========== ✅ OBLICZANIE DYSTANSU ==========
+  // OBLICZANIE DYSTANSU
   let resultsWithDistance = filteredResults.map(facility => {
     let distance: number | null = null;
 
-    // Jeśli mamy user location i facility ma coords
     if (userLat && userLng && facility.latitude && facility.longitude) {
       distance = calculateDistance(
         userLat,
@@ -373,16 +309,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
     return {
       ...facility,
-      distance, // Dodaj pole distance do każdej placówki
+      distance,
     };
   });
 
-  console.log('🗺️ Distance calculated for', resultsWithDistance.filter(r => r.distance !== null).length, 'facilities');
-
-  // ========== ✅ SORTOWANIE - ROZSZERZONE O DISTANCE ========== 
+  // SORTOWANIE
   const sortParam = params.sort || 'default';
-
-  let sortedResults = [...resultsWithDistance]; // Kopia żeby nie mutować
+  let sortedResults = [...resultsWithDistance];
 
   switch (sortParam) {
     case 'name_asc':
@@ -395,7 +328,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     
     case 'price_asc':
       sortedResults.sort((a, b) => {
-        // Bezpłatne na końcu
         if (a.koszt_pobytu === null || a.koszt_pobytu === 0) return 1;
         if (b.koszt_pobytu === null || b.koszt_pobytu === 0) return -1;
         return a.koszt_pobytu - b.koszt_pobytu;
@@ -404,29 +336,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     
     case 'price_desc':
       sortedResults.sort((a, b) => {
-        // Bezpłatne na końcu
         if (a.koszt_pobytu === null || a.koszt_pobytu === 0) return 1;
         if (b.koszt_pobytu === null || b.koszt_pobytu === 0) return -1;
         return b.koszt_pobytu - a.koszt_pobytu;
       });
       break;
     
-    case 'distance': // ✅ NOWA OPCJA
+    case 'distance':
       sortedResults.sort((a, b) => {
-        // Placówki bez distance na końcu
         if (a.distance === null) return 1;
         if (b.distance === null) return -1;
-        return a.distance - b.distance; // Najbliższe pierwsze
+        return a.distance - b.distance;
       });
       break;
     
-    default: // 'default'
-      // Pozostaw w kolejności z bazy
+    default:
       break;
   }
-
-  console.log('🔀 SORTING:', sortParam, '→', sortedResults.length, 'results');
-  // ========== KONIEC SORTOWANIA ==========
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -441,6 +367,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* ✅ USUNIĘTO: <SearchBarCompact /> */}
+
         <div className="flex flex-col lg:flex-row gap-6">
           
           {/* LEFT: Sidebar z filtrami (tylko desktop) */}
@@ -448,18 +376,37 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <FilterSidebar 
               totalResults={sortedResults.length}
               careProfileCounts={careProfileCounts}
+              hasUserLocation={!!(userLat && userLng)}
             />
           </div>
 
           {/* RIGHT: Wyniki wyszukiwania */}
           <div className="flex-1 min-w-0">
             {/* Mobile: Filter drawer */}
-            <div className="lg:hidden mb-4">
-              <MobileFilterDrawer 
+            {/* ✅ Mobile: Sticky Bar + Hidden Filter Button */}
+            <div className="lg:hidden">
+              <MobileStickyBar
+                totalResults={sortedResults.length}
+                activeFiltersCount={
+                  (type !== 'all' ? 1 : 0) +
+                  (selectedCareTypes.length || 0) +
+                  (minPrice ? 1 : 0) +
+                  (maxPrice ? 1 : 0) +
+                  (showFree ? 1 : 0)
+                }
+                hasUserLocation={!!(userLat && userLng)}
+              />
+              {/* MobileFilterDrawer z własnym buttonem - triggerowany przez sticky bar */}
+              <MobileFilterDrawer
                 totalResults={sortedResults.length}
                 careProfileCounts={careProfileCounts}
+                hasUserLocation={!!(userLat && userLng)}
               />
             </div>
+
+
+            {/* Padding dla fixed sticky bar na mobile */}
+            <div className="lg:hidden h-[60px]"></div>
 
             {/* Search Results */}
             <SearchResults 
@@ -467,7 +414,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               type={type}
               results={sortedResults}
               message={message}
-              userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined} // ✅ DODANE
+              userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined}
               activeFilters={{
                 wojewodztwo: wojewodztwo !== 'all' ? wojewodztwo : undefined,
                 powiat: powiatParam || undefined,

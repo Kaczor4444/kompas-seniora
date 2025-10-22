@@ -1,12 +1,27 @@
 // src/components/filters/FilterSidebar.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface FilterSidebarProps {
   totalResults: number;
   careProfileCounts: Record<string, number>;
+  hasUserLocation?: boolean; // ✅ NOWE: czy user użył geolokalizacji
+}
+
+// ✅ NOWE: Typy dla autocomplete
+interface Suggestion {
+  nazwa: string;
+  powiat: string;
+  wojewodztwo: string;
+  facilitiesCount: number;
+}
+
+interface SuggestResponse {
+  suggestions: Suggestion[];
+  totalCount: number;
+  showAll: boolean;
 }
 
 // Wszystkie województwa Polski
@@ -45,7 +60,7 @@ const POWIATY_MAP: Record<string, string[]> = {
   ],
 };
 
-// Typy opieki - mapowanie z profileopieki.ts
+// Typy opieki
 const CARE_TYPES = [
   { value: 'A', label: 'Niepełnosprawność intelektualna (dorośli)' },
   { value: 'B', label: 'Spektrum autyzmu' },
@@ -58,14 +73,28 @@ const CARE_TYPES = [
   { value: 'I', label: 'Niepełnosprawność fizyczna (motoryczna)' },
 ];
 
-export default function FilterSidebar({ totalResults, careProfileCounts }: FilterSidebarProps) {
+export default function FilterSidebar({ totalResults, careProfileCounts, hasUserLocation = false }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // Collapse states
+  // Collapse states - ✅ ZMIENIONE: Lokalizacja domyślnie OTWARTA
   const [isLocationOpen, setIsLocationOpen] = useState(true);
   const [isCareTypeOpen, setIsCareTypeOpen] = useState(false);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
+  
+  // ✅ NOWE: Sort state
+  const [currentSort, setCurrentSort] = useState(searchParams.get('sort') || 'default');
+  
+  // ✅ NOWE: Autocomplete state dla miejscowości
+  const [locationQuery, setLocationQuery] = useState<string>(
+    searchParams.get('q') || ''
+  );
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   // Local state for optimistic updates
   const [localType, setLocalType] = useState<string>(
@@ -89,11 +118,86 @@ export default function FilterSidebar({ totalResults, careProfileCounts }: Filte
   const [maxPrice, setMaxPrice] = useState<string>(searchParams.get('max') || '');
   const [showFree, setShowFree] = useState(searchParams.get('free') === 'true');
 
+  // Helper dla polskiej pluralizacji
+  const getPluralForm = (count: number): string => {
+    if (count === 1) return 'placówka';
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+    
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return 'placówek';
+    if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
+    return 'placówek';
+  };
+
+  // ✅ NOWE: Handle sort change
+  const handleSortChange = (sortValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (sortValue === 'default') {
+      params.delete('sort');
+    } else {
+      params.set('sort', sortValue);
+    }
+    
+    router.push(`/search?${params.toString()}`);
+  };
+
+  // ✅ NOWE: Debounced autocomplete fetch
+  useEffect(() => {
+    if (locationQuery.length < 2) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsLoading(true);
+      
+      try {
+        const params = new URLSearchParams({ q: locationQuery });
+        const apiUrl = `/api/teryt/suggest?${params}`;
+        
+        const response = await fetch(apiUrl);
+        const data: SuggestResponse = await response.json();
+
+        setSuggestions(data.suggestions || []);
+        setShowDropdown((data.suggestions || []).length > 0);
+        setHighlightedIndex(-1);
+      } catch (error) {
+        console.error('Autocomplete error:', error);
+        setSuggestions([]);
+        setShowDropdown(false);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [locationQuery]);
+
+  // ✅ NOWE: Click outside handler
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        !inputRef.current?.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Sync with URL changes
   useEffect(() => {
     setLocalType(searchParams.get('type') || 'all');
     setSelectedWojewodztwo(searchParams.get('woj') || 'all');
     setSelectedPowiat(searchParams.get('powiat') || 'all');
+    setLocationQuery(searchParams.get('q') || '');
+    setCurrentSort(searchParams.get('sort') || 'default');
     
     const careParam = searchParams.get('care');
     setSelectedCareTypes(careParam ? careParam.split(',') : []);
@@ -113,124 +217,344 @@ export default function FilterSidebar({ totalResults, careProfileCounts }: Filte
     localType !== 'all' ||
     selectedWojewodztwo !== 'all' ||
     selectedPowiat !== 'all' ||
+    locationQuery !== '' ||
     selectedCareTypes.length > 0 ||
     minPrice !== '' ||
     maxPrice !== '' ||
     showFree;
 
-  // Handler do czyszczenia filtrów
-  const handleClearFilters = () => {
-    router.push(`/search?${searchParams.get('q') ? 'q=' + searchParams.get('q') : ''}`);
-  };
-
-  // Handler dla zmiany filtrów
-  const handleFilterChange = (updates: {
-    type?: string;
-    wojewodztwo?: string;
-    powiat?: string;
-    careTypes?: string[];
-    minPrice?: number;
-    maxPrice?: number;
-    showFree?: boolean;
-  }) => {
+  const handleFilterChange = (changes: Partial<{
+    type: string;
+    wojewodztwo: string;
+    powiat: string;
+    showFree: boolean;
+  }>) => {
     const params = new URLSearchParams(searchParams.toString());
-
-    if (updates.type !== undefined) {
-      setLocalType(updates.type);
-      if (updates.type !== 'all') {
-        params.set('type', updates.type);
-      } else {
+    
+    if (changes.type !== undefined) {
+      setLocalType(changes.type);
+      if (changes.type === 'all') {
         params.delete('type');
+      } else {
+        params.set('type', changes.type);
       }
     }
-
-    if (updates.wojewodztwo !== undefined) {
-      setSelectedWojewodztwo(updates.wojewodztwo);
-      if (updates.wojewodztwo !== 'all') {
-        params.set('woj', updates.wojewodztwo);
-      } else {
+    
+    if (changes.wojewodztwo !== undefined) {
+      setSelectedWojewodztwo(changes.wojewodztwo);
+      if (changes.wojewodztwo === 'all') {
         params.delete('woj');
-        setSelectedPowiat('all');
+        params.delete('powiat');
+      } else {
+        params.set('woj', changes.wojewodztwo);
         params.delete('powiat');
       }
+      setSelectedPowiat('all');
     }
-
-    if (updates.powiat !== undefined) {
-      setSelectedPowiat(updates.powiat);
-      if (updates.powiat !== 'all') {
-        params.set('powiat', updates.powiat);
-      } else {
+    
+    if (changes.powiat !== undefined) {
+      setSelectedPowiat(changes.powiat);
+      if (changes.powiat === 'all') {
         params.delete('powiat');
-      }
-    }
-
-    if (updates.careTypes !== undefined) {
-      setSelectedCareTypes(updates.careTypes);
-      if (updates.careTypes.length > 0) {
-        params.set('care', updates.careTypes.join(','));
       } else {
-        params.delete('care');
+        params.set('powiat', changes.powiat);
       }
     }
-
-    if (updates.minPrice !== undefined) {
-      if (updates.minPrice > 0) {
-        params.set('min', updates.minPrice.toString());
-      } else {
-        params.delete('min');
-      }
-    }
-
-    if (updates.maxPrice !== undefined) {
-      if (updates.maxPrice > 0) {
-        params.set('max', updates.maxPrice.toString());
-      } else {
-        params.delete('max');
-      }
-    }
-
-    if (updates.showFree !== undefined) {
-      if (updates.showFree) {
+    
+    if (changes.showFree !== undefined) {
+      if (changes.showFree) {
         params.set('free', 'true');
+        params.delete('min');
+        params.delete('max');
+        setMinPrice('');
+        setMaxPrice('');
       } else {
         params.delete('free');
       }
     }
-
+    
     router.push(`/search?${params.toString()}`);
   };
 
   const handleCareTypeToggle = (careType: string) => {
-    const newCareTypes = selectedCareTypes.includes(careType)
+    const newSelectedTypes = selectedCareTypes.includes(careType)
       ? selectedCareTypes.filter(t => t !== careType)
       : [...selectedCareTypes, careType];
     
-    handleFilterChange({ careTypes: newCareTypes });
+    setSelectedCareTypes(newSelectedTypes);
+    
+    const params = new URLSearchParams(searchParams.toString());
+    if (newSelectedTypes.length > 0) {
+      params.set('care', newSelectedTypes.join(','));
+    } else {
+      params.delete('care');
+    }
+    
+    router.push(`/search?${params.toString()}`);
   };
 
   const handlePriceSubmit = () => {
-    const min = minPrice ? parseInt(minPrice) : undefined;
-    const max = maxPrice ? parseInt(maxPrice) : undefined;
-    handleFilterChange({ minPrice: min, maxPrice: max });
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (showFree) return;
+    
+    if (minPrice) {
+      params.set('min', minPrice);
+    } else {
+      params.delete('min');
+    }
+    
+    if (maxPrice) {
+      params.set('max', maxPrice);
+    } else {
+      params.delete('max');
+    }
+    
+    router.push(`/search?${params.toString()}`);
   };
 
+  const clearAllFilters = () => {
+    setLocalType('all');
+    setSelectedWojewodztwo('all');
+    setSelectedPowiat('all');
+    // ✅ NIE czyścimy locationQuery - miejscowość zostaje
+    setSelectedCareTypes([]);
+    setMinPrice('');
+    setMaxPrice('');
+    setShowFree(false);
+    setCurrentSort('default');
+    
+    const params = new URLSearchParams(searchParams.toString());
+    
+    // ✅ Zachowaj query (q), geolokalizację (lat, lng, near)
+    const preserveParams = ['q', 'lat', 'lng', 'near'];
+    const preserved: Record<string, string> = {};
+    
+    preserveParams.forEach(param => {
+      const value = params.get(param);
+      if (value) preserved[param] = value;
+    });
+    
+    // Wyczyść wszystko i przywróć zachowane
+    const newParams = new URLSearchParams();
+    Object.entries(preserved).forEach(([key, value]) => {
+      newParams.set(key, value);
+    });
+    
+    router.push(`/search?${newParams.toString()}`);
+  };
+
+  // ✅ NOWE: Keyboard navigation for autocomplete
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown || suggestions.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(prev => 
+        prev < suggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(prev => prev > 0 ? prev - 1 : -1);
+    } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      e.preventDefault();
+      handleSuggestionClick(suggestions[highlightedIndex]);
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+      setHighlightedIndex(-1);
+    }
+  };
+
+  // ✅ NOWE: Handle suggestion click
+  const handleSuggestionClick = (suggestion: Suggestion) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('q', suggestion.nazwa);
+    params.delete('partial');
+    
+    setLocationQuery(suggestion.nazwa);
+    setShowDropdown(false);
+    setHighlightedIndex(-1);
+    
+    router.push(`/search?${params.toString()}`);
+  };
+
+  // ✅ NOWE: Handle location clear
+  const handleLocationClear = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('q');
+    params.delete('partial');
+    
+    setLocationQuery('');
+    setSuggestions([]);
+    setShowDropdown(false);
+    
+    router.push(`/search?${params.toString()}`);
+  };
+
+  // ✅ NOWE: Opcje sortowania z warunkiem dla geolokalizacji
+  const sortOptions = [
+    { value: 'default', label: 'Domyślnie' },
+    { value: 'name_asc', label: 'Alfabetycznie A-Z' },
+    { value: 'name_desc', label: 'Alfabetycznie Z-A' },
+    { value: 'price_asc', label: 'Najtańsze' },
+    { value: 'price_desc', label: 'Najdroższe' },
+    // Opcja "Najbliższe" tylko gdy user udostępnił lokalizację
+    ...(hasUserLocation ? [{ value: 'distance', label: 'Najbliższe' }] : []),
+  ];
+
   return (
-    <aside className="w-full lg:w-80 space-y-4 lg:sticky lg:top-6 lg:self-start">
-      {/* Header z liczbą wyników + Wyczyść */}
-      <div className="bg-white rounded-lg shadow-sm p-3 border border-neutral-200">
-        <div className="flex items-center justify-between">
+    <aside className="space-y-4 sticky top-6">
+      {/* Header z licznikiem i wyczyść wszystko */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-neutral-200">
+        <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-neutral-600">
-            Znaleziono <span className="font-semibold text-neutral-900">{totalResults}</span> placówek
+            Znaleziono <span className="font-semibold text-neutral-900">{totalResults}</span> {getPluralForm(totalResults)}
           </p>
           {hasActiveFilters && (
             <button
-              onClick={handleClearFilters}
-              className="text-xs text-accent-600 hover:text-accent-700 font-medium"
+              onClick={clearAllFilters}
+              className="text-sm text-accent-600 hover:text-accent-700 font-medium transition-colors"
             >
               Wyczyść filtry
             </button>
           )}
         </div>
+
+        {/* 🆕 SORTOWANIE - Dodane tutaj! */}
+        <div className="pt-4 border-t border-neutral-200">
+          <label htmlFor="sort-select-sidebar" className="block text-sm font-medium text-neutral-700 mb-2">
+            Sortuj wyniki:
+          </label>
+          <select
+            id="sort-select-sidebar"
+            value={currentSort}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg bg-white hover:bg-neutral-50 focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors cursor-pointer"
+          >
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Lokalizacja - COLLAPSIBLE */}
+      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
+        <button
+          onClick={() => setIsLocationOpen(!isLocationOpen)}
+          className="w-full flex items-center justify-between p-4 text-left"
+        >
+          <h3 className="text-base font-semibold text-neutral-900">
+            Lokalizacja
+          </h3>
+          <svg 
+            className={`w-5 h-5 text-neutral-500 transition-transform ${isLocationOpen ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        {isLocationOpen && (
+          <div className="px-4 pb-4 space-y-3">
+            {/* ✅ Miejscowość z autocomplete */}
+            <div className="relative">
+              <label className="block text-sm font-medium text-neutral-700 mb-1">
+                Miejscowość
+              </label>
+              <div className="relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={locationQuery}
+                  onChange={(e) => setLocationQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="np. Kraków, Bochnia..."
+                  className="w-full px-3 py-2 pr-8 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                />
+                {locationQuery && (
+                  <button
+                    onClick={handleLocationClear}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              {/* Autocomplete dropdown */}
+              {showDropdown && suggestions.length > 0 && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute z-50 w-full mt-1 bg-white border border-neutral-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                >
+                  {suggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className={`w-full px-3 py-2 text-left text-sm hover:bg-accent-50 transition-colors ${
+                        index === highlightedIndex ? 'bg-accent-50' : ''
+                      }`}
+                    >
+                      <div className="font-medium text-neutral-900">{suggestion.nazwa}</div>
+                      <div className="text-xs text-neutral-600">
+                        {suggestion.powiat}, {suggestion.wojewodztwo} • {suggestion.facilitiesCount} {getPluralForm(suggestion.facilitiesCount)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Województwo */}
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">
+                Województwo
+              </label>
+              <select
+                value={selectedWojewodztwo}
+                onChange={(e) => handleFilterChange({ wojewodztwo: e.target.value })}
+                className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+              >
+                <option value="all">Wszystkie</option>
+                {WOJEWODZTWA.map((woj) => (
+                  <option 
+                    key={woj.value} 
+                    value={woj.value}
+                    disabled={!woj.hasData}
+                  >
+                    {woj.label} {!woj.hasData && '(Wkrótce)'}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Powiat - tylko gdy wybrane województwo */}
+            {selectedWojewodztwo !== 'all' && availablePowiaty.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Powiat
+                </label>
+                <select
+                  value={selectedPowiat}
+                  onChange={(e) => handleFilterChange({ powiat: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                >
+                  <option value="all">Wszystkie</option>
+                  {availablePowiaty.map((powiat) => (
+                    <option key={powiat} value={powiat}>
+                      {powiat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Typ placówki - ALWAYS VISIBLE */}
@@ -267,70 +591,6 @@ export default function FilterSidebar({ totalResults, careProfileCounts }: Filte
             </label>
           ))}
         </div>
-      </div>
-
-      {/* Lokalizacja - COLLAPSIBLE */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
-        <button
-          onClick={() => setIsLocationOpen(!isLocationOpen)}
-          className="w-full flex items-center justify-between p-4 text-left"
-        >
-          <h3 className="text-base font-semibold text-neutral-900">
-            Lokalizacja
-          </h3>
-          <svg 
-            className={`w-5 h-5 text-neutral-500 transition-transform ${isLocationOpen ? 'rotate-180' : ''}`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        
-        {isLocationOpen && (
-          <div className="px-4 pb-4 space-y-3">
-            {/* Województwo */}
-            <div>
-              <label className="block text-xs font-medium text-neutral-700 mb-1.5">
-                Województwo
-              </label>
-              <select
-                value={selectedWojewodztwo}
-                onChange={(e) => handleFilterChange({ wojewodztwo: e.target.value })}
-                className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
-              >
-                <option value="all">Wszystkie</option>
-                {WOJEWODZTWA.map((woj) => (
-                  <option key={woj.value} value={woj.value} disabled={!woj.hasData}>
-                    {woj.label} {!woj.hasData && '(Wkrótce)'}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Powiat */}
-            {selectedWojewodztwo !== 'all' && availablePowiaty.length > 0 && (
-              <div>
-                <label className="block text-xs font-medium text-neutral-700 mb-1.5">
-                  Powiat
-                </label>
-                <select
-                  value={selectedPowiat}
-                  onChange={(e) => handleFilterChange({ powiat: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
-                >
-                  <option value="all">Wszystkie</option>
-                  {availablePowiaty.map((powiat) => (
-                    <option key={powiat} value={powiat}>
-                      {powiat}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Profil opieki - COLLAPSIBLE */}
