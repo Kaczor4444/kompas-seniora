@@ -21,7 +21,7 @@ export default function MobileStickyBar({
   const [prevScrollY, setPrevScrollY] = useState(0);
   const [showSortModal, setShowSortModal] = useState(false);
   
-  const currentSort = searchParams.get('sort') || 'default';
+  const currentSort = searchParams.get('sort') || '';
 
   // ✅ Auto-hide logic
   useEffect(() => {
@@ -52,7 +52,6 @@ export default function MobileStickyBar({
   };
 
   const sortOptions = [
-    { value: 'default', label: 'Domyślnie', icon: '📋' },
     { value: 'name_asc', label: 'A-Z', icon: '🔤' },
     { value: 'name_desc', label: 'Z-A', icon: '🔤' },
     { value: 'price_asc', label: 'Najtańsze', icon: '💰' },
@@ -62,13 +61,12 @@ export default function MobileStickyBar({
 
   const handleSortChange = (sortValue: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (sortValue === 'default') params.delete('sort');
-    else params.set('sort', sortValue);
+    params.set('sort', sortValue);
     router.push(`/search?${params.toString()}`);
     setShowSortModal(false);
   };
 
-  const currentSortLabel = sortOptions.find(opt => opt.value === currentSort)?.label || 'Domyślnie';
+  const currentSortLabel = sortOptions.find(opt => opt.value === currentSort)?.label || 'Sortuj';
 
   return (
     <>

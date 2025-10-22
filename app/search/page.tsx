@@ -314,7 +314,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   });
 
   // SORTOWANIE
-  const sortParam = params.sort || 'default';
+  const sortParam = params.sort || (userLat && userLng ? 'distance' : 'name_asc');
   let sortedResults = [...resultsWithDistance];
 
   switch (sortParam) {

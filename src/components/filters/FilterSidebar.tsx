@@ -83,7 +83,7 @@ export default function FilterSidebar({ totalResults, careProfileCounts, hasUser
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   
   // ✅ NOWE: Sort state
-  const [currentSort, setCurrentSort] = useState(searchParams.get('sort') || 'default');
+  const [currentSort, setCurrentSort] = useState(searchParams.get('sort') || '');
   
   // ✅ NOWE: Autocomplete state dla miejscowości
   const [locationQuery, setLocationQuery] = useState<string>(
@@ -133,11 +133,7 @@ export default function FilterSidebar({ totalResults, careProfileCounts, hasUser
   const handleSortChange = (sortValue: string) => {
     const params = new URLSearchParams(searchParams.toString());
     
-    if (sortValue === 'default') {
-      params.delete('sort');
-    } else {
-      params.set('sort', sortValue);
-    }
+    params.set('sort', sortValue);
     
     router.push(`/search?${params.toString()}`);
   };
@@ -197,7 +193,7 @@ export default function FilterSidebar({ totalResults, careProfileCounts, hasUser
     setSelectedWojewodztwo(searchParams.get('woj') || 'all');
     setSelectedPowiat(searchParams.get('powiat') || 'all');
     setLocationQuery(searchParams.get('q') || '');
-    setCurrentSort(searchParams.get('sort') || 'default');
+    setCurrentSort(searchParams.get('sort') || '');
     
     const careParam = searchParams.get('care');
     setSelectedCareTypes(careParam ? careParam.split(',') : []);
@@ -322,7 +318,6 @@ export default function FilterSidebar({ totalResults, careProfileCounts, hasUser
     setMinPrice('');
     setMaxPrice('');
     setShowFree(false);
-    setCurrentSort('default');
     
     const params = new URLSearchParams(searchParams.toString());
     
@@ -393,7 +388,6 @@ export default function FilterSidebar({ totalResults, careProfileCounts, hasUser
 
   // ✅ NOWE: Opcje sortowania z warunkiem dla geolokalizacji
   const sortOptions = [
-    { value: 'default', label: 'Domyślnie' },
     { value: 'name_asc', label: 'Alfabetycznie A-Z' },
     { value: 'name_desc', label: 'Alfabetycznie Z-A' },
     { value: 'price_asc', label: 'Najtańsze' },
