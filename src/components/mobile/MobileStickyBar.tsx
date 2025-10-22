@@ -96,8 +96,7 @@ export default function MobileStickyBar({
       {showSortModal && (
         <>
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[9998] lg:hidden" onClick={() => setShowSortModal(false)} />
-          <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl z-[9999] lg:hidden animate-slide-up">
-            <div className="flex justify-center pt-3 pb-2"><div className="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
+          <div className="fixed inset-0 bg-white shadow-2xl z-[9999] lg:hidden animate-slide-down">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold">Sortuj wyniki</h3>
               <button onClick={() => setShowSortModal(false)} className="p-2 hover:bg-gray-100 rounded-full">
@@ -106,10 +105,9 @@ export default function MobileStickyBar({
                 </svg>
               </button>
             </div>
-            <div className="px-6 py-4 space-y-2 max-h-[60vh] overflow-y-auto">
+            <div className="px-6 py-4 space-y-2 h-full overflow-y-auto">
               {sortOptions.map((opt) => (
                 <button key={opt.value} onClick={() => handleSortChange(opt.value)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-left min-h-[56px] ${currentSort === opt.value ? 'bg-accent-50 border-2 border-accent-600' : 'bg-white border-2 border-gray-200 hover:border-gray-300'}`}>
-                  <span className="text-2xl">{opt.icon}</span>
                   <span className={`font-medium flex-1 ${currentSort === opt.value ? 'text-accent-700' : 'text-gray-900'}`}>{opt.label}</span>
                   {currentSort === opt.value && (
                     <svg className="w-5 h-5 text-accent-600" fill="currentColor" viewBox="0 0 20 20">
@@ -125,8 +123,8 @@ export default function MobileStickyBar({
       )}
 
       <style jsx>{`
-        @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slide-down { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+        .animate-slide-down { animation: slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .active\\:scale-95:active { transform: scale(0.95); }
       `}</style>
     </>

@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Compass } from 'lucide-react'; // ✅ NOWY IMPORT - ikona kompasu
 import { getProfileOpiekiNazwy, profileOpiekiKody } from '@/src/data/profileopieki';
-import SortDropdown from '@/src/components/search/SortDropdown';
+// ✅ USUNIĘTO: import SortDropdown - sortowanie przeniesione do FilterSidebar
 import { formatDistance } from '@/src/utils/distance'; // ✅ IMPORT
 
 const FacilityMap = dynamic(() => import('@/components/FacilityMap'), {
@@ -268,13 +268,7 @@ export default function SearchResults({ query, type, results, message, activeFil
         )}
       </AnimatePresence>
 
-      {/* SORTOWANIE - ✅ Przekazujemy hasUserLocation */}
-      {results.length > 0 && (
-        <SortDropdown 
-          totalResults={results.length} 
-          hasUserLocation={!!userLocation} 
-        />
-      )}
+      {/* ✅ USUNIĘTO: SortDropdown - sortowanie przeniesione do FilterSidebar (desktop) */}
 
       {/* Layout: Lista + Mapa */}
       {results.length > 0 && (
@@ -384,7 +378,7 @@ export default function SearchResults({ query, type, results, message, activeFil
           </div>
 
           {/* Mapa - ✅ MOBILE: Ukryta na bardzo małych ekranach, widoczna od 640px */}
-          <div className="hidden sm:block lg:col-span-1">
+          <div className="hidden md:block lg:col-span-1">
             <div className="lg:sticky lg:top-6">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
                 Lokalizacja na mapie
