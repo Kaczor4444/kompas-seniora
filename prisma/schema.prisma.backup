@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -43,13 +42,13 @@ model Placowka {
 model TerytLocation {
   id                 Int     @id @default(autoincrement())
   nazwa              String
-  nazwa_normalized   String
+  nazwa_normalized   String  // ✅ NOWE POLE - znormalizowana nazwa bez polskich znaków
   typ                String
   gmina              String?
   powiat             String
   wojewodztwo        String
 
-  @@index([nazwa_normalized])
+  @@index([nazwa_normalized])  // ✅ Index dla szybkiego wyszukiwania
   @@index([powiat])
   @@index([wojewodztwo])
 }

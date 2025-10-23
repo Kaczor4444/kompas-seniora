@@ -10,6 +10,8 @@
     "import": "tsx scripts/import-csv.ts"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "@prisma/adapter-libsql": "^6.18.0",
     "@prisma/client": "^6.16.2",
     "framer-motion": "^12.23.24",
     "fuse.js": "^7.1.0",
