@@ -4,7 +4,6 @@ import SearchResults from '@/components/SearchResults';
 import FilterSidebar from '@/src/components/filters/FilterSidebar';
 import MobileFilterDrawer from '@/src/components/filters/MobileFilterDrawer';
 import MobileStickyBar from '@/src/components/mobile/MobileStickyBar';
-// ✅ USUNIĘTO: import SearchBarCompact
 import { calculateDistance } from '@/src/utils/distance';
 
 interface SearchPageProps {
@@ -75,7 +74,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     });
 
     console.log('🗺️ All facilities for geolocation:', results.length);
-    // ✅ USUNIĘTO: Niebieski banner z message - user widzi 🧭 na kartach
     message = '';
   }
   // TRYB 1: Z QUERY
@@ -96,17 +94,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                            wojewodztwo === 'malopolskie' ? 'Małopolskie' : 
                            wojewodztwoDbName;
 
-    const hasTerytData = wojewodztwo === 'malopolskie';
+    // ✅ FIX: Sprawdź czy województwo MA dane TERYT (nie tylko Małopolskie!)
+    const wojewodztwaWithTeryt = ['małopolskie', 'śląskie']; // Dodaj więcej jak dodajesz dane
+    const hasTerytData = wojewodztwo === 'all' || wojewodztwaWithTeryt.includes(wojewodztwoDbName.toLowerCase());
+    
     console.log('  hasTerytData:', hasTerytData, '(wojewodztwo:', wojewodztwo, ')');
 
-    // Z TERYT (Małopolskie)
-    if (hasTerytData && wojewodztwo !== 'all') {
-      console.log('  Mode: TERYT');
+    // ✅ FIX: TERYT search działa ZAWSZE gdy mamy dane (nawet dla 'all')
+    if (hasTerytData) {
+      console.log('  Mode: TERYT (improved - works for all województwa)');
 
       const terytWhere: any = isPartialSearch 
         ? { nazwa_normalized: { contains: normalizedQuery } }
         : { nazwa_normalized: normalizedQuery };
 
+      // Filtruj po województwie TYLKO jeśli user wybrał konkretne
       if (wojewodztwo !== 'all') {
         terytWhere.wojewodztwo = wojewodztwoDbName;
       }
@@ -114,6 +116,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       if (powiatParam) {
         terytWhere.powiat = powiatParam;
       }
+
+      console.log('  🔍 TERYT query:', terytWhere);
 
       terytMatches = await prisma.terytLocation.findMany({
         where: terytWhere,
@@ -125,8 +129,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         },
       });
 
+      console.log('  📍 TERYT matches found:', terytMatches.length);
+      if (terytMatches.length > 0) {
+        console.log('  📍 Sample matches:', terytMatches.slice(0, 3).map(m => ({
+          nazwa: m.nazwa,
+          powiat: m.powiat,
+          wojewodztwo: m.wojewodztwo
+        })));
+      }
+
       let uniquePowiaty = [...new Set(terytMatches.map(t => normalizePolish(t.powiat)))];
 
+      // Mapowanie specjalnych przypadków (Kraków, etc.)
       const powiatMapping: Record<string, string[]> = {
         'krakow': ['krakow', 'krakowski'],
         'm. krakow': ['krakow', 'krakowski'],
@@ -136,6 +150,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       uniquePowiaty = [...new Set(uniquePowiaty.flatMap(p => 
         powiatMapping[p] || [p]
       ))];
+
+      console.log('  🗺️ Unique powiaty to search:', uniquePowiaty);
 
       if (uniquePowiaty.length > 0) {
         const typeFilter = type === 'dps' 
@@ -149,12 +165,22 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           orderBy: { nazwa: 'asc' },
         });
 
+        console.log('  🏢 All facilities (before powiat filter):', allFacilities.length);
+
         results = allFacilities.filter(facility => {
           const normalizedFacilityPowiat = normalizePolish(facility.powiat);
-          return uniquePowiaty.some(powiat => {
+          const matches = uniquePowiaty.some(powiat => {
             return normalizedFacilityPowiat.includes(powiat) || powiat.includes(normalizedFacilityPowiat);
           });
+          
+          if (matches) {
+            console.log('  ✅ Matched facility:', facility.nazwa, 'in powiat:', facility.powiat);
+          }
+          
+          return matches;
         });
+
+        console.log('  ✅ Final results after powiat filter:', results.length);
 
         const locationCount = terytMatches.length;
         const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
@@ -171,12 +197,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               .filter(Boolean)
               .join(', ');
             
-            const searchType = isPartialSearch ? 'zawierających' : 'o nazwie';
             message = '';
           } else {
             message = '';
           }
         } else {
+          // Brak placówek w znalezionych powiatach
           const nearbyFacilities = await prisma.placowka.findMany({
             where: typeFilter,
             select: { powiat: true },
@@ -185,16 +211,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           });
 
           const powiatySuggestions = nearbyFacilities.map(f => f.powiat).join(', ');
-          message = `Nie znaleźliśmy ${facilityWord} w ${uniquePowiaty.join(', ')} (${wojewodztwoName}). Spróbuj wyszukać w: ${powiatySuggestions}`;
+          const wojewodztwoInfo = wojewodztwo === 'all' ? '' : ` (${wojewodztwoName})`;
+          message = `Nie znaleźliśmy ${facilityWord} w ${uniquePowiaty.join(', ')}${wojewodztwoInfo}. Spróbuj wyszukać w: ${powiatySuggestions}`;
         }
       } else {
+        // Brak dopasowań TERYT
         const searchType = isPartialSearch ? 'zawierających' : 'o nazwie';
-        message = `Nie znaleźliśmy miejscowości ${searchType} "${query}" w ${wojewodztwoName}. Spróbuj wpisać inną nazwę.`;
+        const wojewodztwoInfo = wojewodztwo === 'all' ? 'w naszej bazie' : `w ${wojewodztwoName}`;
+        message = `Nie znaleźliśmy miejscowości ${searchType} "${query}" ${wojewodztwoInfo}. Spróbuj wpisać inną nazwę.`;
       }
     } 
-    // BEZ TERYT (Śląskie lub 'all')
+    // BEZ TERYT (fallback dla województw bez danych TERYT)
     else {
-      console.log('🔍 NO TERYT MODE');
+      console.log('🔍 NO TERYT MODE (fallback)');
 
       const where: any = type === 'dps' 
         ? { typ_placowki: 'DPS' }
@@ -224,7 +253,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
       
       if (results.length > 0) {
-        const wojewodztwoInfo = wojewodztwo === 'all' ? 'we wszystkich województwach' : `w województwie ${wojewodztwoName}`;
         message = '';
       } else {
         const wojewodztwoInfo = wojewodztwo === 'all' ? 'w żadnym województwie' : `w województwie ${wojewodztwoName}`;
@@ -360,8 +388,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* ✅ USUNIĘTO: <SearchBarCompact /> */}
-
         <div className="flex flex-col lg:flex-row gap-6">
           
           {/* LEFT: Sidebar z filtrami (tylko desktop) */}
@@ -377,7 +403,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           {/* RIGHT: Wyniki wyszukiwania */}
           <div className="flex-1 min-w-0">
             {/* Mobile: Filter drawer */}
-            {/* ✅ Mobile: Sticky Bar + Hidden Filter Button */}
             <div className="lg:hidden">
               <MobileStickyBar
                 totalResults={sortedResults.length}
@@ -390,14 +415,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 }
                 hasUserLocation={!!(userLat && userLng)}
               />
-              {/* MobileFilterDrawer z własnym buttonem - triggerowany przez sticky bar */}
               <MobileFilterDrawer
                 totalResults={sortedResults.length}
                 careProfileCounts={careProfileCounts}
                 hasUserLocation={!!(userLat && userLng)}
               />
             </div>
-
 
             {/* Padding dla fixed sticky bar na mobile */}
             <div className="lg:hidden h-[60px]"></div>

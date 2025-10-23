@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     // ✅ Sprawdź czy województwo ma dane TERYT
     // TYLKO Małopolskie ma TERYT. Gdy brak wyboru ('' lub 'all') → DIRECT mode (szukaj wszędzie)
-    const hasTerytData = wojewodztwo === 'malopolskie';
+    const hasTerytData = wojewodztwo === '' || wojewodztwo === 'malopolskie' || wojewodztwo === 'slaskie';
 
     console.log('  hasTerytData:', hasTerytData, '(wojewodztwo:', wojewodztwo, ')');
 
