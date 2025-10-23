@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from 'next/navigation';
-import { getProfileOpiekiNazwy } from '@/src/data/profileOpieki';
+import { getProfileOpiekiNazwy } from '@/src/data/profileopieki';
 import {
   MapPin,
   Banknote,

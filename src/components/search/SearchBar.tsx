@@ -14,7 +14,7 @@ import {
   Search,
   ChevronRight
 } from 'lucide-react';
-import { getProfileOpiekiNazwy } from '../../data/profileOpieki';
+import { getProfileOpiekiNazwy } from '../../data/profileopieki';
 
 interface Placowka {
   id: number;
