@@ -4,10 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass } from 'lucide-react'; // ✅ NOWY IMPORT - ikona kompasu
+import { Compass } from 'lucide-react';
 import { getProfileOpiekiNazwy, profileOpiekiKody } from '@/src/data/profileopieki';
-// ✅ USUNIĘTO: import SortDropdown - sortowanie przeniesione do FilterSidebar
-import { formatDistance } from '@/src/utils/distance'; // ✅ IMPORT
+import { formatDistance } from '@/src/utils/distance';
 
 const FacilityMap = dynamic(() => import('@/components/FacilityMap'), {
   ssr: false,
@@ -25,7 +24,7 @@ interface Facility {
   latitude: number | null;
   longitude: number | null;
   profil_opieki?: string | null;
-  distance?: number | null; // ✅ NOWE POLE
+  distance?: number | null;
 }
 
 interface ActiveFilters {
@@ -44,7 +43,7 @@ interface SearchResultsProps {
   results: Facility[];
   message: string;
   activeFilters?: ActiveFilters;
-  userLocation?: { lat: number; lng: number }; // ✅ NOWY PROP
+  userLocation?: { lat: number; lng: number };
 }
 
 const cardVariants = {
@@ -123,7 +122,7 @@ export default function SearchResults({ query, type, results, message, activeFil
 
   return (
     <>
-      {/* Message - ✅ MOBILE OPTIMIZED */}
+      {/* Message */}
       <AnimatePresence>
         {message && (
           <motion.div
@@ -138,7 +137,7 @@ export default function SearchResults({ query, type, results, message, activeFil
         )}
       </AnimatePresence>
 
-      {/* AKTYWNE FILTRY - ✅ MOBILE OPTIMIZED */}
+      {/* Active Filters */}
       <AnimatePresence>
         {hasActiveFilters && (
           <motion.div
@@ -153,7 +152,6 @@ export default function SearchResults({ query, type, results, message, activeFil
                 Aktywne filtry:
               </span>
               
-              {/* Badges - ✅ TOUCH-FRIENDLY */}
               <AnimatePresence>
                 {activeFilters?.wojewodztwo && (
                   <motion.button
@@ -268,127 +266,126 @@ export default function SearchResults({ query, type, results, message, activeFil
         )}
       </AnimatePresence>
 
-      {/* ✅ USUNIĘTO: SortDropdown - sortowanie przeniesione do FilterSidebar (desktop) */}
+      {/* Mobile: Fullscreen Map View (hidden by default) */}
+      <div id="mobile-map-view" className="lg:hidden fixed inset-0 top-[120px] z-20 bg-white hidden">
+        <FacilityMap facilities={results} mode="multiple" />
+      </div>
 
-      {/* Layout: Lista + Mapa */}
-      {results.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          
-          {/* Lista placówek - ✅ MOBILE OPTIMIZED */}
-          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
-            <AnimatePresence mode="popLayout">
-              {results.map((facility, index) => {
-                const profileNazwy = facility.profil_opieki 
-                  ? getProfileOpiekiNazwy(facility.profil_opieki)
-                  : [];
+      {/* Mobile + Desktop: List View (wrapper with ID) */}
+      <div id="mobile-list-view" className="lg:block">
+        {results.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            
+            {/* Lista placówek */}
+            <div className="lg:col-span-2 space-y-3 sm:space-y-4">
+              <AnimatePresence mode="popLayout">
+                {results.map((facility, index) => {
+                  const profileNazwy = facility.profil_opieki 
+                    ? getProfileOpiekiNazwy(facility.profil_opieki)
+                    : [];
 
-                return (
-                  <motion.div
-                    key={facility.id}
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="hidden"
-                    transition={{ 
-                      duration: 0.4,
-                      delay: index * 0.05,
-                      ease: [0.22, 1, 0.36, 1]
-                    }}
-                    whileHover={{ 
-                      scale: 1.01,
-                      boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
-                    }}
-                    className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 transition relative"
-                  >
-                    {/* 🧭 DISTANCE BADGE - górny prawy róg z ikoną kompasu */}
-                    {facility.distance !== null && facility.distance !== undefined && (
-                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 px-2 py-1 bg-accent-50 text-gray-800 rounded-full text-[10px] sm:text-xs font-semibold flex items-center gap-1 shadow-sm">
-                        <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                        <span>{formatDistance(facility.distance)} od Ciebie</span>
-                      </div>
-                    )}
-
-                    {/* ✅ MOBILE: Większy, wyraźniejszy tytuł */}
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug pr-20 sm:pr-32">
-                      {facility.nazwa}
-                    </h2>
-                    
-                    {/* ✅ MOBILE: Lepsze spacing */}
-                    <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
-                      {facility.typ_placowki} • {facility.powiat}
-                    </p>
-
-                    <div className="space-y-3 sm:space-y-2 mb-4">
-                      {/* Lokalizacja */}
-                      <div>
-                        <span className="font-medium text-gray-700 text-sm sm:text-base">Lokalizacja</span>
-                        <p className="text-sm sm:text-base text-gray-600 mt-0.5">{facility.miejscowosc}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">Powiat: {facility.powiat}</p>
-                      </div>
-
-                      {/* PROFIL OPIEKI - ✅ MOBILE OPTIMIZED */}
-                      {profileNazwy.length > 0 && (
-                        <div>
-                          <span className="font-medium text-gray-700 text-sm sm:text-base">Profil opieki</span>
-                          <div className="mt-1.5 flex flex-wrap gap-1.5">
-                            {profileNazwy.map((nazwa, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-block px-2 py-1 text-xs sm:text-xs bg-accent-50 text-accent-700 rounded-md leading-tight"
-                              >
-                                {nazwa}
-                              </span>
-                            ))}
-                          </div>
+                  return (
+                    <motion.div
+                      key={facility.id}
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      transition={{ 
+                        duration: 0.4,
+                        delay: index * 0.05,
+                        ease: [0.22, 1, 0.36, 1]
+                      }}
+                      whileHover={{ 
+                        scale: 1.01,
+                        boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+                      }}
+                      className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 transition relative"
+                    >
+                      {/* Distance Badge */}
+                      {facility.distance !== null && facility.distance !== undefined && (
+                        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 px-2 py-1 bg-accent-50 text-gray-800 rounded-full text-[10px] sm:text-xs font-semibold flex items-center gap-1 shadow-sm">
+                          <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          <span>{formatDistance(facility.distance)} od Ciebie</span>
                         </div>
                       )}
 
-                      {/* Koszt miesięczny - ✅ MOBILE: Wyraźniejszy */}
-                      <div>
-                        <span className="font-medium text-gray-700 text-sm sm:text-base">Koszt miesięczny</span>
-                        <p className={`text-xl sm:text-lg font-semibold mt-0.5 ${facility.koszt_pobytu ? 'text-accent-600' : 'text-green-600'}`}>
-                          {facility.koszt_pobytu
-                            ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
-                            : 'Bezpłatne'}
-                        </p>
+                      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug pr-20 sm:pr-32">
+                        {facility.nazwa}
+                      </h2>
+                      
+                      <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+                        {facility.typ_placowki} • {facility.powiat}
+                      </p>
+
+                      <div className="space-y-3 sm:space-y-2 mb-4">
+                        <div>
+                          <span className="font-medium text-gray-700 text-sm sm:text-base">Lokalizacja</span>
+                          <p className="text-sm sm:text-base text-gray-600 mt-0.5">{facility.miejscowosc}</p>
+                          <p className="text-xs sm:text-sm text-gray-500">Powiat: {facility.powiat}</p>
+                        </div>
+
+                        {profileNazwy.length > 0 && (
+                          <div>
+                            <span className="font-medium text-gray-700 text-sm sm:text-base">Profil opieki</span>
+                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                              {profileNazwy.map((nazwa, idx) => (
+                                <span
+                                  key={idx}
+                                  className="inline-block px-2 py-1 text-xs bg-accent-50 text-accent-700 rounded-md"
+                                >
+                                  {nazwa}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div>
+                          <span className="font-medium text-gray-700 text-sm sm:text-base">Koszt miesięczny</span>
+                          <p className={`text-xl sm:text-lg font-semibold mt-0.5 ${facility.koszt_pobytu ? 'text-accent-600' : 'text-green-600'}`}>
+                            {facility.koszt_pobytu
+                              ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
+                              : 'Bezpłatne'}
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* ✅ MOBILE: Touch-friendly buttons, stack on small screens */}
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                      <Link
-                        href={`/placowka/${facility.id}`}
-                        className="flex-1 px-4 py-3 sm:py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors text-center font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center touch-manipulation"
-                      >
-                        Zobacz szczegóły
-                      </Link>
-                      {facility.telefon && (
-                        <a
-                          href={`tel:${facility.telefon.replace(/\s/g, '')}`}
-                          className="flex-1 px-4 py-3 sm:py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-center font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center touch-manipulation"
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                        <Link
+                          href={`/placowka/${facility.id}`}
+                          className="flex-1 px-4 py-3 sm:py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors text-center font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center"
                         >
-                          📞 {facility.telefon}
-                        </a>
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
-
-          {/* Mapa - ✅ MOBILE: Ukryta na bardzo małych ekranach, widoczna od 640px */}
-          <div className="hidden md:block lg:col-span-1">
-            <div className="lg:sticky lg:top-20">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
-                Lokalizacja na mapie
-              </h3>
-              <FacilityMap facilities={results} mode="multiple" />
+                          Zobacz szczegóły
+                        </Link>
+                        {facility.telefon && (
+                          <a
+                            href={`tel:${facility.telefon.replace(/\s/g, '')}`}
+                            className="flex-1 px-4 py-3 sm:py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-center font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center"
+                          >
+                            📞 {facility.telefon}
+                          </a>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
-          </div>
 
-        </div>
-      )}
+            {/* Mapa Desktop */}
+            <div className="hidden md:block lg:col-span-1">
+              <div className="lg:sticky lg:top-20">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
+                  Lokalizacja na mapie
+                </h3>
+                <FacilityMap facilities={results} mode="multiple" />
+              </div>
+            </div>
+
+          </div>
+        )}
+      </div>
     </>
   );
 }

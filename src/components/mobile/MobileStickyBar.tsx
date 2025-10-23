@@ -70,7 +70,7 @@ export default function MobileStickyBar({
 
   return (
     <>
-      <div className={`lg:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <div className={`lg:hidden fixed top-16 left-0 right-0 z-30 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="flex gap-2 p-3">
           <button onClick={handleOpenFilters} className="relative flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,6 +89,36 @@ export default function MobileStickyBar({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
             </svg>
             <span className="font-medium text-sm truncate max-w-[100px]">{currentSortLabel}</span>
+          </button>
+                <button 
+            id="map-toggle-btn"
+            onClick={() => {
+              const mapView = document.getElementById('mobile-map-view');
+              const listView = document.getElementById('mobile-list-view');
+              const btn = document.getElementById('map-toggle-btn');
+              
+              if (mapView && listView && btn) {
+                const isShowingMap = !mapView.classList.contains('hidden');
+                
+                if (isShowingMap) {
+                  // Pokaż listę
+                  mapView.classList.add('hidden');
+                  listView.classList.remove('hidden');
+                  btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span class="font-medium text-sm">Mapa</span>';
+                } else {
+                  // Pokaż mapę
+                  mapView.classList.remove('hidden');
+                  listView.classList.add('hidden');
+                  btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg><span class="font-medium text-sm">Lista</span>';
+                }
+              }
+            }}
+            className="flex items-center justify-center gap-2 px-3 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+            <span className="font-medium text-sm">Mapa</span>
           </button>
         </div>
       </div>
