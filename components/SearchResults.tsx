@@ -1,5 +1,6 @@
 'use client';
 
+import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -108,6 +109,12 @@ export default function SearchResults({ query, type, results, message, activeFil
     }
     
     router.push(`/search?${params.toString()}`);
+
+    // Toast notification
+    toast.success('Filtr usunięty', {
+      duration: 2000,
+      icon: '✓',
+    });
   };
 
   const clearAllFilters = () => {
@@ -226,7 +233,7 @@ export default function SearchResults({ query, type, results, message, activeFil
 
               <AnimatePresence>
                 {activeFilters?.careTypes && activeFilters.careTypes.map(care => {
-                  const careLabel = profileOpiekiKody.find(k => k.kod === care);
+                  const careLabel = profileOpiekiKody[care as keyof typeof profileOpiekiKody];
                   return (
                     <motion.button
                       key={care}
@@ -238,7 +245,7 @@ export default function SearchResults({ query, type, results, message, activeFil
                       onClick={() => removeFilter('care', care)}
                       className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent-50 text-accent-700 rounded-full text-sm hover:bg-accent-100 transition-colors min-h-[44px] touch-manipulation"
                     >
-                      {careLabel?.nazwa || care}
+                      {careLabel || care}
                       <span className="text-accent-600 text-lg">×</span>
                     </motion.button>
                   );
