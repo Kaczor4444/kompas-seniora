@@ -425,7 +425,7 @@ export default function HeroSection() {
           {/* Desktop version - IMPORTANT: overflow visible for dropdown */}
           <div className="hidden md:flex bg-white rounded-xl shadow-lg border border-neutral-200 relative">
             {/* Segment 1: Miejscowość - WITH AUTOCOMPLETE */}
-            <div className="flex-1 px-4 py-4 border-r border-neutral-200 relative" style={{ zIndex: 100 }}>
+            <div className="flex-1 px-4 py-4 border-r border-neutral-200 relative" style={{ zIndex: 10 }}>
               <label className="block text-xs text-neutral-500 mb-1">
                 Miejscowość <span className="text-neutral-400" title="Wpisz co najmniej 2 znaki aby zobaczyć sugestie">ⓘ</span>
               </label>
