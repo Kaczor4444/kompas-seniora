@@ -27,6 +27,9 @@ export default function HeroSection() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  
+  // 🆕 NEW: Geolocation loading state
+  const [isGeoLoading, setIsGeoLoading] = useState(false);
 
   // Refs for click outside detection
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -262,50 +265,51 @@ export default function HeroSection() {
   };
 
   const handleSearch = () => {
-    if (searchQuery.trim()) {
-      const params = new URLSearchParams();
-      params.append("q", searchQuery.trim());
-
-      if (selectedType !== "WSZYSTKIE") {
-        params.append("type", selectedType.toLowerCase());
-      }
-
-      // Dodaj województwo jeśli wybrane i nie Małopolskie
-      if (selectedVoivodeship && selectedVoivodeship !== "malopolskie") {
-        params.append("woj", selectedVoivodeship);
-      }
-
-      // Dodaj powiat jeśli wybrany
-      if (selectedPowiat) {
-        params.append("powiat", selectedPowiat);
-      }
-
-      window.location.href = `/search?${params.toString()}`;
+    const params = new URLSearchParams();
+    if (searchQuery) {
+      params.append("q", searchQuery);
     }
+    if (selectedType !== "WSZYSTKIE") {
+      params.append("type", selectedType.toLowerCase());
+    }
+    if (selectedVoivodeship && selectedVoivodeship !== "malopolskie") {
+      params.append("woj", selectedVoivodeship);
+    }
+    if (selectedPowiat) {
+      params.append("powiat", selectedPowiat);
+    }
+
+    window.location.href = `/search?${params.toString()}`;
   };
 
+  // 🆕 IMPROVED: Geolocation with loading state
   const handleGeolocation = () => {
     if (!navigator.geolocation) {
       alert("Twoja przeglądarka nie obsługuje geolokalizacji");
       return;
     }
 
+    // Start loading
+    setIsGeoLoading(true);
     console.log("📍 Requesting geolocation...");
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         console.log("✅ Geolocation success:", { latitude, longitude });
+        // Loading will stop when page redirects
         window.location.href = `/search?lat=${latitude}&lng=${longitude}&near=true`;
       },
       (error) => {
+        // Stop loading on error
+        setIsGeoLoading(false);
         console.error("❌ Geolocation error:", error);
 
         let message = "Nie udało się pobrać lokalizacji.";
 
         if (error.code === error.PERMISSION_DENIED) {
           message =
-            "Musisz zezwolić na dostęp do lokalizacji w ustawieniach przeglądarki.\n\niPhone: Ustawienia → Safari → Lokalizacja → Zezwól";
+            "Dostęp do lokalizacji został zablokowany.\n\nWłącz w ustawieniach przeglądarki.";
         } else if (error.code === error.TIMEOUT) {
           message =
             "Przekroczono czas oczekiwania.\n\nSpróbuj ponownie lub wpisz miasto ręcznie w polu wyszukiwania.";
@@ -344,124 +348,97 @@ export default function HeroSection() {
               ? "100%"
               : "500px",
           minWidth: "280px",
-          zIndex: 10000,
-          position: "absolute",
-        }}
-        onMouseDown={(e) => {
-          // Zapobiega zamknięciu dropdown przed kliknięciem
-          e.preventDefault();
-          e.stopPropagation();
+          zIndex: 1000,
         }}
       >
-        {/* Suggestions list */}
-        {suggestions.map((suggestion, index) => (
-          <button
-            key={`${suggestion.nazwa}-${suggestion.powiat}`}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleSuggestionClick(suggestion);
-            }}
-            className={`w-full px-4 py-3 text-left border-b border-neutral-100 last:border-b-0 hover:bg-accent-50 transition-colors cursor-pointer ${
-              highlightedIndex === index ? "bg-accent-50" : ""
-            }`}
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="font-medium text-neutral-900">
-                  {suggestion.nazwa}
-                </div>
-                <div className="text-sm text-neutral-500">
-                  {suggestion.powiat}, {suggestion.wojewodztwo}
-                </div>
-              </div>
-              <div className="text-sm text-accent-600 font-medium">
-                {suggestion.facilitiesCount}{" "}
-                {getPluralForm(suggestion.facilitiesCount)}
-              </div>
-            </div>
-          </button>
-        ))}
+        <div className="p-3 border-b border-neutral-200 bg-neutral-50">
+          <p className="text-sm text-neutral-600">
+            {suggestions.length < totalCount ? (
+              <>
+                Pokazano <strong>{suggestions.length}</strong> z{" "}
+                <strong>{totalCount}</strong>{" "}
+                {getPluralForm(totalCount)}
+              </>
+            ) : (
+              <>
+                Znaleziono <strong>{totalCount}</strong>{" "}
+                {getPluralForm(totalCount)}
+              </>
+            )}
+          </p>
+        </div>
 
-        {/* "Show All" button if more results than displayed AND query is long enough */}
-        {totalCount > suggestions.length && searchQuery.length >= 4 && (
-          <button
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleShowAllClick();
-            }}
-            className="w-full px-4 py-3 text-center text-accent-600 hover:bg-accent-50 font-medium transition-colors border-t border-neutral-200 cursor-pointer"
-          >
-            📋 Pokaż wszystkie ({totalCount})
-          </button>
-        )}
+        <ul className="divide-y divide-neutral-100">
+          {suggestions.map((suggestion, index) => (
+            <li
+              key={`${suggestion.nazwa}-${suggestion.powiat}-${index}`}
+              onMouseDown={() => handleSuggestionClick(suggestion)}
+              className={`px-4 py-3 hover:bg-accent-50 cursor-pointer transition-colors ${
+                highlightedIndex === index ? "bg-accent-50" : ""
+              }`}
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <p className="font-medium text-neutral-900">
+                    {suggestion.nazwa}
+                  </p>
+                  <p className="text-sm text-neutral-500 mt-0.5">
+                    {suggestion.powiat}, woj. {suggestion.wojewodztwo}
+                  </p>
+                </div>
+                <div className="ml-3 px-2 py-1 bg-accent-100 text-accent-700 rounded-md text-xs font-semibold whitespace-nowrap">
+                  {suggestion.facilitiesCount}{" "}
+                  {getPluralForm(suggestion.facilitiesCount)}
+                </div>
+              </div>
+            </li>
+          ))}
+
+          {suggestions.length < totalCount && (
+            <li
+              onMouseDown={handleShowAllClick}
+              className="px-4 py-3 bg-neutral-50 hover:bg-accent-50 cursor-pointer border-t-2 border-neutral-200 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <p className="font-medium text-accent-600">
+                  Pokaż wszystkie ({totalCount} {getPluralForm(totalCount)})
+                </p>
+                <svg
+                  className="w-5 h-5 text-accent-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
+            </li>
+          )}
+        </ul>
       </div>
     );
   };
 
   return (
-    <section className="py-16 md:py-20 bg-gradient-to-b from-accent-50 to-white">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* Trust Badge */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white px-6 py-2 rounded-lg shadow-sm border border-neutral-200">
-            <span className="text-sm text-neutral-700">
-              ⭐⭐⭐⭐⭐ Zaufana platforma
-            </span>
-          </div>
-        </div>
-
-        {/* Headline */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4 leading-tight">
-            Znajdź najlepszy dom opieki
-            <br />w Twojej okolicy
+    <section className="bg-gradient-to-br from-white via-neutral-50 to-amber-100/80 py-8 sm:py-16">
+      <div className="container mx-auto px-4 sm:px-6">
+        {/* Hero Header */}
+        <div className="text-center mb-6 sm:mb-10">
+          <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
+            Znajdź Dom Pomocy w Twojej okolicy
           </h1>
-          <p className="text-xl text-neutral-700 max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Transparentna wyszukiwarka publicznych domów pomocy społecznej z
             oficjalnymi cenami
           </p>
         </div>
 
-        {/* Category Tabs */}
-        <div className="flex justify-center gap-2 mb-6 flex-wrap">
-          <button
-            onClick={() => setSelectedType("WSZYSTKIE")}
-            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-              selectedType === "WSZYSTKIE"
-                ? "bg-white border-2 border-accent-500 text-neutral-900"
-                : "bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700"
-            }`}
-            title="Wszystkie typy placówek - zarówno DPS jak i ŚDS"
-          >
-            Wszystkie
-          </button>
-          <button
-            onClick={() => setSelectedType("DPS")}
-            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-              selectedType === "DPS"
-                ? "bg-white border-2 border-accent-500 text-neutral-900"
-                : "bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700"
-            }`}
-            title="Domy Pomocy Społecznej - całodobowa opieka dla osób starszych i niepełnosprawnych"
-          >
-            Domy Pomocy Społecznej (DPS){" "}
-            <span className="text-neutral-400 ml-1">ⓘ</span>
-          </button>
-          <button
-            onClick={() => setSelectedType("ŚDS")}
-            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-              selectedType === "ŚDS"
-                ? "bg-white border-2 border-accent-500 text-neutral-900"
-                : "bg-white hover:bg-neutral-50 border border-neutral-300 text-neutral-700"
-            }`}
-            title="Środowiskowe Domy Samopomocy - wsparcie dla osób z zaburzeniami psychicznymi"
-          >
-            Środowiskowe Domy Samopomocy (ŚDS){" "}
-            <span className="text-neutral-400 ml-1">ⓘ</span>
-          </button>
-        </div>
-
-        {/* Multi-Segment Search Bar */}
+        {/* Search Bar */}
         <div className="max-w-5xl mx-auto">
           {/* Desktop version - IMPORTANT: overflow visible for dropdown */}
           <div className="hidden md:flex bg-white rounded-xl shadow-lg border border-neutral-200 relative">
@@ -552,31 +529,36 @@ export default function HeroSection() {
               </select>
             </div>
 
-            {/* Segment 4: Geo Button */}
+            {/* Segment 4: Geo Button - 🆕 WITH LOADING SPINNER */}
             <button
               onClick={handleGeolocation}
-              className="px-6 bg-green-50 hover:bg-green-100 transition-colors flex items-center justify-center border-r border-neutral-200"
-              title="Szukaj w okolicy"
+              disabled={isGeoLoading}
+              className="px-6 bg-green-200 hover:bg-green-300 transition-colors flex items-center justify-center border-r border-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={isGeoLoading ? "Pobieranie lokalizacji..." : "Szukaj w okolicy"}
             >
-              <svg
-                className="w-6 h-6 text-green-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
+              {isGeoLoading ? (
+                <div className="animate-spin h-6 w-6 border-2 border-green-900 border-t-transparent rounded-full" />
+              ) : (
+                <svg
+                  className="w-6 h-6 text-green-900"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              )}
             </button>
 
             {/* Segment 5: Search Button */}
@@ -686,31 +668,41 @@ export default function HeroSection() {
               </select>
             </div>
 
-            {/* Buttons */}
+            {/* Buttons - 🆕 GEO BUTTON WITH LOADING */}
             <button
               onClick={handleGeolocation}
-              className="w-full px-4 py-4 bg-green-50 hover:bg-green-100 transition-colors flex items-center justify-center gap-2 border-b border-neutral-200 text-green-800 font-medium"
+              disabled={isGeoLoading}
+              className="w-full px-4 py-4 bg-green-200 hover:bg-green-300 transition-colors flex items-center justify-center gap-2 border-b border-neutral-200 text-green-900 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              Szukaj w okolicy
+              {isGeoLoading ? (
+                <>
+                  <div className="animate-spin h-5 w-5 border-2 border-green-900 border-t-transparent rounded-full" />
+                  Pobieranie lokalizacji...
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Szukaj w okolicy
+                </>
+              )}
             </button>
 
             <button

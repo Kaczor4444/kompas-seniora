@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 @theme inline {
   /* Warm Amber - ciepły bursztyn (primary) */
   --color-primary-50: #FFFBEB;
@@ -12,14 +11,12 @@
   --color-primary-700: #B45309;
   --color-primary-800: #92400E;
   --color-primary-900: #78350F;
-
   /* Soft Peach - delikatny brzoskwiniowy (secondary) */
   --color-secondary-50: #FFF7ED;
   --color-secondary-100: #FFEDD5;
   --color-secondary-200: #FED7AA;
   --color-secondary-300: #FDBA74;
   --color-secondary-500: #FB923C;
-
   /* Coral - łososiowy akcent */
   --color-accent-50: #FFF1F2;
   --color-accent-100: #FFE4E6;
@@ -28,7 +25,6 @@
   --color-accent-500: #FB7185;
   --color-accent-600: #F43F5E;
   --color-accent-700: #E11D48;
-
   /* Warm Neutrals - ciepłe szarości */
   --color-neutral-50: #FAFAF9;
   --color-neutral-100: #F5F5F4;
@@ -40,13 +36,11 @@
   --color-neutral-700: #44403C;
   --color-neutral-800: #292524;
   --color-neutral-900: #1C1917;
-
   /* Success - turkusowy zielony */
   --color-success-50: #F0FDFA;
   --color-success-100: #CCFBF1;
   --color-success-500: #14B8A6;
   --color-success-700: #0F766E;
-
   /* Warning - bursztynowy (używamy primary) */
   --color-warning-500: #F59E0B;
   --color-warning-700: #D97706;
@@ -79,4 +73,76 @@ body {
 
 .leaflet-popup-content a:hover {
   background-color: #E11D48 !important;
+}
+
+/* ========================================
+   🎨 DESIGN IMPROVEMENTS - "Subtle & Classy"
+   ======================================== */
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Professional focus states (accessibility) */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid #F43F5E;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove default focus outline (we have better one above) */
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Smooth transitions for interactive elements (subtle!) */
+button,
+a,
+input,
+select,
+textarea {
+  transition: background-color 0.2s ease, 
+              color 0.2s ease, 
+              border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              transform 0.2s ease;
+}
+
+/* Better text selection color */
+::selection {
+  background-color: #FECDD3;
+  color: #1C1917;
+}
+
+::-moz-selection {
+  background-color: #FECDD3;
+  color: #1C1917;
+}
+
+/* Smooth scrollbar (WebKit browsers - Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F5F4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D6D3D1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A8A29E;
 }
