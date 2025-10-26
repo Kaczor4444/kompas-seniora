@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import RegionModal from "./RegionModal";
-import TypeTooltip from "./TypeTooltip";
+import Link from "next/link";
 
 // Type dla suggestion z API
 interface Suggestion {
@@ -21,7 +20,7 @@ export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("WSZYSTKIE");
 
-  // Autocomplete state
+  // NEW: Autocomplete state
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -30,9 +29,6 @@ export default function HeroSection() {
   
   // Geolocation loading state
   const [isGeoLoading, setIsGeoLoading] = useState(false);
-
-  // Region modal state
-  const [showRegionModal, setShowRegionModal] = useState(false);
 
   // Refs for click outside detection
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -334,7 +330,8 @@ export default function HeroSection() {
             Znajdź Dom Pomocy w Twojej okolicy
           </h1>
           <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Transparentna wyszukiwarka domów pomocy społecznej z oficjalnymi cenami
+            Transparentna wyszukiwarka publicznych domów pomocy społecznej z
+            oficjalnymi cenami
           </p>
         </div>
 
@@ -349,7 +346,13 @@ export default function HeroSection() {
                 style={{ zIndex: 10 }}
               >
                 <label className="block text-xs text-neutral-500 mb-1">
-                  Miejscowość
+                  Miejscowość{" "}
+                  <span
+                    className="text-neutral-400"
+                    title="Wpisz co najmniej 2 znaki aby zobaczyć sugestie"
+                  >
+                    ⓘ
+                  </span>
                 </label>
                 <input
                   ref={inputRefDesktop}
@@ -357,7 +360,7 @@ export default function HeroSection() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="np. Kraków, Bochnia, Nowy Sącz"
+                  placeholder="np. Bochnia, Kraków, Nowy Sącz..."
                   className="w-full text-base focus:outline-none"
                   autoComplete="off"
                 />
@@ -376,7 +379,7 @@ export default function HeroSection() {
                 onClick={handleGeolocation}
                 disabled={isGeoLoading}
                 className="px-6 bg-green-200 hover:bg-green-300 transition-colors flex items-center justify-center border-r border-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Znajdź najbliższe placówki"
+                title={isGeoLoading ? "Pobieranie lokalizacji..." : "Szukaj w okolicy"}
               >
                 {isGeoLoading ? (
                   <div className="animate-spin h-6 w-6 border-2 border-green-900 border-t-transparent rounded-full" />
@@ -425,7 +428,7 @@ export default function HeroSection() {
             </div>
 
             {/* Type Buttons - Desktop */}
-            <div className="flex justify-center items-center gap-3 mt-6">
+            <div className="flex justify-center gap-3 mt-6">
               <button
                 onClick={() => setSelectedType("DPS")}
                 className={`px-8 py-3 rounded-lg font-medium transition-all ${
@@ -456,7 +459,6 @@ export default function HeroSection() {
               >
                 WSZYSTKIE
               </button>
-              <TypeTooltip />
             </div>
           </div>
 
@@ -465,7 +467,13 @@ export default function HeroSection() {
             {/* Miejscowość */}
             <div className="px-4 py-4 border-b border-neutral-200 relative">
               <label className="block text-xs text-neutral-500 mb-2">
-                Miejscowość
+                Miejscowość{" "}
+                <span
+                  className="text-neutral-400"
+                  title="Wpisz co najmniej 2 znaki"
+                >
+                  ⓘ
+                </span>
               </label>
               <input
                 ref={inputRefMobile}
@@ -473,7 +481,7 @@ export default function HeroSection() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="np. Kraków, Bochnia, Nowy Sącz"
+                placeholder="np. Bochnia, Kraków, Nowy Sącz..."
                 className="w-full text-base focus:outline-none"
                 autoComplete="off"
               />
@@ -489,14 +497,11 @@ export default function HeroSection() {
 
             {/* Type Buttons - Mobile */}
             <div className="px-4 py-4 border-b border-neutral-200">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-xs text-neutral-500">Typ placówki</label>
-                <TypeTooltip />
-              </div>
+              <label className="block text-xs text-neutral-500 mb-2">Typ placówki</label>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => setSelectedType("DPS")}
-                  className={`py-3 rounded-lg text-xs font-medium transition-all ${
+                  className={`py-3 rounded-lg text-sm font-medium transition-all ${
                     selectedType === "DPS"
                       ? "bg-accent-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-accent-50"
@@ -506,7 +511,7 @@ export default function HeroSection() {
                 </button>
                 <button
                   onClick={() => setSelectedType("ŚDS")}
-                  className={`py-3 rounded-lg text-xs font-medium transition-all ${
+                  className={`py-3 rounded-lg text-sm font-medium transition-all ${
                     selectedType === "ŚDS"
                       ? "bg-accent-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-accent-50"
@@ -516,13 +521,13 @@ export default function HeroSection() {
                 </button>
                 <button
                   onClick={() => setSelectedType("WSZYSTKIE")}
-                  className={`py-3 rounded-lg text-xs font-medium transition-all ${
+                  className={`py-3 rounded-lg text-sm font-medium transition-all ${
                     selectedType === "WSZYSTKIE"
                       ? "bg-accent-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-accent-50"
                   }`}
                 >
-                  WSZYSTKIE
+                  WSZ.
                 </button>
               </div>
             </div>
@@ -573,36 +578,29 @@ export default function HeroSection() {
             </button>
           </div>
 
-          {/* Helper Text + Region Link */}
+          {/* Helper Text + Region Links */}
           <div className="text-center mt-6 space-y-3">
-            <p className="text-sm text-neutral-500 flex items-center justify-center gap-1">
-              <span>💡 Wpisz miejscowość lub kliknij</span>
-              <svg className="w-4 h-4 text-green-700 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>aby znaleźć placówki w okolicy</span>
+            <p className="text-sm text-neutral-500">
+              💡 Wpisz miejscowość - system automatycznie dopasuje region
             </p>
             
-            <button
-              onClick={() => setShowRegionModal(true)}
-              className="text-sm text-accent-600 hover:text-accent-700 font-medium inline-flex items-center gap-1 hover:underline"
-            >
-              <span>🗺️</span>
-              Przeglądaj po województwie
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+            <div className="text-sm text-neutral-600">
+              Lub przeglądaj po województwie:{" "}
+              <Link href="/search?woj=malopolskie" className="text-accent-600 hover:text-accent-700 font-medium underline">
+                Małopolskie
+              </Link>
+              {" • "}
+              <Link href="/search?woj=slaskie" className="text-accent-600 hover:text-accent-700 font-medium underline">
+                Śląskie
+              </Link>
+              {" • "}
+              <Link href="/search" className="text-accent-600 hover:text-accent-700 font-medium underline">
+                Wszystkie
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Region Modal */}
-      <RegionModal 
-        isOpen={showRegionModal} 
-        onClose={() => setShowRegionModal(false)} 
-      />
     </section>
   );
 }
