@@ -337,7 +337,7 @@ export default function HeroSection() {
         {/* Hero Header */}
         <div className="text-center mb-6 sm:mb-10">
           <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
-            Znajdź Dom Pomocy w Twojej okolicy
+            Opieka dla seniora w Twojej okolicy
           </h1>
           <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Porównaj, oblicz koszty i dowiedz się więcej
