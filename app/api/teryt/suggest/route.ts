@@ -45,13 +45,12 @@ export async function GET(request: NextRequest) {
     const wojewodztwoDbName = wojewodztwoMap[wojewodztwo] || wojewodztwo;
 
     // ✅ Sprawdź czy województwo ma dane TERYT
-    // TYLKO Małopolskie ma TERYT. Gdy brak wyboru ('' lub 'all') → DIRECT mode (szukaj wszędzie)
     const hasTerytData = wojewodztwo === '' || wojewodztwo === 'malopolskie' || wojewodztwo === 'slaskie';
 
     console.log('  hasTerytData:', hasTerytData, '(wojewodztwo:', wojewodztwo, ')');
 
     // ========================================
-    // TRYB 1: Z TERYT (Małopolskie)
+    // TRYB 1: Z TERYT (Małopolskie + Śląskie)
     // ========================================
     if (hasTerytData) {
       console.log('  Mode: TERYT');
@@ -75,7 +74,7 @@ export async function GET(request: NextRequest) {
       const terytMatches = await prisma.terytLocation.findMany({
         where: terytWhere,
         distinct: ['nazwa', 'powiat'],
-        take: 20, // Pobierz więcej niż 5, bo będziemy filtrować po placówkach
+        take: 20,
         orderBy: {
           nazwa: 'asc'
         }
@@ -126,11 +125,30 @@ export async function GET(request: NextRequest) {
       );
 
       // 3. Filtruj tylko te które mają placówki + sortuj po liczbie
-      const withFacilities = suggestionsWithCount
+      let withFacilities = suggestionsWithCount
         .filter(s => s.facilitiesCount > 0)
-        .sort((a, b) => b.facilitiesCount - a.facilitiesCount);
+        .sort((a, b) => {
+          // BOOST: Exact match goes first
+          const aExact = normalizePolish(a.nazwa).toLowerCase() === normalizedQuery;
+          const bExact = normalizePolish(b.nazwa).toLowerCase() === normalizedQuery;
+          
+          if (aExact && !bExact) return -1;
+          if (!aExact && bExact) return 1;
+          
+          // Otherwise sort by facility count
+          return b.facilitiesCount - a.facilitiesCount;
+        });
 
       console.log('  Suggestions with facilities:', withFacilities.length);
+      
+      // 🐛 DEBUG: Show what we're returning
+      if (withFacilities.length > 0) {
+        console.log('  📋 Top suggestions (sorted):');
+        withFacilities.slice(0, 5).forEach((s, i) => {
+          const isExact = normalizePolish(s.nazwa).toLowerCase() === normalizedQuery;
+          console.log(`    ${i + 1}. "${s.nazwa}" (${s.facilitiesCount}) - powiat: "${s.powiat}" ${isExact ? '⭐ EXACT' : ''}`);
+        });
+      }
 
       // 4. Zwróć top 5 + totalCount
       const topSuggestions = withFacilities.slice(0, 5);
@@ -144,7 +162,7 @@ export async function GET(request: NextRequest) {
     }
 
     // ========================================
-    // TRYB 2: BEZ TERYT (Śląskie, etc.)
+    // TRYB 2: BEZ TERYT (inne województwa)
     // ========================================
     else {
       console.log('  Mode: DIRECT (no TERYT)');

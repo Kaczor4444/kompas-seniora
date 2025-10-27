@@ -38,7 +38,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params.q || '';
   const type = params.type || 'all';
-  const wojewodztwo = params.woj || 'all';
+  
+  // ✅ FIX BUG #1: Apply wojewodztwo mapping IMMEDIATELY (before any logic)
+  const wojewodztwoRaw = params.woj || 'all';
+  const wojewodztwoMap: Record<string, string> = {
+    'malopolskie': 'małopolskie',
+    'slaskie': 'śląskie',
+    'mazowieckie': 'mazowieckie',
+    'dolnoslaskie': 'dolnośląskie',
+    'wielkopolskie': 'wielkopolskie',
+  };
+  // Apply mapping for non-'all' values
+  const wojewodztwo = wojewodztwoRaw !== 'all' ? (wojewodztwoMap[wojewodztwoRaw] || wojewodztwoRaw) : 'all';
+  
   const powiatParam = params.powiat || '';
   const isPartialSearch = params.partial === 'true';
 
@@ -49,7 +61,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   console.log('🔍 DEBUG Search Page START:');
   console.log('  query:', query);
   console.log('  type:', type);
-  console.log('  wojewodztwo:', wojewodztwo);
+  console.log('  wojewodztwoRaw:', wojewodztwoRaw, '→ wojewodztwo:', wojewodztwo);
   console.log('  powiatParam:', powiatParam);
   console.log('  isPartialSearch:', isPartialSearch);
   console.log('  🗺️ Geolocation:', { userLat, userLng, isNearSearch });
@@ -76,23 +88,42 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     console.log('🗺️ All facilities for geolocation:', results.length);
     message = '';
   }
+  // TRYB 4: WOJEWÓDZTWO ONLY (RegionModal)
+  else if (!query && wojewodztwo !== 'all') {
+    console.log('🗺️ Mode: WOJEWÓDZTWO ONLY (from RegionModal)');
+
+    const typeFilter = type === 'dps' 
+      ? { typ_placowki: 'DPS' }
+      : (type === 'sds' || type === 'śds')
+      ? { typ_placowki: 'ŚDS' }
+      : {};
+
+    const wojewodztwoDbName = wojewodztwo;
+
+    const allFacilities = await prisma.placowka.findMany({
+      where: typeFilter,
+      orderBy: { nazwa: 'asc' },
+    });
+
+    results = allFacilities.filter(facility => {
+      const normalizedFacilityWoj = normalizePolish(facility.wojewodztwo);
+      const normalizedTargetWoj = normalizePolish(wojewodztwoDbName);
+      return normalizedFacilityWoj === normalizedTargetWoj;
+    });
+
+    console.log(`🗺️ Facilities in ${wojewodztwoDbName}:`, results.length);
+    message = '';
+  }
   // TRYB 1: Z QUERY
   else if (query) {
     const normalizedQuery = normalizePolish(query.trim());
     console.log('  normalizedQuery:', normalizedQuery);
 
-    const wojewodztwoMap: Record<string, string> = {
-      'malopolskie': 'małopolskie',
-      'slaskie': 'śląskie',
-      'mazowieckie': 'mazowieckie',
-      'dolnoslaskie': 'dolnośląskie',
-      'wielkopolskie': 'wielkopolskie',
-    };
-
-    const wojewodztwoDbName = wojewodztwoMap[wojewodztwo] || wojewodztwo;
-    const wojewodztwoName = wojewodztwo === 'slaskie' ? 'Śląskie' : 
-                           wojewodztwo === 'malopolskie' ? 'Małopolskie' : 
-                           wojewodztwoDbName;
+    // wojewodztwo już jest zmapowane na początku funkcji
+    const wojewodztwoDbName = wojewodztwo;
+    const wojewodztwoName = wojewodztwo === 'śląskie' ? 'Śląskie' : 
+                           wojewodztwo === 'małopolskie' ? 'Małopolskie' : 
+                           wojewodztwo;
 
     // ✅ FIX: Sprawdź czy województwo MA dane TERYT (nie tylko Małopolskie!)
     const wojewodztwaWithTeryt = ['małopolskie', 'śląskie']; // Dodaj więcej jak dodajesz dane
@@ -140,11 +171,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       let uniquePowiaty = [...new Set(terytMatches.map(t => normalizePolish(t.powiat)))];
 
-      // Mapowanie specjalnych przypadków (Kraków, etc.)
+      // ✅ FIX: NIE łącz miasta z powiatem!
+      // "m. Kraków" (miasto) ≠ "krakowski" (okolice)
+      // Mapowanie TYLKO dla specjalnych przypadków gdzie to samo miejsce ma różne nazwy
       const powiatMapping: Record<string, string[]> = {
-        'krakow': ['krakow', 'krakowski'],
-        'm. krakow': ['krakow', 'krakowski'],
-        'krakowski': ['krakow', 'krakowski'],
+        // Kraków MIASTO - szukaj tylko w mieście
+        'm. krakow': ['m. krakow', 'krakow'],
+        // Jeśli ktoś szuka po staremu "krakowski" - pokaż tylko okolice
+        'krakowski': ['krakowski'],
       };
 
       uniquePowiaty = [...new Set(uniquePowiaty.flatMap(p => 

@@ -124,6 +124,8 @@ export default function HeroSection() {
 
     const params = new URLSearchParams();
     params.append("q", suggestion.nazwa);
+    params.append("powiat", suggestion.powiat);  // ✅ DODAJ TĘ LINIJKĘ!
+
     if (selectedType !== "WSZYSTKIE") {
       params.append("type", selectedType.toLowerCase());
     }
@@ -334,7 +336,7 @@ export default function HeroSection() {
             Znajdź Dom Pomocy w Twojej okolicy
           </h1>
           <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Transparentna wyszukiwarka domów pomocy społecznej z oficjalnymi cenami
+            Porównaj placówki, oblicz koszty i dowiedz się więcej
           </p>
         </div>
 
