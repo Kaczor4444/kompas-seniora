@@ -117,19 +117,23 @@ export default function HeroSection() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle suggestion click
+  // ✅ FIX: Handle suggestion click - pass powiat to search
   const handleSuggestionClick = (suggestion: Suggestion) => {
     setSearchQuery(suggestion.nazwa);
     setShowDropdown(false);
 
     const params = new URLSearchParams();
     params.append("q", suggestion.nazwa);
-    params.append("powiat", suggestion.powiat);  // ✅ DODAJ TĘ LINIJKĘ!
-
+    
+    // ✅ CRITICAL FIX: Pass powiat from suggestion to search page
+    // This ensures "Kraków" (m. Kraków) doesn't show results from "krakowski" powiat
+    params.append("powiat", suggestion.powiat);
+    
     if (selectedType !== "WSZYSTKIE") {
       params.append("type", selectedType.toLowerCase());
     }
 
+    console.log('🔗 Navigating with params:', params.toString());
     window.location.href = `/search?${params.toString()}`;
   };
 
@@ -344,15 +348,24 @@ export default function HeroSection() {
         <div className="max-w-5xl mx-auto">
           {/* Desktop version */}
           <div className="hidden md:block">
+            {/* ✅ NEW: Helper text above input */}
+            <div className="text-center mb-4">
+              <p className="text-sm text-neutral-600 flex items-center justify-center gap-1.5">
+                <span>💡 Wpisz miejscowość lub kliknij</span>
+                <svg className="w-4 h-4 text-green-700 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>aby znaleźć placówki w okolicy</span>
+              </p>
+            </div>
+
             <div className="flex bg-white rounded-xl shadow-lg border border-neutral-200 relative">
-              {/* Miejscowość Input */}
+              {/* Miejscowość Input - NO LABEL */}
               <div
                 className="flex-1 px-4 py-4 border-r border-neutral-200 relative"
                 style={{ zIndex: 10 }}
               >
-                <label className="block text-xs text-neutral-500 mb-1">
-                  Miejscowość
-                </label>
                 <input
                   ref={inputRefDesktop}
                   type="text"
@@ -360,7 +373,7 @@ export default function HeroSection() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="np. Kraków, Bochnia, Nowy Sącz"
-                  className="w-full text-base focus:outline-none"
+                  className="w-full text-base focus:outline-none py-1"
                   autoComplete="off"
                 />
 
@@ -464,18 +477,22 @@ export default function HeroSection() {
 
           {/* Mobile version */}
           <div className="md:hidden bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
-            {/* Miejscowość */}
-            <div className="px-4 py-4 border-b border-neutral-200 relative">
-              <label className="block text-xs text-neutral-500 mb-2">
-                Miejscowość
-              </label>
+            {/* ✅ NEW: Helper text above input - MOBILE */}
+            <div className="px-4 pt-4 pb-2">
+              <p className="text-xs text-neutral-600 text-center leading-relaxed">
+                💡 Wpisz miasto lub kliknij 📍
+              </p>
+            </div>
+
+            {/* Miejscowość - NO LABEL */}
+            <div className="px-4 pb-4 border-b border-neutral-200 relative">
               <input
                 ref={inputRefMobile}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="np. Kraków, Bochnia, Nowy Sącz"
+                placeholder="np. Kraków, Bochnia..."
                 className="w-full text-base focus:outline-none"
                 autoComplete="off"
               />
@@ -575,17 +592,8 @@ export default function HeroSection() {
             </button>
           </div>
 
-          {/* Helper Text + Region Link */}
-          <div className="text-center mt-6 space-y-3">
-            <p className="text-sm text-neutral-500 flex items-center justify-center gap-1">
-              <span>💡 Wpisz miejscowość lub kliknij</span>
-              <svg className="w-4 h-4 text-green-700 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>aby znaleźć placówki w okolicy</span>
-            </p>
-            
+          {/* ✅ UPDATED: Only Region Link (removed duplicate helper text) */}
+          <div className="text-center mt-6">
             <button
               onClick={() => setShowRegionModal(true)}
               className="text-sm text-accent-600 hover:text-accent-700 font-medium inline-flex items-center gap-1 hover:underline"
