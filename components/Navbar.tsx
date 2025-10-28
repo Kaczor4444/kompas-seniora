@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -7,15 +7,36 @@ import {
   CalculatorIcon,
   BookOpenIcon,
   EnvelopeIcon,
-  Bars3Icon
+  Bars3Icon,
+  HeartIcon
 } from '@heroicons/react/24/outline';
 import MobileMenu from './MobileMenu';
+import { getFavoritesCount } from '@/src/utils/favorites';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [favoritesCount, setFavoritesCount] = useState(0);
   const pathname = usePathname();
 
   const isActive = (path: string) => pathname === path;
+
+  useEffect(() => {
+    setFavoritesCount(getFavoritesCount());
+  }, []);
+
+  useEffect(() => {
+    const handleFavoritesChange = () => {
+      setFavoritesCount(getFavoritesCount());
+    };
+
+    window.addEventListener('favoritesChanged', handleFavoritesChange);
+    window.addEventListener('storage', handleFavoritesChange);
+
+    return () => {
+      window.removeEventListener('favoritesChanged', handleFavoritesChange);
+      window.removeEventListener('storage', handleFavoritesChange);
+    };
+  }, []);
 
   return (
     <>
@@ -27,7 +48,6 @@ export default function Navbar() {
       >
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">K</span>
@@ -35,7 +55,6 @@ export default function Navbar() {
               <span className="text-xl font-semibold text-neutral-900">Kompas Seniora</span>
             </Link>
             
-            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <Link 
                 href="/search" 
@@ -47,6 +66,23 @@ export default function Navbar() {
               >
                 <MagnifyingGlassIcon className="w-5 h-5" />
                 Wyszukiwarka
+              </Link>
+
+              <Link 
+                href="/ulubione" 
+                className={`flex items-center gap-2 font-medium transition-colors relative ${
+                  isActive('/ulubione') 
+                    ? 'text-accent-600' 
+                    : 'text-neutral-700 hover:text-neutral-900'
+                }`}
+              >
+                <HeartIcon className="w-5 h-5" />
+                <span>Ulubione</span>
+                {favoritesCount > 0 && (
+                  <span className="absolute -top-2 -right-3 bg-accent-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {favoritesCount}
+                  </span>
+                )}
               </Link>
               
               <a 
@@ -71,7 +107,6 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="md:hidden flex items-center gap-2 px-3 py-1.5 border-2 border-accent-500 text-accent-600 rounded-lg font-semibold hover:bg-accent-50 transition-colors"
@@ -83,7 +118,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
       <MobileMenu 
         isOpen={isMobileMenuOpen} 
         onClose={() => setIsMobileMenuOpen(false)} 
