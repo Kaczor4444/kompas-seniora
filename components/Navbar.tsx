@@ -3,7 +3,12 @@ import Link from 'next/link';
 
 export default function Navbar() {
   return (
-    <nav className="border-b border-neutral-200 bg-white sticky top-0 z-50">
+    <nav 
+      className="border-b border-neutral-200 bg-white sticky top-0 z-50"
+      style={{
+        boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04)'
+      }}
+    >
       <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
