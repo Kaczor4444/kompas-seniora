@@ -32,6 +32,13 @@ interface Facility {
   longitude: number | null;
   profil_opieki?: string | null;
   distance?: number | null;
+  // ➕ NOWE POLA
+  ulica?: string | null;
+  kod_pocztowy?: string | null;
+  prowadzacy?: string | null;
+  liczba_miejsc?: number | null;
+  email?: string | null;
+  www?: string | null;
 }
 
 interface ActiveFilters {
@@ -399,17 +406,32 @@ export default function SearchResults({
                       {!facility.distance && <div className="mb-4"></div>}
 
                       <div className="space-y-3 sm:space-y-2 mb-4">
+                        {/* ➕ KOMPAKTOWY ADRES - wszystko w jednej sekcji */}
                         <div>
                           <span className="font-medium text-gray-700 text-sm sm:text-base">
-                            Lokalizacja
+                            Adres
                           </span>
                           <p className="text-sm sm:text-base text-gray-600 mt-0.5">
+                            {facility.ulica && <>{facility.ulica}, </>}
+                            {facility.kod_pocztowy && <>{facility.kod_pocztowy} </>}
                             {facility.miejscowosc}
-                          </p>
-                          <p className="text-xs sm:text-sm text-gray-500">
-                            Powiat: {facility.powiat}
+                            {facility.powiat && (
+                              <span className="text-gray-500"> • powiat {facility.powiat}</span>
+                            )}
                           </p>
                         </div>
+
+                        {/* ➕ NOWE: Liczba miejsc */}
+                        {facility.liczba_miejsc && (
+                          <div>
+                            <span className="font-medium text-gray-700 text-sm sm:text-base">
+                              Ilość miejsc
+                            </span>
+                            <p className="text-sm sm:text-base text-gray-600 mt-0.5">
+                              👥 {facility.liczba_miejsc}
+                            </p>
+                          </div>
+                        )}
 
                         {profileNazwy.length > 0 && (
                           <div>
@@ -425,6 +447,35 @@ export default function SearchResults({
                                   {nazwa}
                                 </span>
                               ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* ➕ NOWE: Kontakt (email + www) */}
+                        {(facility.email || facility.www) && (
+                          <div>
+                            <span className="font-medium text-gray-700 text-sm sm:text-base">
+                              Kontakt online
+                            </span>
+                            <div className="mt-1 space-y-1">
+                              {facility.email && (
+                                <a 
+                                  href={`mailto:${facility.email}`}
+                                  className="text-sm text-accent-600 hover:text-accent-700 hover:underline block"
+                                >
+                                  📧 {facility.email}
+                                </a>
+                              )}
+                              {facility.www && (
+                                <a 
+                                  href={facility.www}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-accent-600 hover:text-accent-700 hover:underline block"
+                                >
+                                  🌐 Strona internetowa →
+                                </a>
+                              )}
                             </div>
                           </div>
                         )}
@@ -482,7 +533,7 @@ export default function SearchResults({
             </div>
           </div>
         ) : (
-          // ✨ NEW: Empty State
+          // ✨ Empty State
           <motion.div
             variants={emptyStateVariants}
             initial="hidden"
