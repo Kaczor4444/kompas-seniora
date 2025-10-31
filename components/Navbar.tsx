@@ -7,7 +7,6 @@ import {
   CalculatorIcon,
   BookOpenIcon,
   EnvelopeIcon,
-  Bars3Icon,
   HeartIcon
 } from '@heroicons/react/24/outline';
 import MobileMenu from './MobileMenu';
@@ -101,18 +100,47 @@ export default function Navbar() {
                 Poradnik
               </a>
               
-              <button className="flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+              <a 
+                href="#kontakt" 
+                className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900 font-medium transition-colors"
+              >
                 <EnvelopeIcon className="w-5 h-5" />
                 Kontakt
-              </button>
+              </a>
             </div>
 
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden flex items-center gap-2 px-3 py-1.5 border-2 border-accent-500 text-accent-600 rounded-lg font-semibold hover:bg-accent-50 transition-colors"
+            {/* Mobile menu button - ANIMATED HAMBURGER */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors relative w-10 h-10"
+              aria-label={isMobileMenuOpen ? "Zamknij menu" : "Otwórz menu"}
             >
-              <Bars3Icon className="w-5 h-5" />
-              <span className="text-base">MENU</span>
+              <div className="flex flex-col justify-center items-center w-full h-full">
+                {/* Top line */}
+                <span 
+                  className={`block w-6 h-0.5 bg-neutral-700 rounded-full transition-all duration-300 ease-in-out ${
+                    isMobileMenuOpen 
+                      ? 'rotate-45 translate-y-[0.4rem]' 
+                      : 'rotate-0 translate-y-0'
+                  }`}
+                />
+                {/* Middle line */}
+                <span 
+                  className={`block w-6 h-0.5 bg-neutral-700 rounded-full my-1 transition-all duration-300 ease-in-out ${
+                    isMobileMenuOpen 
+                      ? 'opacity-0 scale-0' 
+                      : 'opacity-100 scale-100'
+                  }`}
+                />
+                {/* Bottom line */}
+                <span 
+                  className={`block w-6 h-0.5 bg-neutral-700 rounded-full transition-all duration-300 ease-in-out ${
+                    isMobileMenuOpen 
+                      ? '-rotate-45 -translate-y-[0.4rem]' 
+                      : 'rotate-0 translate-y-0'
+                  }`}
+                />
+              </div>
             </button>
           </div>
         </div>
