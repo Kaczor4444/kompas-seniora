@@ -81,10 +81,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       </div>
 
-      {/* Dropdown Menu Panel */}
+      {/* Dropdown Menu Panel - STICKY zamiast FIXED */}
       <div 
-        className={`fixed left-0 right-0 z-50 md:hidden bg-white shadow-2xl overflow-hidden transition-all duration-500 ease-out rounded-b-2xl ${
-          shouldRender ? 'top-[73px] max-h-screen opacity-100' : 'top-0 max-h-0 opacity-0'
+        className={`sticky left-0 right-0 z-50 md:hidden bg-white shadow-2xl overflow-hidden transition-all duration-500 ease-out rounded-b-2xl ${
+          shouldRender ? 'top-0 max-h-screen opacity-100' : 'top-0 max-h-0 opacity-0'
         }`}
         style={{
           transformOrigin: 'top',
