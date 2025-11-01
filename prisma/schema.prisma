@@ -53,3 +53,14 @@ model TerytLocation {
   @@index([powiat])
   @@index([wojewodztwo])
 }
+
+model SharedList {
+  id       Int      @id @default(autoincrement())
+  token    String   @unique
+  ids      String
+  created  DateTime @default(now())
+  views    Int      @default(0)
+
+  @@index([token])
+  @@index([created])
+}
