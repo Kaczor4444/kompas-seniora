@@ -46,7 +46,10 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // Automatic domain detection from request
+    const protocol = request.headers.get('x-forwarded-proto') || 'http';
+    const host = request.headers.get('host') || 'localhost:3000';
+    const baseUrl = `${protocol}://${host}`;
     const shareUrl = `${baseUrl}/s/${token}`;
 
     return NextResponse.json({
