@@ -9,6 +9,13 @@ export interface FavoriteFacility {
   typ_placowki: string;
   koszt_pobytu: number | null;
   telefon: string | null;
+  // ➕ NOWE POLA - takie same jak w SearchResults
+  ulica: string | null;
+  kod_pocztowy: string | null;
+  email: string | null;
+  www: string | null;
+  liczba_miejsc: number | null;
+  profil_opieki: string | null;
   addedAt: string;
 }
 

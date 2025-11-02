@@ -48,9 +48,9 @@ export default function FacilityNotesDisplay({
     return (
       <div className="mt-2">
         {hasNote ? (
-          <button
+          <div
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 text-sm text-accent-600 hover:text-accent-700 font-medium group"
+            className="flex items-center gap-2 text-sm text-accent-600 hover:text-accent-700 font-medium group cursor-pointer"
           >
             {note.rating > 0 && (
               <div className="flex items-center gap-1">
@@ -61,15 +61,15 @@ export default function FacilityNotesDisplay({
               <PencilIcon className="w-4 h-4" />
               {note.notes.length > 0 ? 'Edytuj notatkę' : 'Dodaj notatkę'}
             </span>
-          </button>
+          </div>
         ) : (
-          <button
+          <div
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-accent-600 font-medium"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-accent-600 font-medium cursor-pointer"
           >
             <PencilIcon className="w-4 h-4" />
             Dodaj notatkę lub ocenę
-          </button>
+          </div>
         )}
 
         <FacilityNotesModal

@@ -377,7 +377,7 @@ export default function SearchResults({
                       <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug pr-20 sm:pr-32">
                         {facility.nazwa}
                       </h2>
-                      {/* Favorite Button - top right corner */}
+                      {/* ✅ FIXED: Favorite Button - przekazuj WSZYSTKIE pola */}
                       <div className="absolute top-4 right-4 z-10">
                         <FavoriteButton
                           facility={{
@@ -388,6 +388,14 @@ export default function SearchResults({
                             typ_placowki: facility.typ_placowki,
                             koszt_pobytu: facility.koszt_pobytu,
                             telefon: facility.telefon,
+                            // ➕ NOWE POLA
+                            ulica: facility.ulica || null,
+                            kod_pocztowy: facility.kod_pocztowy || null,
+                            email: facility.email || null,
+                            www: facility.www || null,
+                            liczba_miejsc: facility.liczba_miejsc || null,
+                            profil_opieki: facility.profil_opieki || null,
+                            addedAt: new Date().toISOString(), // będzie nadpisane w addFavorite()
                           }}
                           variant="icon-only"
                         />
