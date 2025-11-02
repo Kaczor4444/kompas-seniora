@@ -7,6 +7,7 @@ import { HeartIcon, TrashIcon, ArrowLeftIcon, ShareIcon, PrinterIcon } from '@he
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
 import { getFavorites, removeFavorite, getMaxFavorites, type FavoriteFacility } from '@/src/utils/favorites';
+import FacilityNotesDisplay from '@/src/components/FacilityNotesDisplay';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -231,6 +232,13 @@ export default function FavoritesPage() {
                               : 'Bezpłatne'}
                           </p>
                         </div>
+
+                        {/* NOTES & RATINGS - NOWE! */}
+                        <FacilityNotesDisplay
+                          facilityId={facility.id}
+                          facilityName={facility.nazwa}
+                          compact
+                        />
                       </div>
                     </div>
 
