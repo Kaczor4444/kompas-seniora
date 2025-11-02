@@ -365,15 +365,17 @@ export default function FavoritesPage() {
                 <span className="sm:hidden">Drukuj</span>
               </button>
 
-              <button
-                onClick={handleCompare}
-                disabled={favorites.length < 2}
-                className="px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ScaleIcon className="w-5 h-5" />
-                <span className="hidden sm:inline">Porównaj ({favorites.length})</span>
-                <span className="sm:hidden">Porównaj</span>
-              </button>
+              {/* Show compare button only if 2+ favorites */}
+              {favorites.length >= 2 && (
+                <button
+                  onClick={handleCompare}
+                  className="px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-lg flex items-center justify-center gap-2"
+                >
+                  <ScaleIcon className="w-5 h-5" />
+                  <span className="hidden sm:inline">Porównaj ({favorites.length})</span>
+                  <span className="sm:hidden">Porównaj</span>
+                </button>
+              )}
 
               <Link
                 href="/search"
