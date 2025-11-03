@@ -6,11 +6,19 @@ import { ArrowLeftIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@he
 import { getFavorites, type FavoriteFacility } from '@/src/utils/favorites';
 import { getFacilityNote } from '@/src/utils/facilityNotes';
 import StarRating from '@/src/components/StarRating';
+import NoteModal from '@/src/components/compare/NoteModal';
 
 export default function ComparePage() {
   const [facilities, setFacilities] = useState<FavoriteFacility[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [currentPairIndex, setCurrentPairIndex] = useState(0);
+  
+  // Modal state
+  const [selectedNote, setSelectedNote] = useState<{
+    facilityName: string;
+    rating: number;
+    notes: string;
+  } | null>(null);
 
   useEffect(() => {
     const favs = getFavorites();
@@ -515,7 +523,7 @@ export default function ComparePage() {
             ))}
           </ComparisonRow>
 
-          {/* Ocena */}
+          {/* Ocena - ZMIENIONE: używamy NoteModal zamiast alert() */}
           <ComparisonRow label="Twoja ocena">
             {currentPair.map((facility) => {
               const note = getFacilityNote(facility.id);
@@ -525,25 +533,32 @@ export default function ComparePage() {
               
               return (
                 <div key={facility.id} className="bg-white p-2.5 flex flex-col items-center justify-center">
-                  {rating > 0 ? (
+                  {hasNote ? (
+                    // MA NOTATKĘ - pokaż button do otwarcia modalu
+                    <div
+                      onClick={() => {
+                        setSelectedNote({
+                          facilityName: facility.nazwa,
+                          rating: rating,
+                          notes: note.notes
+                        });
+                      }}
+                      className="cursor-pointer hover:opacity-80 transition-opacity text-center"
+                    >
+                      {rating > 0 && <StarRating rating={rating} readonly size="sm" />}
+                      <div className="text-xs text-accent-600 mt-0.5 font-medium break-words">
+                        📝 Kliknij aby zobaczyć notatkę
+                      </div>
+                      {isMax && <div className="text-xs text-green-600 mt-0.5">✅ Najwyższa</div>}
+                    </div>
+                  ) : rating > 0 ? (
+                    // MA TYLKO GWIAZDKI BEZ NOTATKI
                     <>
-                      {hasNote ? (
-                        <button
-                          onClick={() => {
-                            // Show note in alert (simple solution)
-                            alert(`Twoja notatka dla ${facility.nazwa}:\n\n${note.notes}`);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <StarRating rating={rating} readonly size="sm" />
-                          <div className="text-xs text-accent-600 mt-0.5">📝 Kliknij aby zobaczyć Twoją notatkę</div>
-                        </button>
-                      ) : (
-                        <StarRating rating={rating} readonly size="sm" />
-                      )}
+                      <StarRating rating={rating} readonly size="sm" />
                       {isMax && <div className="text-xs text-green-600 mt-0.5">✅ Najwyższa</div>}
                     </>
                   ) : (
+                    // NIE MA NIC
                     <span className="text-xs text-gray-400">—</span>
                   )}
                 </div>
@@ -621,6 +636,17 @@ export default function ComparePage() {
           Wróć do ulubionych
         </Link>
       </div>
+
+      {/* Note Modal */}
+      {selectedNote && (
+        <NoteModal
+          isOpen={selectedNote !== null}
+          onClose={() => setSelectedNote(null)}
+          facilityName={selectedNote.facilityName}
+          rating={selectedNote.rating}
+          notes={selectedNote.notes}
+        />
+      )}
     </div>
   );
 }

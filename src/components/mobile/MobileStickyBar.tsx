@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { getFavorites } from '@/src/utils/favorites';
 
 interface MobileStickyBarProps {
   totalResults: number;
@@ -20,8 +22,27 @@ export default function MobileStickyBar({
   const [isVisible, setIsVisible] = useState(true);
   const [prevScrollY, setPrevScrollY] = useState(0);
   const [showSortModal, setShowSortModal] = useState(false);
+  const [favoritesCount, setFavoritesCount] = useState(0);
   
   const currentSort = searchParams.get('sort') || '';
+
+  // ✅ Śledź liczbę ulubionych
+  useEffect(() => {
+    const updateFavoritesCount = () => {
+      const favorites = getFavorites();
+      setFavoritesCount(favorites.length);
+    };
+
+    // Załaduj przy mount
+    updateFavoritesCount();
+
+    // Nasłuchuj zmian
+    window.addEventListener('favoritesChanged', updateFavoritesCount);
+    
+    return () => {
+      window.removeEventListener('favoritesChanged', updateFavoritesCount);
+    };
+  }, []);
 
   // ✅ Auto-hide logic
   useEffect(() => {
@@ -71,26 +92,37 @@ export default function MobileStickyBar({
   return (
     <>
       <div className={`lg:hidden fixed top-16 left-0 right-0 z-30 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
-        <div className="flex gap-2 p-3">
-          <button onClick={handleOpenFilters} className="relative flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* JEDEN RZĄD: Wszystkie przyciski obok siebie */}
+        <div className="flex gap-1.5 p-2">
+          {/* Filtruj */}
+          <button 
+            onClick={handleOpenFilters} 
+            className="relative flex items-center justify-center gap-1 px-2 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95 flex-1"
+          >
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-            <span className="font-medium text-sm">Filtry</span>
+            <span className="font-medium text-xs hidden xs:inline">Filtry</span>
             {activeFiltersCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 bg-accent-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-accent-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                 {activeFiltersCount}
               </span>
             )}
           </button>
 
-          <button onClick={() => setShowSortModal(true)} className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* Sortuj */}
+          <button 
+            onClick={() => setShowSortModal(true)} 
+            className="flex items-center justify-center gap-1 px-2 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95 flex-1"
+          >
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
             </svg>
-            <span className="font-medium text-sm truncate max-w-[100px]">{currentSortLabel}</span>
+            <span className="font-medium text-xs hidden xs:inline truncate max-w-[60px]">{currentSortLabel}</span>
           </button>
-                <button 
+
+          {/* Widok (Mapa) */}
+          <button 
             id="map-toggle-btn"
             onClick={() => {
               const mapView = document.getElementById('mobile-map-view');
@@ -104,22 +136,41 @@ export default function MobileStickyBar({
                   // Pokaż listę
                   mapView.classList.add('hidden');
                   listView.classList.remove('hidden');
-                  btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span class="font-medium text-sm">Mapa</span>';
+                  btn.innerHTML = '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span class="font-medium text-xs hidden xs:inline">Mapa</span>';
                 } else {
                   // Pokaż mapę
                   mapView.classList.remove('hidden');
                   listView.classList.add('hidden');
-                  btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg><span class="font-medium text-sm">Lista</span>';
+                  btn.innerHTML = '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg><span class="font-medium text-xs hidden xs:inline">Lista</span>';
                 }
               }
             }}
-            className="flex items-center justify-center gap-2 px-3 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95"
+            className="flex items-center justify-center gap-1 px-2 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95 flex-1"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
-            <span className="font-medium text-sm">Mapa</span>
+            <span className="font-medium text-xs hidden xs:inline">Mapa</span>
           </button>
+
+          {/* NOWY: Ulubione (tylko jeśli są) */}
+          {favoritesCount > 0 && (
+            <Link
+              href="/ulubione"
+              className="flex items-center justify-center gap-1 px-2 py-2.5 bg-accent-50 border-2 border-accent-600 rounded-lg hover:bg-accent-100 transition min-h-[44px] active:scale-95 flex-1"
+            >
+              <svg className="w-4 h-4 flex-shrink-0 text-accent-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <span className="font-medium text-xs text-accent-700 hidden xs:inline">
+                ({favoritesCount})
+              </span>
+              {/* Na małych ekranach tylko liczba bez nawiasów */}
+              <span className="font-bold text-xs text-accent-700 xs:hidden">
+                {favoritesCount}
+              </span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -156,6 +207,12 @@ export default function MobileStickyBar({
         @keyframes slide-down { from { transform: translateY(-100%); } to { transform: translateY(0); } }
         .animate-slide-down { animation: slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .active\\:scale-95:active { transform: scale(0.95); }
+        
+        /* Breakpoint dla małych ekranów */
+        @media (min-width: 375px) {
+          .xs\\:inline { display: inline; }
+          .xs\\:hidden { display: none; }
+        }
       `}</style>
     </>
   );

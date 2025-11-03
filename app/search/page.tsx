@@ -457,7 +457,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </div>
 
             {/* Padding dla fixed sticky bar na mobile */}
-            <div className="lg:hidden h-[60px]"></div>
+            <div className="lg:hidden h-[110px]"></div>
 
             {/* Search Results */}
             <SearchResults 
