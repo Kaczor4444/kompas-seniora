@@ -116,6 +116,19 @@ export default function FavoritesPage() {
     router.push('/ulubione/porownaj');
   };
 
+  // ✅ NOWA FUNKCJA: Inteligentny powrót z sessionStorage
+  const handleBack = () => {
+    // Sprawdź czy mamy zapisany URL powrotu
+    const returnUrl = sessionStorage.getItem('returnUrl');
+    
+    if (returnUrl && returnUrl.includes('/search')) {
+      router.push(returnUrl); // Wróć z parametrami!
+      sessionStorage.removeItem('returnUrl'); // Wyczyść
+    } else {
+      router.push('/search'); // Fallback jeśli przyszedł z zewnątrz
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -129,9 +142,14 @@ export default function FavoritesPage() {
       <div className="bg-white border-b border-neutral-200 no-print">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="flex items-center gap-4 mb-4">
-            <Link href="/search" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            {/* ✅ ZMIENIONE: Button zamiast Link + handleBack */}
+            <button 
+              onClick={handleBack}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Wróć"
+            >
               <ArrowLeftIcon className="w-6 h-6 text-gray-600" />
-            </Link>
+            </button>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
                 <HeartIconSolid className="w-8 h-8 text-red-500" />
@@ -189,13 +207,14 @@ export default function FavoritesPage() {
               Dodaj placówki do ulubionych, aby móc je łatwo porównać i wrócić do nich później.
             </p>
 
-            <Link
-              href="/search"
+            {/* ✅ ZMIENIONE: Button zamiast Link + handleBack */}
+            <button
+              onClick={handleBack}
               className="inline-flex items-center gap-2 px-6 py-3 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-medium"
             >
               <ArrowLeftIcon className="w-5 h-5" />
               Wróć do wyszukiwania
-            </Link>
+            </button>
           </motion.div>
         ) : (
           <div className="space-y-4">
@@ -377,14 +396,15 @@ export default function FavoritesPage() {
                 </button>
               )}
 
-              <Link
-                href="/search"
+              {/* ✅ ZMIENIONE: Button zamiast Link + handleBack */}
+              <button
+                onClick={handleBack}
                 className="px-6 py-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-lg flex items-center justify-center gap-2"
               >
                 <ArrowLeftIcon className="w-5 h-5" />
                 <span className="hidden sm:inline">Wróć</span>
                 <span className="sm:hidden">Wróć</span>
-              </Link>
+              </button>
             </div>
 
             {/* Print hint */}

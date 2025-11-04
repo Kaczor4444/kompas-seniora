@@ -100,7 +100,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={onClose}
+                onClick={(e) => {
+                  // ✅ DODANE: Zapisz URL przed odejściem (tylko dla Ulubione)
+                  if (item.href === '/ulubione' && typeof window !== 'undefined') {
+                    sessionStorage.setItem('returnUrl', window.location.pathname + window.location.search);
+                  }
+                  onClose();
+                }}
                 className={`
                   flex items-center gap-4 px-6 py-4
                   text-base font-medium

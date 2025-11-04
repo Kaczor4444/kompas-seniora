@@ -67,8 +67,15 @@ export default function Navbar() {
                 Wyszukiwarka
               </Link>
 
+              {/* ✅ ZMIENIONE: Dodano onClick z sessionStorage */}
               <Link 
-                href="/ulubione" 
+                href="/ulubione"
+                onClick={() => {
+                  // Zapisz obecny URL przed odejściem (desktop)
+                  if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('returnUrl', window.location.pathname + window.location.search);
+                  }
+                }}
                 className={`flex items-center gap-2 font-medium transition-colors relative ${
                   isActive('/ulubione') 
                     ? 'text-accent-600' 

@@ -91,7 +91,8 @@ export default function MobileStickyBar({
 
   return (
     <>
-      <div className={`lg:hidden fixed top-16 left-0 right-0 z-30 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      {/* ✅ ZMIANA 1: top-16 → top-[68px] (niżej) */}
+      <div className={`lg:hidden fixed top-[68px] left-0 right-0 z-30 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         {/* JEDEN RZĄD: Wszystkie przyciski obok siebie */}
         <div className="flex gap-1.5 p-2">
           {/* Filtruj */}
@@ -153,10 +154,17 @@ export default function MobileStickyBar({
             <span className="font-medium text-xs hidden xs:inline">Mapa</span>
           </button>
 
+          {/* ✅ ZMIANA 2: Dodano onClick z sessionStorage */}
           {/* NOWY: Ulubione (tylko jeśli są) */}
           {favoritesCount > 0 && (
             <Link
               href="/ulubione"
+              onClick={() => {
+                // Zapisz obecny URL przed odejściem
+                if (typeof window !== 'undefined') {
+                  sessionStorage.setItem('returnUrl', window.location.pathname + window.location.search);
+                }
+              }}
               className="flex items-center justify-center gap-1 px-2 py-2.5 bg-accent-50 border-2 border-accent-600 rounded-lg hover:bg-accent-100 transition min-h-[44px] active:scale-95 flex-1"
             >
               <svg className="w-4 h-4 flex-shrink-0 text-accent-600" fill="currentColor" viewBox="0 0 24 24">
