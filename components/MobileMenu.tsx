@@ -66,7 +66,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { href: '/ulubione', label: 'Ulubione', icon: HeartIcon },
     { href: '#kalkulator', label: 'Kalkulator', icon: CalculatorIcon },
     { href: '#poradnik', label: 'Poradnik', icon: BookOpenIcon },
-    { href: '#kontakt', label: 'Kontakt', icon: EnvelopeIcon },
+    { href: '/kontakt', label: 'Kontakt', icon: EnvelopeIcon },
   ];
 
   return (

@@ -108,7 +108,7 @@ export default function Navbar() {
               </a>
               
               <a 
-                href="#kontakt" 
+                href="/kontakt" 
                 className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900 font-medium transition-colors"
               >
                 <EnvelopeIcon className="w-5 h-5" />
