@@ -343,7 +343,7 @@ export default function ComparePage() {
                   ))}
                 </tr>
 
-                {/* Your Rating */}
+                {/* ✅ POPRAWIONE: Your Rating - Desktop */}
                 <tr>
                   <td className="px-6 py-4 text-sm font-medium text-gray-700">
                     Twoja ocena
@@ -359,29 +359,44 @@ export default function ComparePage() {
                     
                     return (
                       <td key={facility.id} className="px-6 py-4">
-                        {rating > 0 ? (
-                          <div>
-                            <div className="relative group">
-                              <StarRating rating={rating} readonly size="sm" />
-                              {hasNote && (
-                                <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                  <div className="font-semibold mb-1">Twoja notatka:</div>
-                                  <div className="text-xs leading-relaxed">{note.notes}</div>
-                                </div>
-                              )}
+                        {hasNote ? (
+                          // MA NOTATKĘ - pokazuj i umożliw kliknięcie
+                          <div
+                            onClick={() => {
+                              setSelectedNote({
+                                facilityName: facility.nazwa,
+                                rating: rating,
+                                notes: note.notes
+                              });
+                            }}
+                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                          >
+                            {rating > 0 && (
+                              <>
+                                <StarRating rating={rating} readonly size="sm" />
+                                {isMax && (
+                                  <div className="text-xs text-green-600 font-medium mt-1">
+                                    ✅ Najwyżej oceniona
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            <div className="text-xs text-accent-600 mt-2 font-medium break-words">
+                              📝 "{notePreview}" <span className="text-gray-500">(kliknij aby zobaczyć)</span>
                             </div>
+                          </div>
+                        ) : rating > 0 ? (
+                          // MA TYLKO GWIAZDKI BEZ NOTATKI
+                          <div>
+                            <StarRating rating={rating} readonly size="sm" />
                             {isMax && (
                               <div className="text-xs text-green-600 font-medium mt-1">
                                 ✅ Najwyżej oceniona
                               </div>
                             )}
-                            {hasNote && (
-                              <div className="text-xs text-gray-600 mt-2 italic">
-                                "{notePreview}"
-                              </div>
-                            )}
                           </div>
                         ) : (
+                          // NIE MA NIC
                           <span className="text-sm text-gray-400">Brak oceny</span>
                         )}
                       </td>
@@ -523,7 +538,7 @@ export default function ComparePage() {
             ))}
           </ComparisonRow>
 
-          {/* Ocena - ZMIENIONE: używamy NoteModal zamiast alert() */}
+          {/* Ocena - Mobile (już działa dobrze) */}
           <ComparisonRow label="Twoja ocena">
             {currentPair.map((facility) => {
               const note = getFacilityNote(facility.id);
