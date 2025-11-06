@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link'; 
 import MiniFAQSection from '../src/components/faq/MiniFAQSection';
 import KnowledgeCenter from '../src/components/knowledge/KnowledgeCenter';
 import HeroSection from '../src/components/hero/HeroSection';
@@ -101,15 +102,15 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-semibold text-neutral-900 mb-3 text-center">Kalkulator kosztów</h3>
                 <p className="text-neutral-700 text-center mb-6">Oblicz miesięczne koszty pobytu z uwzględnieniem dofinansowania</p>
-                <button 
+                <Link href="/kalkulator" 
                   className="flex items-center justify-center gap-2 text-accent-600 hover:text-accent-700 font-semibold text-sm group-hover:gap-3 transition-all w-full"
-                  onClick={() => alert('Kalkulator będzie dostępny wkrótce!')}
+                  
                 >
                   Oblicz koszty
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </button>
+                </Link>
               </div>
             </div>
             
@@ -170,15 +171,15 @@ export default function Home() {
                   </div>
                   <h3 className="text-lg font-semibold text-neutral-900 mb-2 text-center">Kalkulator kosztów</h3>
                   <p className="text-sm text-neutral-700 text-center mb-4">Oblicz budżet opieki dla bliskiej osoby</p>
-                  <button 
+                  <Link href="/kalkulator" 
                     className="flex items-center justify-center gap-2 text-accent-600 font-semibold text-sm w-full"
-                    onClick={() => alert('Kalkulator będzie dostępny wkrótce!')}
+                    
                   >
                     Oblicz
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
