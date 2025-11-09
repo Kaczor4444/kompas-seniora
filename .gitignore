@@ -43,3 +43,5 @@ next-env.d.ts
 /app/generated/prisma
 prisma/dev.db
 
+raw_dane/**/*.pdf
+raw_dane/**/*.numbers
