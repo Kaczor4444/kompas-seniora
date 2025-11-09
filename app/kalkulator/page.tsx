@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, TrendingUp, TrendingDown, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -25,6 +25,8 @@ interface CalculationResult {
   city: string;
   wojewodztwo: string;
   facilities: Facility[];
+  facilitiesWithPrices: Facility[];
+  facilitiesWithoutPrices: Facility[];
   affordableFacilities: Facility[];
   needsSubsidy: Facility[];
   hasAffordable: boolean;
@@ -114,16 +116,17 @@ export default function KalkulatorPage() {
       const data = await response.json();
       const facilities: Facility[] = data.results || [];
       
-      // Filter facilities with known prices
-      const facilitiesWithPrices = facilities.filter(f => f.koszt_pobytu && f.koszt_pobytu > 0);
-      
-      if (facilitiesWithPrices.length === 0) {
-        setError(`Nie znaleźliśmy placówek z oficjalnymi cenami dla miejscowości "${city}". Spróbuj wpisać inną miejscowość z województwa ${wojewodztwo}.`);
+      if (facilities.length === 0) {
+        setError(`Nie znaleźliśmy placówek dla miejscowości "${city}". Spróbuj wpisać inną miejscowość z województwa ${wojewodztwo}.`);
         setLoading(false);
         return;
       }
       
-      // Categorize facilities
+      // Separate facilities with and without prices
+      const facilitiesWithPrices = facilities.filter(f => f.koszt_pobytu && f.koszt_pobytu > 0);
+      const facilitiesWithoutPrices = facilities.filter(f => !f.koszt_pobytu || f.koszt_pobytu === 0);
+      
+      // Categorize facilities with prices
       const affordableFacilities = facilitiesWithPrices.filter(f => f.koszt_pobytu! <= maxContribution);
       const needsSubsidy = facilitiesWithPrices.filter(f => f.koszt_pobytu! > maxContribution);
       
@@ -134,11 +137,13 @@ export default function KalkulatorPage() {
         contributionPercent: 70,
         city,
         wojewodztwo,
-        facilities: facilitiesWithPrices,
+        facilities,
+        facilitiesWithPrices,
+        facilitiesWithoutPrices,
         affordableFacilities,
         needsSubsidy,
         hasAffordable: affordableFacilities.length > 0,
-        allNeedSubsidy: affordableFacilities.length === 0 && needsSubsidy.length > 0
+        allNeedSubsidy: facilitiesWithPrices.length > 0 && affordableFacilities.length === 0
       };
       
       setResult(calculationResult);
@@ -321,17 +326,37 @@ export default function KalkulatorPage() {
           <div id="results-section" className="space-y-6">
             
             {/* Alert Message (if all need subsidy) */}
-            {result.allNeedSubsidy && (
+            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-6">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-red-900 mb-2">
-                      ⚠️ Żadna placówka nie mieści się w budżecie seniora
+                      ⚠️ Żadna placówka z oficjalną ceną nie mieści się w budżecie seniora
                     </h3>
                     <p className="text-sm text-red-800">
                       To normalna sytuacja! Oznacza to, że <strong>musisz złożyć wniosek o dopłatę</strong>, 
                       który ureguluje zobowiązanie finansowe Rodziny i Gminy. Poniżej znajdziesz szczegóły.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Info about facilities without prices */}
+            {result.facilitiesWithoutPrices.length > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="flex items-start gap-3">
+                  <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-blue-900 mb-2">
+                      ℹ️ Znaleziono {result.facilitiesWithoutPrices.length} placówek bez oficjalnej ceny
+                    </h3>
+                    <p className="text-sm text-blue-800">
+                      {result.facilitiesWithoutPrices.filter(f => f.typ_placowki === 'ŚDS').length > 0 && (
+                        <>Ośrodki ŚDS często oferują opiekę dzienną bezpłatnie lub za symboliczną opłatę. </>
+                      )}
+                      Skontaktuj się bezpośrednio z placówką w sprawie aktualnych opłat.
                     </p>
                   </div>
                 </div>
@@ -408,7 +433,7 @@ export default function KalkulatorPage() {
             </div>
 
             {/* Family Disclaimer (if needed) */}
-            {result.allNeedSubsidy && (
+            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && (
               <div className="bg-warning-50 border-l-4 border-warning-500 p-6 rounded-lg">
                 <h3 className="font-semibold text-warning-900 mb-2 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5" />
@@ -422,7 +447,7 @@ export default function KalkulatorPage() {
             )}
 
             {/* MOPS Contact Card (if no affordable options) */}
-            {result.allNeedSubsidy && getMopsContact() && (
+            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && getMopsContact() && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
                   <Phone className="w-5 h-5" />
@@ -457,10 +482,11 @@ export default function KalkulatorPage() {
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
               <div className="p-6 md:p-8 border-b border-neutral-200">
                 <h2 className="text-xl font-semibold text-neutral-900">
-                  Porównanie z cenami placówek w: {result.city}
+                  Porównanie placówek w: {result.city}
                 </h2>
                 <p className="text-sm text-neutral-600 mt-1">
-                  Znaleziono {result.facilities.length} placówek z oficjalnymi cenami
+                  Znaleziono {result.facilities.length} {result.facilities.length === 1 ? 'placówkę' : result.facilities.length < 5 ? 'placówki' : 'placówek'}
+                  {result.facilitiesWithPrices.length > 0 && ` (${result.facilitiesWithPrices.length} z oficjalną ceną)`}
                 </p>
               </div>
 
@@ -487,8 +513,9 @@ export default function KalkulatorPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-neutral-200">
                     {result.facilities.map((facility) => {
-                      const difference = facility.koszt_pobytu! - result.maxContribution;
-                      const isAffordable = difference <= 0;
+                      const hasPrice = facility.koszt_pobytu && facility.koszt_pobytu > 0;
+                      const difference = hasPrice ? facility.koszt_pobytu! - result.maxContribution : 0;
+                      const isAffordable = hasPrice && difference <= 0;
 
                       return (
                         <tr key={facility.id} className="hover:bg-neutral-50 transition-colors">
@@ -511,37 +538,69 @@ export default function KalkulatorPage() {
                             </span>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <div className="text-sm font-semibold text-neutral-900">
-                              {formatCurrency(facility.koszt_pobytu!)}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            {isAffordable ? (
-                              <div className="flex items-center gap-2 text-success-700">
-                                <TrendingDown className="w-4 h-4" />
-                                <span className="text-sm font-medium">
-                                  Budżet wystarczający
-                                </span>
+                            {hasPrice ? (
+                              <div className="text-sm font-semibold text-neutral-900">
+                                {formatCurrency(facility.koszt_pobytu!)}
                               </div>
                             ) : (
+                              <div className="text-sm text-neutral-500 italic">
+                                Brak danych
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            {hasPrice ? (
+                              isAffordable ? (
+                                <div className="flex items-center gap-2 text-success-700">
+                                  <TrendingDown className="w-4 h-4" />
+                                  <span className="text-sm font-medium">
+                                    Budżet wystarczający
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="text-sm">
+                                  <div className="flex items-center gap-2 text-red-700 font-medium mb-1">
+                                    <TrendingUp className="w-4 h-4" />
+                                    Brakuje: {formatCurrency(difference)}
+                                  </div>
+                                  <div className="text-xs text-neutral-600">
+                                    (Potencjalna dopłata Rodziny/Gminy)
+                                  </div>
+                                </div>
+                              )
+                            ) : (
                               <div className="text-sm">
-                                <div className="flex items-center gap-2 text-red-700 font-medium mb-1">
-                                  <TrendingUp className="w-4 h-4" />
-                                  Brakuje: {formatCurrency(difference)}
+                                <div className="flex items-center gap-2 text-blue-700 mb-1">
+                                  <Info className="w-4 h-4" />
+                                  <span className="font-medium">Brak oficjalnej ceny</span>
                                 </div>
                                 <div className="text-xs text-neutral-600">
-                                  (Potencjalna dopłata Rodziny/Gminy)
+                                  {facility.typ_placowki === 'ŚDS' 
+                                    ? 'Opieka dzienna - często bezpłatna'
+                                    : 'Skontaktuj się z placówką'
+                                  }
                                 </div>
                               </div>
                             )}
                           </td>
                           <td className="px-6 py-4">
-                            <Link
-                              href={`/placowka/${facility.id}`}
-                              className="text-accent-600 hover:text-accent-700 text-sm font-medium"
-                            >
-                              Zobacz profil →
-                            </Link>
+                            <div className="flex flex-col gap-2">
+                              <Link
+                                href={`/placowka/${facility.id}`}
+                                className="text-accent-600 hover:text-accent-700 text-sm font-medium"
+                              >
+                                Zobacz profil →
+                              </Link>
+                              {facility.telefon && (
+                                <a
+                                  href={`tel:${facility.telefon.replace(/\s/g, '')}`}
+                                  className="text-blue-600 hover:text-blue-700 text-xs flex items-center gap-1"
+                                >
+                                  <Phone className="w-3 h-3" />
+                                  {facility.telefon}
+                                </a>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -553,7 +612,7 @@ export default function KalkulatorPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              {result.hasAffordable ? (
+              {result.hasAffordable || result.facilitiesWithoutPrices.length > 0 ? (
                 <button
                   onClick={navigateToSearch}
                   className="flex-1 bg-accent-600 hover:bg-accent-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
