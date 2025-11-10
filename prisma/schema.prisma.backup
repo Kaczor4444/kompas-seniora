@@ -3,10 +3,11 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -42,13 +43,24 @@ model Placowka {
 model TerytLocation {
   id                 Int     @id @default(autoincrement())
   nazwa              String
-  nazwa_normalized   String  // ✅ NOWE POLE - znormalizowana nazwa bez polskich znaków
+  nazwa_normalized   String
   typ                String
   gmina              String?
   powiat             String
   wojewodztwo        String
 
-  @@index([nazwa_normalized])  // ✅ Index dla szybkiego wyszukiwania
+  @@index([nazwa_normalized])
   @@index([powiat])
   @@index([wojewodztwo])
+}
+
+model SharedList {
+  id       Int      @id @default(autoincrement())
+  token    String   @unique
+  ids      String
+  created  DateTime @default(now())
+  views    Int      @default(0)
+
+  @@index([token])
+  @@index([created])
 }

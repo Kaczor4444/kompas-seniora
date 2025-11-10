@@ -33,18 +33,20 @@ interface CalculationResult {
   allNeedSubsidy: boolean;
 }
 
-interface MopsContact {
-  id: number;
-  city: string;
-  cityDisplay: string;
-  name: string;
-  phone: string;
-  email?: string;
-  address: string;
-  website?: string;
-  wojewodztwo: string;
-  verified: boolean;
-}
+// MOPS Contact data (placeholder - do rozbudowy w przyszłości)
+const MOPS_CONTACTS: Record<string, { name: string; phone: string; address: string }> = {
+  'kraków': {
+    name: 'Miejski Ośrodek Pomocy Społecznej w Krakowie',
+    phone: '12 616 43 00',
+    address: 'ul. Józefińska 14, 30-529 Kraków'
+  },
+  'wieliczka': {
+    name: 'Ośrodek Pomocy Społecznej w Wieliczce',
+    phone: '12 278 12 34',
+    address: 'ul. Krakowska 26, 32-020 Wieliczka'
+  },
+  // Można rozbudować o inne miasta
+};
 
 export default function KalkulatorPage() {
   const router = useRouter();
@@ -58,7 +60,6 @@ export default function KalkulatorPage() {
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [mopsContact, setMopsContact] = useState<MopsContact | null>(null);
 
   // Validation
   const validateInputs = (): string | null => {
@@ -83,38 +84,11 @@ export default function KalkulatorPage() {
     return null;
   };
 
-  // Fetch MOPS contact from API
-  const fetchMopsContact = async (cityName: string) => {
-    try {
-      console.log('🔍 Fetching MOPS for city:', cityName);
-      console.log('🔍 Normalized city:', cityName.toLowerCase());
-      
-      const response = await fetch(`/api/mops?city=${encodeURIComponent(cityName.toLowerCase())}`);
-      console.log('🔍 Response status:', response.status);
-      console.log('🔍 Response OK?:', response.ok);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ MOPS data received:', data);
-        setMopsContact(data);
-      } else {
-        console.log('❌ MOPS not found - status:', response.status);
-        const errorData = await response.json();
-        console.log('❌ Error details:', errorData);
-        setMopsContact(null);
-      }
-    } catch (error) {
-      console.error('❌ Error fetching MOPS:', error);
-      setMopsContact(null);
-    }
-  };
-
   // Main calculation function
   const handleCalculate = async () => {
     // Reset previous state
     setError('');
     setResult(null);
-    setMopsContact(null);
     
     // Validate
     const validationError = validateInputs();
@@ -171,9 +145,6 @@ export default function KalkulatorPage() {
         hasAffordable: affordableFacilities.length > 0,
         allNeedSubsidy: facilitiesWithPrices.length > 0 && affordableFacilities.length === 0
       };
-
-      // Fetch MOPS contact for this city
-      await fetchMopsContact(city);
       
       setResult(calculationResult);
       
@@ -206,6 +177,12 @@ export default function KalkulatorPage() {
   const navigateToSearch = () => {
     if (!result) return;
     router.push(`/search?q=${encodeURIComponent(result.city)}&woj=${encodeURIComponent(result.wojewodztwo)}&maxPrice=${Math.round(result.maxContribution)}`);
+  };
+
+  // Get MOPS contact for city
+  const mopsContact = () => {
+    const cityLower = result?.city.toLowerCase() || '';
+    return MOPS_CONTACTS[cityLower] || null;
   };
 
   return (
@@ -470,7 +447,7 @@ export default function KalkulatorPage() {
             )}
 
             {/* MOPS Contact Card (if no affordable options) */}
-            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && mopsContact && (
+            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && mopsContact() && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
                   <Phone className="w-5 h-5" />
@@ -480,19 +457,19 @@ export default function KalkulatorPage() {
                   <div>
                     <span className="font-medium text-blue-900">Właściwy urząd dla {result.city}:</span>
                     <br />
-                    <span className="text-blue-800">{mopsContact.name}</span>
+                    <span className="text-blue-800">{mopsContact()!.name}</span>
                   </div>
                   <div>
                     <span className="font-medium text-blue-900">Telefon:</span>
                     <br />
-                    <a href={`tel:${mopsContact.phone.replace(/\s/g, '')}`} className="text-accent-600 hover:text-accent-700 font-semibold">
-                      {mopsContact.phone}
+                    <a href={`tel:${mopsContact()!.phone.replace(/\s/g, '')}`} className="text-accent-600 hover:text-accent-700 font-semibold">
+                      {mopsContact()!.phone}
                     </a>
                   </div>
                   <div>
                     <span className="font-medium text-blue-900">Adres:</span>
                     <br />
-                    <span className="text-blue-800">{mopsContact.address}</span>
+                    <span className="text-blue-800">{mopsContact()!.address}</span>
                   </div>
                 </div>
                 <p className="text-sm text-blue-700 mt-4 bg-blue-100 p-3 rounded">

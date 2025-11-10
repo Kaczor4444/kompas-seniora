@@ -35,6 +35,10 @@ model Placowka {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
+  // Relations
+  analytics         PlacowkaAnalytics?
+  snapshots         PlacowkaSnapshot[]
+
   @@index([powiat])
   @@index([wojewodztwo])
   @@index([typ_placowki])
@@ -63,4 +67,103 @@ model SharedList {
 
   @@index([token])
   @@index([created])
+}
+
+// 🆕 NEW MODEL: Analytics for tracking user interactions with facilities
+model PlacowkaAnalytics {
+  id              Int      @id @default(autoincrement())
+  placowkaId      Int      @unique
+  totalViews      Int      @default(0)
+  uniqueVisitors  Int      @default(0)
+  phoneClicks     Int      @default(0)
+  emailClicks     Int      @default(0)
+  websiteClicks   Int      @default(0)
+  favoritesCount  Int      @default(0)
+  comparesCount   Int      @default(0)
+  sharesCount     Int      @default(0)
+  lastViewed      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  placowka        Placowka @relation(fields: [placowkaId], references: [id], onDelete: Cascade)
+
+  @@index([placowkaId])
+  @@index([totalViews])
+  @@index([phoneClicks])
+  @@index([lastViewed])
+}
+
+// 🆕 NEW MODEL: MOPS (Municipal Social Assistance Centers) contact database
+model MopsContact {
+  id            Int      @id @default(autoincrement())
+  city          String   @unique // normalized: "kraków", "wieliczka"
+  cityDisplay   String            // display: "Kraków", "Wieliczka"
+  name          String            // "Miejski Ośrodek Pomocy Społecznej w Krakowie"
+  phone         String
+  email         String?
+  address       String
+  website       String?
+  wojewodztwo   String            // "małopolskie", "śląskie"
+  verified      Boolean  @default(false)
+  lastVerified  DateTime?
+  notes         String?          // internal notes about this MOPS
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([city])
+  @@index([wojewodztwo])
+  @@index([verified])
+}
+
+// 🆕 NEW MODEL: Historical snapshots of facilities for year-over-year analysis
+model PlacowkaSnapshot {
+  id              Int      @id @default(autoincrement())
+  placowkaId      Int
+  rok             Int      // Year: 2023, 2024, 2025...
+  
+  // Snapshot of data for this year
+  nazwa           String
+  typ_placowki    String
+  miejscowosc     String
+  powiat          String
+  wojewodztwo     String
+  koszt_pobytu    Float?
+  liczba_miejsc   Int?
+  profil_opieki   String?
+  status          String   @default("aktywna") // "aktywna" | "zamknięta" | "nowa"
+  
+  createdAt       DateTime @default(now())
+  
+  // Relations
+  placowka        Placowka @relation(fields: [placowkaId], references: [id], onDelete: Cascade)
+  
+  @@unique([placowkaId, rok])
+  @@index([placowkaId])
+  @@index([rok])
+  @@index([wojewodztwo, rok])
+}
+
+// 🆕 NEW MODEL: Aggregated statistics per voivodeship per year
+model WojewodztwoStats {
+  id                  Int      @id @default(autoincrement())
+  wojewodztwo         String
+  rok                 Int      // Year: 2023, 2024, 2025...
+  
+  // Aggregated statistics
+  liczba_dps          Int      // Number of DPS facilities
+  liczba_sds          Int      // Number of ŚDS facilities
+  total_placowek      Int      // Total facilities (DPS + ŚDS)
+  total_miejsc        Int      // Total capacity (all facilities)
+  sredni_koszt_dps    Float?   // Average cost for DPS
+  sredni_koszt_sds    Float?   // Average cost for ŚDS
+  min_koszt           Float?   // Cheapest facility
+  max_koszt           Float?   // Most expensive facility
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@unique([wojewodztwo, rok])
+  @@index([wojewodztwo])
+  @@index([rok])
 }
