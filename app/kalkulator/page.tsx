@@ -31,6 +31,7 @@ interface CalculationResult {
   needsSubsidy: Facility[];
   hasAffordable: boolean;
   allNeedSubsidy: boolean;
+  mopsContact: MopsContact | null; // ✅ DODAJEMY MOPS DO RESULT
 }
 
 interface MopsContact {
@@ -58,7 +59,6 @@ export default function KalkulatorPage() {
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [mopsContact, setMopsContact] = useState<MopsContact | null>(null);
 
   // Validation
   const validateInputs = (): string | null => {
@@ -83,8 +83,8 @@ export default function KalkulatorPage() {
     return null;
   };
 
-  // Fetch MOPS contact from API
-  const fetchMopsContact = async (cityName: string) => {
+  // Fetch MOPS contact from API - ZWRACA dane zamiast tylko setować state
+  const fetchMopsContact = async (cityName: string): Promise<MopsContact | null> => {
     try {
       console.log('🔍 Fetching MOPS for city:', cityName);
       console.log('🔍 Normalized city:', cityName.toLowerCase());
@@ -96,16 +96,16 @@ export default function KalkulatorPage() {
       if (response.ok) {
         const data = await response.json();
         console.log('✅ MOPS data received:', data);
-        setMopsContact(data);
+        return data; // ✅ ZWRACAMY dane!
       } else {
         console.log('❌ MOPS not found - status:', response.status);
         const errorData = await response.json();
         console.log('❌ Error details:', errorData);
-        setMopsContact(null);
+        return null;
       }
     } catch (error) {
       console.error('❌ Error fetching MOPS:', error);
-      setMopsContact(null);
+      return null;
     }
   };
 
@@ -114,7 +114,6 @@ export default function KalkulatorPage() {
     // Reset previous state
     setError('');
     setResult(null);
-    setMopsContact(null);
     
     // Validate
     const validationError = validateInputs();
@@ -155,6 +154,10 @@ export default function KalkulatorPage() {
       // Categorize facilities with prices
       const affordableFacilities = facilitiesWithPrices.filter(f => f.koszt_pobytu! <= maxContribution);
       const needsSubsidy = facilitiesWithPrices.filter(f => f.koszt_pobytu! > maxContribution);
+
+      // ✅ Fetch MOPS contact for this city - AWAIT i zapisz do zmiennej
+      const fetchedMopsContact = await fetchMopsContact(city);
+      console.log('✅ FETCHED MOPS CONTACT:', fetchedMopsContact);
       
       const calculationResult: CalculationResult = {
         income: incomeNum,
@@ -169,12 +172,10 @@ export default function KalkulatorPage() {
         affordableFacilities,
         needsSubsidy,
         hasAffordable: affordableFacilities.length > 0,
-        allNeedSubsidy: facilitiesWithPrices.length > 0 && affordableFacilities.length === 0
+        allNeedSubsidy: facilitiesWithPrices.length > 0 && affordableFacilities.length === 0,
+        mopsContact: fetchedMopsContact // ✅ DODAJEMY MOPS DO RESULT!
       };
 
-      // Fetch MOPS contact for this city
-      await fetchMopsContact(city);
-      
       setResult(calculationResult);
       
       // Scroll to results
@@ -469,8 +470,8 @@ export default function KalkulatorPage() {
               </div>
             )}
 
-            {/* MOPS Contact Card (if no affordable options) */}
-            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && mopsContact && (
+            {/* MOPS Contact Card - ✅ UŻYWAMY result.mopsContact zamiast mopsContact state */}
+            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && result.mopsContact && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
                   <Phone className="w-5 h-5" />
@@ -480,19 +481,19 @@ export default function KalkulatorPage() {
                   <div>
                     <span className="font-medium text-blue-900">Właściwy urząd dla {result.city}:</span>
                     <br />
-                    <span className="text-blue-800">{mopsContact.name}</span>
+                    <span className="text-blue-800">{result.mopsContact.name}</span>
                   </div>
                   <div>
                     <span className="font-medium text-blue-900">Telefon:</span>
                     <br />
-                    <a href={`tel:${mopsContact.phone.replace(/\s/g, '')}`} className="text-accent-600 hover:text-accent-700 font-semibold">
-                      {mopsContact.phone}
+                    <a href={`tel:${result.mopsContact.phone.replace(/\s/g, '')}`} className="text-accent-600 hover:text-accent-700 font-semibold">
+                      {result.mopsContact.phone}
                     </a>
                   </div>
                   <div>
                     <span className="font-medium text-blue-900">Adres:</span>
                     <br />
-                    <span className="text-blue-800">{mopsContact.address}</span>
+                    <span className="text-blue-800">{result.mopsContact.address}</span>
                   </div>
                 </div>
                 <p className="text-sm text-blue-700 mt-4 bg-blue-100 p-3 rounded">
