@@ -92,7 +92,7 @@ export default function Navbar() {
               </Link>
               
               <a 
-                href="#kalkulator" 
+                href="/kalkulator" 
                 className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900 font-medium transition-colors"
               >
                 <CalculatorIcon className="w-5 h-5" />
