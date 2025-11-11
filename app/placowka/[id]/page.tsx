@@ -1,8 +1,6 @@
 import { notFound } from 'next/navigation';
 import PlacowkaDetails from '../../../src/components/placowka/PlacowkaDetails';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export default async function PlacowkaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: idParam } = await params;

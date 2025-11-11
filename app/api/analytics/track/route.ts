@@ -1,9 +1,8 @@
 // app/api/analytics/track/route.ts
 
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
 
 // Event types
 export type AnalyticsEventType = 
