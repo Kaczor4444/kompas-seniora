@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, TrendingUp, TrendingDown, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { mapPowiatToCity } from '@/lib/powiat-to-city';
 
 // Types
 interface Facility {
@@ -31,7 +32,9 @@ interface CalculationResult {
   needsSubsidy: Facility[];
   hasAffordable: boolean;
   allNeedSubsidy: boolean;
-  mopsContact: MopsContact | null; // ✅ DODAJEMY MOPS DO RESULT
+  mopsContact: MopsContact | null;
+  mopsFallbackUsed: boolean; // ✅ NOWE - czy użyto fallbacku
+  mopsFallbackCity?: string; // ✅ NOWE - z jakiego miasta jest MOPS
 }
 
 interface MopsContact {
@@ -96,7 +99,7 @@ export default function KalkulatorPage() {
       if (response.ok) {
         const data = await response.json();
         console.log('✅ MOPS data received:', data);
-        return data; // ✅ ZWRACAMY dane!
+        return data;
       } else {
         console.log('❌ MOPS not found - status:', response.status);
         const errorData = await response.json();
@@ -107,6 +110,48 @@ export default function KalkulatorPage() {
       console.error('❌ Error fetching MOPS:', error);
       return null;
     }
+  };
+
+  // ✅ NOWA FUNKCJA - Fetch MOPS z fallbackiem do powiatu
+  const fetchMopsWithFallback = async (
+    cityName: string, 
+    powiatName: string
+  ): Promise<{ 
+    mops: MopsContact | null; 
+    usedFallback: boolean; 
+    fallbackCity?: string 
+  }> => {
+    console.log('🔍 Starting MOPS search with fallback...');
+    console.log('   City:', cityName);
+    console.log('   Powiat:', powiatName);
+    
+    // KROK 1: Szukaj MOPS dla dokładnej miejscowości
+    let mops = await fetchMopsContact(cityName);
+    
+    if (mops) {
+      console.log('✅ Found MOPS for exact city:', cityName);
+      return { mops, usedFallback: false };
+    }
+    
+    // KROK 2: Fallback - mapuj powiat → miasto powiatowe
+    console.log('⚠️ No MOPS for city, trying fallback to powiat...');
+    const fallbackCity = mapPowiatToCity(powiatName);
+    
+    if (!fallbackCity) {
+      console.log('❌ No mapping found for powiat:', powiatName);
+      return { mops: null, usedFallback: false };
+    }
+    
+    console.log('🔄 Mapped powiat to city:', fallbackCity);
+    mops = await fetchMopsContact(fallbackCity);
+    
+    if (mops) {
+      console.log('✅ Found MOPS via fallback:', fallbackCity);
+      return { mops, usedFallback: true, fallbackCity };
+    }
+    
+    console.log('❌ No MOPS found even with fallback');
+    return { mops: null, usedFallback: false };
   };
 
   // Main calculation function
@@ -155,9 +200,19 @@ export default function KalkulatorPage() {
       const affordableFacilities = facilitiesWithPrices.filter(f => f.koszt_pobytu! <= maxContribution);
       const needsSubsidy = facilitiesWithPrices.filter(f => f.koszt_pobytu! > maxContribution);
 
-      // ✅ Fetch MOPS contact for this city - AWAIT i zapisz do zmiennej
-      const fetchedMopsContact = await fetchMopsContact(city);
-      console.log('✅ FETCHED MOPS CONTACT:', fetchedMopsContact);
+      // ✅ Fetch MOPS contact z fallbackiem
+      // Używamy powiatu z pierwszej placówki (wszystkie powinny być z tego samego)
+      const powiatName = facilities[0]?.powiat || '';
+      const { mops: fetchedMopsContact, usedFallback, fallbackCity } = await fetchMopsWithFallback(
+        city,
+        powiatName
+      );
+      
+      console.log('✅ FINAL MOPS RESULT:', {
+        found: !!fetchedMopsContact,
+        usedFallback,
+        fallbackCity
+      });
       
       const calculationResult: CalculationResult = {
         income: incomeNum,
@@ -173,7 +228,9 @@ export default function KalkulatorPage() {
         needsSubsidy,
         hasAffordable: affordableFacilities.length > 0,
         allNeedSubsidy: facilitiesWithPrices.length > 0 && affordableFacilities.length === 0,
-        mopsContact: fetchedMopsContact // ✅ DODAJEMY MOPS DO RESULT!
+        mopsContact: fetchedMopsContact,
+        mopsFallbackUsed: usedFallback,
+        mopsFallbackCity: fallbackCity
       };
 
       setResult(calculationResult);
@@ -378,7 +435,7 @@ export default function KalkulatorPage() {
                     </h3>
                     <p className="text-sm text-blue-800">
                       {result.facilitiesWithoutPrices.filter(f => f.typ_placowki === 'ŚDS').length > 0 && (
-                        <>Ośrodki ŚDS często oferują opiekę dzienną bezpłatnie lub za symboliczną opłatę. </>
+                        <>Ośrodki ŚDS często oferują opiekę dzienną bezpłatnie lub za symboliczną opłatą. </>
                       )}
                       Skontaktuj się bezpośrednio z placówką w sprawie aktualnych opłat.
                     </p>
@@ -457,7 +514,7 @@ export default function KalkulatorPage() {
             </div>
 
             {/* Family Disclaimer (if needed) */}
-            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && (
+            {result.mopsContact && (result.allNeedSubsidy || result.facilitiesWithoutPrices.length > 0) && (
               <div className="bg-warning-50 border-l-4 border-warning-500 p-6 rounded-lg">
                 <h3 className="font-semibold text-warning-900 mb-2 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5" />
@@ -470,16 +527,30 @@ export default function KalkulatorPage() {
               </div>
             )}
 
-            {/* MOPS Contact Card - ✅ UŻYWAMY result.mopsContact zamiast mopsContact state */}
-            {result.allNeedSubsidy && result.facilitiesWithPrices.length > 0 && result.mopsContact && (
+            {/* ✅ MOPS Contact Card - z informacją o fallbacku */}
+            {result.mopsContact && (result.allNeedSubsidy || result.facilitiesWithoutPrices.length > 0) && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
                   <Phone className="w-5 h-5" />
                   Kluczowy kontakt: Wniosek o dopłatę
                 </h3>
+                
+                {/* ✅ Informacja o fallbacku */}
+                {result.mopsFallbackUsed && result.mopsFallbackCity && (
+                  <div className="bg-blue-100 border-l-4 border-blue-400 p-3 mb-4 text-sm">
+                    <p className="text-blue-900">
+                      ℹ️ Nie znaleźliśmy MOPS-u bezpośrednio dla <strong>{result.city}</strong>. 
+                      Poniżej kontakt do MOPS-u w <strong className="capitalize">{result.mopsFallbackCity}</strong>, 
+                      który obsługuje Twój powiat.
+                    </p>
+                  </div>
+                )}
+                
                 <div className="space-y-2 text-sm">
                   <div>
-                    <span className="font-medium text-blue-900">Właściwy urząd dla {result.city}:</span>
+                    <span className="font-medium text-blue-900">
+                      Właściwy urząd{result.mopsFallbackUsed ? ` dla Twojego powiatu` : ` dla ${result.city}`}:
+                    </span>
                     <br />
                     <span className="text-blue-800">{result.mopsContact.name}</span>
                   </div>
@@ -490,11 +561,34 @@ export default function KalkulatorPage() {
                       {result.mopsContact.phone}
                     </a>
                   </div>
+                  {result.mopsContact.email && (
+                    <div>
+                      <span className="font-medium text-blue-900">Email:</span>
+                      <br />
+                      <a href={`mailto:${result.mopsContact.email}`} className="text-accent-600 hover:text-accent-700">
+                        {result.mopsContact.email}
+                      </a>
+                    </div>
+                  )}
                   <div>
                     <span className="font-medium text-blue-900">Adres:</span>
                     <br />
                     <span className="text-blue-800">{result.mopsContact.address}</span>
                   </div>
+                  {result.mopsContact.website && (
+                    <div>
+                      <span className="font-medium text-blue-900">Strona:</span>
+                      <br />
+                      <a 
+                        href={result.mopsContact.website} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-accent-600 hover:text-accent-700"
+                      >
+                        {result.mopsContact.website}
+                      </a>
+                    </div>
+                  )}
                 </div>
                 <p className="text-sm text-blue-700 mt-4 bg-blue-100 p-3 rounded">
                   💡 Zadzwoń i umów się na rozmowę. To pierwszy krok do uzyskania dopłaty Gminy.
