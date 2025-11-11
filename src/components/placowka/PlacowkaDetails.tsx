@@ -1,6 +1,8 @@
 "use client";
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { getProfileOpiekiNazwy } from '@/src/data/profileopieki';
+import { useAnalytics } from '@/src/hooks/useAnalytics';
 import {
   MapPin,
   Banknote,
@@ -46,8 +48,29 @@ interface Placowka {
 
 export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
   const router = useRouter();
+  const { trackView, trackPhoneClick, trackEmailClick, trackWebsiteClick } = useAnalytics();
+
+  // ✅ TRACK VIEW - gdy komponent się zamontuje
+  useEffect(() => {
+    trackView(placowka.id);
+  }, [placowka.id, trackView]);
 
   const profiles = getProfileOpiekiNazwy(placowka.profil_opieki);
+
+  // ✅ Handler dla kliknięcia w telefon
+  const handlePhoneClick = () => {
+    trackPhoneClick(placowka.id, placowka.telefon || undefined);
+  };
+
+  // ✅ Handler dla kliknięcia w email
+  const handleEmailClick = () => {
+    trackEmailClick(placowka.id, placowka.email || undefined);
+  };
+
+  // ✅ Handler dla kliknięcia w stronę WWW
+  const handleWebsiteClick = () => {
+    trackWebsiteClick(placowka.id, placowka.www || undefined);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -180,12 +203,13 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                 </p>
               </div>
 
-              {/* Telefon */}
+              {/* Telefon - ✅ Z TRACKINGIEM */}
               {placowka.telefon && (
                 <div className="flex items-start gap-3 mb-3">
                   <Phone className="w-5 h-5 text-accent-600 mt-0.5" />
-                  
-                  <a href={`tel:${placowka.telefon}`}
+                  <a 
+                    href={`tel:${placowka.telefon}`}
+                    onClick={handlePhoneClick}
                     className="text-accent-600 hover:text-accent-700 hover:underline"
                   >
                     {placowka.telefon}
@@ -193,12 +217,13 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                 </div>
               )}
 
-              {/* Email */}
+              {/* Email - ✅ Z TRACKINGIEM */}
               {placowka.email && (
                 <div className="flex items-start gap-3 mb-3">
                   <Mail className="w-5 h-5 text-accent-600 mt-0.5" />
-                  
-                  <a href={`mailto:${placowka.email}`}
+                  <a 
+                    href={`mailto:${placowka.email}`}
+                    onClick={handleEmailClick}
                     className="text-accent-600 hover:text-accent-700 hover:underline break-all"
                   >
                     Wyślij email
@@ -206,12 +231,13 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                 </div>
               )}
 
-              {/* Strona WWW */}
+              {/* Strona WWW - ✅ Z TRACKINGIEM */}
               {placowka.www && (
                 <div className="flex items-start gap-3">
                   <Globe className="w-5 h-5 text-accent-600 mt-0.5" />
-                  
-                  <a href={placowka.www}
+                  <a 
+                    href={placowka.www}
+                    onClick={handleWebsiteClick}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-accent-600 hover:text-accent-700 hover:underline break-all"
@@ -282,8 +308,8 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                 </li>
               </ol>
 
-              
-              <a href="#"
+              <a 
+                href="#"
                 className="inline-flex items-center gap-2 mt-4 text-accent-600 hover:text-accent-700 font-medium"
               >
                 <FileText className="w-5 h-5" />
@@ -310,8 +336,8 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
           <p className="text-sm text-gray-500">
             <strong>Źródło danych:</strong>{' '}
             {placowka.zrodlo ? (
-              
-              <a href={placowka.zrodlo}
+              <a 
+                href={placowka.zrodlo}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent-600 hover:underline"

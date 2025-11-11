@@ -38,6 +38,7 @@ model Placowka {
   // Relations
   analytics         PlacowkaAnalytics?
   snapshots         PlacowkaSnapshot[]
+  events            PlacowkaEvent[]
 
   @@index([powiat])
   @@index([wojewodztwo])
@@ -69,7 +70,6 @@ model SharedList {
   @@index([created])
 }
 
-// 🆕 NEW MODEL: Analytics for tracking user interactions with facilities
 model PlacowkaAnalytics {
   id              Int      @id @default(autoincrement())
   placowkaId      Int      @unique
@@ -85,7 +85,6 @@ model PlacowkaAnalytics {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   
-  // Relations
   placowka        Placowka @relation(fields: [placowkaId], references: [id], onDelete: Cascade)
 
   @@index([placowkaId])
@@ -94,20 +93,38 @@ model PlacowkaAnalytics {
   @@index([lastViewed])
 }
 
-// 🆕 NEW MODEL: MOPS (Municipal Social Assistance Centers) contact database
+model PlacowkaEvent {
+  id          Int      @id @default(autoincrement())
+  placowkaId  Int
+  eventType   String
+  userAgent   String?
+  ipAddress   String?
+  referer     String?
+  metadata    Json?
+  timestamp   DateTime @default(now())
+  
+  placowka    Placowka @relation(fields: [placowkaId], references: [id], onDelete: Cascade)
+  
+  @@index([placowkaId])
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([placowkaId, eventType])
+  @@index([placowkaId, timestamp])
+}
+
 model MopsContact {
   id            Int      @id @default(autoincrement())
-  city          String   @unique // normalized: "kraków", "wieliczka"
-  cityDisplay   String            // display: "Kraków", "Wieliczka"
-  name          String            // "Miejski Ośrodek Pomocy Społecznej w Krakowie"
+  city          String   @unique
+  cityDisplay   String
+  name          String
   phone         String
   email         String?
   address       String
   website       String?
-  wojewodztwo   String            // "małopolskie", "śląskie"
+  wojewodztwo   String
   verified      Boolean  @default(false)
   lastVerified  DateTime?
-  notes         String?          // internal notes about this MOPS
+  notes         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -116,13 +133,11 @@ model MopsContact {
   @@index([verified])
 }
 
-// 🆕 NEW MODEL: Historical snapshots of facilities for year-over-year analysis
 model PlacowkaSnapshot {
   id              Int      @id @default(autoincrement())
   placowkaId      Int
-  rok             Int      // Year: 2023, 2024, 2025...
+  rok             Int
   
-  // Snapshot of data for this year
   nazwa           String
   typ_placowki    String
   miejscowosc     String
@@ -131,11 +146,10 @@ model PlacowkaSnapshot {
   koszt_pobytu    Float?
   liczba_miejsc   Int?
   profil_opieki   String?
-  status          String   @default("aktywna") // "aktywna" | "zamknięta" | "nowa"
+  status          String   @default("aktywna")
   
   createdAt       DateTime @default(now())
   
-  // Relations
   placowka        Placowka @relation(fields: [placowkaId], references: [id], onDelete: Cascade)
   
   @@unique([placowkaId, rok])
@@ -144,21 +158,19 @@ model PlacowkaSnapshot {
   @@index([wojewodztwo, rok])
 }
 
-// 🆕 NEW MODEL: Aggregated statistics per voivodeship per year
 model WojewodztwoStats {
   id                  Int      @id @default(autoincrement())
   wojewodztwo         String
-  rok                 Int      // Year: 2023, 2024, 2025...
+  rok                 Int
   
-  // Aggregated statistics
-  liczba_dps          Int      // Number of DPS facilities
-  liczba_sds          Int      // Number of ŚDS facilities
-  total_placowek      Int      // Total facilities (DPS + ŚDS)
-  total_miejsc        Int      // Total capacity (all facilities)
-  sredni_koszt_dps    Float?   // Average cost for DPS
-  sredni_koszt_sds    Float?   // Average cost for ŚDS
-  min_koszt           Float?   // Cheapest facility
-  max_koszt           Float?   // Most expensive facility
+  liczba_dps          Int
+  liczba_sds          Int
+  total_placowek      Int
+  total_miejsc        Int
+  sredni_koszt_dps    Float?
+  sredni_koszt_sds    Float?
+  min_koszt           Float?
+  max_koszt           Float?
   
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
