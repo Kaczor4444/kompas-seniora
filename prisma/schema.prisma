@@ -179,3 +179,16 @@ model WojewodztwoStats {
   @@index([wojewodztwo])
   @@index([rok])
 }
+
+model AdminSecurityLog {
+  id          Int      @id @default(autoincrement())
+  eventType   String
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?
+  timestamp   DateTime @default(now())
+  
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([ipAddress])
+}
