@@ -29,9 +29,18 @@ model Placowka {
   profil_opieki     String?
   koszt_pobytu      Float?
   data_aktualizacji DateTime?
-  zrodlo            String?
+  
+  // Źródła - rozdzielone
+  zrodlo_dane       String?   // URL do BIP z danymi o placówce
+  zrodlo_cena       String?   // URL do dokumentu z cenami
+  data_zrodla_dane  DateTime? // Kiedy dokument z danymi był aktualizowany
+  data_zrodla_cena  DateTime? // Kiedy wykaz cen był aktualizowany
+  data_weryfikacji  DateTime? // Kiedy admin ostatnio weryfikował
+  notatki           String?   // Notatki z weryfikacji
+  
   latitude          Float?
   longitude         Float?
+  verified          Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
