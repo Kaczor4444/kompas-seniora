@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import TerytAutocomplete from '../_components/TerytAutocomplete';
 import { useRouter } from 'next/navigation';
 
 // Zod validation schema
@@ -72,6 +73,7 @@ export default function DodajPlacowkePage() {
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
   } = useForm<PlacowkaFormData>({
     resolver: zodResolver(placowkaSchema),
     defaultValues: {
@@ -345,17 +347,18 @@ export default function DodajPlacowkePage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Miejscowość *
               </label>
-              <input
-                type="text"
-                {...register('miejscowosc')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="np. Kraków"
+              <TerytAutocomplete
+                value={watch("miejscowosc") || ""}
+                onChange={(value) => setValue("miejscowosc", value)}
+                onSelect={(data) => {
+                  setValue("miejscowosc", data.miejscowosc);
+                  setValue("gmina", data.gmina || data.miejscowosc); // Fallback jeśli TERYT nie ma gminy
+                  setValue("powiat", data.powiat);
+                  setValue("wojewodztwo", data.wojewodztwo);
+                }}
+                placeholder="Wpisz miejscowość, np. Kraków"
+                error={errors.miejscowosc?.message}
               />
-              {errors.miejscowosc && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.miejscowosc.message}
-                </p>
-              )}
             </div>
 
             <div>
