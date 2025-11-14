@@ -1,13 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// Funkcja normalizująca telefon (usuwa spacje, myślniki, +48)
+// Funkcja normalizująca telefon
 function normalizePhone(phone: string): string {
   return phone
     .replace(/\s+/g, '')
     .replace(/-/g, '')
     .replace(/\+48/g, '')
-    .replace(/^\(?\d{2}\)?/, '') // Usuń kod kierunkowy w nawiasach
+    .replace(/^\(?\d{2}\)?/, '')
+    .trim();
+}
+
+// Funkcja normalizująca polskie znaki i whitespace
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/ł/g, 'l')
+    .replace(/ą/g, 'a')
+    .replace(/ć/g, 'c')
+    .replace(/ę/g, 'e')
+    .replace(/ń/g, 'n')
+    .replace(/ó/g, 'o')
+    .replace(/ś/g, 's')
+    .replace(/ź/g, 'z')
+    .replace(/ż/g, 'z')
+    .replace(/ul\./g, '')
+    .replace(/os\./g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -23,82 +42,51 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ exists: false });
     }
 
-    let existing = null;
+    // Normalizuj inputy
+    const normalizedMiejscowosc = normalizeText(miejscowosc);
+    const normalizedUlica = ulica ? normalizeText(ulica) : null;
+    const normalizedTelefon = telefon ? normalizePhone(telefon) : null;
 
-    // PRIORYTET 1: Ulica + Miejscowość (jeśli ulica podana)
-    if (ulica && ulica.length >= 3) {
-      existing = await prisma.placowka.findFirst({
-        where: {
-          ulica: {
-            contains: ulica,
-            mode: 'insensitive',
-          },
-          miejscowosc: {
-            contains: miejscowosc,
-            mode: 'insensitive',
-          },
-        },
-        select: {
-          id: true,
-          nazwa: true,
-          typ_placowki: true,
-          miejscowosc: true,
-          ulica: true,
-          powiat: true,
-          wojewodztwo: true,
-          telefon: true,
-          email: true,
-          www: true,
-          verified: true,
-          createdAt: true,
-        },
-      });
+    // Pobierz wszystkie placówki (będziemy filtrować w pamięci)
+    const allPlacowki = await prisma.placowka.findMany({
+      select: {
+        id: true,
+        nazwa: true,
+        typ_placowki: true,
+        miejscowosc: true,
+        ulica: true,
+        powiat: true,
+        wojewodztwo: true,
+        telefon: true,
+        email: true,
+        www: true,
+        verified: true,
+        createdAt: true,
+      },
+    });
 
-      if (existing) {
-        return NextResponse.json({
-          exists: true,
-          placowka: existing,
-          matchedBy: 'ulica',
-        });
+    // PRIORYTET 1: Ulica + Miejscowość
+    if (normalizedUlica && normalizedUlica.length >= 3) {
+      for (const placowka of allPlacowki) {
+        const dbUlica = placowka.ulica ? normalizeText(placowka.ulica) : '';
+        const dbMiejscowosc = normalizeText(placowka.miejscowosc);
+
+        if (dbUlica.includes(normalizedUlica) && dbMiejscowosc === normalizedMiejscowosc) {
+          return NextResponse.json({
+            exists: true,
+            placowka,
+            matchedBy: 'ulica',
+          });
+        }
       }
     }
 
-    // PRIORYTET 2: Telefon (jeśli podany)
-    if (telefon && telefon.length >= 9) {
-      const normalizedPhone = normalizePhone(telefon);
-      
-      // Pobierz wszystkie placówki z tej miejscowości
-      const placowkiWithPhone = await prisma.placowka.findMany({
-        where: {
-          miejscowosc: {
-            contains: miejscowosc,
-            mode: 'insensitive',
-          },
-          telefon: {
-            not: null,
-          },
-        },
-        select: {
-          id: true,
-          nazwa: true,
-          typ_placowki: true,
-          miejscowosc: true,
-          ulica: true,
-          powiat: true,
-          wojewodztwo: true,
-          telefon: true,
-          email: true,
-          www: true,
-          verified: true,
-          createdAt: true,
-        },
-      });
-
-      // Sprawdź znormalizowane telefony
-      for (const placowka of placowkiWithPhone) {
+    // PRIORYTET 2: Telefon
+    if (normalizedTelefon && normalizedTelefon.length >= 7) {
+      for (const placowka of allPlacowki) {
         if (placowka.telefon) {
-          const dbPhone = normalizePhone(placowka.telefon);
-          if (dbPhone === normalizedPhone) {
+          const dbTelefon = normalizePhone(placowka.telefon);
+          if (dbTelefon === normalizedTelefon) {
             return NextResponse.json({
               exists: true,
               placowka,
@@ -109,41 +97,20 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // PRIORYTET 3: Nazwa + Miejscowość (fallback)
+    // PRIORYTET 3: Nazwa + Miejscowość
     if (nazwa && nazwa.length >= 3) {
-      existing = await prisma.placowka.findFirst({
-        where: {
-          nazwa: {
-            contains: nazwa,
-            mode: 'insensitive',
-          },
-          miejscowosc: {
-            contains: miejscowosc,
-            mode: 'insensitive',
-          },
-        },
-        select: {
-          id: true,
-          nazwa: true,
-          typ_placowki: true,
-          miejscowosc: true,
-          ulica: true,
-          powiat: true,
-          wojewodztwo: true,
-          telefon: true,
-          email: true,
-          www: true,
-          verified: true,
-          createdAt: true,
-        },
-      });
+      const normalizedNazwa = normalizeText(nazwa);
+      for (const placowka of allPlacowki) {
+        const dbNazwa = normalizeText(placowka.nazwa);
+        const dbMiejscowosc = normalizeText(placowka.miejscowosc);
 
-      if (existing) {
-        return NextResponse.json({
-          exists: true,
-          placowka: existing,
-          matchedBy: 'nazwa',
-        });
+        if (dbNazwa.includes(normalizedNazwa) && dbMiejscowosc === normalizedMiejscowosc) {
+          return NextResponse.json({
+            exists: true,
+            placowka,
+            matchedBy: 'nazwa',
+          });
+        }
       }
     }
 
