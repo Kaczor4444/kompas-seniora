@@ -132,16 +132,46 @@ export default function DodajPlacowkePage() {
       return;
     }
 
+
+    // Auto-geocoding jeśli podano adres
+    let latitude = null;
+    let longitude = null;
+
+    if (data.miejscowosc) {
+      try {
+        const geoParams = new URLSearchParams({
+          miejscowosc: data.miejscowosc,
+          ...(data.ulica && { ulica: data.ulica }),
+          ...(data.wojewodztwo && { wojewodztwo: data.wojewodztwo }),
+        });
+
+        const geoResponse = await fetch(`/api/geocode?${geoParams}`);
+        const geoData = await geoResponse.json();
+
+        if (geoData.success) {
+          latitude = geoData.latitude;
+          longitude = geoData.longitude;
+          console.log("✅ Geocoding success:", latitude, longitude);
+        } else {
+          console.log("⚠️ Geocoding failed:", geoData.message);
+        }
+      } catch (geoError) {
+        console.error("Geocoding error:", geoError);
+        // Nie blokujemy zapisu jeśli geocoding nie działa
+      }
+    }
     setIsSubmitting(true);
     setError(null);
 
     try {
       // Convert date strings to DateTime objects
       const processedData = {
-        ...data,
         data_zrodla_dane: data.data_zrodla_dane ? new Date(data.data_zrodla_dane).toISOString() : null,
+        ...data,
         data_zrodla_cena: data.data_zrodla_cena ? new Date(data.data_zrodla_cena).toISOString() : null,
         data_weryfikacji: data.data_weryfikacji ? new Date(data.data_weryfikacji).toISOString() : null,
+        latitude,
+        longitude,
       };
 
       const response = await fetch('/api/admin/placowki', {

@@ -18,6 +18,8 @@ const placowkaSchema = z.object({
   www: z.string().url().optional().or(z.literal('')),
   liczba_miejsc: z.number().int().positive().optional(),
   koszt_pobytu: z.number().positive().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   profil_opieki: z.string().optional(),
   
   // Źródła
@@ -74,6 +76,8 @@ export async function POST(request: NextRequest) {
       www: validatedData.www || null,
       liczba_miejsc: validatedData.liczba_miejsc || null,
       koszt_pobytu: validatedData.koszt_pobytu || null,
+      latitude: validatedData.latitude || null,
+      longitude: validatedData.longitude || null,
       profil_opieki: validatedData.profil_opieki || null,
       
       // Źródła - konwersja dat
@@ -100,6 +104,7 @@ export async function POST(request: NextRequest) {
         typ_placowki: newPlacowka.typ_placowki,
         miejscowosc: newPlacowka.miejscowosc,
         powiat: newPlacowka.powiat,
+        // Geo nie idzie do snapshot - to dane techniczne
         wojewodztwo: newPlacowka.wojewodztwo,
         koszt_pobytu: newPlacowka.koszt_pobytu,
         liczba_miejsc: newPlacowka.liczba_miejsc,
