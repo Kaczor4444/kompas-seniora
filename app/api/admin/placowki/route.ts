@@ -3,6 +3,88 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
+// GET - Lista placówek z filtrowaniem i paginacją
+export async function GET(request: NextRequest) {
+  try {
+    const cookieStore = await cookies();
+
+    const isAuthenticated = cookieStore.get("admin-auth")?.value === "true";
+
+    if (!isAuthenticated) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "25");
+    const sort = searchParams.get("sort") || "id";
+    const order = searchParams.get("order") || "desc";
+    const typ = searchParams.get("typ") || "";
+    const wojewodztwo = searchParams.get("wojewodztwo") || "";
+    const verified = searchParams.get("verified") || "";
+    const search = searchParams.get("search") || "";
+
+    const skip = (page - 1) * limit;
+
+    // Build where clause
+    const where: any = {};
+
+    if (typ) where.typ_placowki = typ;
+    if (wojewodztwo) where.wojewodztwo = wojewodztwo;
+    if (verified === "true") where.verified = true;
+    if (verified === "false") where.verified = false;
+    if (search) {
+      where.OR = [
+        { nazwa: { contains: search, mode: "insensitive" } },
+        { miejscowosc: { contains: search, mode: "insensitive" } },
+        { ulica: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Get total count
+    const total = await prisma.placowka.count({ where });
+
+    // Get paginated data
+    const placowki = await prisma.placowka.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { [sort]: order },
+      select: {
+        id: true,
+        nazwa: true,
+        typ_placowki: true,
+        miejscowosc: true,
+        powiat: true,
+        wojewodztwo: true,
+        latitude: true,
+        longitude: true,
+        verified: true,
+        data_weryfikacji: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return NextResponse.json({
+      placowki,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("GET placowki error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+
 const placowkaSchema = z.object({
   nazwa: z.string().min(3).max(200),
   typ_placowki: z.enum(['DPS', 'ŚDS']),
