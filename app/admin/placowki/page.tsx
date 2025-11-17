@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, Trash2, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, MapPin, CheckCircle, XCircle, Search, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Placowka {
@@ -96,17 +96,42 @@ export default function ListaPlacowekPage() {
   const [deleteModal, setDeleteModal] = useState<Placowka | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // 🆕 SEARCH & FILTERS STATE
+  const [search, setSearch] = useState('');
+  const [typFilter, setTypFilter] = useState('');
+  const [wojewodztwoFilter, setWojewodztwoFilter] = useState('');
+  const [verifiedFilter, setVerifiedFilter] = useState('');
+  const [geoFilter, setGeoFilter] = useState(false);
+
+  // 🆕 Get unique wojewodztwa for dropdown
+  const [wojewodztwa, setWojewodztwa] = useState<string[]>([]);
+
   useEffect(() => {
     fetchPlacowki();
-  }, [page, limit]);
+  }, [page, limit, search, typFilter, wojewodztwoFilter, verifiedFilter, geoFilter]);
 
   const fetchPlacowki = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/placowki?page=${page}&limit=${limit}`);
+      // 🆕 Build query params with filters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
+      if (search) params.append('search', search);
+      if (typFilter) params.append('typ', typFilter);
+      if (wojewodztwoFilter) params.append('wojewodztwo', wojewodztwoFilter);
+      if (verifiedFilter) params.append('verified', verifiedFilter);
+
+      const res = await fetch(`/api/admin/placowki?${params.toString()}`);
       const data = await res.json();
       setPlacowki(data.placowki);
       setPagination(data.pagination);
+
+      // 🆕 Extract unique wojewodztwa for dropdown
+      const uniqueWoj = Array.from(new Set(data.placowki.map((p: Placowka) => p.wojewodztwo))).sort();
+      setWojewodztwa(uniqueWoj as string[]);
     } catch (error) {
       console.error('Error fetching placowki:', error);
       toast.error('Błąd podczas ładowania placówek');
@@ -142,6 +167,24 @@ export default function ListaPlacowekPage() {
     }
   };
 
+  // 🆕 Clear all filters
+  const clearFilters = () => {
+    setSearch('');
+    setTypFilter('');
+    setWojewodztwoFilter('');
+    setVerifiedFilter('');
+    setGeoFilter(false);
+    setPage(1);
+  };
+
+  // 🆕 Count active filters
+  const activeFiltersCount = [search, typFilter, wojewodztwoFilter, verifiedFilter, geoFilter].filter(Boolean).length;
+
+  // 🆕 Apply geo filter client-side (since it's not in backend yet)
+  const filteredPlacowki = geoFilter 
+    ? placowki.filter(p => p.latitude && p.longitude)
+    : placowki;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
@@ -149,7 +192,7 @@ export default function ListaPlacowekPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Lista placówek</h1>
           <p className="mt-2 text-gray-600">
-            {pagination && `${pagination.total} placówek w bazie`}
+            {pagination && `${geoFilter ? filteredPlacowki.length : pagination.total} placówek ${activeFiltersCount > 0 ? `(filtrowane)` : 'w bazie'}`}
           </p>
         </div>
         <Link
@@ -161,9 +204,139 @@ export default function ListaPlacowekPage() {
         </Link>
       </div>
 
+      {/* 🆕 SEARCH & FILTERS */}
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Search */}
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Szukaj
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1); // Reset to first page on search
+                }}
+                placeholder="Nazwa lub miejscowość..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Typ Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Typ placówki
+            </label>
+            <select
+              value={typFilter}
+              onChange={(e) => {
+                setTypFilter(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            >
+              <option value="">Wszystkie</option>
+              <option value="DPS">DPS</option>
+              <option value="ŚDS">ŚDS</option>
+            </select>
+          </div>
+
+          {/* Wojewodztwo Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Województwo
+            </label>
+            <select
+              value={wojewodztwoFilter}
+              onChange={(e) => {
+                setWojewodztwoFilter(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            >
+              <option value="">Wszystkie</option>
+              {wojewodztwa.map(woj => (
+                <option key={woj} value={woj}>{woj}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Verified Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status weryfikacji
+            </label>
+            <select
+              value={verifiedFilter}
+              onChange={(e) => {
+                setVerifiedFilter(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            >
+              <option value="">Wszystkie</option>
+              <option value="true">Tylko zweryfikowane</option>
+              <option value="false">Tylko niezweryfikowane</option>
+            </select>
+          </div>
+
+          {/* Geo Filter */}
+          <div className="flex items-end">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={geoFilter}
+                onChange={(e) => {
+                  setGeoFilter(e.target.checked);
+                  setPage(1);
+                }}
+                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+              />
+              <span className="ml-2 text-sm text-gray-700">
+                Tylko z geolokalizacją
+              </span>
+            </label>
+          </div>
+
+          {/* Clear Filters Button */}
+          {activeFiltersCount > 0 && (
+            <div className="flex items-end lg:col-span-2">
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <X className="h-4 w-4" />
+                Wyczyść filtry ({activeFiltersCount})
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Table */}
       {loading ? (
         <div className="text-center py-12">Ładowanie...</div>
+      ) : filteredPlacowki.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <p className="text-gray-500 text-lg">
+            {activeFiltersCount > 0 
+              ? '🔍 Nie znaleziono placówek spełniających kryteria.' 
+              : 'Brak placówek w bazie.'}
+          </p>
+          {activeFiltersCount > 0 && (
+            <button
+              onClick={clearFilters}
+              className="mt-4 text-emerald-600 hover:text-emerald-700 font-medium"
+            >
+              Wyczyść filtry
+            </button>
+          )}
+        </div>
       ) : (
         <>
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -181,7 +354,7 @@ export default function ListaPlacowekPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {placowki.map((p) => (
+                {filteredPlacowki.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{p.id}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{p.nazwa}</td>
@@ -235,7 +408,7 @@ export default function ListaPlacowekPage() {
           </div>
 
           {/* Pagination */}
-          {pagination && pagination.pages > 1 && (
+          {pagination && pagination.pages > 1 && !geoFilter && (
             <div className="mt-6 flex items-center justify-between">
               <div className="text-sm text-gray-700">
                 Strona {pagination.page} z {pagination.pages}
