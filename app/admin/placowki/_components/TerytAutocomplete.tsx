@@ -90,7 +90,7 @@ export default function TerytAutocomplete({
               error ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder={placeholder}
-            displayValue={(suggestion: TerytSuggestion | null) => suggestion?.nazwa || ''}
+            displayValue={(suggestion: TerytSuggestion | null) => suggestion?.nazwa || query}
             onChange={(e) => {
               setQuery(e.target.value);
               onChange(e.target.value);

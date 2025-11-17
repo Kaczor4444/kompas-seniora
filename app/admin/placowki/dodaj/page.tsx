@@ -30,6 +30,8 @@ const placowkaSchema = z.object({
   www: z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
   liczba_miejsc: z.coerce.number().int().positive().optional(),
   koszt_pobytu: z.coerce.number().positive().optional(),
+  latitude: z.coerce.number().nullable().optional(),
+  longitude: z.coerce.number().nullable().optional(),
   profil_opieki: z.string().optional(),
   
   // Źródła
@@ -148,11 +150,12 @@ export default function DodajPlacowkePage() {
       data.telefon = formatPhoneNumber(data.telefon);
     }
 
-    // Auto-geocoding jeśli podano adres
-    let latitude = null;
-    let longitude = null;
+    // 🆕 Użyj ręcznych współrzędnych jeśli są podane, lub spróbuj auto-geocoding
+    let latitude = data.latitude || null;
+    let longitude = data.longitude || null;
 
-    if (data.miejscowosc) {
+    // Auto-geocoding tylko jeśli nie ma ręcznych współrzędnych
+    if (data.miejscowosc && !latitude && !longitude) {
       try {
         const geoParams = new URLSearchParams({
           miejscowosc: data.miejscowosc,
@@ -174,7 +177,10 @@ export default function DodajPlacowkePage() {
         console.error("Geocoding error:", geoError);
         // Nie blokujemy zapisu jeśli geocoding nie działa
       }
+    } else if (latitude && longitude) {
+      console.log("✅ Using manual coordinates:", latitude, longitude);
     }
+
     setIsSubmitting(true);
     setError(null);
 
@@ -477,6 +483,41 @@ export default function DodajPlacowkePage() {
                     {errors.wojewodztwo.message}
                   </p>
                 )}
+              </div>
+            </div>
+
+            {/* 🆕 NOWE POLA: Współrzędne geograficzne */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 mt-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Latitude (szerokość geograficzna)
+                </label>
+                <input
+                  type="number"
+                  step="0.000001"
+                  {...register('latitude')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="np. 50.0647"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  💡 Zostaw puste - auto-geocoding wypełni automatycznie
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Longitude (długość geograficzna)
+                </label>
+                <input
+                  type="number"
+                  step="0.000001"
+                  {...register('longitude')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="np. 19.9450"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  💡 Lub wpisz ręcznie jeśli znasz współrzędne
+                </p>
               </div>
             </div>
           </div>
