@@ -1,5 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Normalizacja polskich znaków dla geocodingu
+function normalizePolish(text: string): string {
+  return text
+    .replace(/ł/g, "l")
+    .replace(/Ł/g, "L")
+    .replace(/ą/g, "a")
+    .replace(/Ą/g, "A")
+    .replace(/ć/g, "c")
+    .replace(/Ć/g, "C")
+    .replace(/ę/g, "e")
+    .replace(/Ę/g, "E")
+    .replace(/ń/g, "n")
+    .replace(/Ń/g, "N")
+    .replace(/ó/g, "o")
+    .replace(/Ó/g, "O")
+    .replace(/ś/g, "s")
+    .replace(/Ś/g, "S")
+    .replace(/ź/g, "z")
+    .replace(/Ź/g, "Z")
+    .replace(/ż/g, "z")
+    .replace(/Ż/g, "Z");
+}
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -14,7 +37,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const addressParts = [ulica, miejscowosc, wojewodztwo, 'Poland'].filter(Boolean);
+    // Normalizuj przed wysłaniem do Nominatim
+    const ulicaNorm = ulica ? normalizePolish(ulica) : '';
+    const miejscowoscNorm = normalizePolish(miejscowosc);
+    const wojewodztwoNorm = wojewodztwo ? normalizePolish(wojewodztwo) : '';
+
+    const addressParts = [ulicaNorm, miejscowoscNorm, wojewodztwoNorm, 'Poland'].filter(Boolean);
     const address = addressParts.join(', ');
 
     console.log('🌍 Geocoding:', address);

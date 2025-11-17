@@ -100,8 +100,8 @@ const placowkaSchema = z.object({
   www: z.string().url().optional().or(z.literal('')),
   liczba_miejsc: z.number().int().positive().optional(),
   koszt_pobytu: z.number().positive().optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
   profil_opieki: z.string().optional(),
   
   // Źródła
