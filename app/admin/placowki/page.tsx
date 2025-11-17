@@ -82,6 +82,7 @@ export default function ListaPlacowekPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nazwa</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ulica</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Miejscowość</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Geo</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Verified</th>
@@ -102,6 +103,7 @@ export default function ListaPlacowekPage() {
                         {p.typ_placowki}
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{p.ulica || "—"}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{p.miejscowosc}</td>
                     <td className="px-6 py-4 text-center">
                       {p.latitude && p.longitude ? (

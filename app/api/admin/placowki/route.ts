@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
         nazwa: true,
         typ_placowki: true,
         miejscowosc: true,
+        ulica: true,
         powiat: true,
         wojewodztwo: true,
         latitude: true,
