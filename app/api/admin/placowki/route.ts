@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { formatPhoneNumber } from '@/lib/phone-utils';
 
 // GET - Lista placówek z filtrowaniem i paginacją
 export async function GET(request: NextRequest) {
@@ -128,6 +129,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = placowkaSchema.parse(body);
     
+    // 🆕 FORMATUJ TELEFON
+    if (validatedData.telefon) {
+      validatedData.telefon = formatPhoneNumber(validatedData.telefon);
+    }
+    
     // Sprawdź czy to force add
     const forceAdd = body.forceAdd === true;
 
@@ -187,7 +193,6 @@ export async function POST(request: NextRequest) {
         typ_placowki: newPlacowka.typ_placowki,
         miejscowosc: newPlacowka.miejscowosc,
         powiat: newPlacowka.powiat,
-        // Geo nie idzie do snapshot - to dane techniczne
         wojewodztwo: newPlacowka.wojewodztwo,
         koszt_pobytu: newPlacowka.koszt_pobytu,
         liczba_miejsc: newPlacowka.liczba_miejsc,

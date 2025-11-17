@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import TerytAutocomplete from '../_components/TerytAutocomplete';
-import { useRouter } from 'next/navigation';
+import TerytAutocomplete from '@/app/admin/placowki/_components/TerytAutocomplete';
+import { useRouter, useParams } from 'next/navigation';
 import { formatPhoneNumber } from '@/lib/phone-utils';
+import toast from 'react-hot-toast';
 
-// Zod validation schema
+// Zod validation schema (ten sam co w dodaj)
 const placowkaSchema = z.object({
   nazwa: z.string().min(3, 'Minimum 3 znaki').max(200, 'Maksimum 200 znaków'),
   typ_placowki: z.enum(['DPS', 'ŚDS'], {
@@ -45,29 +46,14 @@ const placowkaSchema = z.object({
 
 type PlacowkaFormData = z.infer<typeof placowkaSchema>;
 
-interface DuplicateData {
-  id: number;
-  nazwa: string;
-  typ_placowki: string;
-  miejscowosc: string;
-  ulica: string | null;
-  powiat: string;
-  wojewodztwo: string;
-  telefon: string | null;
-  email: string | null;
-  www: string | null;
-  verified: boolean;
-  createdAt: string;
-}
-
-export default function DodajPlacowkePage() {
+export default function EdytujPlacowkePage() {
   const router = useRouter();
+  const params = useParams();
+  const placowkaId = params.id as string;
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [duplicate, setDuplicate] = useState<DuplicateData | null>(null);
-  const [checkingDuplicate, setCheckingDuplicate] = useState(false);
-  const [forceAdd, setForceAdd] = useState(false);
-  const [matchedBy, setMatchedBy] = useState<string>('');
 
   const {
     register,
@@ -75,20 +61,61 @@ export default function DodajPlacowkePage() {
     formState: { errors },
     watch,
     setValue,
+    reset,
   } = useForm<PlacowkaFormData>({
     resolver: zodResolver(placowkaSchema),
-    defaultValues: {
-      verified: true,
-      data_weryfikacji: new Date().toISOString().split('T')[0],
-    },
   });
 
-  const nazwa = watch('nazwa');
-  const miejscowosc = watch('miejscowosc');
-  const ulica = watch('ulica');
   const telefon = watch('telefon');
 
-  // 🆕 AUTO-FORMATOWANIE TELEFONU
+  // Load placowka data
+  useEffect(() => {
+    const loadPlacowka = async () => {
+      try {
+        const res = await fetch(`/api/admin/placowki/${placowkaId}`);
+        if (!res.ok) {
+          throw new Error('Nie znaleziono placówki');
+        }
+        const data = await res.json();
+        
+        // Pre-fill form with existing data
+        reset({
+          nazwa: data.placowka.nazwa,
+          typ_placowki: data.placowka.typ_placowki,
+          prowadzacy: data.placowka.prowadzacy || '',
+          miejscowosc: data.placowka.miejscowosc,
+          ulica: data.placowka.ulica || '',
+          kod_pocztowy: data.placowka.kod_pocztowy || '',
+          gmina: data.placowka.gmina || '',
+          powiat: data.placowka.powiat,
+          wojewodztwo: data.placowka.wojewodztwo,
+          telefon: data.placowka.telefon || '',
+          email: data.placowka.email || '',
+          www: data.placowka.www || '',
+          liczba_miejsc: data.placowka.liczba_miejsc || undefined,
+          koszt_pobytu: data.placowka.koszt_pobytu || undefined,
+          profil_opieki: data.placowka.profil_opieki || '',
+          zrodlo_dane: data.placowka.zrodlo_dane || '',
+          zrodlo_cena: data.placowka.zrodlo_cena || '',
+          data_zrodla_dane: data.placowka.data_zrodla_dane || '',
+          data_zrodla_cena: data.placowka.data_zrodla_cena || '',
+          data_weryfikacji: data.placowka.data_weryfikacji || '',
+          notatki: data.placowka.notatki || '',
+          verified: data.placowka.verified,
+        });
+      } catch (err) {
+        console.error('Error loading placowka:', err);
+        setError(err instanceof Error ? err.message : 'Błąd podczas ładowania');
+        toast.error('Nie można załadować danych placówki');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPlacowka();
+  }, [placowkaId, reset]);
+
+  // Auto-formatowanie telefonu
   useEffect(() => {
     if (telefon && telefon.length >= 9) {
       const formatted = formatPhoneNumber(telefon);
@@ -98,59 +125,15 @@ export default function DodajPlacowkePage() {
     }
   }, [telefon, setValue]);
 
-  // Debounced duplicate check
-  useEffect(() => {
-    if (!miejscowosc || miejscowosc.length < 2) {
-      setDuplicate(null);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setCheckingDuplicate(true);
-      try {
-        const params = new URLSearchParams({
-          miejscowosc,
-        });
-        
-        if (nazwa && nazwa.length >= 3) params.append('nazwa', nazwa);
-        if (ulica && ulica.length >= 3) params.append('ulica', ulica);
-        if (telefon && telefon.length >= 9) params.append('telefon', telefon);
-
-        const response = await fetch(
-          `/api/admin/placowki/check-duplicate?${params.toString()}`
-        );
-        const data = await response.json();
-        
-        if (data.exists && data.placowka) {
-          setDuplicate(data.placowka);
-          setMatchedBy(data.matchedBy || 'nazwa');
-        } else {
-          setDuplicate(null);
-          setMatchedBy('');
-        }
-      } catch (err) {
-        console.error('Error checking duplicate:', err);
-      } finally {
-        setCheckingDuplicate(false);
-      }
-    }, 800);
-
-    return () => clearTimeout(timer);
-  }, [nazwa, miejscowosc, ulica, telefon]);
-
   const onSubmit = async (data: PlacowkaFormData) => {
-    if (duplicate && !forceAdd) {
-      return;
-    }
-
-    // 🆕 FORMATUJ TELEFON PRZED ZAPISEM
+    // Formatuj telefon przed zapisem
     if (data.telefon) {
       data.telefon = formatPhoneNumber(data.telefon);
     }
 
     // Auto-geocoding jeśli podano adres
-    let latitude = null;
-    let longitude = null;
+    let latitude = undefined;
+    let longitude = undefined;
 
     if (data.miejscowosc) {
       try {
@@ -167,32 +150,29 @@ export default function DodajPlacowkePage() {
           latitude = geoData.latitude;
           longitude = geoData.longitude;
           console.log("✅ Geocoding success:", latitude, longitude);
-        } else {
-          console.log("⚠️ Geocoding failed:", geoData.message);
         }
       } catch (geoError) {
         console.error("Geocoding error:", geoError);
-        // Nie blokujemy zapisu jeśli geocoding nie działa
       }
     }
+
     setIsSubmitting(true);
     setError(null);
 
     try {
-      // Convert date strings to DateTime objects
       const processedData = {
-        data_zrodla_dane: data.data_zrodla_dane ? new Date(data.data_zrodla_dane).toISOString() : null,
         ...data,
+        data_zrodla_dane: data.data_zrodla_dane ? new Date(data.data_zrodla_dane).toISOString() : null,
         data_zrodla_cena: data.data_zrodla_cena ? new Date(data.data_zrodla_cena).toISOString() : null,
         data_weryfikacji: data.data_weryfikacji ? new Date(data.data_weryfikacji).toISOString() : null,
         latitude,
         longitude,
       };
 
-      const response = await fetch('/api/admin/placowki', {
-        method: 'POST',
+      const response = await fetch(`/api/admin/placowki/${placowkaId}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...processedData, forceAdd }),
+        body: JSON.stringify(processedData),
       });
 
       if (!response.ok) {
@@ -200,132 +180,52 @@ export default function DodajPlacowkePage() {
         throw new Error(errorData.error || 'Błąd podczas zapisywania');
       }
 
-      const result = await response.json();
-      router.push(`/admin/placowki?success=added&id=${result.id}`);
+      toast.success('Placówka zaktualizowana pomyślnie!');
+      router.push('/admin/placowki');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Nieznany błąd');
+      const errorMsg = err instanceof Error ? err.message : 'Nieznany błąd';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getMatchLabel = () => {
-    if (matchedBy === 'ulica') return '(znaleziono po adresie)';
-    if (matchedBy === 'telefon') return '(znaleziono po telefonie)';
-    return '(znaleziono po nazwie)';
-  };
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Ładowanie danych placówki...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+          <p className="font-medium">Błąd: {error}</p>
+          <button
+            onClick={() => router.push('/admin/placowki')}
+            className="mt-2 text-sm underline"
+          >
+            Powrót do listy
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dodaj placówkę</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Edytuj placówkę</h1>
         <p className="mt-2 text-gray-600">
-          Wypełnij formularz aby dodać zweryfikowaną placówkę DPS lub ŚDS
+          Zaktualizuj dane placówki DPS lub ŚDS
         </p>
       </div>
-
-      {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-          <p className="font-medium">Błąd: {error}</p>
-        </div>
-      )}
-
-      {/* Duplicate Warning */}
-      {duplicate && !forceAdd && (
-        <div className="mb-6 bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <span className="text-3xl">⚠️</span>
-            </div>
-            <div className="ml-4 flex-1">
-              <h3 className="text-lg font-semibold text-yellow-900 mb-2">
-                Uwaga: Podobna placówka już istnieje w bazie! {getMatchLabel()}
-              </h3>
-              
-              <div className="bg-white rounded-lg p-4 mb-4 border border-yellow-200">
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-700">Nazwa:</span>
-                    <p className="text-gray-900">{duplicate.nazwa}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Typ:</span>
-                    <p className="text-gray-900">{duplicate.typ_placowki}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Miejscowość:</span>
-                    <p className="text-gray-900">{duplicate.miejscowosc}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Ulica:</span>
-                    <p className="text-gray-900">{duplicate.ulica || '—'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Powiat:</span>
-                    <p className="text-gray-900">{duplicate.powiat}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Województwo:</span>
-                    <p className="text-gray-900">{duplicate.wojewodztwo}</p>
-                  </div>
-                  {duplicate.telefon && (
-                    <div>
-                      <span className="font-medium text-gray-700">Telefon:</span>
-                      <p className="text-gray-900">{duplicate.telefon}</p>
-                    </div>
-                  )}
-                  {duplicate.www && (
-                    <div className="col-span-2">
-                      <span className="font-medium text-gray-700">WWW:</span>
-                      <p className="text-gray-900 truncate">
-                        <a 
-                          href={duplicate.www} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          {duplicate.www}
-                        </a>
-                      </p>
-                    </div>
-                  )}
-                  <div className="col-span-2">
-                    <span className="font-medium text-gray-700">Status:</span>
-                    <p className="text-gray-900">
-                      {duplicate.verified ? '✅ Zweryfikowana' : '⚠️ Niezweryfikowana'} • 
-                      ID: {duplicate.id} • 
-                      Dodano: {new Date(duplicate.createdAt).toLocaleDateString('pl-PL')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={() => router.push('/admin/placowki')}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setForceAdd(true)}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
-                >
-                  Dodaj mimo to (to inna placówka)
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {checkingDuplicate && (
-        <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
-          <p className="text-sm">🔍 Sprawdzam czy placówka już istnieje...</p>
-        </div>
-      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* Podstawowe informacje */}
@@ -397,7 +297,7 @@ export default function DodajPlacowkePage() {
                 onChange={(value) => setValue("miejscowosc", value)}
                 onSelect={(data) => {
                   setValue("miejscowosc", data.miejscowosc);
-                  setValue("gmina", data.gmina || data.miejscowosc); // Fallback jeśli TERYT nie ma gminy
+                  setValue("gmina", data.gmina || data.miejscowosc);
                   setValue("powiat", data.powiat);
                   setValue("wojewodztwo", data.wojewodztwo);
                 }}
@@ -683,17 +583,17 @@ export default function DodajPlacowkePage() {
         <div className="flex items-center justify-between">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push('/admin/placowki')}
             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
           >
             Anuluj
           </button>
           <button
             type="submit"
-            disabled={isSubmitting || (duplicate && !forceAdd)}
+            disabled={isSubmitting}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Zapisywanie...' : 'Dodaj placówkę'}
+            {isSubmitting ? 'Zapisywanie...' : 'Zapisz zmiany'}
           </button>
         </div>
       </form>

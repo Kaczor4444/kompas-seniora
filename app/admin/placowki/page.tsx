@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Edit2, Trash2, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Placowka {
   id: number;
   nazwa: string;
   typ_placowki: string;
   miejscowosc: string;
+  ulica: string | null;
   powiat: string;
   wojewodztwo: string;
   latitude: number | null;
@@ -26,12 +28,73 @@ interface Pagination {
   pages: number;
 }
 
+interface DeleteModalProps {
+  placowka: Placowka | null;
+  onClose: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
+}
+
+function DeleteModal({ placowka, onClose, onConfirm, isDeleting }: DeleteModalProps) {
+  if (!placowka) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="flex items-start mb-4">
+          <div className="flex-shrink-0">
+            <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+              <Trash2 className="h-6 w-6 text-red-600" />
+            </div>
+          </div>
+          <div className="ml-4 flex-1">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Usuń placówkę
+            </h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Czy na pewno chcesz usunąć placówkę:
+            </p>
+            <p className="mt-2 text-sm font-medium text-gray-900">
+              {placowka.nazwa}
+            </p>
+            <p className="text-sm text-gray-500">
+              {placowka.miejscowosc}, {placowka.wojewodztwo}
+            </p>
+            <p className="mt-2 text-sm text-red-600">
+              ⚠️ Ta operacja jest nieodwracalna!
+            </p>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            onClick={onClose}
+            disabled={isDeleting}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            Anuluj
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+          >
+            {isDeleting ? 'Usuwanie...' : 'Usuń placówkę'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ListaPlacowekPage() {
   const [placowki, setPlacowki] = useState<Placowka[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(25);
+  const [deleteModal, setDeleteModal] = useState<Placowka | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchPlacowki();
@@ -46,8 +109,36 @@ export default function ListaPlacowekPage() {
       setPagination(data.pagination);
     } catch (error) {
       console.error('Error fetching placowki:', error);
+      toast.error('Błąd podczas ładowania placówek');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteModal) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/placowki/${deleteModal.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Błąd podczas usuwania');
+      }
+
+      toast.success(`Placówka "${deleteModal.nazwa}" została usunięta`);
+      setDeleteModal(null);
+      
+      // Refresh list
+      await fetchPlacowki();
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error(error instanceof Error ? error.message : 'Błąd podczas usuwania');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -123,11 +214,16 @@ export default function ListaPlacowekPage() {
                       <div className="flex justify-end gap-2">
                         <Link
                           href={`/admin/placowki/${p.id}/edytuj`}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
+                          title="Edytuj"
                         >
                           <Edit2 className="h-4 w-4" />
                         </Link>
-                        <button className="text-red-600 hover:text-red-900">
+                        <button
+                          onClick={() => setDeleteModal(p)}
+                          className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"
+                          title="Usuń"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
@@ -148,14 +244,14 @@ export default function ListaPlacowekPage() {
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-4 py-2 border rounded-lg disabled:opacity-50"
+                  className="px-4 py-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
                   Poprzednia
                 </button>
                 <button
                   onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
                   disabled={page === pagination.pages}
-                  className="px-4 py-2 border rounded-lg disabled:opacity-50"
+                  className="px-4 py-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50"
                 >
                   Następna
                 </button>
@@ -163,6 +259,16 @@ export default function ListaPlacowekPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* Delete Modal */}
+      {deleteModal && (
+        <DeleteModal
+          placowka={deleteModal}
+          onClose={() => setDeleteModal(null)}
+          onConfirm={handleDelete}
+          isDeleting={isDeleting}
+        />
       )}
     </div>
   );
