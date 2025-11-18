@@ -71,7 +71,7 @@ export default async function AdminDashboardPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Szybkie akcje
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href="/admin/placowki/dodaj"
             className="block p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
@@ -93,6 +93,18 @@ export default async function AdminDashboardPage() {
             </div>
             <p className="mt-1 text-sm text-gray-600">
               Przeglądaj i edytuj istniejące placówki
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/analytics"
+            className="block p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-colors"
+          >
+            <div className="text-lg font-medium text-gray-900">
+              📊 Analytics Dashboard
+            </div>
+            <p className="mt-1 text-sm text-gray-600">
+              Monitoruj aktywność użytkowników i statystyki
             </p>
           </Link>
         </div>
