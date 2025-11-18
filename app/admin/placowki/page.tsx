@@ -106,9 +106,29 @@ export default function ListaPlacowekPage() {
   // 🆕 Get unique wojewodztwa for dropdown
   const [wojewodztwa, setWojewodztwa] = useState<string[]>([]);
 
+  // 🆕 Fetch wojewodztwa once on mount
+  useEffect(() => {
+    fetchWojewodztwa();
+  }, []);
+
   useEffect(() => {
     fetchPlacowki();
   }, [page, limit, search, typFilter, wojewodztwoFilter, verifiedFilter, geoFilter]);
+
+  const fetchWojewodztwa = async () => {
+    try {
+      const res = await fetch('/api/admin/placowki?limit=1000');
+      const data = await res.json();
+      if (data.placowki && Array.isArray(data.placowki)) {
+        const uniqueWoj = Array.from(
+          new Set(data.placowki.map((p: Placowka) => p.wojewodztwo))
+        ).sort();
+        setWojewodztwa(uniqueWoj as string[]);
+      }
+    } catch (error) {
+      console.error('Error fetching wojewodztwa:', error);
+    }
+  };
 
   const fetchPlacowki = async () => {
     setLoading(true);
@@ -126,12 +146,8 @@ export default function ListaPlacowekPage() {
 
       const res = await fetch(`/api/admin/placowki?${params.toString()}`);
       const data = await res.json();
-      setPlacowki(data.placowki);
+      setPlacowki(data.placowki || []);
       setPagination(data.pagination);
-
-      // 🆕 Extract unique wojewodztwa for dropdown
-      const uniqueWoj = Array.from(new Set(data.placowki.map((p: Placowka) => p.wojewodztwo))).sort();
-      setWojewodztwa(uniqueWoj as string[]);
     } catch (error) {
       console.error('Error fetching placowki:', error);
       toast.error('Błąd podczas ładowania placówek');
