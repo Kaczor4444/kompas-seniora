@@ -12,12 +12,29 @@ import {
   Activity,
   BarChart3
 } from 'lucide-react';
+import ConversionFunnel from './_components/ConversionFunnel';
 
 interface AnalyticsData {
   overview: {
     totalEvents: number;
     recentEventsCount: number;
     eventsByType: Array<{ type: string; count: number }>;
+  };
+  conversionFunnel: {
+    totalViews: number;
+    totalContacts: number;
+    conversionRate: number;
+    uniqueFacilitiesViewed: number;
+    uniqueFacilitiesContacted: number;
+    topConversionFacilities: Array<{
+      id: number;
+      nazwa: string;
+      miejscowosc: string;
+      typ_placowki: string;
+      views: number;
+      contacts: number;
+      conversionRate: number;
+    }>;
   };
   topViewed: Array<{
     id: number;
@@ -121,19 +138,21 @@ export default function AnalyticsDashboardPage() {
     );
   }
 
-  const totalViews = data.overview.eventsByType.find(e => e.type === 'view')?.count || 0;
-  const totalPhoneClicks = data.overview.eventsByType.find(e => e.type === 'phone_click')?.count || 0;
-  const totalEmailClicks = data.overview.eventsByType.find(e => e.type === 'email_click')?.count || 0;
-  const totalWebsiteClicks = data.overview.eventsByType.find(e => e.type === 'website_click')?.count || 0;
+  const totalViews = data.overview?.eventsByType?.find(e => e.type === 'view')?.count || 0;
+  const totalPhoneClicks = data.overview?.eventsByType?.find(e => e.type === 'phone_click')?.count || 0;
+  const totalEmailClicks = data.overview?.eventsByType?.find(e => e.type === 'email_click')?.count || 0;
+  const totalWebsiteClicks = data.overview?.eventsByType?.find(e => e.type === 'website_click')?.count || 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Analytics Dashboard
+          </h1>
           <p className="mt-2 text-gray-600">
-            Monitorowanie aktywności użytkowników
+            Monitorowanie aktywności użytkowników i analiza konwersji
           </p>
         </div>
         
@@ -141,7 +160,7 @@ export default function AnalyticsDashboardPage() {
         <select
           value={days}
           onChange={(e) => setDays(parseInt(e.target.value))}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
         >
           <option value={7}>Ostatnie 7 dni</option>
           <option value={30}>Ostatnie 30 dni</option>
@@ -149,102 +168,112 @@ export default function AnalyticsDashboardPage() {
         </select>
       </div>
 
-      {/* Overview Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
+      {/* Overview Stats Cards - Softer professional colors */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500">Wyświetlenia</p>
+              <p className="text-sm font-medium text-gray-600">Wyświetlenia</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">{totalViews}</p>
             </div>
-            <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center">
               <Eye className="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500">Kliknięcia telefon</p>
+              <p className="text-sm font-medium text-gray-600">Kliknięcia telefon</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">{totalPhoneClicks}</p>
             </div>
-            <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <Phone className="h-6 w-6 text-green-600" />
+            <div className="h-12 w-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <Phone className="h-6 w-6 text-emerald-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500">Kliknięcia email</p>
+              <p className="text-sm font-medium text-gray-600">Kliknięcia email</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">{totalEmailClicks}</p>
             </div>
-            <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
               <Mail className="h-6 w-6 text-purple-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500">Kliknięcia WWW</p>
+              <p className="text-sm font-medium text-gray-600">Kliknięcia WWW</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">{totalWebsiteClicks}</p>
             </div>
-            <div className="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Globe className="h-6 w-6 text-orange-600" />
+            <div className="h-12 w-12 bg-amber-100 rounded-xl flex items-center justify-center">
+              <Globe className="h-6 w-6 text-amber-600" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Daily Activity Chart */}
-      <div className="bg-white rounded-lg shadow p-6">
+      {/* 🌟 CONVERSION FUNNEL - NEW! */}
+      {data.conversionFunnel && (
+        <ConversionFunnel data={data.conversionFunnel} />
+      )}
+
+      {/* Daily Activity Chart - Enhanced */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <Activity className="h-5 w-5 text-emerald-600" />
           Aktywność dzienna
         </h2>
         <div className="space-y-2">
-          {data.dailyActivity.map((day) => (
-            <div key={day.date} className="flex items-center gap-4">
-              <span className="text-sm text-gray-600 w-24">
-                {new Date(day.date).toLocaleDateString('pl-PL', { 
-                  month: 'short', 
-                  day: 'numeric' 
-                })}
-              </span>
-              <div className="flex-1 bg-gray-200 rounded-full h-8 relative">
-                <div
-                  className="bg-emerald-600 h-8 rounded-full flex items-center justify-end pr-3"
-                  style={{
-                    width: `${Math.min((day.count / Math.max(...data.dailyActivity.map(d => d.count))) * 100, 100)}%`,
-                    minWidth: day.count > 0 ? '40px' : '0'
-                  }}
-                >
-                  <span className="text-sm font-medium text-white">{day.count}</span>
+          {data.dailyActivity.length === 0 ? (
+            <p className="text-gray-500 text-sm py-4 text-center">Brak aktywności w tym okresie</p>
+          ) : (
+            data.dailyActivity.map((day) => (
+              <div key={day.date} className="flex items-center gap-4">
+                <span className="text-sm text-gray-600 w-24 font-medium">
+                  {new Date(day.date).toLocaleDateString('pl-PL', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}
+                </span>
+                <div className="flex-1 bg-gray-100 rounded-full h-8 relative overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-emerald-500 to-teal-500 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-500"
+                    style={{
+                      width: `${Math.min((day.count / Math.max(...data.dailyActivity.map(d => d.count))) * 100, 100)}%`,
+                      minWidth: day.count > 0 ? '40px' : '0'
+                    }}
+                  >
+                    <span className="text-sm font-bold text-white">{day.count}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
-      {/* Two Column Layout */}
+      {/* Two Column Layout - Top Viewed & Top Contacted */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Viewed */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            🏆 Najpopularniejsze placówki
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="text-2xl">🏆</span>
+            Najpopularniejsze placówki
           </h2>
           <div className="space-y-3">
             {data.topViewed.length === 0 ? (
-              <p className="text-gray-500 text-sm">Brak danych</p>
+              <p className="text-gray-500 text-sm text-center py-8">Brak danych o wyświetleniach</p>
             ) : (
               data.topViewed.map((placowka, index) => (
-                <div key={placowka.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold">
+                <div key={placowka.id} className="flex items-center gap-3 p-3 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 rounded-lg transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">
                     {index + 1}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -256,7 +285,7 @@ export default function AnalyticsDashboardPage() {
                     </p>
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="text-lg font-bold text-gray-900">{placowka.views}</p>
+                    <p className="text-lg font-bold text-emerald-600">{placowka.views}</p>
                     <p className="text-xs text-gray-500">wyświetleń</p>
                   </div>
                 </div>
@@ -266,17 +295,18 @@ export default function AnalyticsDashboardPage() {
         </div>
 
         {/* Top Contacted */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            📞 Najczęściej kontaktowane
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="text-2xl">📞</span>
+            Najczęściej kontaktowane
           </h2>
           <div className="space-y-3">
             {data.topContacted.length === 0 ? (
-              <p className="text-gray-500 text-sm">Brak danych</p>
+              <p className="text-gray-500 text-sm text-center py-8">Brak danych o kontaktach</p>
             ) : (
               data.topContacted.map((placowka, index) => (
-                <div key={placowka.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                <div key={placowka.id} className="flex items-center gap-3 p-3 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-lg transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">
                     {index + 1}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -288,7 +318,7 @@ export default function AnalyticsDashboardPage() {
                     </p>
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="text-lg font-bold text-gray-900">{placowka.contacts}</p>
+                    <p className="text-lg font-bold text-blue-600">{placowka.contacts}</p>
                     <p className="text-xs text-gray-500">kontaktów</p>
                   </div>
                 </div>
@@ -298,69 +328,82 @@ export default function AnalyticsDashboardPage() {
         </div>
       </div>
 
-      {/* Stats by Wojewodztwo */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          📍 Statystyki według województw
+      {/* Stats by Wojewodztwo - Enhanced */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <span className="text-2xl">📍</span>
+          Statystyki według województw
         </h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Województwo
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Wyświetlenia
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Kontakty
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {data.statsByWojewodztwo.map((stat) => (
-                <tr key={stat.wojewodztwo} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {stat.wojewodztwo}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {stat.views}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {stat.contacts}
-                  </td>
+        {data.statsByWojewodztwo.length === 0 ? (
+          <p className="text-gray-500 text-sm text-center py-8">Brak danych regionalnych</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Województwo
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Wyświetlenia
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Kontakty
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {data.statsByWojewodztwo.map((stat) => (
+                  <tr key={stat.wojewodztwo} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {stat.wojewodztwo}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {stat.views}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {stat.contacts}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow p-6">
+      {/* Recent Activity - Enhanced */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <Calendar className="h-5 w-5 text-emerald-600" />
           Ostatnia aktywność
         </h2>
         <div className="space-y-2">
-          {data.recentActivity.map((event) => (
-            <div key={event.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg">
-              <div className="flex-shrink-0 text-gray-600">
-                {EVENT_ICONS[event.eventType] || <Activity className="h-4 w-4" />}
+          {data.recentActivity.length === 0 ? (
+            <p className="text-gray-500 text-sm text-center py-8">Brak ostatniej aktywności</p>
+          ) : (
+            data.recentActivity.map((event) => (
+              <div key={event.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                <div className="flex-shrink-0 text-gray-600">
+                  {EVENT_ICONS[event.eventType] || <Activity className="h-4 w-4" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900">
+                    <span className="font-medium">{EVENT_LABELS[event.eventType] || event.eventType}</span>
+                    {' • '}
+                    <span className="text-gray-600">{event.placowka.nazwa}</span>
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {event.placowka.miejscowosc} • {new Date(event.timestamp).toLocaleString('pl-PL')}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900">
-                  <span className="font-medium">{EVENT_LABELS[event.eventType] || event.eventType}</span>
-                  {' • '}
-                  <span className="text-gray-600">{event.placowka.nazwa}</span>
-                </p>
-                <p className="text-xs text-gray-500">
-                  {event.placowka.miejscowosc} • {new Date(event.timestamp).toLocaleString('pl-PL')}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

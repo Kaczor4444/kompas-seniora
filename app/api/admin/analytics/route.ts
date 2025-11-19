@@ -162,7 +162,7 @@ export async function GET(request: NextRequest) {
       count: Number(item.count),
     }));
 
-    // 8. STATS BY WOJEWODZTWO - FIXED with proper column names
+    // 8. STATS BY WOJEWODZTWO
     const statsByWojewodztwo = await prisma.$queryRaw<Array<{ wojewodztwo: string; views: bigint; contacts: bigint }>>`
       SELECT 
         p.wojewodztwo,
@@ -170,6 +170,7 @@ export async function GET(request: NextRequest) {
         COUNT(CASE WHEN pe."eventType" IN ('phone_click', 'email_click', 'website_click') THEN 1 END) as contacts
       FROM "PlacowkaEvent" pe
       JOIN "Placowka" p ON pe."placowkaId" = p.id
+      WHERE pe.timestamp >= ${startDate}
       GROUP BY p.wojewodztwo
       ORDER BY views DESC
     `;
@@ -180,6 +181,73 @@ export async function GET(request: NextRequest) {
       contacts: Number(item.contacts),
     }));
 
+    // 9. CONVERSION FUNNEL DATA ⭐ NEW!
+    const conversionData = await prisma.$queryRaw<Array<{
+      total_views: bigint;
+      total_contacts: bigint;
+      unique_facilities_viewed: bigint;
+      unique_facilities_contacted: bigint;
+    }>>`
+      SELECT 
+        COUNT(CASE WHEN pe."eventType" = 'view' THEN 1 END) as total_views,
+        COUNT(CASE WHEN pe."eventType" IN ('phone_click', 'email_click', 'website_click') THEN 1 END) as total_contacts,
+        COUNT(DISTINCT CASE WHEN pe."eventType" = 'view' THEN pe."placowkaId" END) as unique_facilities_viewed,
+        COUNT(DISTINCT CASE WHEN pe."eventType" IN ('phone_click', 'email_click', 'website_click') THEN pe."placowkaId" END) as unique_facilities_contacted
+      FROM "PlacowkaEvent" pe
+      WHERE pe.timestamp >= ${startDate}
+    `;
+
+    const conversionStats = conversionData[0];
+    const totalViews = Number(conversionStats.total_views);
+    const totalContacts = Number(conversionStats.total_contacts);
+    const conversionRate = totalViews > 0 ? ((totalContacts / totalViews) * 100).toFixed(2) : '0.00';
+
+    // Top facilities by conversion rate (min 1 view to be included)
+    const conversionByFacility = await prisma.$queryRaw<Array<{
+      placowka_id: number;
+      views: bigint;
+      contacts: bigint;
+      conversion_rate: number;
+    }>>`
+      SELECT 
+        pe."placowkaId" as placowka_id,
+        COUNT(CASE WHEN pe."eventType" = 'view' THEN 1 END) as views,
+        COUNT(CASE WHEN pe."eventType" IN ('phone_click', 'email_click', 'website_click') THEN 1 END) as contacts,
+        CASE 
+          WHEN COUNT(CASE WHEN pe."eventType" = 'view' THEN 1 END) > 0 
+          THEN ROUND(
+            CAST(
+              (COUNT(CASE WHEN pe."eventType" IN ('phone_click', 'email_click', 'website_click') THEN 1 END)::float / 
+              COUNT(CASE WHEN pe."eventType" = 'view' THEN 1 END)::float) * 100 
+            AS numeric), 
+            2
+          )
+          ELSE 0
+        END as conversion_rate
+      FROM "PlacowkaEvent" pe
+      WHERE pe.timestamp >= ${startDate}
+      GROUP BY pe."placowkaId"
+      HAVING COUNT(CASE WHEN pe."eventType" = 'view' THEN 1 END) >= 1
+      ORDER BY conversion_rate DESC
+      LIMIT 10
+    `;
+
+    const conversionFacilityIds = conversionByFacility.map(f => Number(f.placowka_id));
+    const conversionFacilities = await prisma.placowka.findMany({
+      where: { id: { in: conversionFacilityIds } },
+      select: { id: true, nazwa: true, miejscowosc: true, typ_placowki: true },
+    });
+
+    const topConversionFacilities = conversionByFacility.map(item => {
+      const facility = conversionFacilities.find(f => f.id === Number(item.placowka_id));
+      return {
+        ...facility,
+        views: Number(item.views),
+        contacts: Number(item.contacts),
+        conversionRate: Number(item.conversion_rate),
+      };
+    });
+
     return NextResponse.json({
       overview: {
         totalEvents,
@@ -188,6 +256,14 @@ export async function GET(request: NextRequest) {
           type: item.eventType,
           count: item._count.eventType,
         })),
+      },
+      conversionFunnel: {
+        totalViews,
+        totalContacts,
+        conversionRate: parseFloat(conversionRate),
+        uniqueFacilitiesViewed: Number(conversionStats.unique_facilities_viewed),
+        uniqueFacilitiesContacted: Number(conversionStats.unique_facilities_contacted),
+        topConversionFacilities,
       },
       topViewed: topViewedWithDetails,
       topContacted: topContactedWithDetails,
