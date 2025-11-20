@@ -248,7 +248,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // 10. GEOGRAPHIC INSIGHTS ⭐ NEW!
+    // 10. GEOGRAPHIC INSIGHTS ⭐
     const geographicData = await prisma.$queryRaw<Array<{
       miejscowosc: string;
       wojewodztwo: string;
@@ -290,6 +290,64 @@ export async function GET(request: NextRequest) {
           : 'low',
     }));
 
+    // 11. TIME PATTERNS ⭐ NEW!
+    // Hour of day distribution with breakdown
+    const hourlyData = await prisma.$queryRaw<Array<{
+      hour: number;
+      total_events: bigint;
+      views: bigint;
+      contacts: bigint;
+    }>>`
+      SELECT 
+        EXTRACT(HOUR FROM timestamp)::integer as hour,
+        COUNT(*) as total_events,
+        COUNT(CASE WHEN "eventType" = 'view' THEN 1 END) as views,
+        COUNT(CASE WHEN "eventType" IN ('phone_click', 'email_click', 'website_click') THEN 1 END) as contacts
+      FROM "PlacowkaEvent"
+      WHERE timestamp >= ${startDate}
+      GROUP BY hour
+      ORDER BY hour
+    `;
+
+    const hourlyStats = hourlyData.map(item => ({
+      hour: Number(item.hour),
+      totalEvents: Number(item.total_events),
+      views: Number(item.views),
+      contacts: Number(item.contacts),
+    }));
+
+    // Day of week distribution with breakdown
+    const dailyData = await prisma.$queryRaw<Array<{
+      day_of_week: number;
+      total_events: bigint;
+      views: bigint;
+      contacts: bigint;
+    }>>`
+      SELECT 
+        EXTRACT(DOW FROM timestamp)::integer as day_of_week,
+        COUNT(*) as total_events,
+        COUNT(CASE WHEN "eventType" = 'view' THEN 1 END) as views,
+        COUNT(CASE WHEN "eventType" IN ('phone_click', 'email_click', 'website_click') THEN 1 END) as contacts
+      FROM "PlacowkaEvent"
+      WHERE timestamp >= ${startDate}
+      GROUP BY day_of_week
+      ORDER BY day_of_week
+    `;
+
+    const dayNames = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+    
+    const dailyStats = dailyData.map(item => ({
+      dayOfWeek: Number(item.day_of_week),
+      dayName: dayNames[Number(item.day_of_week)],
+      totalEvents: Number(item.total_events),
+      views: Number(item.views),
+      contacts: Number(item.contacts),
+    }));
+
+    // Find peak hours (top 3)
+    const sortedByActivity = [...hourlyStats].sort((a, b) => b.totalEvents - a.totalEvents);
+    const peakHours = sortedByActivity.slice(0, 3);
+
     return NextResponse.json({
       overview: {
         totalEvents,
@@ -311,6 +369,15 @@ export async function GET(request: NextRequest) {
         byCity: geographicStats,
         topCities: geographicStats.slice(0, 10),
         highDemandCities: geographicStats.filter(city => city.demandLevel === 'high'),
+      },
+      timePatterns: {
+        hourly: hourlyStats,
+        daily: dailyStats,
+        peakHours: peakHours.map(h => ({
+          hour: h.hour,
+          totalEvents: h.totalEvents,
+          label: `${h.hour}:00 - ${h.hour}:59`
+        })),
       },
       topViewed: topViewedWithDetails,
       topContacted: topContactedWithDetails,

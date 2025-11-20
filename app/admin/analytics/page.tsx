@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import ConversionFunnel from './_components/ConversionFunnel';
 import GeographicInsights from './_components/GeographicInsights';
+import TimePatterns from './_components/TimePatterns';
 
 interface AnalyticsData {
   overview: {
@@ -67,6 +68,26 @@ interface AnalyticsData {
       facilitiesCount: number;
       viewsPerFacility: number;
       demandLevel: 'high' | 'medium' | 'low';
+    }>;
+  };
+  timePatterns: {
+    hourly: Array<{
+      hour: number;
+      totalEvents: number;
+      views: number;
+      contacts: number;
+    }>;
+    daily: Array<{
+      dayOfWeek: number;
+      dayName: string;
+      totalEvents: number;
+      views: number;
+      contacts: number;
+    }>;
+    peakHours: Array<{
+      hour: number;
+      totalEvents: number;
+      label: string;
     }>;
   };
   topViewed: Array<{
@@ -257,9 +278,14 @@ export default function AnalyticsDashboardPage() {
         <ConversionFunnel data={data.conversionFunnel} />
       )}
 
-      {/* 🗺️ GEOGRAPHIC INSIGHTS - NEW! */}
+      {/* 🗺️ GEOGRAPHIC INSIGHTS */}
       {data.geographicInsights && (
         <GeographicInsights data={data.geographicInsights} />
+      )}
+
+      {/* ⏰ TIME PATTERNS - NEW! */}
+      {data.timePatterns && (
+        <TimePatterns data={data.timePatterns} />
       )}
 
       {/* Daily Activity Chart - Enhanced */}
