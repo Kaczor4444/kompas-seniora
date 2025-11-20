@@ -96,17 +96,17 @@ export default function ListaPlacowekPage() {
   const [deleteModal, setDeleteModal] = useState<Placowka | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 🆕 SEARCH & FILTERS STATE
+  // SEARCH & FILTERS STATE
   const [search, setSearch] = useState('');
   const [typFilter, setTypFilter] = useState('');
   const [wojewodztwoFilter, setWojewodztwoFilter] = useState('');
   const [verifiedFilter, setVerifiedFilter] = useState('');
   const [geoFilter, setGeoFilter] = useState(false);
 
-  // 🆕 Get unique wojewodztwa for dropdown
+  // Get unique wojewodztwa for dropdown
   const [wojewodztwa, setWojewodztwa] = useState<string[]>([]);
 
-  // 🆕 Fetch wojewodztwa once on mount
+  // Fetch wojewodztwa once on mount
   useEffect(() => {
     fetchWojewodztwa();
   }, []);
@@ -133,7 +133,7 @@ export default function ListaPlacowekPage() {
   const fetchPlacowki = async () => {
     setLoading(true);
     try {
-      // 🆕 Build query params with filters
+      // Build query params with filters
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -183,7 +183,7 @@ export default function ListaPlacowekPage() {
     }
   };
 
-  // 🆕 Clear all filters
+  // Clear all filters
   const clearFilters = () => {
     setSearch('');
     setTypFilter('');
@@ -193,17 +193,17 @@ export default function ListaPlacowekPage() {
     setPage(1);
   };
 
-  // 🆕 Count active filters
+  // Count active filters
   const activeFiltersCount = [search, typFilter, wojewodztwoFilter, verifiedFilter, geoFilter].filter(Boolean).length;
 
-  // 🆕 Apply geo filter client-side (since it's not in backend yet)
+  // Apply geo filter client-side
   const filteredPlacowki = geoFilter 
     ? placowki.filter(p => p.latitude && p.longitude)
     : placowki;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Header */}
+      {/* Header with Export Buttons */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Lista placówek</h1>
@@ -211,16 +211,32 @@ export default function ListaPlacowekPage() {
             {pagination && `${geoFilter ? filteredPlacowki.length : pagination.total} placówek ${activeFiltersCount > 0 ? `(filtrowane)` : 'w bazie'}`}
           </p>
         </div>
-        <Link
-          href="/admin/placowki/dodaj"
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-        >
-          <Plus className="h-5 w-5" />
-          Dodaj placówkę
-        </Link>
+        <div className="flex gap-3">
+          <a
+            href="/api/admin/export/csv?mode=data"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            title="Eksportuj wszystkie dane do CSV"
+          >
+            📥 Eksport CSV
+          </a>
+          <a
+            href="/api/admin/export/csv?mode=template"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            title="Pobierz pusty template CSV"
+          >
+            📄 Template CSV
+          </a>
+          <Link
+            href="/admin/placowki/dodaj"
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          >
+            <Plus className="h-5 w-5" />
+            Dodaj placówkę
+          </Link>
+        </div>
       </div>
 
-      {/* 🆕 SEARCH & FILTERS */}
+      {/* SEARCH & FILTERS */}
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
@@ -235,7 +251,7 @@ export default function ListaPlacowekPage() {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  setPage(1); // Reset to first page on search
+                  setPage(1);
                 }}
                 placeholder="Nazwa lub miejscowość..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
