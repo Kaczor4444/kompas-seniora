@@ -26,7 +26,6 @@ export default function ConversionFunnel({ data }: ConversionFunnelProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center gap-3">
         <div className="p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl border border-indigo-200">
           <TrendingUp className="w-6 h-6 text-indigo-600" />
@@ -38,12 +37,10 @@ export default function ConversionFunnel({ data }: ConversionFunnelProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Funnel Visualization */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
           <h3 className="text-lg font-semibold mb-6 text-gray-800">Wizualizacja Lejka</h3>
           
           <div className="space-y-4">
-            {/* Step 1: Views */}
             <div className="relative">
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-20 rounded-lg flex items-center justify-between px-6 text-white shadow-md hover:shadow-xl transition-shadow">
                 <div className="flex items-center gap-3">
@@ -57,7 +54,6 @@ export default function ConversionFunnel({ data }: ConversionFunnelProps) {
               </div>
             </div>
 
-            {/* Arrow */}
             <div className="flex justify-center py-2">
               <div className="flex flex-col items-center">
                 <div className="w-0.5 h-8 bg-gradient-to-b from-blue-400 to-green-400"></div>
@@ -65,7 +61,6 @@ export default function ConversionFunnel({ data }: ConversionFunnelProps) {
               </div>
             </div>
 
-            {/* Step 2: Contacts */}
             <div className="relative">
               <div 
                 className="bg-gradient-to-r from-green-500 to-green-600 h-20 rounded-lg flex items-center justify-between px-6 text-white shadow-md hover:shadow-xl transition-all duration-300"
@@ -86,7 +81,6 @@ export default function ConversionFunnel({ data }: ConversionFunnelProps) {
             </div>
           </div>
 
-          {/* Summary Card */}
           <div className="mt-8 p-5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -109,7 +103,6 @@ export default function ConversionFunnel({ data }: ConversionFunnelProps) {
           </div>
         </div>
 
-        {/* Top Converting Facilities */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
           <h3 className="text-lg font-semibold mb-6 text-gray-800 flex items-center gap-2">
             <Award className="w-5 h-5 text-yellow-500" />

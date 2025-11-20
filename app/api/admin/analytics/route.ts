@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
       contacts: Number(item.contacts),
     }));
 
-    // 9. CONVERSION FUNNEL DATA ⭐ NEW!
+    // 9. CONVERSION FUNNEL DATA ⭐
     const conversionData = await prisma.$queryRaw<Array<{
       total_views: bigint;
       total_contacts: bigint;
@@ -248,6 +248,48 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    // 10. GEOGRAPHIC INSIGHTS ⭐ NEW!
+    const geographicData = await prisma.$queryRaw<Array<{
+      miejscowosc: string;
+      wojewodztwo: string;
+      total_events: bigint;
+      views: bigint;
+      contacts: bigint;
+      facilities_count: bigint;
+    }>>`
+      SELECT 
+        p.miejscowosc,
+        p.wojewodztwo,
+        COUNT(pe.id) as total_events,
+        COUNT(CASE WHEN pe."eventType" = 'view' THEN 1 END) as views,
+        COUNT(CASE WHEN pe."eventType" IN ('phone_click', 'email_click', 'website_click') THEN 1 END) as contacts,
+        COUNT(DISTINCT p.id) as facilities_count
+      FROM "Placowka" p
+      LEFT JOIN "PlacowkaEvent" pe ON p.id = pe."placowkaId" 
+        AND pe.timestamp >= ${startDate}
+      GROUP BY p.miejscowosc, p.wojewodztwo
+      HAVING COUNT(pe.id) > 0
+      ORDER BY views DESC
+      LIMIT 20
+    `;
+
+    const geographicStats = geographicData.map(item => ({
+      city: item.miejscowosc,
+      wojewodztwo: item.wojewodztwo,
+      totalEvents: Number(item.total_events),
+      views: Number(item.views),
+      contacts: Number(item.contacts),
+      facilitiesCount: Number(item.facilities_count),
+      viewsPerFacility: Number(item.facilities_count) > 0 
+        ? Number((Number(item.views) / Number(item.facilities_count)).toFixed(2))
+        : 0,
+      demandLevel: Number(item.views) / Number(item.facilities_count) > 10 
+        ? 'high' 
+        : Number(item.views) / Number(item.facilities_count) > 5 
+          ? 'medium' 
+          : 'low',
+    }));
+
     return NextResponse.json({
       overview: {
         totalEvents,
@@ -264,6 +306,11 @@ export async function GET(request: NextRequest) {
         uniqueFacilitiesViewed: Number(conversionStats.unique_facilities_viewed),
         uniqueFacilitiesContacted: Number(conversionStats.unique_facilities_contacted),
         topConversionFacilities,
+      },
+      geographicInsights: {
+        byCity: geographicStats,
+        topCities: geographicStats.slice(0, 10),
+        highDemandCities: geographicStats.filter(city => city.demandLevel === 'high'),
       },
       topViewed: topViewedWithDetails,
       topContacted: topContactedWithDetails,

@@ -13,6 +13,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import ConversionFunnel from './_components/ConversionFunnel';
+import GeographicInsights from './_components/GeographicInsights';
 
 interface AnalyticsData {
   overview: {
@@ -34,6 +35,38 @@ interface AnalyticsData {
       views: number;
       contacts: number;
       conversionRate: number;
+    }>;
+  };
+  geographicInsights: {
+    byCity: Array<{
+      city: string;
+      wojewodztwo: string;
+      totalEvents: number;
+      views: number;
+      contacts: number;
+      facilitiesCount: number;
+      viewsPerFacility: number;
+      demandLevel: 'high' | 'medium' | 'low';
+    }>;
+    topCities: Array<{
+      city: string;
+      wojewodztwo: string;
+      totalEvents: number;
+      views: number;
+      contacts: number;
+      facilitiesCount: number;
+      viewsPerFacility: number;
+      demandLevel: 'high' | 'medium' | 'low';
+    }>;
+    highDemandCities: Array<{
+      city: string;
+      wojewodztwo: string;
+      totalEvents: number;
+      views: number;
+      contacts: number;
+      facilitiesCount: number;
+      viewsPerFacility: number;
+      demandLevel: 'high' | 'medium' | 'low';
     }>;
   };
   topViewed: Array<{
@@ -219,9 +252,14 @@ export default function AnalyticsDashboardPage() {
         </div>
       </div>
 
-      {/* 🌟 CONVERSION FUNNEL - NEW! */}
+      {/* 🌟 CONVERSION FUNNEL */}
       {data.conversionFunnel && (
         <ConversionFunnel data={data.conversionFunnel} />
+      )}
+
+      {/* 🗺️ GEOGRAPHIC INSIGHTS - NEW! */}
+      {data.geographicInsights && (
+        <GeographicInsights data={data.geographicInsights} />
       )}
 
       {/* Daily Activity Chart - Enhanced */}
