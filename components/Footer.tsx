@@ -4,7 +4,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white mt-20">
+    <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -18,7 +18,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Serwis - ROZSZERZONE! */}
+          {/* Serwis - POPRAWIONE LINKI! */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-emerald-400">
               Serwis
@@ -30,12 +30,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/favorites" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/ulubione" className="text-gray-300 hover:text-emerald-400 transition-colors">
                   Ulubione
                 </Link>
               </li>
               <li>
-                <Link href="/calculator" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/kalkulator" className="text-gray-300 hover:text-emerald-400 transition-colors">
                   Kalkulator
                 </Link>
               </li>
