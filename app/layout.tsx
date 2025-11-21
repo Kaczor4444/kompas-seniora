@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import "./leaflet-overrides.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CookieBanner from "@/components/CookieBanner";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -41,6 +42,7 @@ export default function RootLayout({
         <Toaster position="top-center" />
         {children}
         <Footer />
+        <CookieBanner />
       </body>
     </html>
   );
