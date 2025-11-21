@@ -20,14 +20,21 @@ export default function PolitykaPrywatnosciPage() {
           </p>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Postanowienia ogólne</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Postanowienia ogólne i Administrator</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Niniejsza Polityka Prywatności określa zasady przetwarzania i ochrony danych osobowych 
               użytkowników serwisu <strong>kompaseniora.pl</strong> (zwanego dalej „Serwisem").
             </p>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              Administratorem danych osobowych jest właściciel serwisu kompaseniora.pl.
-            </p>
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+              <p className="text-gray-700 leading-relaxed mb-2">
+                <strong>Administratorem danych osobowych jest:</strong>
+              </p>
+              <p className="text-gray-700">
+                <strong>[NAZWA FIRMY UK - np. Senior Compass Ltd.]</strong><br />
+                Company Number: <strong>[NUMER REJESTRACYJNY]</strong><br />
+                Adres siedziby: <strong>[ADRES UK - np. 123 Business Street, London, E1 6AN, United Kingdom]</strong>
+              </p>
+            </div>
             <p className="text-gray-700 leading-relaxed">
               Ochrona danych odbywa się zgodnie z wymogami powszechnie obowiązujących przepisów prawa, 
               w tym Rozporządzenia Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. 
@@ -37,7 +44,30 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Rodzaje przetwarzanych danych</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Przedstawiciel RODO w Unii Europejskiej</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Zgodnie z art. 27 RODO, Administrator wyznaczył przedstawiciela w Polsce, 
+              z którym można kontaktować się we wszystkich sprawach związanych z przetwarzaniem 
+              danych osobowych i korzystaniem z praw:
+            </p>
+            <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4">
+              <p className="text-gray-700 mb-1">
+                <strong>Przedstawiciel:</strong> [NAZWA FIRMY UK - np. Senior Compass Ltd.]
+              </p>
+              <p className="text-gray-700 mb-1">
+                <strong>Adres w Polsce:</strong> [ADRES WIRTUALNY - np. ul. Marszałkowska 10/5, 00-001 Warszawa]
+              </p>
+              <p className="text-gray-700 mb-1">
+                <strong>Email:</strong> <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-600 hover:text-emerald-700 underline">kontakt@kompaseniora.pl</a>
+              </p>
+              <p className="text-gray-700">
+                <strong>Języki komunikacji:</strong> polski, angielski
+              </p>
+            </div>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Rodzaje przetwarzanych danych</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Serwis przetwarza następujące kategorie danych:
             </p>
@@ -55,7 +85,7 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Cel i podstawa prawna przetwarzania</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Cel i podstawa prawna przetwarzania</h2>
             <div className="space-y-4 text-gray-700">
               <div className="border-l-4 border-emerald-500 pl-4">
                 <h3 className="font-semibold mb-2">Świadczenie usług Serwisu</h3>
@@ -63,7 +93,7 @@ export default function PolitykaPrywatnosciPage() {
               </div>
               <div className="border-l-4 border-blue-500 pl-4">
                 <h3 className="font-semibold mb-2">Analiza statystyczna i poprawa Serwisu</h3>
-                <p>Podstawa prawna: Art. 6 ust. 1 lit. f) RODO (prawnie uzasadniony interes administratora)</p>
+                <p>Podstawa prawna: Art. 6 ust. 1 lit. f) RODO (prawnie uzasadniony interes administratora - optymalizacja Serwisu, zwiększenie użyteczności, badanie efektywności działania)</p>
               </div>
               <div className="border-l-4 border-purple-500 pl-4">
                 <h3 className="font-semibold mb-2">Marketing i komunikacja</h3>
@@ -78,7 +108,7 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Udostępnianie danych</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Udostępnianie danych i przechowywanie</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Dane mogą być udostępniane następującym kategoriom odbiorców:
             </p>
@@ -92,10 +122,17 @@ export default function PolitykaPrywatnosciPage() {
               <strong>Nie sprzedajemy</strong> ani nie udostępniamy danych osobowych firmom trzecim 
               w celach marketingowych.
             </p>
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
+              <p className="text-gray-700 leading-relaxed">
+                <strong>Lokalizacja serwerów:</strong> Dane są przechowywane i przetwarzane na serwerach 
+                zlokalizowanych w Unii Europejskiej / Europejskim Obszarze Gospodarczym, 
+                co gwarantuje pełną zgodność z RODO.
+              </p>
+            </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Okres przechowywania danych</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Okres przechowywania danych</h2>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
               <li><strong>Dane analityczne</strong>: przez czas niezbędny do realizacji celów analitycznych (maksymalnie 24 miesiące)</li>
               <li><strong>Dane lokalizacyjne</strong>: wykorzystywane wyłącznie w danej sesji, nie są przechowywane na serwerze</li>
@@ -105,7 +142,7 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Prawa użytkownika</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Prawa użytkownika</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Przysługują Ci następujące prawa związane z przetwarzaniem danych osobowych:
             </p>
@@ -132,7 +169,7 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Profilowanie</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Profilowanie</h2>
             <p className="text-gray-700 leading-relaxed">
               <strong>Ważne:</strong> Serwis <strong>nie profiluje</strong> użytkowników w sposób zautomatyzowany 
               ani nie podejmuje decyzji wpływających na Twoje prawa wyłącznie na podstawie automatycznego 
@@ -141,7 +178,7 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Pliki cookies</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Pliki cookies</h2>
             <p className="text-gray-700 leading-relaxed">
               Szczegółowe informacje na temat wykorzystywania plików cookies znajdują się w 
               {' '}<a href="/polityka-cookies" className="text-emerald-600 hover:text-emerald-700 underline">
@@ -151,7 +188,7 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Źródła danych o placówkach</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Źródła danych o placówkach</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Informacje o placówkach opieki prezentowane w Serwisie pochodzą z oficjalnych źródeł publicznych 
               (MOPS, strony BIP, strony internetowe placówek).
@@ -165,7 +202,7 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Zmiany w Polityce Prywatności</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Zmiany w Polityce Prywatności</h2>
             <p className="text-gray-700 leading-relaxed">
               Administrator zastrzega sobie prawo do wprowadzania zmian w niniejszej Polityce Prywatności. 
               O wszelkich zmianach użytkownicy zostaną poinformowani poprzez komunikat w Serwisie.
@@ -173,10 +210,10 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Punkt kontaktowy</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Punkt kontaktowy (DSA)</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Zgodnie z Rozporządzeniem o Usługach Cyfrowych (DSA), wyznaczamy punkt kontaktowy 
-              dla użytkowników, organów państwowych i Komisji Europejskiej:
+              Zgodnie z Rozporządzeniem o Usługach Cyfrowych (DSA), punkt kontaktowy dla użytkowników, 
+              organów państwowych i Komisji Europejskiej:
             </p>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
               <li>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-600 hover:text-emerald-700 underline">kontakt@kompaseniora.pl</a></li>
@@ -186,7 +223,7 @@ export default function PolitykaPrywatnosciPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Zgłaszanie nieprawidłowości</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Zgłaszanie nieprawidłowości</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Jeśli zauważysz nieprawidłowe, nieaktualne lub niezgodne z prawem informacje w Serwisie, 
               prosimy o kontakt:
