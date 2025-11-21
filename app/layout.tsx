@@ -4,6 +4,7 @@ import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import "./leaflet-overrides.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -27,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pl">
       <head>
         <link rel="preconnect" href="https://unpkg.com" />
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
@@ -39,6 +40,7 @@ export default function RootLayout({
         <Navbar />
         <Toaster position="top-center" />
         {children}
+        <Footer />
       </body>
     </html>
   );
