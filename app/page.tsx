@@ -2,6 +2,7 @@
 
 import Link from 'next/link'; 
 import MiniFAQSection from '../src/components/faq/MiniFAQSection';
+import NewsletterSection from '../src/components/newsletter/NewsletterSection';
 import KnowledgeCenter from '../src/components/knowledge/KnowledgeCenter';
 import HeroSection from '../src/components/hero/HeroSection';
 
@@ -42,7 +43,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ✅ IMPROVED Features Section - SVG icons, better copy, CTA buttons */}
+      {/* Features Section */}
       <section className="py-12 md:py-16 bg-neutral-50">
         <div className="max-w-6xl mx-auto">
           <div className="md:px-4">
@@ -104,7 +105,6 @@ export default function Home() {
                 <p className="text-neutral-700 text-center mb-6">Oblicz miesięczne koszty pobytu z uwzględnieniem dofinansowania</p>
                 <Link href="/kalkulator" 
                   className="flex items-center justify-center gap-2 text-accent-600 hover:text-accent-700 font-semibold text-sm group-hover:gap-3 transition-all w-full"
-                  
                 >
                   Oblicz koszty
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,6 @@ export default function Home() {
                   <p className="text-sm text-neutral-700 text-center mb-4">Oblicz budżet opieki dla bliskiej osoby</p>
                   <Link href="/kalkulator" 
                     className="flex items-center justify-center gap-2 text-accent-600 font-semibold text-sm w-full"
-                    
                   >
                     Oblicz
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,19 +186,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Knowledge Center */}
       <KnowledgeCenter />
 
+      {/* CTA Section */}
       <section className="py-16 bg-neutral-50">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">Rozpocznij poszukiwania już dziś</h2>
           <p className="text-xl text-neutral-700 mb-8">Pomożemy Ci znaleźć najlepszą opiekę dla Twojego bliskiego</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/search" className="bg-accent-500 hover:bg-accent-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-sm hover:shadow-md">
+            <Link href="/search" className="bg-accent-500 hover:bg-accent-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-sm hover:shadow-md">
               Znajdź dom opieki
-            </a>
-            <button className="bg-white hover:bg-neutral-50 text-neutral-900 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-neutral-300 transition-colors">
+            </Link>
+            <Link href="/kalkulator" className="bg-white hover:bg-neutral-50 text-neutral-900 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-neutral-300 transition-colors">
               Użyj kalkulatora
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -217,99 +218,86 @@ export default function Home() {
           <div className="bg-white rounded-xl border border-neutral-200 p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-4">
-                <a href="/search?q=krakow" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <Link href="/search?q=krakow" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Kraków</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-                <a href="/search?q=limanowa" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                </Link>
+                <Link href="/search?q=limanowa" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Limanowa</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-                <a href="/search?q=nowy+targ" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                </Link>
+                <Link href="/search?q=nowy+targ" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Nowy Targ</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
+                </Link>
               </div>
               
               <div className="space-y-4">
-                <a href="/search?q=nowy+sacz" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <Link href="/search?q=nowy+sacz" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Nowy Sącz</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-                <a href="/search?q=wadowice" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                </Link>
+                <Link href="/search?q=wadowice" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Wadowice</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-                <a href="/search?q=oswiecim" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                </Link>
+                <Link href="/search?q=oswiecim" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Oświęcim</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
+                </Link>
               </div>
               
               <div className="space-y-4">
-                <a href="/search?q=tarnow" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                <Link href="/search?q=tarnow" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Tarnów</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-                <a href="/search?q=zakopane" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                </Link>
+                <Link href="/search?q=zakopane" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Zakopane</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-                <a href="/search?q=myslenice" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
+                </Link>
+                <Link href="/search?q=myslenice" className="flex items-center justify-between p-4 hover:bg-neutral-50 rounded-lg transition-colors group">
                   <span className="text-neutral-900 font-medium">DPS Myślenice</span>
                   <svg className="w-5 h-5 text-neutral-400 group-hover:text-accent-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
+                </Link>
               </div>
             </div>
             
             <div className="mt-8 text-center">
-              <a href="/search" className="inline-flex items-center gap-2 bg-accent-100 hover:bg-accent-200 text-accent-700 px-6 py-3 rounded-lg font-medium transition-colors">
+              <Link href="/search" className="inline-flex items-center gap-2 bg-accent-100 hover:bg-accent-200 text-accent-700 px-6 py-3 rounded-lg font-medium transition-colors">
                 Zobacz wszystkie lokalizacje
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Mini FAQ */}
       <MiniFAQSection />
 
-      {/* Newsletter */}
-      <section className="py-16 bg-gradient-to-br from-accent-500 to-accent-600">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Bądź na bieżąco z kompaseniora.pl</h2>
-            <p className="text-lg text-accent-50 max-w-2xl mx-auto">Otrzymuj aktualizacje o nowych domach opieki, zmianach cen oraz wsparcie dla całej rodziny w opiece nad bliskimi.</p>
-          </div>
-          <form className="max-w-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input type="email" placeholder="Twój adres email" className="flex-1 px-6 py-4 rounded-lg text-lg text-neutral-900 placeholder:text-white border-2 border-white bg-white/10 backdrop-blur-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-white" />
-              <button type="submit" className="bg-neutral-900 hover:bg-neutral-800 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors whitespace-nowrap">Zapisz się</button>
-            </div>
-            <p className="text-sm text-accent-50 mt-4 text-center">Nie dzielimy się danymi z nikim. Wypisz się kiedy chcesz.</p>
-          </form>
-        </div>
-      </section>
+      {/* Newsletter - Dark Theme */}
+      <NewsletterSection />
     </div>
   );
 }
