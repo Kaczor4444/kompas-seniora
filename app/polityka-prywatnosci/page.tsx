@@ -72,16 +72,83 @@ export default function PolitykaPrywatnosciPage() {
               Serwis przetwarza następujące kategorie danych:
             </p>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
-              <li><strong>Dane analityczne</strong>: informacje o aktywności w Serwisie (odsłony placówek, kliknięcia w kontakty)</li>
-              <li><strong>Dane techniczne</strong>: adres IP, typ przeglądarki, system operacyjny, czas wizyty</li>
+              <li><strong>Dane analityczne</strong>: informacje o aktywności w Serwisie (szczegóły poniżej)</li>
+              <li><strong>Dane techniczne</strong>: typ przeglądarki, system operacyjny, czas wizyty</li>
+              <li><strong>Dane bezpieczeństwa</strong>: adres IP (tylko w logach bezpieczeństwa panelu administracyjnego)</li>
               <li><strong>Dane lokalizacyjne</strong> (opcjonalnie): współrzędne geograficzne pobierane z przeglądarki wyłącznie gdy użytkownik aktywuje funkcję wyszukiwania w pobliżu. Dane wykorzystywane są jedynie w danej sesji i nie są przechowywane</li>
               <li><strong>Pliki cookies</strong>: szczegóły w Polityce Cookies</li>
             </ul>
             <p className="text-gray-700 leading-relaxed mt-4">
               <strong>Ważne:</strong> Serwis nie wymaga rejestracji ani logowania użytkowników. 
               Nie zbieramy danych osobowych takich jak imię, nazwisko, email czy numer telefonu 
-              (z wyjątkiem dobrowolnego kontaktu przez formularz).
+              (z wyjątkiem dobrowolnego kontaktu przez formularz lub newsletter).
             </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">3.1. Analityka strony - szczegóły</h2>
+            
+            <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Własna analityka (anonimowa, zawsze aktywna)</h3>
+              <p className="text-gray-700 leading-relaxed mb-3">
+                Zbieramy podstawowe, anonimowe statystyki o korzystaniu z Serwisu, aby poprawić jego działanie:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2 mb-3">
+                <li>Liczba odsłon placówek</li>
+                <li>Częstotliwość korzystania z funkcji kontaktu</li>
+                <li>Popularne wyszukiwania i filtry</li>
+                <li>Ogólne informacje techniczne (rodzaj urządzenia, przeglądarka)</li>
+              </ul>
+              <p className="text-gray-700 leading-relaxed mb-3">
+                <strong>Dane są całkowicie anonimowe</strong> - nie identyfikujemy użytkowników, 
+                nie łączymy wizyt z konkretnymi osobami, nie śledzimy aktywności poza naszą stroną.
+              </p>
+              <div className="border-t border-emerald-200 pt-3 mt-3">
+                <p className="text-sm text-gray-600">
+                  <strong>Podstawa prawna:</strong> Art. 6 ust. 1 lit. f) RODO (uzasadniony interes administratora)<br />
+                  <strong>Cel:</strong> Poprawa jakości serwisu, zrozumienie potrzeb użytkowników, optymalizacja funkcji<br />
+                  <strong>Okres przechowywania:</strong> maksymalnie 24 miesiące
+                </p>
+              </div>
+              <p className="text-sm text-gray-600 mt-3">
+                <strong>Jak zablokować analitykę?</strong> Jeśli wolisz, aby Twoja aktywność nie była śledzona, 
+                możesz użyć trybu prywatnego w przeglądarce lub zainstalować dodatki blokujące śledzenie.
+              </p>
+            </div>
+
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Google Analytics (opcjonalne, wymaga zgody)</h3>
+              <p className="text-gray-700 leading-relaxed mb-3">
+                Jeśli <strong>zaakceptujesz cookies analityczne</strong> w bannerze, dodatkowo używamy Google Analytics 
+                do bardziej szczegółowych statystyk:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2 mb-3">
+                <li>Źródła ruchu (skąd przyszli użytkownicy)</li>
+                <li>Słowa kluczowe w wyszukiwarkach</li>
+                <li>Analiza zachowań na stronie</li>
+                <li>Ogólne dane demograficzne (jeśli dostępne)</li>
+              </ul>
+              <p className="text-gray-700 leading-relaxed mb-3">
+                <strong>Informacje techniczne:</strong>
+              </p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2 mb-3">
+                <li>Google może ustawiać cookies na Twoim urządzeniu</li>
+                <li>Anonimizacja IP jest <strong>włączona</strong></li>
+                <li>Dane są przekazywane do Google LLC z odpowiednimi zabezpieczeniami RODO</li>
+                <li>Cookies są blokowane do momentu wyrażenia zgody</li>
+              </ul>
+              <div className="border-t border-blue-200 pt-3 mt-3">
+                <p className="text-sm text-gray-600">
+                  <strong>Podstawa prawna:</strong> Art. 6 ust. 1 lit. a) RODO (zgoda użytkownika)<br />
+                  <strong>Zarządzanie zgodą:</strong> Banner cookies + przycisk "Ustawienia cookies" w stopce<br />
+                  <strong>Cofnięcie zgody:</strong> Możesz zmienić ustawienia w każdej chwili
+                </p>
+              </div>
+              <p className="text-sm text-gray-600 mt-3">
+                <strong>Odmowa:</strong> Jeśli odrzucisz cookies analityczne, Google Analytics nie będzie działać. 
+                Nadal będziemy zbierać podstawowe anonimowe statystyki (własna analityka powyżej).
+              </p>
+            </div>
           </section>
 
           <section className="mb-8">
@@ -96,7 +163,7 @@ export default function PolitykaPrywatnosciPage() {
                 <p>Podstawa prawna: Art. 6 ust. 1 lit. f) RODO (prawnie uzasadniony interes administratora - optymalizacja Serwisu, zwiększenie użyteczności, badanie efektywności działania)</p>
               </div>
               <div className="border-l-4 border-purple-500 pl-4">
-                <h3 className="font-semibold mb-2">Marketing i komunikacja</h3>
+                <h3 className="font-semibold mb-2">Marketing i komunikacja (newsletter)</h3>
                 <p>Podstawa prawna: Art. 6 ust. 1 lit. a) RODO (zgoda użytkownika)</p>
               </div>
               <div className="border-l-4 border-orange-500 pl-4">
@@ -114,8 +181,8 @@ export default function PolitykaPrywatnosciPage() {
             </p>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
               <li>Dostawcom usług hostingowych i baz danych</li>
-              <li>Dostawcom usług geolokalizacji</li>
-              <li>Narzędziom analitycznym (jeśli zostaną wdrożone w przyszłości)</li>
+              <li>Dostawcom usług geolokalizacji (OpenStreetMap)</li>
+              <li>Google Analytics (jeśli zaakceptujesz cookies analityczne)</li>
               <li>Organom państwowym na podstawie przepisów prawa</li>
             </ul>
             <p className="text-gray-700 leading-relaxed mt-4">
@@ -124,9 +191,11 @@ export default function PolitykaPrywatnosciPage() {
             </p>
             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
               <p className="text-gray-700 leading-relaxed">
-                <strong>Lokalizacja serwerów:</strong> Dane są przechowywane i przetwarzane na serwerach 
-                zlokalizowanych w Unii Europejskiej / Europejskim Obszarze Gospodarczym, 
-                co gwarantuje pełną zgodność z RODO.
+                <strong>Lokalizacja i bezpieczeństwo danych:</strong> Korzystamy z profesjonalnych 
+                dostawców usług chmurowych i email zgodnych z RODO/GDPR. Wszyscy dostawcy posiadają 
+                odpowiednie zabezpieczenia techniczne i organizacyjne oraz certyfikaty zgodności 
+                z przepisami ochrony danych osobowych. Dane są przetwarzane w sposób zapewniający 
+                zgodność z wymogami europejskimi.
               </p>
             </div>
           </section>
@@ -134,38 +203,53 @@ export default function PolitykaPrywatnosciPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Okres przechowywania danych</h2>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
-              <li><strong>Dane analityczne</strong>: przez czas niezbędny do realizacji celów analitycznych (maksymalnie 24 miesiące)</li>
+              <li><strong>Dane analityczne własne</strong>: 24 miesiące od zebrania</li>
+              <li><strong>Google Analytics</strong>: zgodnie z polityką Google (możesz zarządzać w ustawieniach cookies)</li>
               <li><strong>Dane lokalizacyjne</strong>: wykorzystywane wyłącznie w danej sesji, nie są przechowywane na serwerze</li>
+              <li><strong>Logi bezpieczeństwa</strong>: 12 miesięcy (dotyczą wyłącznie panelu administracyjnego - logowanie, próby nieautoryzowanego dostępu)</li>
               <li><strong>Pliki cookies</strong>: zgodnie z Polityką Cookies (maksymalnie 12 miesięcy)</li>
-              <li><strong>Logi systemowe</strong>: przez okres wymagany przepisami prawa (maksymalnie 12 miesięcy)</li>
             </ul>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Prawa użytkownika</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Twoje prawa</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Przysługują Ci następujące prawa związane z przetwarzaniem danych osobowych:
+              Zgodnie z RODO, przysługują Ci następujące prawa:
             </p>
-            <ul className="list-disc pl-6 text-gray-700 space-y-2">
-              <li><strong>Prawo dostępu</strong> do swoich danych (art. 15 RODO)</li>
-              <li><strong>Prawo do sprostowania</strong> danych (art. 16 RODO)</li>
-              <li><strong>Prawo do usunięcia</strong> danych („prawo do bycia zapomnianym", art. 17 RODO)</li>
-              <li><strong>Prawo do ograniczenia przetwarzania</strong> (art. 18 RODO)</li>
-              <li><strong>Prawo do przenoszenia danych</strong> (art. 20 RODO)</li>
-              <li><strong>Prawo sprzeciwu</strong> wobec przetwarzania (art. 21 RODO)</li>
-              <li><strong>Prawo do cofnięcia zgody</strong> w dowolnym momencie (jeśli przetwarzanie opiera się na zgodzie)</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-4">
-              Aby skorzystać z powyższych praw, skontaktuj się z nami:
+            <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4 mb-4">
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-600 font-bold">•</span>
+                  <span><strong>Prawo dostępu</strong> - możesz zapytać, jakie dane o Tobie przetwarzamy</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-600 font-bold">•</span>
+                  <span><strong>Prawo do poprawiania</strong> - możesz poprosić o zmianę nieprawidłowych danych</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-600 font-bold">•</span>
+                  <span><strong>Prawo do usunięcia</strong> - możesz poprosić o usunięcie swoich danych (np. email z newslettera)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-600 font-bold">•</span>
+                  <span><strong>Prawo do cofnięcia zgody</strong> - możesz w każdej chwili zmienić zdanie (np. wypisać się z newslettera)</span>
+                </li>
+              </ul>
+            </div>
+            <p className="text-gray-700 leading-relaxed mb-3">
+              <strong>Jak skorzystać z praw?</strong>
             </p>
-            <ul className="list-disc pl-6 text-gray-700 space-y-2 mt-2">
+            <ul className="list-disc pl-6 text-gray-700 space-y-2 mb-4">
               <li>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-600 hover:text-emerald-700 underline">kontakt@kompaseniora.pl</a></li>
               <li><a href="/kontakt" className="text-emerald-600 hover:text-emerald-700 underline">Formularz kontaktowy</a></li>
             </ul>
-            <p className="text-gray-700 leading-relaxed mt-4">
-              <strong>Prawo do skargi:</strong> Masz prawo wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych 
-              (PUODO), jeśli uważasz, że przetwarzanie Twoich danych narusza przepisy RODO.
-            </p>
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+              <p className="text-gray-700 leading-relaxed">
+                <strong>Prawo do skargi:</strong> Jeśli uważasz, że nieprawidłowo przetwarzamy Twoje dane, 
+                możesz złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych (PUODO): 
+                <a href="https://uodo.gov.pl" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700 underline">uodo.gov.pl</a>
+              </p>
+            </div>
           </section>
 
           <section className="mb-8">
@@ -183,7 +267,8 @@ export default function PolitykaPrywatnosciPage() {
               Szczegółowe informacje na temat wykorzystywania plików cookies znajdują się w 
               {' '}<a href="/polityka-cookies" className="text-emerald-600 hover:text-emerald-700 underline">
                 Polityce Cookies
-              </a>.
+              </a>. Możesz zarządzać ustawieniami cookies klikając przycisk 
+              {' '}<strong>"Ustawienia cookies"</strong> w stopce strony.
             </p>
           </section>
 
