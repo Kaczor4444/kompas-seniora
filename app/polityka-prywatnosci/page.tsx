@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+
 export const metadata: Metadata = {
   title: 'Polityka Prywatności | Kompas Seniora',
   description: 'Polityka prywatności i ochrony danych osobowych serwisu Kompas Seniora zgodnie z RODO.',

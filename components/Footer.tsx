@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CookieSettingsButton from './CookieSettingsButton';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -6,9 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* O serwisie */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-emerald-400">
               Kompas Seniora
@@ -18,7 +17,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Serwis - POPRAWIONE LINKI! */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-emerald-400">
               Serwis
@@ -52,7 +50,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Dokumenty prawne */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-emerald-400">
               Dokumenty prawne
@@ -73,10 +70,12 @@ export default function Footer() {
                   Polityka Cookies
                 </Link>
               </li>
+              <li>
+                <CookieSettingsButton />
+              </li>
             </ul>
           </div>
 
-          {/* Źródła danych - UPROSZCZONE */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-emerald-400">
               Źródła danych
@@ -90,7 +89,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
         <div className="border-t border-gray-700 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
             <div className="mb-4 md:mb-0">
