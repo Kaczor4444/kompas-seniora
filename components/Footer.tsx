@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* 3 kolumny - centered na desktop, 3 kolumny też na mobile */}
         <div className="grid grid-cols-3 gap-4 md:gap-8 mb-8 max-w-5xl mx-auto">
-          {/* Kolumna 1: O nas */}
+          {/* Kolumna 1: O nas - teraz 4 linki */}
           <div className="text-center">
             <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-emerald-400">
               O nas
@@ -32,11 +32,6 @@ export default function Footer() {
               <li>
                 <Link href="/faq" className="text-gray-300 hover:text-emerald-400 transition-colors">
                   FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/mapa-strony" className="text-gray-300 hover:text-emerald-400 transition-colors">
-                  Mapa strony
                 </Link>
               </li>
             </ul>
@@ -76,7 +71,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Kolumna 3: Prawne */}
+          {/* Kolumna 3: Prawne - teraz 5 linków */}
           <div className="text-center">
             <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-emerald-400">
               Prawne
@@ -100,6 +95,11 @@ export default function Footer() {
               <li>
                 <Link href="/wyglad-strony" className="text-gray-300 hover:text-emerald-400 transition-colors">
                   Wygląd strony
+                </Link>
+              </li>
+              <li>
+                <Link href="/mapa-strony" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  Mapa strony
                 </Link>
               </li>
             </ul>
