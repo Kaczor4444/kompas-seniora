@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import CookieSettingsButton from './CookieSettingsButton';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -7,21 +6,48 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-emerald-400">
-              Kompas Seniora
+        {/* 3 kolumny - centered na desktop, 3 kolumny też na mobile */}
+        <div className="grid grid-cols-3 gap-4 md:gap-8 mb-8 max-w-5xl mx-auto">
+          {/* Kolumna 1: O nas */}
+          <div className="text-center">
+            <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-emerald-400">
+              O nas
             </h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              Wyszukiwarka publicznych placówek opieki dla seniorów.
-            </p>
+            <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm">
+              <li>
+                <Link href="/o-nas" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  O nas
+                </Link>
+              </li>
+              <li>
+                <Link href="/kontakt" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  Kontakt
+                </Link>
+              </li>
+              <li>
+                <Link href="/wspolpraca" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  Współpraca
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/mapa-strony" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  Mapa strony
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-emerald-400">
+          {/* Kolumna 2: Serwis */}
+          <div className="text-center">
+            <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-emerald-400">
               Serwis
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm">
               <li>
                 <Link href="/search" className="text-gray-300 hover:text-emerald-400 transition-colors">
                   Wyszukiwarka
@@ -43,18 +69,19 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/kontakt" className="text-gray-300 hover:text-emerald-400 transition-colors">
-                  Kontakt
+                <Link href="/blog" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  Blog
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-emerald-400">
-              Dokumenty prawne
+          {/* Kolumna 3: Prawne */}
+          <div className="text-center">
+            <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-emerald-400">
+              Prawne
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm">
               <li>
                 <Link href="/polityka-prywatnosci" className="text-gray-300 hover:text-emerald-400 transition-colors">
                   Polityka Prywatności
@@ -71,37 +98,20 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <CookieSettingsButton />
+                <Link href="/wyglad-strony" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  Wygląd strony
+                </Link>
               </li>
             </ul>
           </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-emerald-400">
-              Źródła danych
-            </h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              Informacje z oficjalnych źródeł publicznych.
-            </p>
-            <p className="text-xs text-gray-400 mt-2">
-              Dane weryfikowane regularnie.
-            </p>
-          </div>
         </div>
 
-        <div className="border-t border-gray-700 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-            <div className="mb-4 md:mb-0">
-              <p>
-                © {currentYear} <span className="text-emerald-400 font-semibold">Kompas Seniora</span>. 
-                Wszelkie prawa zastrzeżone.
-              </p>
-            </div>
-            <div className="text-center md:text-right">
-              <p className="text-xs">
-                Serwis ma charakter informacyjny.
-              </p>
-            </div>
+        {/* Copyright - jedna linia z źródłami */}
+        <div className="border-t border-gray-700 pt-6 md:pt-8">
+          <div className="text-center text-xs md:text-sm text-gray-400">
+            <p>
+              © {currentYear} <span className="text-emerald-400 font-semibold">Kompas Seniora</span> | Źródła: MOPS, BIP
+            </p>
           </div>
         </div>
       </div>
