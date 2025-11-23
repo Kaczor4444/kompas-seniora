@@ -98,11 +98,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/ustawienia-cookies" className="text-gray-300 hover:text-emerald-400 transition-colors">
-                  Ustawienia cookies
-                </Link>
-              </li>
-              <li>
                 <Link href="/wyglad-strony" className="text-gray-300 hover:text-emerald-400 transition-colors">
                   Wygląd strony
                 </Link>
