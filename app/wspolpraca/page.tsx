@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Building2, Home, Users, CheckCircle2, Mail, Phone, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Building2, Home, Users, CheckCircle2, Mail } from 'lucide-react';
 
 export default function WspolpracaPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,10 +70,10 @@ export default function WspolpracaPage() {
         <section className="mb-16">
           <div className="max-w-3xl">
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              Kompas Seniora powstał, żeby ułatwić rodzinom dostęp do rzetelnych informacji o opiece nad seniorami.
+              Kompas Seniora powstał, aby ułatwić rodzinom dostęp do rzetelnych informacji o opiece nad seniorami. Wszystkie dane opieramy wyłącznie na oficjalnych źródłach: BIP, MOPS/OPS oraz instytucjach prowadzących placówki.
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              Jeśli jesteś przedstawicielem MOPS, placówki opiekuńczej lub organizacji wspierającej seniorów — zapraszamy do współpracy.
+              Jeśli reprezentujesz MOPS, placówkę opiekuńczą lub organizację działającą na rzecz seniorów — zapraszamy do <strong>bezpłatnej współpracy</strong>.
             </p>
           </div>
         </section>
@@ -94,22 +94,27 @@ export default function WspolpracaPage() {
                 MOPS / OPS
               </h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Zwiększ dostępność informacji o placówkach w waszym powiecie.
+                Pomóż mieszkańcom szybciej znaleźć potrzebne informacje — i odciąż swoje zespoły.
               </p>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-start gap-2">
+              <div className="space-y-2 text-sm text-gray-600">
+                <p className="font-medium text-gray-700 mb-3">Co zyskujecie?</p>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Aktualne dane o placówkach</span>
-                </li>
-                <li className="flex items-start gap-2">
+                  <span>Mniej powtarzających się telefonów i zgłoszeń od rodzin</span>
+                </div>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Dotrzyjcie do większej liczby rodzin</span>
-                </li>
-                <li className="flex items-start gap-2">
+                  <span>Przejrzyste przedstawienie procedur w waszym powiecie</span>
+                </div>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Wsparcie w aktualizacji danych</span>
-                </li>
-              </ul>
+                  <span>Dane oparte na oficjalnych informacjach z BIP/MOPS</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <span>Wsparcie w uporządkowaniu i aktualizacji informacji dla mieszkańców</span>
+                </div>
+              </div>
             </div>
 
             {/* Placówki DPS/ŚDS */}
@@ -121,22 +126,27 @@ export default function WspolpracaPage() {
                 Placówki DPS / ŚDS
               </h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Dotrzyjcie do rodzin poszukujących opieki dla bliskich.
+                Ułatw rodzinom znalezienie waszej placówki i poznanie waszej oferty.
               </p>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-start gap-2">
+              <div className="space-y-2 text-sm text-gray-600">
+                <p className="font-medium text-gray-700 mb-3">Co zyskujecie?</p>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Prezentacja waszej oferty</span>
-                </li>
-                <li className="flex items-start gap-2">
+                  <span>Bezpłatną i rzetelną prezentację waszej oferty</span>
+                </div>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Aktualne dane kontaktowe</span>
-                </li>
-                <li className="flex items-start gap-2">
+                  <span>Możliwość szybkiego kontaktu rodzin z placówką</span>
+                </div>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Bezpośredni kontakt z zainteresowanymi</span>
-                </li>
-              </ul>
+                  <span>Mniej przypadkowych zapytań, więcej świadomych rozmów</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <span>Większą transparentność, która buduje zaufanie</span>
+                </div>
+              </div>
             </div>
 
             {/* Stowarzyszenia */}
@@ -145,25 +155,30 @@ export default function WspolpracaPage() {
                 <Users className="w-6 h-6 text-accent-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Stowarzyszenia
+                Stowarzyszenia i Fundacje
               </h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Amplifikujcie swój impact i dotrzyjcie do większej grupy seniorów.
+                Wzmocnijcie swój lokalny wpływ i dotrzyjcie do większej liczby osób potrzebujących wsparcia.
               </p>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-start gap-2">
+              <div className="space-y-2 text-sm text-gray-600">
+                <p className="font-medium text-gray-700 mb-3">Co zyskujecie?</p>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Promowanie waszych inicjatyw</span>
-                </li>
-                <li className="flex items-start gap-2">
+                  <span>Promocję wydarzeń, akcji i działań edukacyjnych</span>
+                </div>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Współpraca przy contencie</span>
-                </li>
-                <li className="flex items-start gap-2">
+                  <span>Możliwość publikowania materiałów dla seniorów i rodzin</span>
+                </div>
+                <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Wspólne projekty edukacyjne</span>
-                </li>
-              </ul>
+                  <span>Wspólne kampanie informacyjne i inicjatywy społeczne</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <span>Przestrzeń do współtworzenia treści i projektów edukacyjnych</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -185,7 +200,7 @@ export default function WspolpracaPage() {
                     Większy zasięg
                   </h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    Dotrzyjcie do rodzin aktywnie poszukujących informacji o opiece nad seniorami.
+                    Dotarcie do rodzin aktywnie szukających informacji o opiece nad seniorami — bez żadnych kosztów.
                   </p>
                 </div>
               </div>
@@ -199,7 +214,7 @@ export default function WspolpracaPage() {
                     Aktualne dane
                   </h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    Zapewniamy regularną aktualizację informacji o waszej placówce.
+                    Regularnie odświeżamy informacje o placówkach na podstawie oficjalnych źródeł.
                   </p>
                 </div>
               </div>
@@ -213,7 +228,7 @@ export default function WspolpracaPage() {
                     Transparentność
                   </h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    Pomagamy budować zaufanie poprzez rzetelne informacje.
+                    Rzetelne i przejrzyste informacje zwiększają zaufanie do instytucji.
                   </p>
                 </div>
               </div>
@@ -227,7 +242,7 @@ export default function WspolpracaPage() {
                     Wsparcie techniczne
                   </h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    Pomagamy w digitalizacji i prezentacji waszej oferty.
+                    Pomagamy przygotować i przedstawić informacje o ofercie — bezpłatnie i profesjonalnie.
                   </p>
                 </div>
               </div>
@@ -242,24 +257,53 @@ export default function WspolpracaPage() {
           </h2>
           
           <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { num: '1', title: 'Kontakt', desc: 'Wypełnij formularz poniżej' },
-              { num: '2', title: 'Rozmowa', desc: 'Omówimy szczegóły współpracy' },
-              { num: '3', title: 'Integracja', desc: 'Dodamy dane do bazy' },
-              { num: '4', title: 'Aktualizacje', desc: 'Regularne odświeżanie danych' },
-            ].map((step) => (
-              <div key={step.num} className="text-center">
-                <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                  {step.num}
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {step.desc}
-                </p>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                1
               </div>
-            ))}
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Kontakt
+              </h3>
+              <p className="text-sm text-gray-600">
+                Wypełnij formularz — całkowicie bez zobowiązań
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                2
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Rozmowa
+              </h3>
+              <p className="text-sm text-gray-600">
+                Ustalamy zakres współpracy i wasze potrzeby
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                3
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Integracja
+              </h3>
+              <p className="text-sm text-gray-600">
+                Dodajemy i porządkujemy dane o waszej organizacji — szybko i bezpłatnie
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                4
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Aktualizacje
+              </h3>
+              <p className="text-sm text-gray-600">
+                Dbamy o regularne odświeżanie informacji oraz stałe wsparcie techniczne
+              </p>
+            </div>
           </div>
         </section>
 
@@ -271,7 +315,7 @@ export default function WspolpracaPage() {
                 Napisz do nas
               </h2>
               <p className="text-gray-600">
-                Wypełnij formularz, a my skontaktujemy się z Tobą w ciągu 2 dni roboczych.
+                Odpowiemy w ciągu 2 dni roboczych.
               </p>
             </div>
 
@@ -423,24 +467,15 @@ export default function WspolpracaPage() {
             Masz pytania?
           </h2>
           <p className="text-xl text-accent-50 mb-8 max-w-2xl mx-auto">
-            Chętnie odpowiemy na wszystkie pytania dotyczące współpracy.
+            Chętnie odpowiemy i opowiemy więcej o współpracy — bez zobowiązań.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:wspolpraca@kompaseniora.pl"
-              className="inline-flex items-center justify-center gap-2 bg-white text-accent-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent-50 transition-colors"
-            >
-              <Mail className="w-5 h-5" />
-              wspolpraca@kompaseniora.pl
-            </a>
-            <a
-              href="tel:+48123456789"
-              className="inline-flex items-center justify-center gap-2 bg-accent-800 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent-900 transition-colors border-2 border-accent-700"
-            >
-              <Phone className="w-5 h-5" />
-              +48 123 456 789
-            </a>
-          </div>
+          <a
+            href="mailto:kontakt@kompaseniora.pl"
+            className="inline-flex items-center justify-center gap-2 bg-white text-accent-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent-50 transition-colors"
+          >
+            <Mail className="w-5 h-5" />
+            kontakt@kompaseniora.pl
+          </a>
         </section>
 
       </main>
