@@ -49,13 +49,13 @@ export default function WspolpracaPage() {
       {/* Success Message */}
       {showSuccess && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-6">
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex items-start gap-4">
-            <CheckCircle2 className="w-8 h-8 text-green-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 flex items-start gap-4">
+            <CheckCircle2 className="w-8 h-8 text-emerald-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-lg font-semibold text-green-900 mb-2">
+              <h3 className="text-lg font-semibold text-emerald-900 mb-2">
                 ✅ Dziękujemy za zgłoszenie!
               </h3>
-              <p className="text-green-800 leading-relaxed">
+              <p className="text-emerald-800 leading-relaxed">
                 Otrzymaliśmy Twoją wiadomość. Skontaktujemy się z Tobą wkrótce, aby omówić szczegóły współpracy.
               </p>
             </div>
@@ -87,8 +87,8 @@ export default function WspolpracaPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {/* MOPS/OPS */}
             <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center mb-4">
-                <Building2 className="w-6 h-6 text-accent-600" />
+              <div className="mb-4">
+                <Building2 className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 MOPS / OPS
@@ -99,51 +99,51 @@ export default function WspolpracaPage() {
               <div className="space-y-2 text-sm text-gray-600">
                 <p className="font-medium text-gray-700 mb-3">Co zyskujecie?</p>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Mniej powtarzających się telefonów i zgłoszeń od rodzin</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Przejrzyste przedstawienie procedur w waszym powiecie</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Dane oparte na oficjalnych informacjach z BIP/MOPS</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                  <span>Wsparcie w uporządkowaniu i aktualizacji informacji dla mieszkańców</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                  <span>Wsparcie w prezentowaniu i aktualizowaniu informacji dla mieszkańców</span>
                 </div>
               </div>
             </div>
 
             {/* Placówki DPS/ŚDS */}
             <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center mb-4">
-                <Home className="w-6 h-6 text-accent-600" />
+              <div className="mb-4">
+                <Home className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 Placówki DPS / ŚDS
               </h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Ułatw rodzinom znalezienie waszej placówki i poznanie waszej oferty.
+                Pomóż rodzinom łatwiej znaleźć waszą placówkę i poznać waszą ofertę.
               </p>
               <div className="space-y-2 text-sm text-gray-600">
                 <p className="font-medium text-gray-700 mb-3">Co zyskujecie?</p>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Bezpłatną i rzetelną prezentację waszej oferty</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Możliwość szybkiego kontaktu rodzin z placówką</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Mniej przypadkowych zapytań, więcej świadomych rozmów</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Większą transparentność, która buduje zaufanie</span>
                 </div>
               </div>
@@ -151,8 +151,8 @@ export default function WspolpracaPage() {
 
             {/* Stowarzyszenia */}
             <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-accent-600" />
+              <div className="mb-4">
+                <Users className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 Stowarzyszenia i Fundacje
@@ -163,19 +163,19 @@ export default function WspolpracaPage() {
               <div className="space-y-2 text-sm text-gray-600">
                 <p className="font-medium text-gray-700 mb-3">Co zyskujecie?</p>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Promocję wydarzeń, akcji i działań edukacyjnych</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Możliwość publikowania materiałów dla seniorów i rodzin</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Wspólne kampanie informacyjne i inicjatywy społeczne</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                   <span>Przestrzeń do współtworzenia treści i projektów edukacyjnych</span>
                 </div>
               </div>
@@ -192,8 +192,8 @@ export default function WspolpracaPage() {
           <div className="bg-white rounded-xl border border-gray-200 p-8">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-accent-600 font-bold">1</span>
+                <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-emerald-600 font-bold">1</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">
@@ -206,8 +206,8 @@ export default function WspolpracaPage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-accent-600 font-bold">2</span>
+                <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-emerald-600 font-bold">2</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">
@@ -220,8 +220,8 @@ export default function WspolpracaPage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-accent-600 font-bold">3</span>
+                <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-emerald-600 font-bold">3</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">
@@ -234,8 +234,8 @@ export default function WspolpracaPage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-accent-600 font-bold">4</span>
+                <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-emerald-600 font-bold">4</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">
@@ -258,7 +258,7 @@ export default function WspolpracaPage() {
           
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 1
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">
@@ -270,7 +270,7 @@ export default function WspolpracaPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 2
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">
@@ -282,7 +282,7 @@ export default function WspolpracaPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 3
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">
@@ -294,7 +294,7 @@ export default function WspolpracaPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-accent-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 4
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">
@@ -320,7 +320,6 @@ export default function WspolpracaPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Imię i nazwisko */}
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                   Imię i nazwisko *
@@ -331,7 +330,7 @@ export default function WspolpracaPage() {
                   name="name"
                   required
                   placeholder="Jan Kowalski"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
@@ -346,7 +345,7 @@ export default function WspolpracaPage() {
                   name="email"
                   required
                   placeholder="jan.kowalski@example.pl"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
@@ -361,7 +360,7 @@ export default function WspolpracaPage() {
                   name="organization"
                   required
                   placeholder="np. MOPS Kraków, DPS Vita"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
@@ -374,7 +373,7 @@ export default function WspolpracaPage() {
                   id="partnerType"
                   name="partnerType"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 >
                   <option value="">Wybierz...</option>
                   <option value="mops">MOPS / OPS</option>
@@ -394,7 +393,7 @@ export default function WspolpracaPage() {
                   id="phone"
                   name="phone"
                   placeholder="12 345 67 89"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
@@ -409,18 +408,17 @@ export default function WspolpracaPage() {
                   required
                   rows={5}
                   placeholder="Opisz krótko, jak chciałbyś współpracować..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors resize-none"
                 />
               </div>
 
-              {/* RODO Consent */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     name="gdprConsent"
                     required
-                    className="w-5 h-5 text-accent-600 border-gray-300 rounded focus:ring-accent-500 mt-0.5 flex-shrink-0"
+                    className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 mt-0.5 flex-shrink-0"
                   />
                   <span className="text-sm text-gray-700 leading-relaxed">
                     Wyrażam zgodę na przetwarzanie moich danych osobowych w celu kontaktu dotyczącego współpracy. 
@@ -429,17 +427,16 @@ export default function WspolpracaPage() {
                 </label>
                 <p className="text-xs text-gray-500 mt-2 ml-8">
                   Więcej informacji w{' '}
-                  <Link href="/polityka-prywatnosci" className="text-accent-600 hover:text-accent-700 underline">
+                  <Link href="/polityka-prywatnosci" className="text-emerald-600 hover:text-emerald-700 underline">
                     Polityce Prywatności
                   </Link>
                 </p>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full px-6 py-4 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full px-6 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -462,16 +459,16 @@ export default function WspolpracaPage() {
         </section>
 
         {/* CTA - Masz Pytania */}
-        <section className="bg-gradient-to-r from-accent-600 to-accent-700 rounded-2xl p-8 md:p-12 text-white text-center">
+        <section className="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-8 md:p-12 text-white text-center">
           <h2 className="text-3xl font-bold mb-4">
             Masz pytania?
           </h2>
-          <p className="text-xl text-accent-50 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-emerald-50 mb-8 max-w-2xl mx-auto">
             Chętnie odpowiemy i opowiemy więcej o współpracy — bez zobowiązań.
           </p>
           <a
             href="mailto:kontakt@kompaseniora.pl"
-            className="inline-flex items-center justify-center gap-2 bg-white text-accent-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent-50 transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-50 transition-colors"
           >
             <Mail className="w-5 h-5" />
             kontakt@kompaseniora.pl
