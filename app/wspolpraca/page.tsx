@@ -12,19 +12,43 @@ export default function WspolpracaPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // TODO: Backend API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const formData = new FormData(e.currentTarget);
+      
+      const response = await fetch("/api/wspolpraca", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          email: formData.get("email"),
+          organization: formData.get("organization"),
+          partnerType: formData.get("partnerType"),
+          phone: formData.get("phone") || undefined,
+          message: formData.get("message"),
+          gdprConsent: formData.get("gdprConsent") === "on"
+        })
+      });
 
-    setIsSubmitting(false);
-    setShowSuccess(true);
+      const data = await response.json();
 
-    // Auto-hide po 5 sekundach
-    setTimeout(() => setShowSuccess(false), 5000);
+      if (!response.ok) {
+        throw new Error(data.message || "Wystąpił błąd");
+      }
 
-    // Reset form
-    e.currentTarget.reset();
+      // Success!
+      setShowSuccess(true);
+      e.currentTarget.reset();
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => setShowSuccess(false), 5000);
+
+    } catch (error) {
+      console.error("Form submission error:", error);
+      alert(error instanceof Error ? error.message : "Wystąpił błąd. Spróbuj ponownie.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
