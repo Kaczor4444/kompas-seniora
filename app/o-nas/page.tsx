@@ -17,7 +17,7 @@ export default function ONasPage() {
             O nas
           </h1>
           <p className="text-xl md:text-2xl text-emerald-50">
-            Jesteśmy tu, żebyś w trudnym momencie nie czuł się sam
+            Jesteśmy tu, żebyś w trudnym momencie nie był sam
           </p>
         </div>
       </section>
@@ -28,13 +28,13 @@ export default function ONasPage() {
         {/* Introduction */}
         <section className="mb-16">
           <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-            Prowadzenie rozmów o opiece nad seniorem to jedno z tych zadań, które zwykle spadają na nas nagle — często w trudnym momencie.
+            Rozmowy o opiece nad seniorem pojawiają się zwykle nagle — często wtedy, gdy jesteśmy już zmęczeni, zmartwieni albo pełni niepewności — i boimy się podjąć złą decyzję.
           </p>
           <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-            I wtedy zaczyna się maraton: setki stron, dziesiątki przepisów, różne instytucje, a każda mówi trochę inaczej.
+            Nagle trzeba przebrnąć przez setki stron, różne przepisy i instytucje, które tłumaczą te same rzeczy na różne sposoby. Łatwo w tym wszystkim poczuć się przytłoczonym.
           </p>
           <p className="text-lg md:text-xl text-gray-700 leading-relaxed font-semibold">
-            Właśnie dlatego powstał Kompas Seniora. Chcemy, żebyś w tym wszystkim nie czuł się sam.
+            Właśnie dlatego powstał Kompas Seniora — żeby uporządkować informacje, uspokoić chaos i pomóc Ci zrozumieć, od czego zacząć.
           </p>
         </section>
 
@@ -44,20 +44,17 @@ export default function ONasPage() {
             Nasza misja
           </h2>
           <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            Tworzymy miejsce, które pomaga szybko odnaleźć najważniejsze informacje o opiece nad osobami starszymi — przejrzyście, spokojnie i bez skomplikowanego języka urzędowego.
+            Tworzymy miejsce, które w prosty sposób pokazuje, jakie formy opieki są dostępne dla osób starszych: czym różni się dom pomocy społecznej od opieki długoterminowej, czym są placówki dzienne i jakie dokumenty trzeba przygotować, aby złożyć wniosek.
           </p>
-          <p className="text-lg text-gray-700 leading-relaxed">
-            Tłumaczymy, czym jest dom pomocy społecznej w twojej okolicy, czym różni się opieka długoterminowa, czym są dzienne placówki i jakie dokumenty są potrzebne, żeby złożyć wniosek.
-          </p>
-          <p className="text-lg text-gray-700 leading-relaxed mt-4 italic">
-            Wszystko tak, jak sami chcielibyśmy to przeczytać, gdy potrzebowaliśmy pomocy blisko siebie.
+          <p className="text-lg text-gray-700 leading-relaxed italic">
+            Wszystko tłumaczymy tak, jak sami chcielibyśmy to przeczytać, gdy szukaliśmy wsparcia dla kogoś bliskiego.
           </p>
         </section>
 
         {/* Professional Approach */}
         <section className="mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Profesjonalnie — ale konkretnie i po ludzku
+            Profesjonalnie — ale po ludzku
           </h2>
           
           <div className="bg-white border-2 border-emerald-200 rounded-lg p-6 mb-6">
@@ -68,7 +65,7 @@ export default function ONasPage() {
               Nasze źródła danych
             </h3>
             <p className="text-gray-700 mb-4">
-              Opieramy się wyłącznie na danych z oficjalnych źródeł:
+              Korzystamy wyłącznie z oficjalnych, wiarygodnych informacji:
             </p>
             <ul className="space-y-2 text-gray-700">
               <li className="flex items-start gap-2">
@@ -87,7 +84,7 @@ export default function ONasPage() {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
-                Akty prawne i rozporządzenia
+                Obowiązujące akty prawne i rozporządzenia
               </li>
               <li className="flex items-start gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0">
@@ -99,10 +96,10 @@ export default function ONasPage() {
           </div>
 
           <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            Informacje są regularnie aktualizowane, tak abyś miał pewność, że korzystasz z rzetelnych materiałów — choć tempo aktualizacji zależy od tego, jak szybko swoje dane publikują same instytucje.
+            Dane aktualizujemy regularnie, ale ich tempo zależy również od tego, jak często publikują je instytucje.
           </p>
           <p className="text-lg text-gray-700 leading-relaxed">
-            Zamiast obiecywać liczby czy dostępność, stawiamy na to, co naprawdę pomaga: <strong>fakty, procedury, kontakt do właściwych urzędów, wskazówki, gdzie szukać wsparcia w powiecie.</strong>
+            Dlatego zamiast obiecywać konkretne liczby czy dostępność, skupiamy się na tym, co naprawdę pomaga: <strong>procedurach, kontaktach i wskazówkach, gdzie szukać wsparcia w swoim powiecie.</strong>
           </p>
         </section>
 
@@ -112,13 +109,13 @@ export default function ONasPage() {
             Po co to wszystko?
           </h2>
           <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            Bo wielu z nas przeszło przez ten proces osobiście — w rodzinie, wśród bliskich, w sytuacjach, które wymagały szybkich i trudnych decyzji.
+            Bo wielu z nas przeszło przez ten proces osobiście — w swoich rodzinach, w sytuacjach wymagających szybkich i trudnych decyzji.
           </p>
           <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            I wiemy jedno: <strong>nikt nie powinien uczyć się tego wszystkiego od zera, kiedy mierzy się z troską o starszą osobę.</strong>
+            I wiemy jedno: <strong>nikt nie powinien uczyć się tego wszystkiego od zera, gdy troszczy się o bliską osobę.</strong>
           </p>
           <p className="text-lg text-gray-700 leading-relaxed">
-            Kompas Seniora powstał, żeby uporządkować to, co w systemie często bywa nieprzejrzyste. Żeby dać poczucie, że jest ktoś, kto prowadzi przez każdy krok. Żeby pomóc Ci zrozumieć możliwości — od DPS, przez ŚDS, po inne formy wsparcia, które mogą być dostępne w twoim powiecie.
+            Kompas Seniora powstał po to, żeby wyjaśnić to, co bywa niejasne. Żeby pokazać wszystkie możliwości — od DPS i ŚDS, po inne formy wsparcia, które mogą pomóc w Twojej sytuacji.
           </p>
         </section>
 
@@ -144,7 +141,7 @@ export default function ONasPage() {
                     </Link>
                   </h3>
                   <p className="text-gray-600">
-                    Znajdź placówki w swojej okolicy z oficjalnymi danymi kontaktowymi i cenami.
+                    Z oficjalnymi danymi kontaktowymi i informacjami o kosztach.
                   </p>
                 </div>
               </div>
@@ -165,7 +162,7 @@ export default function ONasPage() {
                     </Link>
                   </h3>
                   <p className="text-gray-600">
-                    Jasne wskazówki, jakie dokumenty przygotować do wniosku o miejsce w placówce.
+                    Jasne wskazówki, co przygotować, żeby złożyć wniosek bez stresu.
                   </p>
                 </div>
               </div>
@@ -186,7 +183,7 @@ export default function ONasPage() {
                     </Link>
                   </h3>
                   <p className="text-gray-600">
-                    Prosty i bezpieczny — nie zbiera żadnych danych osobowych.
+                    Prosty, bezpieczny i bez zbierania danych osobowych — żeby szybko oszacować, z czym trzeba się liczyć.
                   </p>
                 </div>
               </div>
@@ -207,7 +204,7 @@ export default function ONasPage() {
                     </Link>
                   </h3>
                   <p className="text-gray-600">
-                    Przewodniki krok po kroku, bez zagmatwanego języka urzędowego.
+                    Praktyczne przewodniki, które przeprowadzą Cię przez cały proces — bez trudnych określeń.
                   </p>
                 </div>
               </div>
@@ -221,42 +218,42 @@ export default function ONasPage() {
             Na końcu chodzi o jedno
           </h2>
           <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            Każdy z nas kiedyś będzie seniorem. A każdy z nas już dziś ma kogoś bliskiego, kto może potrzebować wsparcia.
+            Każdy z nas kiedyś będzie seniorem. I każdy z nas już dziś ma kogoś bliskiego, kto może potrzebować wsparcia.
           </p>
           <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            Dlatego Kompas Seniora powstał nie po to, by zastąpić instytucje — ale by pomóc Ci w tej drodze: spokojnie, krok po kroku.
+            Kompas Seniora nie powstał po to, by zastąpić instytucje. Powstał po to, żeby pomóc Ci przejść tę drogę spokojniej — krok po kroku.
           </p>
           <p className="text-xl text-gray-900 leading-relaxed font-semibold">
-            Jeśli stoisz przed ważną decyzją dotyczącą opieki nad bliską osobą — jesteśmy tu, aby Ci ją ułatwić.
+            Jeśli stoisz przed ważną decyzją dotyczącą opieki nad bliską osobą, jesteśmy tu, żeby Ci to ułatwić.
           </p>
         </section>
 
         {/* CTA Section */}
         <section className="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-8 md:p-12 text-white text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Gotowy na następny krok?
+            Gotowy na kolejny krok?
           </h2>
           <p className="text-xl text-emerald-50 mb-8 max-w-2xl mx-auto">
-            Zacznij od wyszukania placówek w swojej okolicy lub przeczytaj poradnik dla rodzin.
+            Zobacz, od czego zacząć: przeczytaj poradnik dla rodzin lub wyszukaj placówki w swojej okolicy.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/search"
-              className="inline-flex items-center justify-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-50 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-              Wyszukaj placówki
-            </Link>
-            <Link 
               href="/knowledge"
-              className="inline-flex items-center justify-center gap-2 bg-emerald-800 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-900 transition-colors border-2 border-emerald-700"
+              className="inline-flex items-center justify-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-50 transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
               </svg>
               Przeczytaj poradnik
+            </Link>
+            <Link 
+              href="/search"
+              className="inline-flex items-center justify-center gap-2 bg-emerald-800 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-900 transition-colors border-2 border-emerald-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              Wyszukaj placówki
             </Link>
           </div>
         </section>
