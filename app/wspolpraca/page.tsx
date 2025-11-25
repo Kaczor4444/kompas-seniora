@@ -8,14 +8,15 @@ export default function WspolpracaPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    try {
-      const formData = new FormData(e.currentTarget);
-      
-      const response = await fetch("/api/wspolpraca", {
+  try {
+    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget; // <-- DODAJ TO!
+    
+    const response = await fetch("/api/wspolpraca", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -37,7 +38,7 @@ export default function WspolpracaPage() {
 
       // Success!
       setShowSuccess(true);
-      e.currentTarget.reset();
+      form.reset();
       
       // Auto-hide after 5 seconds
       setTimeout(() => setShowSuccess(false), 5000);

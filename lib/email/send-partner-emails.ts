@@ -34,7 +34,7 @@ export async function sendPartnerInquiryEmails(data: PartnerEmailData) {
   // Send admin notification
   try {
     await resend.emails.send({
-      from: "Kompas Seniora <wspolpraca@kompaseniora.pl>",
+      from: "Kompas Seniora <onboarding@resend.dev>",
       to: adminEmail,
       replyTo: data.email,
       subject: `🤝 Nowe zapytanie partnera: ${data.organization}`,
