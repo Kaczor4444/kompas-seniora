@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           message: "Nieprawidłowe dane formularza",
-          errors: error.errors.map(e => ({
+          errors: error.issues.map(e => ({
             field: e.path.join("."),
             message: e.message
           }))

@@ -8,15 +8,15 @@ export default function WspolpracaPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setIsSubmitting(true);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  try {
-    const formData = new FormData(e.currentTarget);
-    const form = e.currentTarget; // <-- DODAJ TO!
-    
-    const response = await fetch("/api/wspolpraca", {
+    try {
+      const formData = new FormData(e.currentTarget);
+      const form = e.currentTarget;
+      
+      const response = await fetch("/api/wspolpraca", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -50,6 +50,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       setIsSubmitting(false);
     }
   };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -71,18 +72,29 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         </div>
       </div>
 
-      {/* Success Message */}
+      {/* Success Modal */}
       {showSuccess && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-6">
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 flex items-start gap-4">
-            <CheckCircle2 className="w-8 h-8 text-emerald-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-lg font-semibold text-emerald-900 mb-2">
-                ✅ Dziękujemy za zgłoszenie!
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative animate-in fade-in zoom-in duration-300">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+              </div>
+              
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Dziękujemy za zgłoszenie!
               </h3>
-              <p className="text-emerald-800 leading-relaxed">
+              
+              <p className="text-gray-600 leading-relaxed mb-6">
                 Otrzymaliśmy Twoją wiadomość. Skontaktujemy się z Tobą wkrótce, aby omówić szczegóły współpracy.
               </p>
+              
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold"
+              >
+                Zamknij
+              </button>
             </div>
           </div>
         </div>
@@ -481,23 +493,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               </p>
             </form>
           </div>
-        </section>
-
-        {/* CTA - Masz Pytania */}
-        <section className="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-8 md:p-12 text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Masz pytania?
-          </h2>
-          <p className="text-xl text-emerald-50 mb-8 max-w-2xl mx-auto">
-            Chętnie odpowiemy i opowiemy więcej o współpracy — bez zobowiązań.
-          </p>
-          <a
-            href="mailto:kontakt@kompaseniora.pl"
-            className="inline-flex items-center justify-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-50 transition-colors"
-          >
-            <Mail className="w-5 h-5" />
-            kontakt@kompaseniora.pl
-          </a>
         </section>
 
       </main>

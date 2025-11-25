@@ -1,7 +1,19 @@
 import { Resend } from "resend";
 import { getAdminEmailTemplate, getUserEmailTemplate } from "./partner-inquiry-templates";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy init - only when actually sending emails
+let resend: Resend | null = null;
+
+function getResendClient() {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error("RESEND_API_KEY not configured");
+    }
+    resend = new Resend(apiKey);
+  }
+  return resend;
+}
 
 interface PartnerEmailData {
   name: string;
@@ -33,7 +45,7 @@ export async function sendPartnerInquiryEmails(data: PartnerEmailData) {
 
   // Send admin notification
   try {
-    await resend.emails.send({
+    await getResendClient().emails.send({
       from: "Kompas Seniora <onboarding@resend.dev>",
       to: adminEmail,
       replyTo: data.email,
@@ -49,8 +61,8 @@ export async function sendPartnerInquiryEmails(data: PartnerEmailData) {
 
   // Send user confirmation
   try {
-    await resend.emails.send({
-      from: "Kompas Seniora <wspolpraca@kompaseniora.pl>",
+    await getResendClient().emails.send({
+      from: "Kompas Seniora <onboarding@resend.dev>",
       to: data.email,
       subject: "Dziękujemy za zgłoszenie współpracy - Kompas Seniora",
       html: getUserEmailTemplate({ name: data.name })
