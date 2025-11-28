@@ -122,8 +122,8 @@ export default function KontaktPage() {
                 className="bg-white rounded-xl border border-gray-200 p-8 text-left transition-all duration-200 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 group"
               >
                 <div className="flex items-start gap-5">
-                  <div className="flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
-                    <IconComponent className="w-8 h-8 text-gray-700" strokeWidth={1.5} />
+                  <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 group-hover:scale-105 transition-all duration-200">
+                    <IconComponent className="w-6 h-6 text-emerald-600" strokeWidth={1.5} />
                   </div>
                   
                   <div className="flex-1">
@@ -168,9 +168,17 @@ export default function KontaktPage() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {cards.find(c => c.id === selectedForm)?.title}
-              </h2>
+              <div className="flex items-center gap-3">
+                {(() => {
+                  const card = cards.find(c => c.id === selectedForm);
+                  if (!card) return null;
+                  const IconComponent = card.icon;
+                  return <IconComponent className="w-6 h-6 text-emerald-600" strokeWidth={1.5} />;
+                })()}
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {cards.find(c => c.id === selectedForm)?.title}
+                </h2>
+              </div>
               <button
                 onClick={() => setSelectedForm(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -429,14 +437,14 @@ export default function KontaktPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedForm(null)}
-                  className="flex-1 px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-base"
+                  className="px-6 py-3 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors font-medium text-base"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-8 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Wysyłanie...' : 'Prześlij zgłoszenie'}
                 </button>
