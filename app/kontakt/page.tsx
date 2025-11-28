@@ -16,13 +16,12 @@ export default function KontaktPage() {
     setIsSubmitting(true);
 
     // TODO: Implement API call
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Symulacja
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     setIsSubmitting(false);
     setShowSuccess(true);
     setSelectedForm(null);
 
-    // Auto-hide success message po 5 sekundach
     setTimeout(() => setShowSuccess(false), 5000);
   };
 
@@ -30,26 +29,26 @@ export default function KontaktPage() {
     {
       id: 'bug' as FormType,
       icon: Bug,
-      title: 'Zgłoś błąd techniczny',
-      description: 'Strona nie działa? Coś się zepsuło?',
+      title: 'Błąd na stronie',
+      description: 'Coś nie działa? Pomóż nam to naprawić',
     },
     {
       id: 'add' as FormType,
       icon: Plus,
       title: 'Dodaj placówkę',
-      description: 'Znasz DPS który nie jest w naszej bazie?',
+      description: 'Znasz DPS/ŚDS którego nie ma w bazie?',
     },
     {
       id: 'edit' as FormType,
       icon: Edit,
-      title: 'Popraw dane placówki',
-      description: 'Widzisz błędny telefon, cenę lub adres?',
+      title: 'Popraw dane',
+      description: 'Widzisz błędny telefon lub adres?',
     },
     {
       id: 'general' as FormType,
       icon: MessageCircle,
-      title: 'Napisz do nas',
-      description: 'Pytanie? Sugestia? Współpraca?',
+      title: 'Kontakt ogólny',
+      description: 'Pytanie? Sugestia? Napisz do nas',
     },
   ];
 
@@ -74,19 +73,30 @@ export default function KontaktPage() {
         </div>
       </div>
 
-      {/* Success Message */}
+      {/* Success Modal */}
       {showSuccess && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-6">
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex items-start gap-4">
-            <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-lg font-semibold text-green-900 mb-2">
-                ✅ Dziękujemy za zgłoszenie!
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative animate-in fade-in zoom-in duration-300">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-10 h-10 text-emerald-600" />
+              </div>
+              
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Dziękujemy za zgłoszenie!
               </h3>
-              <p className="text-green-800 leading-relaxed">
+              
+              <p className="text-gray-600 leading-relaxed mb-6">
                 Otrzymaliśmy Twoją wiadomość i wkrótce się z nią zapoznamy. 
-                Jeśli podałeś email, skontaktujemy się z Tobą w razie potrzeby.
+                Jeśli podałeś email, skontaktujemy się w razie potrzeby.
               </p>
+              
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold"
+              >
+                Zamknij
+              </button>
             </div>
           </div>
         </div>
@@ -101,7 +111,7 @@ export default function KontaktPage() {
           </p>
         </div>
 
-        {/* Cards Grid - LŻEJSZA WERSJA */}
+        {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-8">
           {cards.map((card) => {
             const IconComponent = card.icon;
@@ -112,13 +122,12 @@ export default function KontaktPage() {
                 className="bg-white rounded-xl border border-gray-200 p-8 text-left transition-all duration-200 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 group"
               >
                 <div className="flex items-start gap-5">
-                  {/* Icon bez tła - minimalistyczny */}
                   <div className="flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
                     <IconComponent className="w-8 h-8 text-gray-700" strokeWidth={1.5} />
                   </div>
                   
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-accent-600 transition-colors">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">
                       {card.title}
                     </h3>
                     <p className="text-sm text-gray-600 leading-relaxed">
@@ -141,7 +150,7 @@ export default function KontaktPage() {
               <span className="font-medium">Email:</span>{' '}
               <a 
                 href="mailto:kontakt@kompaseniora.pl" 
-                className="text-accent-600 hover:text-accent-700 hover:underline"
+                className="text-emerald-600 hover:text-emerald-700 hover:underline"
               >
                 kontakt@kompaseniora.pl
               </a>
@@ -171,35 +180,35 @@ export default function KontaktPage() {
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               {selectedForm === 'bug' && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Gdzie wystąpił problem? (URL strony)
+                      Gdzie pojawił się błąd?
                     </label>
                     <input
                       type="url"
-                      placeholder="https://kompaseniora.pl/..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      placeholder="Adres strony, np. https://kompaseniora.pl/wyszukiwarka"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Opisz problem *
+                      Co dokładnie się stało? *
                     </label>
                     <textarea
                       required
                       rows={5}
-                      placeholder="Co się stało? Jakie kroki doprowadziły do błędu?"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      placeholder="Np. Po kliknięciu 'Pokaż więcej' strona się nie ładuje. Spróbowałem 2 razy."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Przeglądarka
+                      Jakiej używasz przeglądarki?
                     </label>
-                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500">
+                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base">
                       <option>Chrome</option>
                       <option>Safari</option>
                       <option>Firefox</option>
@@ -214,10 +223,10 @@ export default function KontaktPage() {
                     <input
                       type="email"
                       placeholder="twoj@email.pl"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Podaj jeśli chcesz otrzymać odpowiedź
+                    <p className="text-xs text-gray-500 mt-2">
+                      Podaj, jeśli chcesz, żebyśmy dali znać gdy błąd zostanie naprawiony
                     </p>
                   </div>
                 </>
@@ -233,8 +242,11 @@ export default function KontaktPage() {
                       type="email"
                       required
                       placeholder="twoj@email.pl"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
+                    <p className="text-xs text-gray-500 mt-2">
+                      Do potwierdzenia zgłoszenia
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -244,7 +256,18 @@ export default function KontaktPage() {
                       type="text"
                       required
                       placeholder="np. DPS Vita"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Miasto *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="np. Kraków"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
                   </div>
                   <div>
@@ -253,7 +276,7 @@ export default function KontaktPage() {
                     </label>
                     <select 
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     >
                       <option value="">Wybierz...</option>
                       <option>DPS</option>
@@ -262,33 +285,22 @@ export default function KontaktPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Miejscowość *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="np. Kraków"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Adres
+                      Adres (opcjonalnie)
                     </label>
                     <input
                       type="text"
                       placeholder="ul. Przykładowa 123"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Telefon
+                      Telefon (opcjonalnie)
                     </label>
                     <input
                       type="tel"
                       placeholder="12 345 67 89"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
                   </div>
                   <div>
@@ -297,8 +309,8 @@ export default function KontaktPage() {
                     </label>
                     <textarea
                       rows={3}
-                      placeholder="Strona www, cena, profil opieki..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      placeholder="Jeśli masz — podaj stronę www, profil opieki, orientacyjną cenę lub inne dane"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
                     />
                   </div>
                 </>
@@ -308,25 +320,28 @@ export default function KontaktPage() {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nazwa placówki *
+                      Link do placówki *
                     </label>
                     <input
-                      type="text"
+                      type="url"
                       required
-                      placeholder="np. DPS Vita Kraków"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      placeholder="Wklej adres strony placówki z naszej wyszukiwarki"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
+                    <p className="text-xs text-gray-500 mt-2">
+                      To pomoże nam szybko znaleźć właściwą placówkę
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Co jest błędne? *
+                      Co jest błędne?
                     </label>
                     <div className="space-y-2">
                       {['Telefon', 'Adres', 'Cena', 'Email', 'Strona WWW', 'Inne'].map(option => (
                         <label key={option} className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="checkbox"
-                            className="w-4 h-4 text-accent-600 border-gray-300 rounded focus:ring-accent-500"
+                            className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                           />
                           <span className="text-sm text-gray-700">{option}</span>
                         </label>
@@ -340,19 +355,22 @@ export default function KontaktPage() {
                     <textarea
                       required
                       rows={4}
-                      placeholder="Wpisz poprawne dane..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      placeholder="Wpisz poprawne informacje — np. nowy numer telefonu: 12 345 67 89"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Twój email (opcjonalnie)
+                      Email (opcjonalnie)
                     </label>
                     <input
                       type="email"
                       placeholder="twoj@email.pl"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
+                    <p className="text-xs text-gray-500 mt-2">
+                      Podaj, jeśli możemy się z Tobą skontaktować w razie pytań
+                    </p>
                   </div>
                 </>
               )}
@@ -361,13 +379,13 @@ export default function KontaktPage() {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Twój email *
+                      Email *
                     </label>
                     <input
                       type="email"
                       required
                       placeholder="twoj@email.pl"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     />
                   </div>
                   <div>
@@ -376,7 +394,7 @@ export default function KontaktPage() {
                     </label>
                     <select 
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                     >
                       <option value="">Wybierz...</option>
                       <option>Pytanie</option>
@@ -392,28 +410,35 @@ export default function KontaktPage() {
                     <textarea
                       required
                       rows={6}
-                      placeholder="Napisz swoją wiadomość..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                      placeholder="Opisz krótko, w czym możemy pomóc..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
                     />
                   </div>
                 </>
               )}
 
+              {/* Security Notice */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p className="text-xs text-gray-600 text-center">
+                  🛡️ Twoje dane są bezpieczne. Używamy ich tylko do odpowiedzi na Twoją wiadomość.
+                </p>
+              </div>
+
               {/* Submit Button */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setSelectedForm(null)}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                  className="flex-1 px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-base"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-3 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? 'Wysyłanie...' : 'Wyślij zgłoszenie'}
+                  {isSubmitting ? 'Wysyłanie...' : 'Prześlij zgłoszenie'}
                 </button>
               </div>
             </form>
