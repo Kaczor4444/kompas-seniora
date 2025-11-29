@@ -99,13 +99,17 @@ export default function Navbar() {
                 Kalkulator
               </a>
               
-              <a 
-                href="#poradnik" 
-                className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900 font-medium transition-colors"
+              <Link
+                href="/poradniki"
+                className={`flex items-center gap-2 font-medium transition-colors ${
+                  isActive('/poradniki')
+                    ? 'text-accent-600'
+                    : 'text-neutral-700 hover:text-neutral-900'
+                }`}
               >
                 <BookOpenIcon className="w-5 h-5" />
-                Poradnik
-              </a>
+                Poradniki
+              </Link>
               
               <a 
                 href="/kontakt" 

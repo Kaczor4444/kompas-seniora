@@ -157,7 +157,7 @@ export default function ONasPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    <Link href="/knowledge" className="hover:text-emerald-600 transition-colors">
+                    <Link href="/poradniki" className="hover:text-emerald-600 transition-colors">
                       Listę dokumentów krok po kroku
                     </Link>
                   </h3>
@@ -199,7 +199,7 @@ export default function ONasPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    <Link href="/knowledge" className="hover:text-emerald-600 transition-colors">
+                    <Link href="/poradniki" className="hover:text-emerald-600 transition-colors">
                       Poradniki w prostym języku
                     </Link>
                   </h3>
@@ -237,8 +237,8 @@ export default function ONasPage() {
             Zobacz, od czego zacząć: przeczytaj poradnik dla rodzin lub wyszukaj placówki w swojej okolicy.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/knowledge"
+            <Link
+              href="/poradniki"
               className="inline-flex items-center justify-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-50 transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
