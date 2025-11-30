@@ -448,8 +448,32 @@ export default function PoradnikiPage() {
           {/* Main Content Area - Sections */}
           <div className="flex-1">
 
+            {/* Licznik wyników */}
+            <div className="mb-6">
+              <p className="text-gray-600 text-sm md:text-base">
+                Znaleziono <span className="font-semibold text-gray-900">{allArticles.length}</span> {allArticles.length === 1 ? 'poradnik' : allArticles.length < 5 ? 'poradniki' : 'poradników'}
+              </p>
+            </div>
+
             {/* Sections with Categories */}
-            <div className="space-y-12">
+            {allArticles.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="max-w-md mx-auto">
+                  <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Nie znaleziono poradników</h3>
+                  <p className="text-gray-600 mb-6">Spróbuj zmienić kryteria wyszukiwania lub filtry</p>
+                  <button
+                    onClick={handleResetFilters}
+                    className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
+                  >
+                    Wyczyść filtry
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-12">
               {sections
                 .filter(section =>
                   activeCategory === 'Wszystkie' ||
@@ -639,11 +663,12 @@ export default function PoradnikiPage() {
                   </section>
                 );
               })}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar - Najczęściej czytane */}
-          <aside className="lg:w-80 flex-shrink-0">
+          <aside className="lg:w-80 flex-shrink-0 order-first lg:order-last">
             <div className="sticky top-60">
               <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center">
