@@ -12,6 +12,7 @@ export default function PoradnikiPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Wszystkie');
   const [sortBy, setSortBy] = useState('popular');
+  const [showPopularModal, setShowPopularModal] = useState(false);
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
@@ -403,7 +404,7 @@ export default function PoradnikiPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-12 md:py-20 overflow-hidden">
+      <section className="relative bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-6 md:py-20 overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <img
@@ -416,11 +417,12 @@ export default function PoradnikiPage() {
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 drop-shadow-lg">
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4 drop-shadow-lg">
             Poradniki dla Seniorów i Opiekunów
           </h1>
-          <p className="text-lg md:text-xl lg:text-2xl text-emerald-50 max-w-2xl drop-shadow leading-relaxed">
-            Praktyczne przewodniki - wszystko, co musisz wiedzieć o opiece, finansach i prawach seniora w jednym miejscu
+          <p className="text-base md:text-xl lg:text-2xl text-emerald-50 max-w-2xl drop-shadow leading-relaxed">
+            <span className="hidden sm:inline">Praktyczne przewodniki - wszystko, co musisz wiedzieć o opiece, finansach i prawach seniora w jednym miejscu</span>
+            <span className="sm:hidden">Praktyczne przewodniki o opiece, finansach i prawach seniora</span>
           </p>
         </div>
       </section>
@@ -429,28 +431,76 @@ export default function PoradnikiPage() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
 
         {/* SearchBar + Filters + Sort */}
-        <div className="sticky top-16 z-40 bg-gray-50 py-4 -mx-4 px-4 md:-mx-6 md:px-6 shadow-sm mb-8 space-y-4">
+        <div className="sticky top-16 z-40 bg-gray-50 py-3 -mx-4 px-4 md:-mx-6 md:px-6 shadow-sm mb-4 md:mb-8 space-y-4">
           <SearchBar onSearch={setSearchQuery} />
-          <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+          <div className="flex flex-wrap gap-2 md:gap-4 items-start justify-between">
             <CategoryFilters
               categories={categories}
               activeCategory={activeCategory}
               onCategoryChange={handleCategoryChange}
             />
-            {(searchQuery || activeCategory !== 'Wszystkie') && (
+
+            <div className="flex gap-2 items-center">
+              {/* Mobile: Najczęściej czytane button */}
               <button
-                onClick={handleResetFilters}
-                className="px-5 py-2.5 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-200 transition-all min-h-[44px] flex items-center gap-2"
+                onClick={() => setShowPopularModal(!showPopularModal)}
+                className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg font-semibold text-xs text-gray-900 hover:border-emerald-300 transition-all min-h-[44px]"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                Wyczyść filtry
+                <span className="hidden sm:inline">Najczęściej</span>
+                <svg className={`w-4 h-4 transition-transform ${showPopularModal ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
-            )}
-            <SortDropdown onSortChange={setSortBy} />
+
+              <SortDropdown onSortChange={setSortBy} />
+
+              {(searchQuery || activeCategory !== 'Wszystkie') && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-5 py-2.5 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-200 transition-all min-h-[44px] flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Wyczyść filtry
+                </button>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Mobile: Modal "Najczęściej czytane" */}
+        {showPopularModal && (
+          <div className="lg:hidden mb-4 bg-white border border-gray-200 rounded-lg p-4">
+            <div className="space-y-3">
+              {popularArticles.map((article, index) => (
+                <Link
+                  key={`mobile-popular-${article.sectionId}-${article.slug}`}
+                  href={`/poradniki/${article.sectionId}/${article.slug}`}
+                  className="group flex gap-3 p-3 rounded-lg hover:bg-emerald-50 transition-all"
+                >
+                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm text-gray-900 group-hover:text-emerald-700 line-clamp-2">
+                      {article.title}
+                    </h4>
+                    <div className="flex items-center text-xs text-gray-500 mt-1">
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {article.readTime} min
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Layout: Main Content + Sidebar */}
         <div className="flex flex-col lg:flex-row gap-8">
@@ -459,14 +509,14 @@ export default function PoradnikiPage() {
           <div className="flex-1">
 
             {/* Licznik wyników */}
-            <div className="mb-6">
+            <div className="mb-3 md:mb-6">
               <p className="text-gray-600 text-sm md:text-base">
                 Znaleziono <span className="font-semibold text-gray-900">{allArticles.length}</span> {allArticles.length === 1 ? 'poradnik' : allArticles.length < 5 ? 'poradniki' : 'poradników'}
               </p>
             </div>
 
             {/* Najczęściej wyszukiwane tematy */}
-            <section className="mb-8 md:mb-12">
+            <section className="hidden md:block mb-8 md:mb-12">
               <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
                 Najczęściej wyszukiwane tematy
               </h2>
@@ -708,8 +758,8 @@ export default function PoradnikiPage() {
             )}
           </div>
 
-          {/* Sidebar - Najczęściej czytane */}
-          <aside className="lg:w-80 flex-shrink-0 order-first lg:order-last">
+          {/* Desktop: Sidebar - Najczęściej czytane */}
+          <aside className="hidden lg:block lg:w-80 flex-shrink-0">
             <div className="sticky top-60">
               <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center">
@@ -748,6 +798,33 @@ export default function PoradnikiPage() {
           </aside>
 
         </div>
+
+        {/* Mobile: Najczęściej wyszukiwane - na dole, 4 pigułki */}
+        <section className="md:hidden mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Najczęściej wyszukiwane tematy
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { text: 'Koszty DPS 2025', category: 'Finanse i świadczenia' },
+              { text: 'Różnice DPS vs ŚDS', category: 'Wybór opieki' },
+              { text: 'Dodatek pielęgnacyjny', category: 'Finanse i świadczenia' },
+              { text: 'Prawa mieszkańców DPS', category: 'Prawne aspekty' }
+            ].map((topic, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setSearchQuery(topic.text);
+                  setActiveCategory(topic.category);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 transition-all"
+              >
+                🔍 {topic.text}
+              </button>
+            ))}
+          </div>
+        </section>
 
         {/* CTA Section */}
         <section className="mt-12 md:mt-16 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl md:rounded-2xl p-6 md:p-8 lg:p-12 text-white text-center">
