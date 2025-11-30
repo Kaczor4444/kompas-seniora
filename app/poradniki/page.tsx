@@ -1,17 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
+import SearchBar from '@/components/poradniki/SearchBar';
+import CategoryFilters from '@/components/poradniki/CategoryFilters';
+import SortDropdown from '@/components/poradniki/SortDropdown';
 
 export default function PoradnikiPage() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('Wszystkie');
+  const [sortBy, setSortBy] = useState('popular');
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
       ...prev,
       [sectionId]: !prev[sectionId]
     }));
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category);
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setActiveCategory('Wszystkie');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Extended article data with metadata
@@ -26,6 +42,9 @@ export default function PoradnikiPage() {
     isNew?: boolean;
     isPopular?: boolean;
   };
+
+  // Lista kategorii do filtrowania
+  const categories = ['Wszystkie', 'Wybór opieki', 'Porady dla opiekunów', 'Porady dla seniorów', 'Finanse i świadczenia', 'Prawne aspekty'];
 
   const sections = [
     {
@@ -245,7 +264,7 @@ export default function PoradnikiPage() {
     },
     {
       id: 'prawne',
-      title: 'Prawne aspekty opieki',
+      title: 'Prawne aspekty',
       articles: [
         {
           title: 'Prawa mieszkańców DPS i pacjentów ZOL – przewodnik',
@@ -298,13 +317,58 @@ export default function PoradnikiPage() {
     },
   ];
 
-  // Flatten all articles for the main grid
-  const allArticles = sections.flatMap(section =>
-    section.articles.map(article => ({
-      ...article,
-      sectionId: section.id
-    }))
-  );
+  // Flatten all articles with filtering and sorting
+  const allArticles = useMemo(() => {
+    let articles = sections.flatMap(section =>
+      section.articles.map(article => ({
+        ...article,
+        sectionId: section.id,
+        sectionTitle: section.title
+      }))
+    );
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      articles = articles.filter(article =>
+        article.title.toLowerCase().includes(query) ||
+        article.excerpt.toLowerCase().includes(query) ||
+        article.category.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by category
+    if (activeCategory !== 'Wszystkie') {
+      articles = articles.filter(article => article.category === activeCategory);
+    }
+
+    // Sort articles
+    switch (sortBy) {
+      case 'newest':
+        articles = articles.sort((a, b) => {
+          if (a.isNew && !b.isNew) return -1;
+          if (!a.isNew && b.isNew) return 1;
+          return 0;
+        });
+        break;
+      case 'popular':
+        articles = articles.sort((a, b) => {
+          if (a.isPopular && !b.isPopular) return -1;
+          if (!a.isPopular && b.isPopular) return 1;
+          return 0;
+        });
+        break;
+      case 'recommended':
+        articles = articles.sort((a, b) => {
+          const scoreA = (a.isPopular ? 2 : 0) + (a.isNew ? 1 : 0);
+          const scoreB = (b.isPopular ? 2 : 0) + (b.isNew ? 1 : 0);
+          return scoreB - scoreA;
+        });
+        break;
+    }
+
+    return articles;
+  }, [sections, searchQuery, activeCategory, sortBy]);
 
   // Get popular articles for sidebar
   const popularArticles = allArticles.filter(a => a.isPopular).slice(0, 5);
@@ -354,6 +418,30 @@ export default function PoradnikiPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
 
+        {/* SearchBar + Filters + Sort */}
+        <div className="sticky top-16 z-40 bg-gray-50 py-4 -mx-4 px-4 md:-mx-6 md:px-6 shadow-sm mb-8 space-y-4">
+          <SearchBar onSearch={setSearchQuery} />
+          <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+            <CategoryFilters
+              categories={categories}
+              activeCategory={activeCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+            {(searchQuery || activeCategory !== 'Wszystkie') && (
+              <button
+                onClick={handleResetFilters}
+                className="px-5 py-2.5 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-200 transition-all min-h-[44px] flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Wyczyść filtry
+              </button>
+            )}
+            <SortDropdown onSortChange={setSortBy} />
+          </div>
+        </div>
+
         {/* Layout: Main Content + Sidebar */}
         <div className="flex flex-col lg:flex-row gap-8">
 
@@ -362,7 +450,12 @@ export default function PoradnikiPage() {
 
             {/* Sections with Categories */}
             <div className="space-y-12">
-              {sections.map((section) => {
+              {sections
+                .filter(section =>
+                  activeCategory === 'Wszystkie' ||
+                  section.articles.some(article => article.category === activeCategory)
+                )
+                .map((section) => {
                 const isExpanded = expandedSections[section.id];
                 const displayedArticles = isExpanded
                   ? section.articles
@@ -551,7 +644,7 @@ export default function PoradnikiPage() {
 
           {/* Sidebar - Najczęściej czytane */}
           <aside className="lg:w-80 flex-shrink-0">
-            <div className="sticky top-24">
+            <div className="sticky top-60">
               <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center">
                   <svg className="w-6 h-6 mr-2 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
