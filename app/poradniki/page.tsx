@@ -335,9 +335,9 @@ export default function PoradnikiPage() {
           <img
             src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=1920&q=80"
             alt="Senior z opiekunem"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-20"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 to-emerald-700/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/85 to-emerald-700/85"></div>
         </div>
 
         {/* Content */}
@@ -380,12 +380,12 @@ export default function PoradnikiPage() {
                     </div>
 
                     {/* Articles Grid - 3 columns desktop, 2 tablet, 1 mobile */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
                       {displayedArticles.map((article) => (
                         <Link
                           key={article.slug}
                           href={`/poradniki/${section.id}/${article.slug}`}
-                          className="group bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:shadow-xl hover:border-emerald-300 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none flex flex-col"
+                          className="group bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-xl hover:border-emerald-300 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none flex flex-col"
                         >
                           {/* Image 16:9 */}
                           <div className="relative aspect-video bg-gray-100 overflow-hidden">
@@ -478,12 +478,12 @@ export default function PoradnikiPage() {
                               transition={{ duration: 0.3, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6 mt-6">
                                 {section.articles.slice(3).map((article) => (
                                   <Link
                                     key={article.slug}
                                     href={`/poradniki/${section.id}/${article.slug}`}
-                                    className="group bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:shadow-xl hover:border-emerald-300 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none flex flex-col"
+                                    className="group bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-xl hover:border-emerald-300 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none flex flex-col"
                                   >
                                     {/* Image 16:9 */}
                                     <div className="relative aspect-video bg-gray-100 overflow-hidden">
@@ -552,7 +552,7 @@ export default function PoradnikiPage() {
           {/* Sidebar - Najczęściej czytane */}
           <aside className="lg:w-80 flex-shrink-0">
             <div className="sticky top-24">
-              <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center">
                   <svg className="w-6 h-6 mr-2 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
