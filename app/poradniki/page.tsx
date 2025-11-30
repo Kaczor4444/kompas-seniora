@@ -385,9 +385,19 @@ export default function PoradnikiPage() {
               </Link>
             </li>
             <li className="text-gray-400">/</li>
-            <li className="text-gray-900 font-medium" aria-current="page">
-              Poradniki
+            <li>
+              <Link href="/poradniki" className={activeCategory !== 'Wszystkie' ? 'text-gray-500 hover:text-emerald-600 transition-colors' : 'text-gray-900 font-medium'}>
+                Poradniki
+              </Link>
             </li>
+            {activeCategory !== 'Wszystkie' && (
+              <>
+                <li className="text-gray-400">/</li>
+                <li className="text-gray-900 font-medium" aria-current="page">
+                  {activeCategory}
+                </li>
+              </>
+            )}
           </ol>
         </div>
       </nav>
@@ -454,6 +464,37 @@ export default function PoradnikiPage() {
                 Znaleziono <span className="font-semibold text-gray-900">{allArticles.length}</span> {allArticles.length === 1 ? 'poradnik' : allArticles.length < 5 ? 'poradniki' : 'poradników'}
               </p>
             </div>
+
+            {/* Najczęściej wyszukiwane tematy */}
+            <section className="mb-8 md:mb-12">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
+                Najczęściej wyszukiwane tematy
+              </h2>
+              <div className="flex flex-wrap gap-2 md:gap-3">
+                {[
+                  { text: 'Koszty DPS 2025', category: 'Finanse i świadczenia' },
+                  { text: 'Różnice DPS vs ŚDS', category: 'Wybór opieki' },
+                  { text: 'Jak złożyć wniosek do DPS', category: 'Wybór opieki' },
+                  { text: 'Dodatek pielęgnacyjny', category: 'Finanse i świadczenia' },
+                  { text: 'Prawa mieszkańców DPS', category: 'Prawne aspekty' },
+                  { text: 'Świadczenia z MOPS', category: 'Finanse i świadczenia' },
+                  { text: 'Opieka dzienna vs całodobowa', category: 'Wybór opieki' },
+                  { text: 'Komunikacja z seniorem', category: 'Porady dla opiekunów' }
+                ].map((topic, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setSearchQuery(topic.text);
+                      setActiveCategory(topic.category);
+                      window.scrollTo({ top: 400, behavior: 'smooth' });
+                    }}
+                    className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 hover:shadow-sm transition-all"
+                  >
+                    🔍 {topic.text}
+                  </button>
+                ))}
+              </div>
+            </section>
 
             {/* Sections with Categories */}
             {allArticles.length === 0 ? (
