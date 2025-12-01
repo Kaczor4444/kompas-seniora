@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Building2, Heart, Users, Wallet, Scale } from 'lucide-react';
 import ArticleCard from '@/components/poradniki/ArticleCard';
-import { categories } from '@/data/categories';
+import { primaryCategories } from '@/data/categories';
 import { sections } from '@/data/articles';
 import { useArticles } from '@/hooks/useArticles';
 import Hero from '@/components/poradniki/sections/Hero';
@@ -68,11 +68,11 @@ export default function PoradnikiPage() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
 
         {/* Najczęściej wyszukiwane tematy */}
-        <section className="hidden md:block mb-8 md:mb-12">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
+        <section className="hidden md:block mb-6 md:mb-10">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
             Najczęściej wyszukiwane tematy
           </h2>
-          <div className="flex flex-wrap gap-2 md:gap-3">
+          <div className="flex flex-wrap gap-2">
             {[
               { text: 'Koszty DPS 2025', category: 'Finanse i świadczenia' },
               { text: 'Różnice DPS vs ŚDS', category: 'Wybór opieki' },
@@ -90,7 +90,7 @@ export default function PoradnikiPage() {
                   setActiveCategory(topic.category);
                   scrollToFilters();
                 }}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 hover:shadow-sm transition-all"
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 hover:shadow-sm transition-all"
               >
                 🔍 {topic.text}
               </button>
@@ -101,7 +101,7 @@ export default function PoradnikiPage() {
         <SearchFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          categories={categories}
+          categories={primaryCategories}
           activeCategory={activeCategory}
           setActiveCategory={handleCategoryChange}
           sortBy={sortBy}
@@ -277,8 +277,8 @@ export default function PoradnikiPage() {
         </div>
 
         {/* Mobile: Najczęściej wyszukiwane - na dole, 4 pigułki */}
-        <section className="md:hidden mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
+        <section className="md:hidden mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">
             Najczęściej wyszukiwane tematy
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -295,7 +295,7 @@ export default function PoradnikiPage() {
                   setActiveCategory(topic.category);
                   scrollToFilters();
                 }}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 transition-all"
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 transition-all"
               >
                 🔍 {topic.text}
               </button>
