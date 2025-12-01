@@ -67,6 +67,37 @@ export default function PoradnikiPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
 
+        {/* Najczęściej wyszukiwane tematy */}
+        <section className="hidden md:block mb-8 md:mb-12">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
+            Najczęściej wyszukiwane tematy
+          </h2>
+          <div className="flex flex-wrap gap-2 md:gap-3">
+            {[
+              { text: 'Koszty DPS 2025', category: 'Finanse i świadczenia' },
+              { text: 'Różnice DPS vs ŚDS', category: 'Wybór opieki' },
+              { text: 'Jak złożyć wniosek do DPS', category: 'Wybór opieki' },
+              { text: 'Dodatek pielęgnacyjny', category: 'Finanse i świadczenia' },
+              { text: 'Prawa mieszkańców DPS', category: 'Prawne aspekty' },
+              { text: 'Świadczenia z MOPS', category: 'Finanse i świadczenia' },
+              { text: 'Opieka dzienna vs całodobowa', category: 'Wybór opieki' },
+              { text: 'Komunikacja z seniorem', category: 'Porady dla opiekunów' }
+            ].map((topic, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setSearchQuery(topic.text);
+                  setActiveCategory(topic.category);
+                  scrollToFilters();
+                }}
+                className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 hover:shadow-sm transition-all"
+              >
+                🔍 {topic.text}
+              </button>
+            ))}
+          </div>
+        </section>
+
         <SearchFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -90,37 +121,6 @@ export default function PoradnikiPage() {
                 Znaleziono <span className="font-semibold text-gray-900">{resultCount}</span> {resultCount === 1 ? 'poradnik' : resultCount < 5 ? 'poradniki' : 'poradników'}
               </p>
             </div>
-
-            {/* Najczęściej wyszukiwane tematy */}
-            <section className="hidden md:block mb-8 md:mb-12">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
-                Najczęściej wyszukiwane tematy
-              </h2>
-              <div className="flex flex-wrap gap-2 md:gap-3">
-                {[
-                  { text: 'Koszty DPS 2025', category: 'Finanse i świadczenia' },
-                  { text: 'Różnice DPS vs ŚDS', category: 'Wybór opieki' },
-                  { text: 'Jak złożyć wniosek do DPS', category: 'Wybór opieki' },
-                  { text: 'Dodatek pielęgnacyjny', category: 'Finanse i świadczenia' },
-                  { text: 'Prawa mieszkańców DPS', category: 'Prawne aspekty' },
-                  { text: 'Świadczenia z MOPS', category: 'Finanse i świadczenia' },
-                  { text: 'Opieka dzienna vs całodobowa', category: 'Wybór opieki' },
-                  { text: 'Komunikacja z seniorem', category: 'Porady dla opiekunów' }
-                ].map((topic, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setSearchQuery(topic.text);
-                      setActiveCategory(topic.category);
-                      scrollToFilters();
-                    }}
-                    className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 hover:shadow-sm transition-all"
-                  >
-                    🔍 {topic.text}
-                  </button>
-                ))}
-              </div>
-            </section>
 
             {/* Sections with Categories */}
             {allArticles.length === 0 ? (
