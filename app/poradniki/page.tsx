@@ -7,6 +7,7 @@ import SearchBar from '@/components/poradniki/SearchBar';
 import CategoryFilters from '@/components/poradniki/CategoryFilters';
 import SortDropdown from '@/components/poradniki/SortDropdown';
 import ArticleCard from '@/components/poradniki/ArticleCard';
+import type { Article, Section } from '@/types/article';
 
 export default function PoradnikiPage() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -39,19 +40,6 @@ export default function PoradnikiPage() {
     setSortBy('popular');
     setShowPopularModal(false);
     scrollToFilters();
-  };
-
-  // Extended article data with metadata
-  type Article = {
-    title: string;
-    slug: string;
-    thumbnail: string;
-    category: string;
-    categoryColor: string;
-    excerpt: string;
-    readTime: number;
-    isNew?: boolean;
-    isPopular?: boolean;
   };
 
   // Lista kategorii do filtrowania
