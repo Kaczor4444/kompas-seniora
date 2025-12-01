@@ -8,9 +8,8 @@ interface SortDropdownProps {
 
 export default function SortDropdown({ onSortChange }: SortDropdownProps) {
   const options = [
-    { value: 'popular', label: 'Najpopularniejsze' },
-    { value: 'newest', label: 'Najnowsze' },
-    { value: 'recommended', label: 'Polecane' }
+    { value: 'recommended', label: 'Polecane' },
+    { value: 'newest', label: 'Najnowsze' }
   ];
 
   return (
@@ -19,7 +18,7 @@ export default function SortDropdown({ onSortChange }: SortDropdownProps) {
       <select
         onChange={(e) => onSortChange(e.target.value)}
         className="appearance-none bg-white border border-gray-200 rounded-lg px-4 py-2.5 pr-10 font-medium text-sm text-gray-700 hover:border-emerald-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none cursor-pointer min-h-[44px]"
-        defaultValue="popular"
+        defaultValue="recommended"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

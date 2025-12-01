@@ -15,8 +15,7 @@ export default function PoradnikiPage() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Wszystkie');
-  const [sortBy, setSortBy] = useState('popular');
-  const [showPopularModal, setShowPopularModal] = useState(false);
+  const [sortBy, setSortBy] = useState('recommended');
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
@@ -39,8 +38,7 @@ export default function PoradnikiPage() {
   const handleResetFilters = () => {
     setSearchQuery('');
     setActiveCategory('Wszystkie');
-    setSortBy('popular');
-    setShowPopularModal(false);
+    setSortBy('recommended');
     scrollToFilters();
   };
 
@@ -68,10 +66,7 @@ export default function PoradnikiPage() {
           setActiveCategory={handleCategoryChange}
           sortBy={sortBy}
           setSortBy={setSortBy}
-          showPopularModal={showPopularModal}
-          setShowPopularModal={setShowPopularModal}
           onResetFilters={handleResetFilters}
-          popularArticles={popularArticles}
         />
 
         {/* Layout: Main Content + Sidebar */}
