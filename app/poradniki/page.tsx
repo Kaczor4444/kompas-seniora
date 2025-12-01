@@ -8,6 +8,7 @@ import CategoryFilters from '@/components/poradniki/CategoryFilters';
 import SortDropdown from '@/components/poradniki/SortDropdown';
 import ArticleCard from '@/components/poradniki/ArticleCard';
 import type { Article, Section } from '@/types/article';
+import { categories } from '@/data/categories';
 
 export default function PoradnikiPage() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -41,9 +42,6 @@ export default function PoradnikiPage() {
     setShowPopularModal(false);
     scrollToFilters();
   };
-
-  // Lista kategorii do filtrowania
-  const categories = ['Wszystkie', 'Wybór opieki', 'Porady dla opiekunów', 'Porady dla seniorów', 'Finanse i świadczenia', 'Prawne aspekty'];
 
   const sections = [
     {
