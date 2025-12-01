@@ -10,6 +10,7 @@ import ArticleCard from '@/components/poradniki/ArticleCard';
 import type { Article, Section } from '@/types/article';
 import { categories } from '@/data/categories';
 import { sections } from '@/data/articles';
+import { useArticles } from '@/hooks/useArticles';
 
 export default function PoradnikiPage() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -44,61 +45,12 @@ export default function PoradnikiPage() {
     scrollToFilters();
   };
 
-  // Flatten all articles with filtering and sorting
-  const allArticles = useMemo(() => {
-    let articles = sections.flatMap(section =>
-      section.articles.map(article => ({
-        ...article,
-        sectionId: section.id,
-        sectionTitle: section.title
-      }))
-    );
-
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.trim().toLowerCase();
-      articles = articles.filter(article =>
-        article.title.toLowerCase().includes(query) ||
-        article.excerpt.toLowerCase().includes(query) ||
-        article.category.toLowerCase().includes(query)
-      );
-    }
-
-    // Filter by category
-    if (activeCategory !== 'Wszystkie') {
-      articles = articles.filter(article => article.category === activeCategory);
-    }
-
-    // Sort articles
-    switch (sortBy) {
-      case 'newest':
-        articles = [...articles].sort((a, b) => {
-          if (a.isNew && !b.isNew) return -1;
-          if (!a.isNew && b.isNew) return 1;
-          return 0;
-        });
-        break;
-      case 'popular':
-        articles = [...articles].sort((a, b) => {
-          if (a.isPopular && !b.isPopular) return -1;
-          if (!a.isPopular && b.isPopular) return 1;
-          return 0;
-        });
-        break;
-      case 'recommended':
-        articles = [...articles].sort((a, b) => {
-          const scoreA = (a.isPopular ? 2 : 0) + (a.isNew ? 1 : 0);
-          const scoreB = (b.isPopular ? 2 : 0) + (b.isNew ? 1 : 0);
-          return scoreB - scoreA;
-        });
-        break;
-    }
-
-    return articles;
-  }, [sections, searchQuery, activeCategory, sortBy]);
-
-  // Get popular articles for sidebar
-  const popularArticles = allArticles.filter(a => a.isPopular).slice(0, 5);
+  const { allArticles, popularArticles, resultCount } = useArticles({
+    sections,
+    searchQuery,
+    activeCategory,
+    sortBy,
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -237,7 +189,7 @@ export default function PoradnikiPage() {
             {/* Licznik wyników */}
             <div id="search-results" className="mb-3 md:mb-6">
               <p className="text-gray-600 text-sm md:text-base">
-                Znaleziono <span className="font-semibold text-gray-900">{allArticles.length}</span> {allArticles.length === 1 ? 'poradnik' : allArticles.length < 5 ? 'poradniki' : 'poradników'}
+                Znaleziono <span className="font-semibold text-gray-900">{resultCount}</span> {resultCount === 1 ? 'poradnik' : resultCount < 5 ? 'poradniki' : 'poradników'}
               </p>
             </div>
 
