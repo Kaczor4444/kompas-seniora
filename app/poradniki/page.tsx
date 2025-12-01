@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import SearchBar from '@/components/poradniki/SearchBar';
 import CategoryFilters from '@/components/poradniki/CategoryFilters';
 import SortDropdown from '@/components/poradniki/SortDropdown';
+import ArticleCard from '@/components/poradniki/ArticleCard';
 
 export default function PoradnikiPage() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -450,20 +451,6 @@ export default function PoradnikiPage() {
             />
 
             <div className="flex gap-2 items-center">
-              {/* Mobile: Najczęściej czytane button */}
-              <button
-                onClick={() => setShowPopularModal(!showPopularModal)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg font-semibold text-xs text-gray-900 hover:border-emerald-500 hover:text-emerald-700 transition-all min-h-[44px]"
-              >
-                <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <span className="hidden sm:inline">Najczęściej</span>
-                <svg className={`w-4 h-4 transition-transform ${showPopularModal ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
               <SortDropdown onSortChange={setSortBy} />
 
               {(searchQuery || activeCategory !== 'Wszystkie') && (
@@ -481,41 +468,55 @@ export default function PoradnikiPage() {
           </div>
         </div>
 
-        {/* Mobile: Modal "Najczęściej czytane" */}
-        {showPopularModal && (
-          <div className="lg:hidden mb-4 bg-white border border-gray-200 rounded-lg p-4">
-            <div className="space-y-3">
-              {popularArticles.map((article, index) => (
-                <Link
-                  key={`mobile-popular-${article.sectionId}-${article.slug}`}
-                  href={`/poradniki/${article.sectionId}/${article.slug}`}
-                  className="group flex gap-3 p-3 rounded-lg hover:bg-emerald-50 transition-all"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-900 group-hover:text-emerald-700 line-clamp-2" title={article.title}>
-                      {article.title}
-                    </h4>
-                    <div className="flex items-center text-xs text-gray-500 mt-1">
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {article.readTime} min
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Layout: Main Content + Sidebar */}
         <div className="flex flex-col lg:flex-row gap-8">
 
           {/* Main Content Area - Sections */}
           <div className="flex-1">
+
+            {/* Mobile: Najczęściej czytane button */}
+            <button
+              onClick={() => setShowPopularModal(!showPopularModal)}
+              className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg font-semibold text-xs text-gray-900 hover:border-emerald-500 hover:text-emerald-700 transition-all min-h-[44px] mb-3"
+            >
+              <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span>Najczęściej czytane</span>
+              <svg className={`w-4 h-4 transition-transform ${showPopularModal ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Mobile: Modal "Najczęściej czytane" */}
+            {showPopularModal && (
+              <div className="lg:hidden mb-4 bg-white border border-gray-200 rounded-lg p-4">
+                <div className="space-y-3">
+                  {popularArticles.map((article, index) => (
+                    <Link
+                      key={`mobile-popular-${article.sectionId}-${article.slug}`}
+                      href={`/poradniki/${article.sectionId}/${article.slug}`}
+                      className="group flex gap-3 p-3 rounded-lg hover:bg-emerald-50 transition-all"
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-sm text-gray-900 group-hover:text-emerald-700 line-clamp-2" title={article.title}>
+                          {article.title}
+                        </h4>
+                        <div className="flex items-center text-xs text-gray-500 mt-1">
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {article.readTime} min
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Licznik wyników */}
             <div id="search-results" className="mb-3 md:mb-6">
@@ -580,11 +581,12 @@ export default function PoradnikiPage() {
                   section.articles.some(article => article.category === activeCategory)
                 )
                 .map((section) => {
+                // Get filtered articles for this section
+                const sectionArticles = allArticles.filter(a => a.sectionId === section.id);
                 const isExpanded = expandedSections[section.id];
-                const displayedArticles = isExpanded
-                  ? section.articles
-                  : section.articles.slice(0, 3);
-                const hasMore = section.articles.length > 3;
+                const firstThreeArticles = sectionArticles.slice(0, 3);
+                const additionalArticles = sectionArticles.slice(3);
+                const hasMore = sectionArticles.length > 3;
 
                 return (
                   <section key={section.id} id={section.id} className="scroll-mt-24">
@@ -598,63 +600,11 @@ export default function PoradnikiPage() {
 
                     {/* Articles Grid - 3 columns desktop, 2 tablet, 1 mobile */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {displayedArticles.map((article) => (
-                        <Link
+                      {firstThreeArticles.map((article) => (
+                        <ArticleCard
                           key={article.slug}
-                          href={`/poradniki/${section.id}/${article.slug}`}
-                          className="group bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:shadow-xl hover:border-emerald-500 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none flex flex-col"
-                        >
-                          {/* Image 16:9 */}
-                          <div className="relative aspect-video bg-gray-100 overflow-hidden">
-                            <img
-                              src={article.thumbnail}
-                              alt={article.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-
-                            {/* Badges */}
-                            <div className="absolute top-3 left-3 flex gap-2">
-                              {article.isNew && (
-                                <span className="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                                  NOWY
-                                </span>
-                              )}
-                              {article.isPopular && (
-                                <span className="bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                                  Popularny
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Content */}
-                          <div className="p-5 flex-1 flex flex-col">
-                            {/* Category Tag */}
-                            <div className="mb-3">
-                              <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${article.categoryColor}`}>
-                                {article.category}
-                              </span>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-emerald-700 transition-colors mb-3 line-clamp-2" title={article.title}>
-                              {article.title}
-                            </h3>
-
-                            {/* Excerpt */}
-                            <p className="text-sm md:text-base text-gray-600 mb-4 line-clamp-2 flex-1">
-                              {article.excerpt}
-                            </p>
-
-                            {/* Read Time */}
-                            <div className="flex items-center text-sm text-gray-500 pt-3 border-t border-gray-100">
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              <span>{article.readTime} min czytania</span>
-                            </div>
-                          </div>
-                        </Link>
+                          article={article}
+                        />
                       ))}
                     </div>
 
@@ -676,7 +626,7 @@ export default function PoradnikiPage() {
                             </>
                           ) : (
                             <>
-                              Pokaż więcej ({section.articles.length - 3})
+                              Pokaż więcej ({additionalArticles.length})
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
@@ -696,63 +646,11 @@ export default function PoradnikiPage() {
                               className="overflow-hidden"
                             >
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                                {section.articles.slice(3).map((article) => (
-                                  <Link
+                                {additionalArticles.map((article) => (
+                                  <ArticleCard
                                     key={article.slug}
-                                    href={`/poradniki/${section.id}/${article.slug}`}
-                                    className="group bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:shadow-xl hover:border-emerald-500 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none flex flex-col"
-                                  >
-                                    {/* Image 16:9 */}
-                                    <div className="relative aspect-video bg-gray-100 overflow-hidden">
-                                      <img
-                                        src={article.thumbnail}
-                                        alt={article.title}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                      />
-
-                                      {/* Badges */}
-                                      <div className="absolute top-3 left-3 flex gap-2">
-                                        {article.isNew && (
-                                          <span className="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                                            NOWY
-                                          </span>
-                                        )}
-                                        {article.isPopular && (
-                                          <span className="bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                                            Popularny
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="p-5 flex-1 flex flex-col">
-                                      {/* Category Tag */}
-                                      <div className="mb-3">
-                                        <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${article.categoryColor}`}>
-                                          {article.category}
-                                        </span>
-                                      </div>
-
-                                      {/* Title */}
-                                      <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-emerald-700 transition-colors mb-3 line-clamp-2" title={article.title}>
-                                        {article.title}
-                                      </h3>
-
-                                      {/* Excerpt */}
-                                      <p className="text-sm md:text-base text-gray-600 mb-4 line-clamp-2 flex-1">
-                                        {article.excerpt}
-                                      </p>
-
-                                      {/* Read Time */}
-                                      <div className="flex items-center text-sm text-gray-500 pt-3 border-t border-gray-100">
-                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>{article.readTime} min czytania</span>
-                                      </div>
-                                    </div>
-                                  </Link>
+                                    article={article}
+                                  />
                                 ))}
                               </div>
                             </motion.div>
