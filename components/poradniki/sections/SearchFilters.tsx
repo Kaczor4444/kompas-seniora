@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import SearchBar from '@/components/poradniki/SearchBar';
 import CategoryFilters from '@/components/poradniki/CategoryFilters';
 import SortDropdown from '@/components/poradniki/SortDropdown';
@@ -23,21 +24,56 @@ export default function SearchFilters({
   setSortBy,
   onResetFilters,
 }: SearchFiltersProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [showSearch, setShowSearch] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Pokaż/ukryj search bar w zależności od kierunku scrollu
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scroll w dół + poza hero -> ukryj search
+        setShowSearch(false);
+        setIsScrolled(true);
+      } else if (currentScrollY < lastScrollY) {
+        // Scroll w górę -> pokaż search
+        setShowSearch(true);
+      }
+
+      // Jeśli jesteśmy na górze strony, zawsze pokaż search
+      if (currentScrollY < 50) {
+        setShowSearch(true);
+        setIsScrolled(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   return (
     <div
       id="filters-section"
-      className="sticky top-16 z-40 bg-gray-50 py-3 -mx-4 px-4 md:-mx-6 md:px-6 shadow-sm mb-4 md:mb-8"
+      className={`sticky top-16 z-40 bg-gray-50 -mx-4 px-4 md:-mx-6 md:px-6 shadow-sm mb-4 md:mb-8 transition-all duration-300 ${
+        isScrolled && !showSearch ? 'py-2' : 'py-3'
+      }`}
     >
       <div className="flex flex-col gap-3">
         {/* Rząd 1: Search + Sort (mobile obok siebie, desktop Search full width) */}
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <SearchBar onSearch={setSearchQuery} />
+        {showSearch && (
+          <div className="flex gap-2 transition-all duration-200">
+            <div className="flex-1">
+              <SearchBar onSearch={setSearchQuery} />
+            </div>
+            <div className="md:hidden">
+              <SortDropdown onSortChange={setSortBy} />
+            </div>
           </div>
-          <div className="md:hidden">
-            <SortDropdown onSortChange={setSortBy} />
-          </div>
-        </div>
+        )}
 
         {/* Rząd 2: Categories + Sort (desktop) + Reset */}
         <div className="flex flex-wrap gap-2 md:gap-4 items-start justify-between">
