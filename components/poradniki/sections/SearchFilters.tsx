@@ -64,16 +64,18 @@ export default function SearchFilters({
     >
       <div className="flex flex-col gap-3">
         {/* Rząd 1: Search + Sort (mobile obok siebie, desktop Search full width) */}
-        {showSearch && (
-          <div className="flex gap-2 transition-all duration-200">
-            <div className="flex-1">
-              <SearchBar onSearch={setSearchQuery} />
-            </div>
-            <div className="md:hidden">
-              <SortDropdown onSortChange={setSortBy} />
-            </div>
+        <div className={`flex gap-2 transition-all duration-300 overflow-hidden ${
+          showSearch
+            ? 'opacity-100 max-h-20'
+            : 'opacity-0 max-h-0 pointer-events-none'
+        }`}>
+          <div className="flex-1">
+            <SearchBar onSearch={setSearchQuery} />
           </div>
-        )}
+          <div className="md:hidden">
+            <SortDropdown onSortChange={setSortBy} />
+          </div>
+        </div>
 
         {/* Rząd 2: Categories + Sort (desktop) + Reset */}
         <div className="flex flex-wrap gap-2 md:gap-4 items-start justify-between">
