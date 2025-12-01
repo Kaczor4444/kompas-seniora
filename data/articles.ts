@@ -1,9 +1,11 @@
 import type { Section } from '@/types/article';
+import { Building2, Heart, Users, Wallet, Scale } from 'lucide-react';
 
 export const sections: Section[] = [
     {
       id: 'wybor-opieki',
       title: 'Wybór opieki',
+      icon: 'Building2',
       articles: [
         {
           title: 'DPS, ZOL, ŚDS, opieka domowa – czym się różnią',
@@ -58,6 +60,7 @@ export const sections: Section[] = [
     {
       id: 'opiekunowie',
       title: 'Porady dla opiekunów',
+      icon: 'Heart',
       articles: [
         {
           title: 'Jak zorganizować opiekę nad seniorem krok po kroku',
@@ -112,6 +115,7 @@ export const sections: Section[] = [
     {
       id: 'seniorzy',
       title: 'Porady dla seniorów',
+      icon: 'Users',
       articles: [
         {
           title: 'Aktywność fizyczna dla seniorów – proste ćwiczenia',
@@ -165,6 +169,7 @@ export const sections: Section[] = [
     {
       id: 'finanse',
       title: 'Finanse i świadczenia',
+      icon: 'Wallet',
       articles: [
         {
           title: 'Dodatek pielęgnacyjny – ile wynosi i jak złożyć wniosek',
@@ -219,6 +224,7 @@ export const sections: Section[] = [
     {
       id: 'prawne',
       title: 'Prawne aspekty',
+      icon: 'Scale',
       articles: [
         {
           title: 'Prawa mieszkańców DPS i pacjentów ZOL – przewodnik',

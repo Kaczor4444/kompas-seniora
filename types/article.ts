@@ -13,6 +13,7 @@ export type Article = {
 export type Section = {
   id: string;
   title: string;
+  icon?: string;
   articles: Article[];
 };
 

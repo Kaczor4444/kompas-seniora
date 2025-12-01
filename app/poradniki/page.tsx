@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Building2, Heart, Users, Wallet, Scale } from 'lucide-react';
 import ArticleCard from '@/components/poradniki/ArticleCard';
 import { categories } from '@/data/categories';
 import { sections } from '@/data/articles';
@@ -10,6 +11,14 @@ import { useArticles } from '@/hooks/useArticles';
 import Hero from '@/components/poradniki/sections/Hero';
 import Breadcrumbs from '@/components/poradniki/sections/Breadcrumbs';
 import SearchFilters from '@/components/poradniki/sections/SearchFilters';
+
+const iconMap = {
+  Building2: Building2,
+  Heart: Heart,
+  Users: Users,
+  Wallet: Wallet,
+  Scale: Scale,
+};
 
 export default function PoradnikiPage() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -149,7 +158,11 @@ export default function PoradnikiPage() {
                   <section key={section.id} id={section.id} className="scroll-mt-24">
                     {/* Section Header */}
                     <div className="mb-6">
-                      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                        {section.icon && (() => {
+                          const Icon = iconMap[section.icon as keyof typeof iconMap];
+                          return Icon ? <Icon className="w-7 h-7 md:w-8 md:h-8 text-emerald-600" /> : null;
+                        })()}
                         {section.title}
                       </h2>
                       <div className="h-1 w-20 bg-emerald-600 rounded-full"></div>
