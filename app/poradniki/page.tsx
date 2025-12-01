@@ -356,21 +356,21 @@ export default function PoradnikiPage() {
     // Sort articles
     switch (sortBy) {
       case 'newest':
-        articles = articles.sort((a, b) => {
+        articles = [...articles].sort((a, b) => {
           if (a.isNew && !b.isNew) return -1;
           if (!a.isNew && b.isNew) return 1;
           return 0;
         });
         break;
       case 'popular':
-        articles = articles.sort((a, b) => {
+        articles = [...articles].sort((a, b) => {
           if (a.isPopular && !b.isPopular) return -1;
           if (!a.isPopular && b.isPopular) return 1;
           return 0;
         });
         break;
       case 'recommended':
-        articles = articles.sort((a, b) => {
+        articles = [...articles].sort((a, b) => {
           const scoreA = (a.isPopular ? 2 : 0) + (a.isNew ? 1 : 0);
           const scoreB = (b.isPopular ? 2 : 0) + (b.isNew ? 1 : 0);
           return scoreB - scoreA;
