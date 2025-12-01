@@ -67,7 +67,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         </h3>
 
         {/* Excerpt */}
-        <p className="text-sm md:text-base text-gray-600 mb-4 line-clamp-2 flex-1">
+        <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed mb-4 flex-1">
           {article.excerpt}
         </p>
 
