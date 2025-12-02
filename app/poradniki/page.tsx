@@ -168,8 +168,8 @@ export default function PoradnikiPage() {
                       <div className="h-1 w-20 bg-emerald-600 rounded-full"></div>
                     </div>
 
-                    {/* Articles Grid - 3 columns desktop, 2 tablet, 1 mobile */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Articles Grid - 2 columns desktop, 2 tablet, 1 mobile */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
                       {firstThreeArticles.map((article) => (
                         <ArticleCard
                           key={article.slug}
@@ -215,7 +215,7 @@ export default function PoradnikiPage() {
                               transition={{ duration: 0.3, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
                                 {additionalArticles.map((article) => (
                                   <ArticleCard
                                     key={article.slug}
