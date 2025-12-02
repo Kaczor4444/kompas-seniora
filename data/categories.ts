@@ -1,8 +1,8 @@
 export const primaryCategories = [
   'Wszystkie',
   'Wybór opieki',
-  'Porady dla opiekunów',
-  'Porady dla seniorów'
+  'Dla opiekuna',
+  'Dla seniora'
 ] as const;
 
 export const secondaryCategories = [
