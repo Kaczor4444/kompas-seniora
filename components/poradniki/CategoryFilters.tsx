@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 interface CategoryFiltersProps {
   categories: string[];
@@ -10,6 +10,20 @@ interface CategoryFiltersProps {
 
 export default function CategoryFilters({ categories, activeCategory, onCategoryChange }: CategoryFiltersProps) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setShowDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setShowDropdown(false);
+    }, 150); // 150ms opóźnienie przed zamknięciem
+  };
 
   // Skrócone nazwy kategorii na mobile
   const categoryLabels: Record<string, string> = {
@@ -50,8 +64,8 @@ export default function CategoryFilters({ categories, activeCategory, onCategory
       {secondaryCategories.length > 0 && (
         <div
           className="relative"
-          onMouseEnter={() => setShowDropdown(true)}
-          onMouseLeave={() => setShowDropdown(false)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           <button
             onClick={() => setShowDropdown(!showDropdown)}
@@ -73,7 +87,7 @@ export default function CategoryFilters({ categories, activeCategory, onCategory
 
           {/* Dropdown z secondary categories */}
           {showDropdown && (
-            <div className="absolute z-10 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-[200px] left-0">
+            <div className="absolute z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-[200px] left-0">
               {secondaryCategories.map((category) => {
                 const isActive = activeCategory === category;
                 return (
@@ -83,10 +97,10 @@ export default function CategoryFilters({ categories, activeCategory, onCategory
                       onCategoryChange(category);
                       setShowDropdown(false);
                     }}
-                    className={`w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition-all ${
+                    className={`w-full text-left px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
                       isActive
                         ? 'bg-emerald-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        : 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-700'
                     }`}
                   >
                     {category}
