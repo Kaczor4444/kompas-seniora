@@ -11,6 +11,7 @@ import { useArticles } from '@/hooks/useArticles';
 import Hero from '@/components/poradniki/sections/Hero';
 import Breadcrumbs from '@/components/poradniki/sections/Breadcrumbs';
 import SearchFilters from '@/components/poradniki/sections/SearchFilters';
+import ReadingHistory from '@/components/poradniki/ReadingHistory';
 
 const iconMap = {
   Building2: Building2,
@@ -271,6 +272,9 @@ export default function PoradnikiPage() {
                   ))}
                 </div>
               </div>
+
+              {/* Ostatnio czytane */}
+              <ReadingHistory variant="sidebar" />
             </div>
           </aside>
 
@@ -302,6 +306,11 @@ export default function PoradnikiPage() {
             ))}
           </div>
         </section>
+
+        {/* Mobile: Ostatnio czytane */}
+        <div className="md:hidden">
+          <ReadingHistory variant="mobile" />
+        </div>
 
         {/* CTA Section */}
         <section className="mt-12 md:mt-16 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl md:rounded-2xl p-6 md:p-8 lg:p-12 text-white text-center">
