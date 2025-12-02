@@ -22,12 +22,12 @@ export default function CategoryFilters({ categories, activeCategory, onCategory
   };
 
   // Podział na primary (zawsze widoczne) i secondary (w dropdown)
-  const primaryCategories = categories.slice(0, 3); // Pierwsze 3: Wszystkie, Opieka, Opiekunowie
-  const secondaryCategories = categories.slice(3); // Reszta w dropdown
+  const primaryCategories = categories.slice(0, 4); // Pierwsze 4: Wszystkie, Opieka, Opiekun, Senior
+  const secondaryCategories = categories.slice(4); // Reszta w dropdown
 
   return (
     <div className="relative">
-      <div className="flex flex-wrap gap-1.5 md:gap-2">
+      <div className="flex flex-wrap gap-1.5 md:gap-2 will-change-transform" style={{ backfaceVisibility: 'hidden' }}>
         {/* Primary categories - zawsze widoczne */}
         {primaryCategories.map((category) => {
           const isActive = activeCategory === category;
@@ -52,6 +52,7 @@ export default function CategoryFilters({ categories, activeCategory, onCategory
           <button
             onClick={() => setShowDropdown(!showDropdown)}
             className="px-2.5 py-2 md:px-5 md:py-2.5 rounded-lg font-semibold text-xs md:text-sm transition-all min-h-[44px] bg-white text-gray-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm flex items-center gap-1"
+            style={{ transform: 'translate3d(0,0,0)' }}
             aria-expanded={showDropdown}
             aria-haspopup="true"
           >
