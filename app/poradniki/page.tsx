@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Building2, Heart, Users, Wallet, Scale } from 'lucide-react';
 import ArticleCard from '@/components/poradniki/ArticleCard';
-import { primaryCategories } from '@/data/categories';
+import { categories } from '@/data/categories';
 import { sections } from '@/data/articles';
 import { useArticles } from '@/hooks/useArticles';
 import Hero from '@/components/poradniki/sections/Hero';
@@ -81,7 +81,7 @@ export default function PoradnikiPage() {
               { text: 'Prawa mieszkańców DPS', category: 'Prawne aspekty' },
               { text: 'Świadczenia z MOPS', category: 'Finanse i świadczenia' },
               { text: 'Opieka dzienna vs całodobowa', category: 'Wybór opieki' },
-              { text: 'Komunikacja z seniorem', category: 'Porady dla opiekunów' }
+              { text: 'Komunikacja z seniorem', category: 'Dla opiekuna' }
             ].map((topic, index) => (
               <button
                 key={index}
@@ -101,7 +101,7 @@ export default function PoradnikiPage() {
         <SearchFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          categories={primaryCategories}
+          categories={categories}
           activeCategory={activeCategory}
           setActiveCategory={handleCategoryChange}
           sortBy={sortBy}

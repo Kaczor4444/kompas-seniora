@@ -59,14 +59,14 @@ export const sections: Section[] = [
     },
     {
       id: 'opiekunowie',
-      title: 'Porady dla opiekunów',
+      title: 'Dla opiekuna',
       icon: 'Heart',
       articles: [
         {
           title: 'Jak zorganizować opiekę nad seniorem krok po kroku',
           slug: 'organizacja-opieki',
           thumbnail: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80',
-          category: 'Porady dla opiekunów',
+          category: 'Dla opiekuna',
           categoryColor: 'bg-purple-50 text-purple-700',
           excerpt: 'Kompleksowy przewodnik jak zaplanować i zorganizować opiekę nad osobą starszą.',
           readTime: 10,
@@ -76,7 +76,7 @@ export const sections: Section[] = [
           title: 'Komunikacja z seniorem – sprawdzone techniki',
           slug: 'komunikacja-senior',
           thumbnail: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80',
-          category: 'Porady dla opiekunów',
+          category: 'Dla opiekuna',
           categoryColor: 'bg-purple-50 text-purple-700',
           excerpt: 'Praktyczne wskazówki jak rozmawiać z seniorem i budować pozytywne relacje.',
           readTime: 6
@@ -85,7 +85,7 @@ export const sections: Section[] = [
           title: 'Higiena i pielęgnacja seniora – praktyczny poradnik',
           slug: 'higiena-pielegnacja',
           thumbnail: 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=800&q=80',
-          category: 'Porady dla opiekunów',
+          category: 'Dla opiekuna',
           categoryColor: 'bg-purple-50 text-purple-700',
           excerpt: 'Szczegółowe instrukcje dotyczące codziennej pielęgnacji osoby starszej.',
           readTime: 8
@@ -94,7 +94,7 @@ export const sections: Section[] = [
           title: 'Jak wspierać seniora z demencją i problemami pamięci',
           slug: 'wsparcie-demencja',
           thumbnail: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80',
-          category: 'Porady dla opiekunów',
+          category: 'Dla opiekuna',
           categoryColor: 'bg-purple-50 text-purple-700',
           excerpt: 'Praktyczne strategie wspierania seniora z zaburzeniami pamięci i demencją.',
           readTime: 9,
@@ -104,7 +104,7 @@ export const sections: Section[] = [
           title: 'Udogodnienia w domu seniora – co warto przygotować',
           slug: 'udogodnienia-dom',
           thumbnail: 'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&q=80',
-          category: 'Porady dla opiekunów',
+          category: 'Dla opiekuna',
           categoryColor: 'bg-purple-50 text-purple-700',
           excerpt: 'Lista niezbędnych adaptacji domu dla bezpieczeństwa i komfortu seniora.',
           readTime: 7,
@@ -114,14 +114,14 @@ export const sections: Section[] = [
     },
     {
       id: 'seniorzy',
-      title: 'Porady dla seniorów',
+      title: 'Dla seniora',
       icon: 'Users',
       articles: [
         {
           title: 'Aktywność fizyczna dla seniorów – proste ćwiczenia',
           slug: 'aktywnosc-fizyczna',
           thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80',
-          category: 'Porady dla seniorów',
+          category: 'Dla seniora',
           categoryColor: 'bg-green-50 text-green-700',
           excerpt: 'Bezpieczne i skuteczne ćwiczenia dla osób starszych do wykonania w domu.',
           readTime: 6
@@ -130,7 +130,7 @@ export const sections: Section[] = [
           title: 'Jak bezpiecznie senior może korzystać z internetu',
           slug: 'internet-bezpieczenstwo',
           thumbnail: 'https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=800&q=80',
-          category: 'Porady dla seniorów',
+          category: 'Dla seniora',
           categoryColor: 'bg-green-50 text-green-700',
           excerpt: 'Zasady bezpieczeństwa w sieci i ochrona przed oszustwami online.',
           readTime: 7,
@@ -140,7 +140,7 @@ export const sections: Section[] = [
           title: 'Emerytura z dobrym planem – porady finansowe',
           slug: 'emerytura-plan',
           thumbnail: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80',
-          category: 'Porady dla seniorów',
+          category: 'Dla seniora',
           categoryColor: 'bg-green-50 text-green-700',
           excerpt: 'Jak mądrze planować budżet i zarządzać finansami na emeryturze.',
           readTime: 8
@@ -149,7 +149,7 @@ export const sections: Section[] = [
           title: 'Jak dbać o zdrowie i sprawność po 70 roku życia',
           slug: 'zdrowie-po-70',
           thumbnail: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&q=80',
-          category: 'Porady dla seniorów',
+          category: 'Dla seniora',
           categoryColor: 'bg-green-50 text-green-700',
           excerpt: 'Kompleksowy przewodnik po profilaktyce zdrowotnej i aktywności po 70.',
           readTime: 9,
@@ -159,7 +159,7 @@ export const sections: Section[] = [
           title: 'Jak zaplanować dzień, by zachować energię',
           slug: 'planowanie-dnia',
           thumbnail: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&q=80',
-          category: 'Porady dla seniorów',
+          category: 'Dla seniora',
           categoryColor: 'bg-green-50 text-green-700',
           excerpt: 'Strategie organizacji dnia, które pomogą zachować witalność i dobry nastrój.',
           readTime: 5
