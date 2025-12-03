@@ -1,3 +1,26 @@
+/**
+ * HYBRID SYSTEM - How it works:
+ *
+ * This file contains ORGANIZATIONAL data only:
+ * - slug (identifier)
+ * - sectionId (which section)
+ * - category (which category)
+ * - featured (priority flag)
+ *
+ * CONTENT data comes from MDX frontmatter:
+ * - title (heading)
+ * - excerpt (description)
+ * - readTime (minutes)
+ * - publishedAt (date)
+ *
+ * To add a new article:
+ * 1. Add entry here: { slug: "...", sectionId: "...", category: "...", featured: true }
+ * 2. Create MDX: content/articles/[sectionId]/[slug].mdx
+ * 3. System auto-loads metadata from frontmatter
+ *
+ * Articles without MDX show placeholder: "Artykuł w przygotowaniu..."
+ */
+
 import type { Section } from '@/types/article';
 import { Building2, Heart, Users, Wallet, Scale } from 'lucide-react';
 

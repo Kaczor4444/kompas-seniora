@@ -68,13 +68,24 @@ export async function enrichArticleWithMetadata(
     }
   }
 
+  // Warn in development when article has no MDX file
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`📝 Missing MDX file for article: ${article.slug} (showing placeholder)`)
+  }
+
   // Fallback for articles without MDX files
+  // Convert slug to readable title: "dodatek-pielegnacyjny" -> "Dodatek Pielęgnacyjny"
+  const readableTitle = article.slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+
   return {
     ...article,
-    title: `[Placeholder] ${article.slug}`,
-    excerpt: 'Ten artykuł jest w przygotowaniu.',
+    title: `[Placeholder] ${readableTitle}`,
+    excerpt: 'Artykuł w przygotowaniu...',
     readTime: 5,
-    publishedAt: new Date().toISOString().split('T')[0],
+    publishedAt: '2025-12-03',
   }
 }
 
@@ -93,12 +104,23 @@ export async function enrichArticlesWithMetadata(
  * Useful for consistent fallback behavior
  */
 export function getPlaceholderMetadata(slug: string, category: string): ArticleMetadata {
+  // Warn in development when article has no MDX file
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`📝 Missing MDX file for article: ${slug} (showing placeholder)`)
+  }
+
+  // Convert slug to readable title: "dodatek-pielegnacyjny" -> "Dodatek Pielęgnacyjny"
+  const readableTitle = slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+
   return {
-    title: `[Placeholder] ${slug}`,
-    excerpt: 'Ten artykuł jest w przygotowaniu.',
+    title: `[Placeholder] ${readableTitle}`,
+    excerpt: 'Artykuł w przygotowaniu...',
     category,
     readTime: 5,
-    publishedAt: new Date().toISOString().split('T')[0],
+    publishedAt: '2025-12-03',
     featured: false,
   }
 }
