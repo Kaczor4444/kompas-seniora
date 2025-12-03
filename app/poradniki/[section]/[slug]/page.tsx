@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import matter from 'gray-matter'
@@ -5,6 +6,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import ArticleLayout from '@/components/articles/ArticleLayout'
 import ArticleTracker from '@/components/articles/ArticleTracker'
+import ArticleSchema from '@/components/articles/ArticleSchema'
 
 interface ArticleFrontmatter {
   title: string
@@ -37,6 +39,48 @@ async function loadArticle(section: string, slug: string) {
   }
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { section: string; slug: string }
+}): Promise<Metadata> {
+  const article = await loadArticle(params.section, params.slug)
+
+  if (!article) {
+    return {
+      title: 'Artykuł nie znaleziony | Kompas Seniora',
+    }
+  }
+
+  const { frontmatter } = article
+
+  return {
+    title: `${frontmatter.title} | Kompas Seniora`,
+    description: frontmatter.excerpt,
+    keywords: [
+      'dom pomocy społecznej',
+      'dps',
+      'śds',
+      'opieka senioralna',
+      frontmatter.category,
+    ],
+    openGraph: {
+      title: frontmatter.title,
+      description: frontmatter.excerpt,
+      type: 'article',
+      publishedTime: frontmatter.publishedAt,
+      modifiedTime: frontmatter.updatedAt,
+      authors: ['Kompas Seniora'],
+      siteName: 'Kompas Seniora',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: frontmatter.title,
+      description: frontmatter.excerpt,
+    },
+  }
+}
+
 export default async function ArticlePage({
   params,
 }: {
@@ -51,6 +95,13 @@ export default async function ArticlePage({
 
   return (
     <>
+      <ArticleSchema
+        title={article.frontmatter.title}
+        excerpt={article.frontmatter.excerpt}
+        publishedAt={article.frontmatter.publishedAt}
+        updatedAt={article.frontmatter.updatedAt}
+        category={article.frontmatter.category}
+      />
       <ArticleTracker
         slug={slug}
         sectionId={section}
