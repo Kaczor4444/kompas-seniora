@@ -1,13 +1,8 @@
 export type Article = {
-  title: string;
   slug: string;
-  thumbnail: string;
+  sectionId: string;
   category: string;
-  categoryColor: string;
-  excerpt: string;
-  readTime: number;
-  isNew?: boolean;
-  isPopular?: boolean;
+  featured?: boolean;
 };
 
 export type Section = {
@@ -18,6 +13,5 @@ export type Section = {
 };
 
 export type ArticleWithSection = Article & {
-  sectionId: string;
   sectionTitle: string;
 };
