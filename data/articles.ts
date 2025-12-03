@@ -58,7 +58,7 @@ export const sections: Section[] = [
       ],
     },
     {
-      id: 'opiekunowie',
+      id: 'dla-opiekuna',
       title: 'Dla opiekuna',
       icon: 'Heart',
       articles: [
@@ -113,7 +113,7 @@ export const sections: Section[] = [
       ],
     },
     {
-      id: 'seniorzy',
+      id: 'dla-seniora',
       title: 'Dla seniora',
       icon: 'Users',
       articles: [
@@ -167,7 +167,7 @@ export const sections: Section[] = [
       ],
     },
     {
-      id: 'finanse',
+      id: 'finanse-i-swiadczenia',
       title: 'Finanse i świadczenia',
       icon: 'Wallet',
       articles: [
@@ -222,7 +222,7 @@ export const sections: Section[] = [
       ],
     },
     {
-      id: 'prawne',
+      id: 'prawne-aspekty',
       title: 'Prawne aspekty',
       icon: 'Scale',
       articles: [
