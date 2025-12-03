@@ -7,6 +7,10 @@ import path from 'path'
 import ArticleLayout from '@/components/articles/ArticleLayout'
 import ArticleTracker from '@/components/articles/ArticleTracker'
 import ArticleSchema from '@/components/articles/ArticleSchema'
+import KeyTakeaways from '@/components/articles/KeyTakeaways'
+import InfoBox from '@/components/articles/InfoBox'
+import WarningBox from '@/components/articles/WarningBox'
+import Checklist from '@/components/articles/Checklist'
 
 interface ArticleFrontmatter {
   title: string
@@ -37,6 +41,14 @@ async function loadArticle(section: string, slug: string) {
   } catch (error) {
     return null
   }
+}
+
+// MDX components that can be used in articles
+const components = {
+  KeyTakeaways,
+  InfoBox,
+  WarningBox,
+  Checklist,
 }
 
 export async function generateMetadata({
@@ -115,7 +127,7 @@ export default async function ArticlePage({
         publishedAt={article.frontmatter.publishedAt}
         updatedAt={article.frontmatter.updatedAt}
       >
-        <MDXRemote source={article.content} />
+        <MDXRemote source={article.content} components={components} />
       </ArticleLayout>
     </>
   )
