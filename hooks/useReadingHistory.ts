@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const STORAGE_KEY = 'kompas_reading_history';
 const MAX_ITEMS = 3;
@@ -24,16 +24,10 @@ export function useReadingHistory() {
   const [history, setHistory] = useState<ReadingHistoryItem[]>([]);
   const [isClient, setIsClient] = useState(false);
 
-  // Check if we're on the client side (SSR safe)
-  useEffect(() => {
-    setIsClient(true);
-    loadHistory();
-  }, []);
-
   /**
    * Load history from localStorage and filter expired items
    */
-  const loadHistory = () => {
+  const loadHistory = useCallback(() => {
     if (typeof window === 'undefined') return;
 
     try {
@@ -62,22 +56,26 @@ export function useReadingHistory() {
       console.error('Error loading reading history:', error);
       setHistory([]);
     }
-  };
+  }, []);
 
   /**
    * Add article to reading history
    * Updates timestamp if article already exists
+   * Reads localStorage directly to avoid circular dependencies
    */
-  const addToHistory = (article: Omit<ReadingHistoryItem, 'timestamp' | 'expiresAt'>) => {
+  const addToHistory = useCallback((article: Omit<ReadingHistoryItem, 'timestamp' | 'expiresAt'>) => {
     if (typeof window === 'undefined') return;
 
     try {
       const now = Date.now();
       const expiresAt = now + (EXPIRY_DAYS * 24 * 60 * 60 * 1000);
 
-      // Load current history
+      // Load current history directly from localStorage
       const stored = localStorage.getItem(STORAGE_KEY);
       let items: ReadingHistoryItem[] = stored ? JSON.parse(stored) : [];
+
+      // Filter expired items first
+      items = items.filter(item => item.expiresAt > now);
 
       // Check if article already exists
       const existingIndex = items.findIndex(
@@ -101,14 +99,11 @@ export function useReadingHistory() {
         items.unshift(newItem);
       }
 
-      // Filter expired items
-      const validItems = items.filter(item => item.expiresAt > now);
-
       // Sort by timestamp DESC
-      validItems.sort((a, b) => b.timestamp - a.timestamp);
+      items.sort((a, b) => b.timestamp - a.timestamp);
 
       // Keep only max items
-      const limitedItems = validItems.slice(0, MAX_ITEMS);
+      const limitedItems = items.slice(0, MAX_ITEMS);
 
       // Save to localStorage
       localStorage.setItem(STORAGE_KEY, JSON.stringify(limitedItems));
@@ -118,20 +113,20 @@ export function useReadingHistory() {
     } catch (error) {
       console.error('Error adding to reading history:', error);
     }
-  };
+  }, []);
 
   /**
    * Get current reading history
-   * Returns filtered and sorted items
+   * Returns filtered and sorted items from state
    */
-  const getHistory = (): ReadingHistoryItem[] => {
+  const getHistory = useCallback((): ReadingHistoryItem[] => {
     return history;
-  };
+  }, [history]);
 
   /**
    * Clear all reading history
    */
-  const clearHistory = () => {
+  const clearHistory = useCallback(() => {
     if (typeof window === 'undefined') return;
 
     try {
@@ -140,7 +135,13 @@ export function useReadingHistory() {
     } catch (error) {
       console.error('Error clearing reading history:', error);
     }
-  };
+  }, []);
+
+  // Check if we're on the client side (SSR safe) and load history
+  useEffect(() => {
+    setIsClient(true);
+    loadHistory();
+  }, [loadHistory]);
 
   return {
     history,
