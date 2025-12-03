@@ -11,6 +11,7 @@ export interface ArticleMetadata {
   publishedAt: string
   updatedAt?: string
   featured?: boolean
+  thumbnail?: string
 }
 
 export interface ArticleWithMetadata extends Article {
@@ -20,6 +21,23 @@ export interface ArticleWithMetadata extends Article {
   readTime: number
   publishedAt: string
   updatedAt?: string
+  thumbnail: string  // Always present (from MDX or fallback)
+}
+
+/**
+ * Get fallback thumbnail for category
+ * Uses themed Unsplash images for Polish senior care context
+ */
+function getCategoryThumbnail(category: string): string {
+  const thumbnails: Record<string, string> = {
+    'Wybór opieki': 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80', // Modern nursing home lobby
+    'Dla opiekuna': 'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=800&q=80', // Caregiver holding elderly hand
+    'Dla seniora': 'https://images.unsplash.com/photo-1566616213894-2d4e1baee5d8?w=800&q=80', // Happy senior reading
+    'Finanse i świadczenia': 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80', // Financial planning documents
+    'Prawne aspekty': 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80', // Legal documents signing
+  }
+
+  return thumbnails[category] || 'https://images.unsplash.com/photo-1559825481-12a05cc00344?w=800&q=80' // Default: senior care
 }
 
 /**
@@ -41,7 +59,12 @@ export async function loadArticleMetadata(
   try {
     const source = await fs.readFile(filePath, 'utf8')
     const { data } = matter(source)
-    return data as ArticleMetadata
+
+    // Add category fallback thumbnail if not specified in MDX
+    return {
+      ...data,
+      thumbnail: data.thumbnail || getCategoryThumbnail(data.category || ''),
+    } as ArticleMetadata
   } catch (error) {
     // File doesn't exist or parsing failed
     return null
@@ -65,6 +88,7 @@ export async function enrichArticleWithMetadata(
       readTime: metadata.readTime,
       publishedAt: metadata.publishedAt,
       updatedAt: metadata.updatedAt,
+      thumbnail: metadata.thumbnail || getCategoryThumbnail(article.category),
     }
   }
 
@@ -86,6 +110,7 @@ export async function enrichArticleWithMetadata(
     excerpt: 'Artykuł w przygotowaniu...',
     readTime: 5,
     publishedAt: '2025-12-03',
+    thumbnail: getCategoryThumbnail(article.category),
   }
 }
 
@@ -122,5 +147,6 @@ export function getPlaceholderMetadata(slug: string, category: string): ArticleM
     readTime: 5,
     publishedAt: '2025-12-03',
     featured: false,
+    thumbnail: getCategoryThumbnail(category),
   }
 }
