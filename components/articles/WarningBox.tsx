@@ -8,7 +8,7 @@ interface WarningBoxProps {
 
 export default function WarningBox({ children, title = 'Ważne!' }: WarningBoxProps) {
   return (
-    <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-6 my-8 md:my-12">
+    <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-7 md:p-8 my-8 md:my-12">
       <div className="flex items-start gap-3">
         <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
         <div className="flex-1">
