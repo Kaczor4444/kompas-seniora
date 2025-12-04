@@ -54,9 +54,10 @@ const components = {
 export async function generateMetadata({
   params,
 }: {
-  params: { section: string; slug: string }
+  params: Promise<{ section: string; slug: string }>
 }): Promise<Metadata> {
-  const article = await loadArticle(params.section, params.slug)
+  const { section, slug } = await params
+  const article = await loadArticle(section, slug)
 
   if (!article) {
     return {
@@ -96,9 +97,9 @@ export async function generateMetadata({
 export default async function ArticlePage({
   params,
 }: {
-  params: { section: string; slug: string }
+  params: Promise<{ section: string; slug: string }>
 }) {
-  const { section, slug } = params
+  const { section, slug } = await params
   const article = await loadArticle(section, slug)
 
   if (!article) {
