@@ -12,7 +12,7 @@ interface ChecklistProps {
 
 export default function Checklist({ items }: ChecklistProps) {
   return (
-    <div className="my-6">
+    <div className="my-8 md:my-12">
       <ul className="space-y-3">
         {items.map((item, i) => (
           <li

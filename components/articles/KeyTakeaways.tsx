@@ -7,7 +7,7 @@ interface KeyTakeawaysProps {
 
 export default function KeyTakeaways({ items }: KeyTakeawaysProps) {
   return (
-    <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-6 mb-8">
+    <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-6 my-8 md:my-12">
       <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
         <CheckCircle className="w-6 h-6 text-emerald-600" />
         Najważniejsze wnioski

@@ -81,7 +81,7 @@ export default function ArticleLayout({
       </nav>
 
       {/* Article */}
-      <article className="max-w-4xl mx-auto py-8 md:py-12 px-4 md:px-6">
+      <article className="max-w-4xl mx-auto py-12 md:py-16 px-4 md:px-6">
         {/* Header */}
         <header className="mb-8 md:mb-12">
           {/* Category Badge */}
@@ -128,7 +128,7 @@ export default function ArticleLayout({
         </header>
 
         {/* Content */}
-        <div className="prose prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:lg:text-4xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:md:text-2xl prose-h3:font-semibold prose-h3:mt-6 prose-h3:mb-3 prose-p:text-lg prose-p:md:text-xl prose-p:leading-loose prose-p:mb-4 prose-p:text-gray-800 prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:text-emerald-700 hover:prose-a:underline prose-strong:text-gray-900 prose-strong:font-semibold prose-ul:space-y-3 prose-ol:space-y-3 prose-li:text-lg prose-li:md:text-xl prose-li:text-gray-800 prose-li:leading-loose prose-blockquote:border-l-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-6 prose-blockquote:not-italic prose-img:rounded-lg prose-img:shadow-md space-y-6">
+        <div className="prose prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:lg:text-4xl prose-h2:mt-16 prose-h2:mb-8 prose-h3:text-xl prose-h3:md:text-2xl prose-h3:font-semibold prose-h3:mt-12 prose-h3:mb-6 prose-p:text-lg prose-p:md:text-xl prose-p:leading-loose prose-p:mb-6 prose-p:md:mb-8 prose-p:text-gray-800 prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:text-emerald-700 hover:prose-a:underline prose-strong:text-gray-900 prose-strong:font-semibold prose-ul:space-y-3 prose-ol:space-y-3 prose-li:text-lg prose-li:md:text-xl prose-li:text-gray-800 prose-li:leading-loose prose-blockquote:border-l-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-6 prose-blockquote:not-italic prose-img:rounded-lg prose-img:shadow-md space-y-8 md:space-y-12">
           {children}
         </div>
 
