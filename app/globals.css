@@ -147,3 +147,80 @@ textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: #A8A29E;
 }
+
+/* ========================================
+   📝 PROSE TYPOGRAPHY - Senior-Friendly
+   ======================================== */
+
+/* Base prose sizing for better readability */
+.prose {
+  font-size: 1.125rem; /* 18px base */
+  line-height: 1.75; /* loose leading */
+}
+
+@media (min-width: 768px) {
+  .prose {
+    font-size: 1.25rem; /* 20px desktop */
+  }
+}
+
+/* Paragraph spacing and line height */
+.prose p {
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+}
+
+/* List spacing for better readability */
+.prose ul,
+.prose ol {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.prose li {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.75;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .prose li {
+    font-size: 1.25rem; /* 20px desktop */
+  }
+}
+
+/* Heading hierarchy with better scaling */
+.prose h2 {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+  .prose h2 {
+    font-size: 1.875rem; /* 30px */
+  }
+}
+
+@media (min-width: 1024px) {
+  .prose h2 {
+    font-size: 2.25rem; /* 36px */
+  }
+}
+
+.prose h3 {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  .prose h3 {
+    font-size: 1.5rem; /* 24px */
+  }
+}
