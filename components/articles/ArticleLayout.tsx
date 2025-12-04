@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { ChevronRightIcon, ClockIcon, CalendarIcon, ArrowLeftIcon } from '@heroicons/react/24/outline'
 import TableOfContents from '@/components/articles/TableOfContents'
+import ReadingProgressBar from '@/components/articles/ReadingProgressBar'
 
 interface ArticleLayoutProps {
   children: React.ReactNode
@@ -43,6 +44,9 @@ export default function ArticleLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Mobile reading progress bar */}
+      <ReadingProgressBar />
+
       {/* Breadcrumbs */}
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-4">
