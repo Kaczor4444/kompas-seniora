@@ -12,34 +12,35 @@ interface ChecklistProps {
 
 export default function Checklist({ items }: ChecklistProps) {
   return (
-    <div className="my-8 md:my-12">
-      <ul className="space-y-3">
-        {items.map((item, i) => (
-          <li
-            key={i}
-            className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+    <ul className="space-y-4 my-8 md:my-12">
+      {items.map((item, i) => (
+        <li
+          key={i}
+          className="flex items-start gap-4 rounded-lg border border-gray-200 p-5 md:p-6 min-h-[60px] hover:bg-emerald-50/50 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+          role="checkbox"
+          aria-checked={item.checked || false}
+          tabIndex={0}
+        >
+          <div
+            className={`flex-shrink-0 w-7 h-7 rounded-md border-2 flex items-center justify-center transition-colors ${
+              item.checked
+                ? 'bg-emerald-600 border-emerald-600'
+                : 'border-gray-300 hover:border-emerald-400'
+            }`}
           >
-            <div
-              className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
-                item.checked
-                  ? 'bg-emerald-600 border-2 border-emerald-600'
-                  : 'border-2 border-gray-300 bg-white'
-              }`}
-              role="checkbox"
-              aria-checked={item.checked || false}
-            >
-              {item.checked && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-            </div>
-            <span
-              className={`text-lg leading-relaxed flex-1 ${
-                item.checked ? 'text-gray-900' : 'text-gray-700'
-              }`}
-            >
-              {item.text}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
+            {item.checked && (
+              <Check className="w-5 h-5 text-white" />
+            )}
+          </div>
+          <span
+            className={`text-lg md:text-xl leading-loose ${
+              item.checked ? 'text-gray-500 line-through' : 'text-gray-900'
+            }`}
+          >
+            {item.text}
+          </span>
+        </li>
+      ))}
+    </ul>
   )
 }
