@@ -112,14 +112,19 @@ export default function TableOfContents({ headings, variant = 'desktop' }: Table
   return (
     <aside className="hidden lg:block">
       <div className="sticky top-24">
-        <div className="bg-white rounded-xl border-2 border-gray-200 p-6 max-h-[calc(100vh-120px)] overflow-y-auto">
-          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 sticky top-0 bg-white pb-3 border-b border-gray-200 z-10">
-            <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            Spis treści
-          </h3>
-          <nav>
+        <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden max-h-[calc(100vh-120px)]">
+          {/* Sticky header with solid background */}
+          <div className="sticky top-0 z-10 bg-white border-b-2 border-gray-200 px-6 pt-6 pb-3">
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              Spis treści
+            </h3>
+          </div>
+
+          {/* Scrollable content */}
+          <nav className="overflow-y-auto max-h-[calc(100vh-240px)] px-6 pb-6 pt-4">
             <ul className="space-y-2 text-sm">
               {headings.map((heading) => (
                 <li key={heading.id}>

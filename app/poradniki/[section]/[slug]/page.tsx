@@ -13,6 +13,20 @@ import WarningBox from '@/components/articles/WarningBox'
 import Checklist from '@/components/articles/Checklist'
 import { extractHeadings } from '@/lib/mdxUtils'
 
+// Extract text from React children (handles strings and React elements)
+function getTextFromChildren(children: any): string {
+  if (typeof children === 'string') {
+    return children
+  }
+  if (Array.isArray(children)) {
+    return children.map(getTextFromChildren).join('')
+  }
+  if (children?.props?.children) {
+    return getTextFromChildren(children.props.children)
+  }
+  return ''
+}
+
 // Generate ID from heading text (same logic as mdx-components.tsx and mdxUtils.ts)
 function generateId(text: string): string {
   return text
@@ -64,8 +78,9 @@ const components = {
   WarningBox,
   Checklist,
   h2: ({ children, ...props }: any) => {
-    const id = typeof children === 'string' ? generateId(children) : undefined
-    if (id) console.log('🏷️ H2 rendered with ID:', id, '- Text:', children) // DEBUG
+    const text = getTextFromChildren(children)
+    const id = text ? generateId(text) : undefined
+    if (id) console.log('🏷️ H2 rendered with ID:', id, '- Text:', text.slice(0, 60)) // DEBUG
     return (
       <h2 id={id} className="scroll-mt-24" {...props}>
         {children}
@@ -73,8 +88,9 @@ const components = {
     )
   },
   h3: ({ children, ...props }: any) => {
-    const id = typeof children === 'string' ? generateId(children) : undefined
-    if (id) console.log('🏷️ H3 rendered with ID:', id, '- Text:', children) // DEBUG
+    const text = getTextFromChildren(children)
+    const id = text ? generateId(text) : undefined
+    if (id) console.log('🏷️ H3 rendered with ID:', id, '- Text:', text.slice(0, 60)) // DEBUG
     return (
       <h3 id={id} className="scroll-mt-24" {...props}>
         {children}
