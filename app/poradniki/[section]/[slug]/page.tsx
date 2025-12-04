@@ -11,6 +11,7 @@ import KeyTakeaways from '@/components/articles/KeyTakeaways'
 import InfoBox from '@/components/articles/InfoBox'
 import WarningBox from '@/components/articles/WarningBox'
 import Checklist from '@/components/articles/Checklist'
+import { extractHeadings } from '@/lib/mdxUtils'
 
 interface ArticleFrontmatter {
   title: string
@@ -106,6 +107,9 @@ export default async function ArticlePage({
     notFound()
   }
 
+  // Extract headings for TOC
+  const headings = extractHeadings(article.content)
+
   return (
     <>
       <ArticleSchema
@@ -127,6 +131,7 @@ export default async function ArticlePage({
         readTime={article.frontmatter.readTime}
         publishedAt={article.frontmatter.publishedAt}
         updatedAt={article.frontmatter.updatedAt}
+        headings={headings}
       >
         <MDXRemote source={article.content} components={components} />
       </ArticleLayout>
