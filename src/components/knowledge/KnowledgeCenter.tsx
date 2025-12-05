@@ -48,11 +48,11 @@ export default function KnowledgeCenter() {
                 <div className="absolute top-4 right-4 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold animate-pulse z-10">
                   POLECAMY
                 </div>
-                <div className="aspect-w-16 aspect-h-12 bg-accent-50 p-8 flex items-center justify-center relative">
+                <div className="relative h-48 overflow-hidden">
                   <img
-                    src="/images/dps-comfort.webp"
+                    src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=800&q=80"
                     alt="Jak wybrać placówkę dla seniora"
-                    className="w-full h-48 object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-6">
@@ -80,11 +80,11 @@ export default function KnowledgeCenter() {
                 <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
                   WKRÓTCE
                 </div>
-                <div className="aspect-w-16 aspect-h-12 bg-gray-50 p-8 flex items-center justify-center relative">
+                <div className="relative h-48 overflow-hidden">
                   <img
-                    src="/images/family-support.webp"
+                    src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80"
                     alt="Koszty domu opieki"
-                    className="w-full h-48 object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-6">
@@ -112,11 +112,11 @@ export default function KnowledgeCenter() {
                 <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
                   WKRÓTCE
                 </div>
-                <div className="aspect-w-16 aspect-h-12 bg-gray-50 p-8 flex items-center justify-center relative">
+                <div className="relative h-48 overflow-hidden">
                   <img
-                    src="/images/garden-therapy.webp"
+                    src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
                     alt="Różnice DPS i ŚDS"
-                    className="w-full h-48 object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-6">
@@ -148,11 +148,11 @@ export default function KnowledgeCenter() {
                   <div className="absolute top-2 right-2 px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold animate-pulse z-10">
                     POLECAMY
                   </div>
-                  <div className="bg-accent-50 p-6 flex items-center justify-center h-40 relative">
+                  <div className="relative h-40 overflow-hidden">
                     <img
-                      src="/images/dps-comfort.webp"
+                      src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=800&q=80"
                       alt="Jak wybrać placówkę dla seniora"
-                      className="w-full h-32 object-contain"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="p-5">
@@ -180,11 +180,11 @@ export default function KnowledgeCenter() {
                   <div className="absolute top-2 right-2 px-2 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
                     WKRÓTCE
                   </div>
-                  <div className="bg-gray-50 p-6 flex items-center justify-center h-40 relative">
+                  <div className="relative h-40 overflow-hidden">
                     <img
-                      src="/images/family-support.webp"
+                      src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80"
                       alt="Koszty domu opieki"
-                      className="w-full h-32 object-contain"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="p-5">
@@ -212,11 +212,11 @@ export default function KnowledgeCenter() {
                   <div className="absolute top-2 right-2 px-2 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
                     WKRÓTCE
                   </div>
-                  <div className="bg-gray-50 p-6 flex items-center justify-center h-40 relative">
+                  <div className="relative h-40 overflow-hidden">
                     <img
-                      src="/images/garden-therapy.webp"
+                      src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
                       alt="Różnice DPS i ŚDS"
-                      className="w-full h-32 object-contain"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="p-5">
