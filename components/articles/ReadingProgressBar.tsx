@@ -29,7 +29,7 @@ export default function ReadingProgressBar() {
 
   return (
     <div
-      className="fixed top-[66px] left-0 right-0 h-1 bg-gray-200 z-40 lg:hidden"
+      className="fixed top-[66px] left-0 right-0 h-1 bg-transparent z-[51] lg:hidden pointer-events-none"
       role="progressbar"
       aria-valuenow={Math.round(progress)}
       aria-valuemin={0}
