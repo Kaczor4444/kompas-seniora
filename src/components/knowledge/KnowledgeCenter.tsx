@@ -6,10 +6,10 @@ export default function KnowledgeCenter() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
-              Centrum Wiedzy dla Rodzin
+              🎯 Nie wiesz od czego zacząć?
             </h2>
             <p className="text-xl text-neutral-700 max-w-3xl mx-auto">
-              Praktyczne porady i informacje o opiece nad seniorami - finanse, prawo, zdrowie i wsparcie
+              Zacznij od tych artykułów - pomogą Ci podjąć pierwszą decyzję
             </p>
           </div>
           
@@ -37,103 +37,97 @@ export default function KnowledgeCenter() {
           
           {/* Desktop: Grid 3 kolumny */}
           <div className="hidden md:grid md:grid-cols-3 gap-8">
-            {/* Artykuł 1 - DPS */}
+            {/* Artykuł 1 - Wybór placówki */}
             <Link
-              href="/poradniki#wybor-opieki"
-              aria-label="Jak wygląda życie w domu pomocy społecznej"
+              href="/poradniki/wybor-opieki/wybor-placowki"
+              aria-label="Jak wybrać odpowiednią placówkę dla seniora?"
               className="group"
             >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full">
+              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full relative">
+                {/* Badge POLECAMY - top right */}
+                <div className="absolute top-4 right-4 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold animate-pulse z-10">
+                  POLECAMY
+                </div>
                 <div className="aspect-w-16 aspect-h-12 bg-accent-50 p-8 flex items-center justify-center relative">
-                  <span className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-xs font-medium text-accent-600 border border-accent-200">
-                    Domy Pomocy
-                  </span>
                   <img
                     src="/images/dps-comfort.webp"
-                    alt="Komfort w domu pomocy społecznej"
+                    alt="Jak wybrać placówkę dla seniora"
                     className="w-full h-48 object-contain"
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-accent-600 transition-colors">
-                    Jak wygląda życie w domu pomocy społecznej?
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-emerald-600 transition-colors">
+                    Jak wybrać odpowiednią placówkę dla seniora?
                   </h3>
                   <p className="text-neutral-700 mb-3">
-                    Obalamy mity - zobacz jak naprawdę wygląda codzienny dzień mieszkańca DPS i jakie ma prawa.
+                    Poznaj kryteria wyboru. Dowiedz się na co zwrócić uwagę.
                   </p>
-                  <span className="text-sm text-accent-600 font-medium inline-flex items-center gap-1">
-                    Czytaj poradnik
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <span className="text-sm text-emerald-600 font-medium inline-flex items-center gap-1">
+                    Rozpocznij czytanie →
                   </span>
                 </div>
               </article>
             </Link>
 
-            {/* Artykuł 2 - ŚDS */}
+            {/* Artykuł 2 - Koszty opieki */}
             <Link
-              href="/poradniki#wybor-opieki"
-              aria-label="Środowiskowe Domy Samopomocy - alternatywa dla DPS"
-              className="group"
+              href="/poradniki/finanse-prawne/koszty-opieki"
+              aria-label="Ile kosztuje dom opieki?"
+              className="group pointer-events-none"
             >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full">
-                <div className="aspect-w-16 aspect-h-12 bg-success-50 p-8 flex items-center justify-center relative">
-                  <span className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-xs font-medium text-success-600 border border-success-200">
-                    Środowiskowe
-                  </span>
-                  <img
-                    src="/images/garden-therapy.webp"
-                    alt="Terapia ogrodowa w ŚDS"
-                    className="w-full h-48 object-contain"
-                  />
+              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden h-full relative opacity-75">
+                {/* Badge WKRÓTCE - top right */}
+                <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
+                  WKRÓTCE
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-success-600 transition-colors">
-                    Środowiskowe Domy Samopomocy - alternatywa dla DPS
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Poznaj dzienne formy wsparcia: hortiterapia, arteterapia i zajęcia grupowe dla osób z demencją.
-                  </p>
-                  <span className="text-sm text-success-600 font-medium inline-flex items-center gap-1">
-                    Czytaj poradnik
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </div>
-              </article>
-            </Link>
-
-            {/* Artykuł 3 - Finanse */}
-            <Link
-              href="/poradniki#finanse"
-              aria-label="Ile to kosztuje? Finansowanie opieki krok po kroku"
-              className="group"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full">
-                <div className="aspect-w-16 aspect-h-12 bg-primary-50 p-8 flex items-center justify-center relative">
-                  <span className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-xs font-medium text-primary-600 border border-primary-200">
-                    Finanse i prawo
-                  </span>
+                <div className="aspect-w-16 aspect-h-12 bg-gray-50 p-8 flex items-center justify-center relative">
                   <img
                     src="/images/family-support.webp"
-                    alt="Wsparcie dla rodziny"
+                    alt="Koszty domu opieki"
                     className="w-full h-48 object-contain"
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-primary-600 transition-colors">
-                    Ile to kosztuje? Finansowanie opieki krok po kroku
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-3">
+                    Ile kosztuje dom opieki?
                   </h3>
                   <p className="text-neutral-700 mb-3">
-                    Od dopłat MOPS po ulgi podatkowe - kompletny przewodnik finansowania opieki nad seniorem.
+                    Koszty pobytu i możliwości dofinansowania z MOPS
                   </p>
-                  <span className="text-sm text-primary-600 font-medium inline-flex items-center gap-1">
-                    Czytaj poradnik
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
+                    W przygotowaniu
+                  </span>
+                </div>
+              </article>
+            </Link>
+
+            {/* Artykuł 3 - DPS vs ŚDS */}
+            <Link
+              href="/poradniki/wybor-opieki/dps-vs-sds"
+              aria-label="Czym różni się DPS od ŚDS?"
+              className="group pointer-events-none"
+            >
+              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden h-full relative opacity-75">
+                {/* Badge WKRÓTCE - top right */}
+                <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
+                  WKRÓTCE
+                </div>
+                <div className="aspect-w-16 aspect-h-12 bg-gray-50 p-8 flex items-center justify-center relative">
+                  <img
+                    src="/images/garden-therapy.webp"
+                    alt="Różnice DPS i ŚDS"
+                    className="w-full h-48 object-contain"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-3">
+                    Czym różni się DPS od ŚDS?
+                  </h3>
+                  <p className="text-neutral-700 mb-3">
+                    Zrozum różnice i wybierz właściwą formę opieki
+                  </p>
+                  <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
+                    W przygotowaniu
                   </span>
                 </div>
               </article>
@@ -143,103 +137,97 @@ export default function KnowledgeCenter() {
           {/* Mobile: Horizontal Scroll Carousel */}
           <div className="md:hidden overflow-x-auto scrollbar-hide">
             <div className="flex gap-4 pb-4" style={{ width: 'max-content' }}>
-              {/* Artykuł 1 - DPS */}
+              {/* Artykuł 1 - Wybór placówki */}
               <Link
-                href="/poradniki#wybor-opieki"
-                aria-label="Życie w domu pomocy społecznej"
+                href="/poradniki/wybor-opieki/wybor-placowki"
+                aria-label="Jak wybrać odpowiednią placówkę dla seniora?"
                 className="group"
               >
-                <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden" style={{ width: '300px' }}>
+                <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden relative" style={{ width: '300px' }}>
+                  {/* Badge POLECAMY - top right */}
+                  <div className="absolute top-2 right-2 px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold animate-pulse z-10">
+                    POLECAMY
+                  </div>
                   <div className="bg-accent-50 p-6 flex items-center justify-center h-40 relative">
-                    <span className="absolute top-2 left-2 bg-white px-2 py-0.5 rounded-full text-xs font-medium text-accent-600">
-                      Domy Pomocy
-                    </span>
                     <img
                       src="/images/dps-comfort.webp"
-                      alt="Komfort w domu pomocy społecznej"
+                      alt="Jak wybrać placówkę dla seniora"
                       className="w-full h-32 object-contain"
                     />
                   </div>
                   <div className="p-5">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-2 group-hover:text-accent-600 transition-colors">
-                      Życie w domu pomocy społecznej
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2 group-hover:text-emerald-600 transition-colors">
+                      Jak wybrać odpowiednią placówkę dla seniora?
                     </h3>
                     <p className="text-sm text-neutral-700 mb-2">
-                      Obalamy mity - zobacz jak wygląda dzień w DPS.
+                      Poznaj kryteria wyboru. Dowiedz się na co zwrócić uwagę.
                     </p>
-                    <span className="text-xs text-accent-600 font-medium inline-flex items-center gap-1">
-                      Czytaj poradnik
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                    <span className="text-xs text-emerald-600 font-medium inline-flex items-center gap-1">
+                      Rozpocznij czytanie →
                     </span>
                   </div>
                 </article>
               </Link>
 
-              {/* Artykuł 2 - ŚDS */}
+              {/* Artykuł 2 - Koszty opieki */}
               <Link
-                href="/poradniki#wybor-opieki"
-                aria-label="Środowiskowe Domy Samopomocy"
-                className="group"
+                href="/poradniki/finanse-prawne/koszty-opieki"
+                aria-label="Ile kosztuje dom opieki?"
+                className="group pointer-events-none"
               >
-                <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden" style={{ width: '300px' }}>
-                  <div className="bg-success-50 p-6 flex items-center justify-center h-40 relative">
-                    <span className="absolute top-2 left-2 bg-white px-2 py-0.5 rounded-full text-xs font-medium text-success-600">
-                      Środowiskowe
-                    </span>
-                    <img
-                      src="/images/garden-therapy.webp"
-                      alt="Terapia ogrodowa w ŚDS"
-                      className="w-full h-32 object-contain"
-                    />
+                <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden relative opacity-75" style={{ width: '300px' }}>
+                  {/* Badge WKRÓTCE - top right */}
+                  <div className="absolute top-2 right-2 px-2 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
+                    WKRÓTCE
                   </div>
-                  <div className="p-5">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-2 group-hover:text-success-600 transition-colors">
-                      Środowiskowe Domy Samopomocy
-                    </h3>
-                    <p className="text-sm text-neutral-700 mb-2">
-                      Dzienne wsparcie: hortiterapia i zajęcia grupowe.
-                    </p>
-                    <span className="text-xs text-success-600 font-medium inline-flex items-center gap-1">
-                      Czytaj poradnik
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </div>
-                </article>
-              </Link>
-
-              {/* Artykuł 3 - Finanse */}
-              <Link
-                href="/poradniki#finanse"
-                aria-label="Finansowanie opieki"
-                className="group"
-              >
-                <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden" style={{ width: '300px' }}>
-                  <div className="bg-primary-50 p-6 flex items-center justify-center h-40 relative">
-                    <span className="absolute top-2 left-2 bg-white px-2 py-0.5 rounded-full text-xs font-medium text-primary-600">
-                      Finanse i prawo
-                    </span>
+                  <div className="bg-gray-50 p-6 flex items-center justify-center h-40 relative">
                     <img
                       src="/images/family-support.webp"
-                      alt="Wsparcie dla rodziny"
+                      alt="Koszty domu opieki"
                       className="w-full h-32 object-contain"
                     />
                   </div>
                   <div className="p-5">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-2 group-hover:text-primary-600 transition-colors">
-                      Finansowanie opieki
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                      Ile kosztuje dom opieki?
                     </h3>
                     <p className="text-sm text-neutral-700 mb-2">
-                      Dopłaty MOPS, ulgi podatkowe - kompletny przewodnik.
+                      Koszty pobytu i możliwości dofinansowania z MOPS
                     </p>
-                    <span className="text-xs text-primary-600 font-medium inline-flex items-center gap-1">
-                      Czytaj poradnik
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                    <span className="text-xs text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
+                      W przygotowaniu
+                    </span>
+                  </div>
+                </article>
+              </Link>
+
+              {/* Artykuł 3 - DPS vs ŚDS */}
+              <Link
+                href="/poradniki/wybor-opieki/dps-vs-sds"
+                aria-label="Czym różni się DPS od ŚDS?"
+                className="group pointer-events-none"
+              >
+                <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden relative opacity-75" style={{ width: '300px' }}>
+                  {/* Badge WKRÓTCE - top right */}
+                  <div className="absolute top-2 right-2 px-2 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
+                    WKRÓTCE
+                  </div>
+                  <div className="bg-gray-50 p-6 flex items-center justify-center h-40 relative">
+                    <img
+                      src="/images/garden-therapy.webp"
+                      alt="Różnice DPS i ŚDS"
+                      className="w-full h-32 object-contain"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                      Czym różni się DPS od ŚDS?
+                    </h3>
+                    <p className="text-sm text-neutral-700 mb-2">
+                      Zrozum różnice i wybierz właściwą formę opieki
+                    </p>
+                    <span className="text-xs text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
+                      W przygotowaniu
                     </span>
                   </div>
                 </article>
