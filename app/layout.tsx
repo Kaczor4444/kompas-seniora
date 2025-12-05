@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import FloatingCookieButton from "@/components/FloatingCookieButton";
+import BackToTop from "@/components/ui/BackToTop";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Toaster } from "react-hot-toast";
 
@@ -98,8 +99,9 @@ export default function RootLayout({
         
         {/* Cookie Banner (bottom - ładuje się ostatni) */}
         <CookieBanner />
-        
-        {/* Floating Cookie Settings Button */}
+
+        {/* Floating Buttons (left: Back to Top, right: Cookie Settings) */}
+        <BackToTop />
         <FloatingCookieButton />
       </body>
     </html>
