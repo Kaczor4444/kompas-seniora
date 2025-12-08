@@ -9,12 +9,19 @@ interface TOCHeading {
   level: number
 }
 
+interface Download {
+  title: string
+  url: string
+  icon?: string
+}
+
 interface TableOfContentsProps {
   headings: TOCHeading[]
+  downloads?: Download[]
   variant?: 'mobile' | 'desktop'
 }
 
-export default function TableOfContents({ headings, variant = 'desktop' }: TableOfContentsProps) {
+export default function TableOfContents({ headings, downloads = [], variant = 'desktop' }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('')
   const [isOpen, setIsOpen] = useState(false)
 
@@ -42,6 +49,30 @@ export default function TableOfContents({ headings, variant = 'desktop' }: Table
 
     return () => observer.disconnect()
   }, [headings])
+
+  // Auto-scroll TOC to keep active item visible
+  useEffect(() => {
+    if (!activeId || variant === 'mobile') return
+
+    const tocNav = document.querySelector('nav[aria-label="Table of contents"]')
+    const activeLink = tocNav?.querySelector(`a[href="#${activeId}"]`)
+
+    if (activeLink && tocNav) {
+      const navRect = tocNav.getBoundingClientRect()
+      const linkRect = activeLink.getBoundingClientRect()
+
+      // Check if link is outside viewport
+      const isOutOfView = linkRect.top < navRect.top + 50 || linkRect.bottom > navRect.bottom - 50
+
+      if (isOutOfView) {
+        activeLink.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        })
+      }
+    }
+  }, [activeId, variant])
 
   const handleClick = (id: string) => {
     console.log('🔍 TOC click:', id) // DEBUG
@@ -88,8 +119,12 @@ export default function TableOfContents({ headings, variant = 'desktop' }: Table
             <ul className="space-y-2">
               {headings.map((heading) => (
                 <li key={heading.id}>
-                  <button
-                    onClick={() => handleClick(heading.id)}
+                  <a
+                    href={`#${heading.id}`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleClick(heading.id)
+                    }}
                     className={`block w-full text-left py-2 px-3 rounded transition-colors ${
                       heading.level === 3 ? 'pl-6 text-sm' : ''
                     } ${
@@ -99,10 +134,35 @@ export default function TableOfContents({ headings, variant = 'desktop' }: Table
                     }`}
                   >
                     {heading.text}
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>
+
+            {/* Downloads Section */}
+            {downloads && downloads.length > 0 && (
+              <div className="mt-4 pt-4 border-t-2 border-gray-200">
+                <h4 className="text-sm font-bold text-gray-900 mb-2 px-3 flex items-center gap-2">
+                  <span>📥</span>
+                  <span>Do pobrania</span>
+                </h4>
+                <ul className="space-y-2">
+                  {downloads.map((item, index) => (
+                    <li key={index}>
+                      <a
+                        href={item.url}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                        target={item.url.startsWith('http') ? '_blank' : undefined}
+                        rel={item.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      >
+                        <span className="text-lg">{item.icon || '📄'}</span>
+                        <span className="font-medium">{item.title}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </nav>
         )}
       </div>
@@ -124,12 +184,16 @@ export default function TableOfContents({ headings, variant = 'desktop' }: Table
           </div>
 
           {/* Scrollable content */}
-          <nav className="overflow-y-auto max-h-[calc(100vh-240px)] px-6 pb-6 pt-4">
+          <nav aria-label="Table of contents" className="overflow-y-auto max-h-[calc(100vh-240px)] px-6 pb-6 pt-4">
             <ul className="space-y-2 text-sm">
               {headings.map((heading) => (
                 <li key={heading.id}>
-                  <button
-                    onClick={() => handleClick(heading.id)}
+                  <a
+                    href={`#${heading.id}`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleClick(heading.id)
+                    }}
                     className={`block w-full text-left py-2 px-3 rounded transition-colors ${
                       heading.level === 3 ? 'pl-6 text-sm' : ''
                     } ${
@@ -139,10 +203,35 @@ export default function TableOfContents({ headings, variant = 'desktop' }: Table
                     }`}
                   >
                     {heading.text}
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>
+
+            {/* Downloads Section */}
+            {downloads && downloads.length > 0 && (
+              <div className="mt-6 pt-6 border-t-2 border-gray-200">
+                <h4 className="text-sm font-bold text-gray-900 mb-3 px-3 flex items-center gap-2">
+                  <span>📥</span>
+                  <span>Do pobrania</span>
+                </h4>
+                <ul className="space-y-2">
+                  {downloads.map((item, index) => (
+                    <li key={index}>
+                      <a
+                        href={item.url}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                        target={item.url.startsWith('http') ? '_blank' : undefined}
+                        rel={item.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      >
+                        <span className="text-lg">{item.icon || '📄'}</span>
+                        <span className="font-medium">{item.title}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </nav>
         </div>
       </div>

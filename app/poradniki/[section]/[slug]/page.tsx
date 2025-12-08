@@ -48,6 +48,7 @@ interface ArticleFrontmatter {
   publishedAt: string
   updatedAt?: string
   featured?: boolean
+  downloads?: Array<{ title: string; url: string; icon?: string }>
 }
 
 async function loadArticle(section: string, slug: string) {
@@ -179,6 +180,7 @@ export default async function ArticlePage({
         publishedAt={article.frontmatter.publishedAt}
         updatedAt={article.frontmatter.updatedAt}
         headings={headings}
+        downloads={article.frontmatter.downloads}
       >
         <MDXRemote source={article.content} components={components} />
       </ArticleLayout>

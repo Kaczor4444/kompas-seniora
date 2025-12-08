@@ -12,6 +12,7 @@ export interface ArticleMetadata {
   updatedAt?: string
   featured?: boolean
   thumbnail?: string
+  downloads?: Array<{ title: string; url: string; icon?: string }>
 }
 
 export interface ArticleWithMetadata extends Article {
