@@ -43,6 +43,12 @@ export const sections: Section[] = [
         featured: true,
       },
       {
+        slug: 'typy-dps',
+        sectionId: 'wybor-opieki',
+        category: 'Wybór opieki',
+        featured: true,
+      },
+      {
         slug: 'zgoda-seniora',
         sectionId: 'wybor-opieki',
         category: 'Wybór opieki',

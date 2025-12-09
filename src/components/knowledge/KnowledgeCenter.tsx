@@ -135,7 +135,39 @@ export default function KnowledgeCenter() {
               </article>
             </Link>
 
-            {/* Card 2 - Koszty opieki (WKRÓTCE) */}
+            {/* Card 2 - Typy DPS (NOWE!) */}
+            <Link
+              href="/poradniki/wybor-opieki/typy-dps"
+              aria-label="6 Typów DPS w Polsce - który wybrać?"
+              className="group flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
+            >
+              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full relative">
+                {/* Badge NOWE - top right */}
+                <div className="absolute top-4 right-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold z-10">
+                  NOWE
+                </div>
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
+                    alt="6 typów DPS w Polsce"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-emerald-600 transition-colors">
+                    6 Typów DPS w Polsce - który wybrać?
+                  </h3>
+                  <p className="text-neutral-700 mb-3">
+                    Poznaj rodzaje DPS zgodnie z Art. 54 i sprawdź który typ pasuje do potrzeb Twojego bliskiego
+                  </p>
+                  <span className="text-sm text-emerald-600 font-medium inline-flex items-center gap-1">
+                    Przeczytaj teraz →
+                  </span>
+                </div>
+              </article>
+            </Link>
+
+            {/* Card 3 - Koszty opieki (WKRÓTCE) */}
             <Link
               href="/poradniki/finanse-prawne/koszty-opieki"
               aria-label="Ile kosztuje dom opieki?"
@@ -167,7 +199,7 @@ export default function KnowledgeCenter() {
               </article>
             </Link>
 
-            {/* Card 3 - DPS vs ŚDS (WKRÓTCE) */}
+            {/* Card 4 - DPS vs ŚDS (WKRÓTCE) */}
             <Link
               href="/poradniki/wybor-opieki/dps-vs-sds"
               aria-label="Czym różni się DPS od ŚDS?"
