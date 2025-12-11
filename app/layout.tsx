@@ -26,6 +26,14 @@ export const metadata: Metadata = {
   description: "Znajdź publiczne placówki opieki dla seniorów (DPS, ŚDS) w swojej okolicy. Przejrzyste ceny z oficjalnych źródeł MOPS.",
   keywords: "dom opieki, senior, DPS, ŚDS, opieka nad seniorem, MOPS, Kraków, Małopolska",
   authors: [{ name: "Kompas Seniora" }],
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
   openGraph: {
     title: "Kompas Seniora - Wyszukiwarka placówek opieki",
     description: "Znajdź publiczne placówki opieki dla seniorów w swojej okolicy",
