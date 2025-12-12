@@ -21,6 +21,7 @@ const categoryMap: Record<string, { name: string; slug: string }> = {
   'dla-seniora': { name: 'Dla seniora', slug: 'dla-seniora' },
   'finanse-i-swiadczenia': { name: 'Finanse i świadczenia', slug: 'finanse-i-swiadczenia' },
   'prawne-aspekty': { name: 'Prawne aspekty', slug: 'prawne-aspekty' },
+  'finanse-prawne': { name: 'Finanse i prawne', slug: 'finanse-prawne' },
 }
 
 export default function ArticleLayout({

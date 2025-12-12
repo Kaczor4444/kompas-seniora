@@ -1,0 +1,37 @@
+{
+  "project_name": "Kompas Seniora Logo",
+  "logo_name": "KS Compass Heart",
+  "version": "1.0",
+  "components": [
+    {
+      "element": "Central Initials",
+      "value": "KS",
+      "color_hex": "#EC6F8C",
+      "font_style": "Sans-serif, bold, geometric",
+      "meaning": "Skrót od Kompas Seniora"
+    },
+    {
+      "element": "Compass Rose Frame",
+      "type": "Circular Emblem",
+      "color_hex": "#1C3754",
+      "detail": "Stylizowany okrąg kompasu/róży wiatrów z czterema głównymi kierunkami",
+      "meaning": "Wskazywanie drogi, nawigacja (Kompas)"
+    },
+{
+      "element": "Supporting Hand",
+      "type": "Opieka/Wsparcie",
+      "color_hex": "#126742",
+      "color_name": "Ciemna Zieleń",
+      "style": "Wypełniona sylwetka otwartej dłoni, baza dla ścieżki.",
+      "meaning": "Pomoc, troska, prowadzenie."
+    },
+
+  ],
+  "brand_keywords": [
+    "Nawigacja",
+    "Opieka",
+    "Wsparcie",
+    "Senior",
+    "Informacja"
+  ]
+}

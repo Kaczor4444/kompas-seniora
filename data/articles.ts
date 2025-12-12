@@ -22,7 +22,7 @@
  */
 
 import type { Section } from '@/types/article';
-import { Building2, Heart, Users, Wallet, Scale } from 'lucide-react';
+import { Building2, Heart, Users, Wallet, Scale, FileText } from 'lucide-react';
 
 export const sections: Section[] = [
   {
@@ -49,15 +49,16 @@ export const sections: Section[] = [
         featured: true,
       },
       {
-        slug: 'zgoda-seniora',
+        slug: 'proces-przyjecia-dps',
         sectionId: 'wybor-opieki',
         category: 'Wybór opieki',
         featured: true,
       },
       {
-        slug: 'proces-przyjecia',
+        slug: 'zgoda-seniora',
         sectionId: 'wybor-opieki',
         category: 'Wybór opieki',
+        featured: true,
       },
       {
         slug: 'opieka-dzienna-calodobowa',

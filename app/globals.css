@@ -240,3 +240,130 @@ textarea {
     font-size: 1.5rem; /* 24px */
   }
 }
+
+/* ========================================
+   📊 DPS COMPARISON TABLE STYLES (Final Version)
+   ======================================== */
+
+.dps-comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem; 
+    margin-bottom: 2rem;
+    font-size: 1.125rem; /* Zachowujemy dużą czcionkę dla czytelności (18px) */
+    line-height: 1.5;
+    /* Dodajemy lekką ramkę wokół całej tabeli dla odseparowania */
+    border: 1px solid var(--color-neutral-300); 
+    border-radius: 8px; /* Lekkie zaokrąglenie krawędzi */
+    overflow: hidden; /* Aby ramka działała z border-radius */
+}
+
+/* Nagłówki tabeli (TH) */
+.dps-comparison-table th {
+    /* Użycie ciemniejszego neutralnego tła, aby nagłówki były bardziej wyraźne */
+    background-color: var(--color-neutral-200); 
+    padding: 18px 16px; /* Większy padding dla lepszej czytelności */
+    text-align: left;
+    font-weight: 700;
+    color: var(--color-neutral-700);
+    /* Używamy PRIMARY (Amber) jako separatora wizualnego */
+    border-bottom: 4px solid var(--color-primary-500); 
+}
+
+/* Komórki danych (TD) */
+.dps-comparison-table td {
+    padding: 16px; 
+    border-bottom: 1px solid var(--color-neutral-200); /* Cienka, delikatna linia */
+    vertical-align: top;
+    color: var(--color-neutral-700);
+}
+
+/* Ostatni wiersz bez dolnej ramki */
+.dps-comparison-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Wyróżnienie najważniejszych wierszy (DPS dla seniorów, rehab, psych.) */
+.dps-comparison-table .dps-type-main {
+    /* Użycie najjaśniejszego koloru pierwotnego (Amber) */
+    background-color: var(--color-primary-50); 
+    font-weight: 500;
+}
+
+/* Wyraźniejszy kolor dla tytułów głównych typów w kolumnie */
+.dps-comparison-table .dps-type-main strong {
+    color: var(--color-primary-800); 
+}
+
+/* Efekt hover dla lepszej interakcji */
+.dps-comparison-table tr:hover {
+    background-color: var(--color-neutral-100); 
+}
+
+/* Dopasowanie efektu hover dla wyróżnionych wierszy */
+.dps-comparison-table .dps-type-main:hover {
+    background-color: var(--color-primary-100); 
+}
+
+/* --- Responsywność dla telefonów --- */
+
+@media (max-width: 768px) {
+    /* Używamy ramki zdefiniowanej na początku */
+    .dps-comparison-table {
+        border: 1px solid var(--color-neutral-300);
+    }
+    
+    /* Zapewnienie, że etykiety (data-label) są czytelne */
+    .dps-comparison-table td::before {
+        content: attr(data-label); 
+        /* Używamy ciemniejszego odcienia Amber dla kontrastu w etykiecie */
+        color: var(--color-primary-700); 
+        font-size: 1rem;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    /* Dopasowanie koloru tła dla głównych typów na telefonach */
+    .dps-comparison-table .dps-type-main {
+        background-color: var(--color-primary-50); 
+    }
+    
+    /* Zapewnienie działania responsywności przez blokowanie domyślnego wyświetlania */
+    .dps-comparison-table, 
+    .dps-comparison-table thead, 
+    .dps-comparison-table tbody, 
+    .dps-comparison-table th, 
+    .dps-comparison-table td, 
+    .dps-comparison-table tr {
+        display: block; 
+    }
+
+    .dps-comparison-table thead {
+        display: none; 
+    }
+
+    .dps-comparison-table tr {
+        margin-bottom: 15px;
+        border: 1px solid var(--color-neutral-300);
+        border-radius: 8px;
+    }
+
+    .dps-comparison-table td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        border: none;
+        border-bottom: 1px dotted var(--color-neutral-200);
+    }
+
+    .dps-comparison-table td:last-child {
+        border-bottom: none;
+    }
+
+    .dps-comparison-table td::before {
+        position: absolute;
+        left: 16px; /* Wyrównanie do lewej strony komórki */
+        width: 45%;
+        text-align: left;
+    }
+}

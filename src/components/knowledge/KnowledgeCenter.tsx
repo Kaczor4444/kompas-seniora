@@ -167,7 +167,40 @@ export default function KnowledgeCenter() {
               </article>
             </Link>
 
-            {/* Card 3 - Koszty opieki (WKRÓTCE) */}
+            {/* Card 3 - Proces Przyjęcia do DPS (NOWY ARTYKUŁ) */}
+            <Link
+              href="/poradniki/wybor-opieki/proces-przyjecia-dps"
+              aria-label="Proces Przyjęcia do DPS: Jak to Wygląda Krok po Kroku"
+              className="group flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
+            >
+              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full relative">
+                {/* Badge NOWY ARTYKUŁ - top right */}
+                <div className="absolute top-4 right-4 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold animate-pulse z-10">
+                  NOWY ARTYKUŁ
+                </div>
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80"
+                    alt="Proces przyjęcia do DPS"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6">
+                  <div className="text-sm text-emerald-600 mb-2 font-medium">Wybór opieki</div>
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-emerald-600 transition-colors">
+                    Proces Przyjęcia do DPS: Krok po Kroku
+                  </h3>
+                  <p className="text-neutral-700 mb-3">
+                    Pełny przewodnik od wniosku w MOPS po dzień przyjęcia. Z oficjalnymi danymi o czasach oczekiwania z 2 województw.
+                  </p>
+                  <span className="text-sm text-emerald-600 font-medium inline-flex items-center gap-1">
+                    Czytaj teraz →
+                  </span>
+                </div>
+              </article>
+            </Link>
+
+            {/* Card 4 - Koszty opieki (WKRÓTCE) */}
             <Link
               href="/poradniki/finanse-prawne/koszty-opieki"
               aria-label="Ile kosztuje dom opieki?"
@@ -199,7 +232,7 @@ export default function KnowledgeCenter() {
               </article>
             </Link>
 
-            {/* Card 4 - DPS vs ŚDS (WKRÓTCE) */}
+            {/* Card 5 - DPS vs ŚDS (WKRÓTCE) */}
             <Link
               href="/poradniki/wybor-opieki/dps-vs-sds"
               aria-label="Czym różni się DPS od ŚDS?"
@@ -231,7 +264,7 @@ export default function KnowledgeCenter() {
               </article>
             </Link>
 
-            {/* Card 4 - Przygotowanie seniora (WKRÓTCE) */}
+            {/* Card 6 - Przygotowanie seniora (WKRÓTCE) */}
             <Link
               href="/poradniki/wsparcie-emocjonalne/przygotowanie-seniora"
               aria-label="Jak przygotować seniora do przeprowadzki do DPS?"
@@ -264,7 +297,7 @@ export default function KnowledgeCenter() {
               </article>
             </Link>
 
-            {/* Card 5 - Dokumenty do wniosku (WKRÓTCE) */}
+            {/* Card 7 - Dokumenty do wniosku (WKRÓTCE) */}
             <Link
               href="/poradniki/finanse-prawne/dokumenty-wniosek"
               aria-label="Jakie dokumenty potrzebne do złożenia wniosku do DPS?"
@@ -297,7 +330,7 @@ export default function KnowledgeCenter() {
               </article>
             </Link>
 
-            {/* Card 6 - Prawa mieszkańca (WKRÓTCE) */}
+            {/* Card 8 - Prawa mieszkańca (WKRÓTCE) */}
             <Link
               href="/poradniki/finanse-prawne/prawa-mieszkanca"
               aria-label="Prawa mieszkańca domu pomocy społecznej"
