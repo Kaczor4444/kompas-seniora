@@ -140,7 +140,7 @@ export default function PolitykaCookiesPage() {
               </div>
             </div>
 
-            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mt-6">
+            <div className="bg-warning-50 border-l-4 border-warning p-4 mt-6">
               <p className="text-gray-700">
                 <strong>⚠️ Uwaga:</strong> Zablokowanie cookies może ograniczyć funkcjonalność Serwisu 
                 (np. preferencje wyszukiwania nie będą zapamiętywane, mapa może nie działać poprawnie).

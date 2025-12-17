@@ -266,8 +266,8 @@ export default function AnalyticsDashboardPage() {
               <p className="text-sm font-medium text-gray-600">Kliknięcia WWW</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">{totalWebsiteClicks}</p>
             </div>
-            <div className="h-12 w-12 bg-amber-100 rounded-xl flex items-center justify-center">
-              <Globe className="h-6 w-6 text-amber-600" />
+            <div className="h-12 w-12 bg-warning-100 rounded-xl flex items-center justify-center">
+              <Globe className="h-6 w-6 text-warning-600" />
             </div>
           </div>
         </div>

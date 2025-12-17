@@ -103,7 +103,7 @@ export default function RegulaminPage() {
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Źródła danych i odpowiedzialność</h2>
-            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-4">
+            <div className="bg-warning-50 border-l-4 border-warning p-4 mb-4">
               <p className="text-gray-700 leading-relaxed">
                 <strong>Ważne zastrzeżenie:</strong> Informacje prezentowane w Serwisie pochodzą 
                 z oficjalnych źródeł publicznych (MOPS, strony BIP, strony placówek). Dokładamy 

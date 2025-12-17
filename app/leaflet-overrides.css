@@ -2,7 +2,7 @@
 .leaflet-popup-content a,
 .leaflet-popup-content-wrapper a,
 div.leaflet-popup-content a {
-  background-color: #F43F5E !important;
+  background-color: #059669 !important;
   color: white !important;
   text-decoration: none !important;
   padding: 0.25rem 0.75rem !important;
@@ -14,5 +14,5 @@ div.leaflet-popup-content a {
 .leaflet-popup-content a:hover,
 .leaflet-popup-content-wrapper a:hover,
 div.leaflet-popup-content a:hover {
-  background-color: #E11D48 !important;
+  background-color: #047857 !important;
 }

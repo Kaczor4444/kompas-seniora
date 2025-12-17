@@ -35,7 +35,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         {/* Placeholder Badge */}
         {isPlaceholder && (
           <div className="absolute top-3 left-3">
-            <span className="bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+            <span className="bg-warning text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
               W PRZYGOTOWANIU
             </span>
           </div>

@@ -22,7 +22,7 @@ export default function OcenaPotrzeb() {
 
           {/* Status Badge */}
           <div className="inline-flex items-center justify-center w-full mb-8">
-            <span className="px-6 py-3 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold">
+            <span className="px-6 py-3 bg-warning-100 text-warning-800 rounded-full text-sm font-semibold">
               🚧 Narzędzie w przygotowaniu
             </span>
           </div>

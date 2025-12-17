@@ -1,458 +1,161 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, Bug, Plus, Edit, MessageCircle } from 'lucide-react';
-
-type FormType = 'bug' | 'add' | 'edit' | 'general' | null;
+import { Mail, ArrowLeft, PlusCircle, AlertOctagon, FileEdit, MessageSquare, Copy, Check } from 'lucide-react';
 
 export default function KontaktPage() {
-  const [selectedForm, setSelectedForm] = useState<FormType>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // TODO: Implement API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    setSelectedForm(null);
-
-    setTimeout(() => setShowSuccess(false), 5000);
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText('kontakt@kompaseniora.pl');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const cards = [
-    {
-      id: 'bug' as FormType,
-      icon: Bug,
-      title: 'Błąd na stronie',
-      description: 'Coś nie działa? Pomóż nam to naprawić',
-    },
-    {
-      id: 'add' as FormType,
-      icon: Plus,
-      title: 'Dodaj placówkę',
-      description: 'Znasz DPS/ŚDS którego nie ma w bazie?',
-    },
-    {
-      id: 'edit' as FormType,
-      icon: Edit,
-      title: 'Popraw dane',
-      description: 'Widzisz błędny telefon lub adres?',
-    },
-    {
-      id: 'general' as FormType,
-      icon: MessageCircle,
-      title: 'Kontakt ogólny',
-      description: 'Pytanie? Sugestia? Napisz do nas',
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Link href="/" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <ArrowLeft className="w-6 h-6 text-gray-600" />
-            </Link>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Kontakt
-              </h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
-                Jak możemy Ci pomóc?
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-stone-50 relative overflow-hidden">
+      {/* Decorative Background Elements (Consistent with Hero) */}
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-100 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-secondary-100 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
 
-      {/* Success Modal */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative animate-in fade-in zoom-in duration-300">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-10 h-10 text-emerald-600" />
-              </div>
-              
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Dziękujemy za zgłoszenie!
-              </h3>
-              
-              <p className="text-gray-600 leading-relaxed mb-6">
-                Otrzymaliśmy Twoją wiadomość i wkrótce się z nią zapoznamy. 
-                Jeśli podałeś email, skontaktujemy się w razie potrzeby.
-              </p>
-              
-              <button
-                onClick={() => setShowSuccess(false)}
-                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold"
-              >
-                Zamknij
-              </button>
-            </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+        
+        {/* Navigation */}
+        <Link 
+          href="/"
+          className="group flex items-center gap-2 text-slate-600 hover:text-primary-600 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-white/50 w-fit"
+        >
+          <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center group-hover:border-primary-300 transition-colors shadow-sm">
+            <ArrowLeft size={16} />
           </div>
-        </div>
-      )}
+          Wróć do strony głównej
+        </Link>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Info Box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-          <p className="text-sm text-gray-700 text-center">
-            💡 Znalazłeś błąd? Pomóż nam go naprawić! 🛠️
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 mb-4">
+            Jesteśmy tu dla Ciebie
+          </h1>
+          <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+            Masz pytania dotyczące domów opieki? A może chcesz zgłosić poprawkę? 
+            Wybierz temat, w którym możemy Ci pomóc.
           </p>
         </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-8">
-          {cards.map((card) => {
-            const IconComponent = card.icon;
-            return (
-              <button
-                key={card.id}
-                onClick={() => setSelectedForm(card.id)}
-                className="bg-white rounded-xl border border-gray-200 p-8 text-left transition-all duration-200 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 group"
-              >
-                <div className="flex items-start gap-5">
-                  <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 group-hover:scale-105 transition-all duration-200">
-                    <IconComponent className="w-6 h-6 text-emerald-600" strokeWidth={1.5} />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">
-                      {card.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {card.description}
-                    </p>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Direct Contact Info */}
-        <div className="bg-white rounded-xl border border-gray-200 p-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            📧 Kontakt bezpośredni
-          </h3>
-          <div className="space-y-3 text-gray-700">
-            <p>
-              <span className="font-medium">Email:</span>{' '}
-              <a 
-                href="mailto:kontakt@kompaseniora.pl" 
-                className="text-emerald-600 hover:text-emerald-700 hover:underline"
-              >
-                kontakt@kompaseniora.pl
-              </a>
-            </p>
-            <p className="text-sm text-gray-600">
-              Możesz również napisać do nas bezpośrednio na powyższy adres email.
-            </p>
-          </div>
-        </div>
-      </main>
-
-      {/* Modal z formularzem */}
-      {selectedForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {(() => {
-                  const card = cards.find(c => c.id === selectedForm);
-                  if (!card) return null;
-                  const IconComponent = card.icon;
-                  return <IconComponent className="w-6 h-6 text-emerald-600" strokeWidth={1.5} />;
-                })()}
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {cards.find(c => c.id === selectedForm)?.title}
-                </h2>
-              </div>
-              <button
-                onClick={() => setSelectedForm(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <span className="text-2xl text-gray-500">×</span>
-              </button>
+        {/* Priority Contact Card */}
+        <div className="bg-white rounded-3xl p-8 border border-stone-100 shadow-xl shadow-primary-900/5 mb-12 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-50 to-transparent rounded-bl-full opacity-50"></div>
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+            <div className="text-center md:text-left">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2 flex items-center justify-center md:justify-start gap-2">
+                <Mail className="text-primary-500" />
+                Kontakt bezpośredni
+              </h2>
+              <p className="text-slate-500 mb-6 md:mb-0">
+                Preferujesz tradycyjną wiadomość? Napisz do nas. <br/>
+                Odpowiadamy zazwyczaj w ciągu 24 godzin.
+              </p>
             </div>
 
-            {/* Modal Body */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              {selectedForm === 'bug' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Gdzie pojawił się błąd?
-                    </label>
-                    <input
-                      type="url"
-                      placeholder="Adres strony, np. https://kompaseniora.pl/wyszukiwarka"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Co dokładnie się stało? *
-                    </label>
-                    <textarea
-                      required
-                      rows={5}
-                      placeholder="Np. Po kliknięciu 'Pokaż więcej' strona się nie ładuje. Spróbowałem 2 razy."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Jakiej używasz przeglądarki?
-                    </label>
-                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base">
-                      <option>Chrome</option>
-                      <option>Safari</option>
-                      <option>Firefox</option>
-                      <option>Edge</option>
-                      <option>Inna</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Twój email (opcjonalnie)
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="twoj@email.pl"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                    <p className="text-xs text-gray-500 mt-2">
-                      Podaj, jeśli chcesz, żebyśmy dali znać gdy błąd zostanie naprawiony
-                    </p>
-                  </div>
-                </>
-              )}
-
-              {selectedForm === 'add' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Twój email *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="twoj@email.pl"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                    <p className="text-xs text-gray-500 mt-2">
-                      Do potwierdzenia zgłoszenia
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nazwa placówki *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="np. DPS Vita"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Miasto *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="np. Kraków"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Typ placówki *
-                    </label>
-                    <select 
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    >
-                      <option value="">Wybierz...</option>
-                      <option>DPS</option>
-                      <option>ŚDS</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Adres (opcjonalnie)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="ul. Przykładowa 123"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Telefon (opcjonalnie)
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="12 345 67 89"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Dodatkowe informacje
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="Jeśli masz — podaj stronę www, profil opieki, orientacyjną cenę lub inne dane"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
-                    />
-                  </div>
-                </>
-              )}
-
-              {selectedForm === 'edit' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Link do placówki *
-                    </label>
-                    <input
-                      type="url"
-                      required
-                      placeholder="Wklej adres strony placówki z naszej wyszukiwarki"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                    <p className="text-xs text-gray-500 mt-2">
-                      To pomoże nam szybko znaleźć właściwą placówkę
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Co jest błędne?
-                    </label>
-                    <div className="space-y-2">
-                      {['Telefon', 'Adres', 'Cena', 'Email', 'Strona WWW', 'Inne'].map(option => (
-                        <label key={option} className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                          />
-                          <span className="text-sm text-gray-700">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Prawidłowe dane *
-                    </label>
-                    <textarea
-                      required
-                      rows={4}
-                      placeholder="Wpisz poprawne informacje — np. nowy numer telefonu: 12 345 67 89"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email (opcjonalnie)
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="twoj@email.pl"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                    <p className="text-xs text-gray-500 mt-2">
-                      Podaj, jeśli możemy się z Tobą skontaktować w razie pytań
-                    </p>
-                  </div>
-                </>
-              )}
-
-              {selectedForm === 'general' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="twoj@email.pl"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Temat *
-                    </label>
-                    <select 
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                    >
-                      <option value="">Wybierz...</option>
-                      <option>Pytanie</option>
-                      <option>Sugestia</option>
-                      <option>Współpraca</option>
-                      <option>Inne</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Wiadomość *
-                    </label>
-                    <textarea
-                      required
-                      rows={6}
-                      placeholder="Opisz krótko, w czym możemy pomóc..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Security Notice */}
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <p className="text-xs text-gray-600 text-center">
-                  🛡️ Twoje dane są bezpieczne. Używamy ich tylko do odpowiedzi na Twoją wiadomość.
-                </p>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedForm(null)}
-                  className="px-6 py-3 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors font-medium text-base"
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 px-8 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? 'Wysyłanie...' : 'Prześlij zgłoszenie'}
-                </button>
-              </div>
-            </form>
+            <div className="flex flex-col gap-3 w-full md:w-auto">
+               <a 
+                 href="mailto:kontakt@kompaseniora.pl"
+                 className="flex items-center justify-center gap-3 bg-primary-600 hover:bg-primary-700 text-white text-lg font-bold py-4 px-8 rounded-xl shadow-lg shadow-primary-600/20 transition-all transform active:scale-95"
+               >
+                 <Mail size={20} />
+                 Napisz wiadomość
+               </a>
+               
+               <button 
+                 onClick={handleCopyEmail}
+                 className="flex items-center justify-center gap-2 text-slate-500 hover:text-primary-600 text-sm font-medium py-2 px-4 rounded-lg hover:bg-stone-50 transition-colors"
+               >
+                 {copied ? <Check size={16} /> : <Copy size={16} />}
+                 {copied ? "Skopiowano adres" : "Kopiuj adres email"}
+               </button>
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Options Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* Card 1: Add Facility */}
+          <a 
+            href="mailto:kontakt@kompaseniora.pl?subject=Dodanie%20nowej%20placówki"
+            className="group bg-white hover:bg-primary-50 p-6 rounded-2xl border border-stone-200 hover:border-primary-200 shadow-sm hover:shadow-lg transition-all text-left flex items-start gap-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <PlusCircle size={24} />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-slate-900 group-hover:text-primary-800 mb-1">Dodaj placówkę</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Znasz DPS lub ŚDS, którego nie ma w naszej bazie? Pomóż nam ją uzupełnić.
+              </p>
+            </div>
+          </a>
+
+          {/* Card 2: Report Error */}
+          <a 
+            href="mailto:kontakt@kompaseniora.pl?subject=Błąd%20na%20stronie"
+            className="group bg-white hover:bg-warning-50 p-6 rounded-2xl border border-stone-200 hover:border-warning-200 shadow-sm hover:shadow-lg transition-all text-left flex items-start gap-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-warning-100 text-warning-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <AlertOctagon size={24} />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-slate-900 group-hover:text-warning-800 mb-1">Błąd na stronie</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Coś nie działa poprawnie? Znalazłeś literówkę? Daj nam znać.
+              </p>
+            </div>
+          </a>
+
+          {/* Card 3: Correct Data */}
+          <a 
+            href="mailto:kontakt@kompaseniora.pl?subject=Poprawka%20danych%20placówki"
+            className="group bg-white hover:bg-secondary-50 p-6 rounded-2xl border border-stone-200 hover:border-secondary-200 shadow-sm hover:shadow-lg transition-all text-left flex items-start gap-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-secondary-100 text-secondary-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <FileEdit size={24} />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-slate-900 group-hover:text-secondary-800 mb-1">Popraw dane</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Widzisz nieaktualny numer telefonu lub adres placówki? Zgłoś poprawkę.
+              </p>
+            </div>
+          </a>
+
+          {/* Card 4: General Contact */}
+          <a 
+            href="mailto:kontakt@kompaseniora.pl?subject=Kontakt%20ogólny"
+            className="group bg-white hover:bg-stone-100 p-6 rounded-2xl border border-stone-200 hover:border-stone-300 shadow-sm hover:shadow-lg transition-all text-left flex items-start gap-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-stone-100 text-slate-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <MessageSquare size={24} />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-slate-900 group-hover:text-slate-800 mb-1">Kontakt ogólny</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Masz sugestię dotyczącą rozwoju serwisu? Chcesz nawiązać współpracę?
+              </p>
+            </div>
+          </a>
+
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-12 text-center text-slate-400 text-sm">
+           Administratorem danych osobowych jest Kompas Seniora sp. z o.o.<br/>
+           <Link href="/polityka-prywatnosci" className="underline hover:text-primary-600">
+             Polityka Prywatności
+           </Link>
+        </div>
+      </div>
     </div>
   );
 }

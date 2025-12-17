@@ -332,14 +332,33 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="bg-gradient-to-br from-white via-neutral-50 to-amber-100/80 py-8 sm:py-16">
-      <div className="container mx-auto px-4 sm:px-6">
+    <section className="bg-gradient-to-b from-primary-50/50 via-white to-stone-50 pt-10 pb-8 md:pt-16 md:pb-12 relative overflow-hidden">
+      {/* Abstract shapes decorations */}
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-100 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-secondary-500/10 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Hero Header */}
-        <div className="text-center mb-6 sm:mb-10">
-          <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
-            Opieka dla seniora w Twojej okolicy
+        <div className="text-center max-w-5xl mx-auto mb-6 sm:mb-10">
+          {/* Badge - v2 style (no animation) */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-primary-100 shadow-sm mb-6 md:mb-8">
+            <span className="flex h-2 w-2 rounded-full bg-primary-500"></span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-primary-600">
+              Publiczny System Pomocy Społecznej
+            </span>
+          </div>
+
+          <h1 className="text-3xl md:text-6xl font-serif font-bold text-slate-900 mb-4 md:mb-6 leading-tight">
+            Znajdź publiczną opiekę <br/>
+            <span className="text-primary-600 relative inline-block">
+              dostosowaną do potrzeb
+              <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+              </svg>
+            </span>
           </h1>
-          <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+
+          <p className="text-base md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Porównaj, oblicz koszty i dowiedz się więcej
           </p>
         </div>

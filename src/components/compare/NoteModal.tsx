@@ -73,7 +73,7 @@ export default function NoteModal({
 
                 {/* Content */}
                 <div className="mt-4">
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="bg-warning-50 border border-warning-200 rounded-lg p-4">
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">
                       📝 Twoja notatka:
                     </h4>

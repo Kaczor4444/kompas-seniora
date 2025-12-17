@@ -279,7 +279,7 @@ export default function PolitykaPrywatnosciPage() {
               Informacje o placówkach opieki prezentowane w Serwisie pochodzą z oficjalnych źródeł publicznych 
               (MOPS, strony BIP, strony internetowe placówek).
             </p>
-            <div className="bg-amber-50 border-l-4 border-amber-500 p-4">
+            <div className="bg-warning-50 border-l-4 border-warning p-4">
               <p className="text-gray-700 leading-relaxed">
                 <strong>Ważne:</strong> Dane są regularnie weryfikowane i aktualizowane (co najmniej raz w roku). 
                 Zalecamy jednak bezpośrednią weryfikację aktualnych cen i dostępności miejsc z placówką.

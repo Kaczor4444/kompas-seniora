@@ -29,7 +29,7 @@ export default function ReadingProgressBar() {
 
   return (
     <div
-      className="fixed top-[66px] left-0 right-0 h-1 bg-transparent z-[51] lg:hidden pointer-events-none"
+      className="fixed top-[66px] left-0 right-0 h-1 bg-gray-200 z-[51] pointer-events-none shadow-sm"
       role="progressbar"
       aria-valuenow={Math.round(progress)}
       aria-valuemin={0}
@@ -37,7 +37,7 @@ export default function ReadingProgressBar() {
       aria-label={`Przeczytano ${Math.round(progress)}% artykułu`}
     >
       <div
-        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-150 ease-out"
+        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-150 ease-out shadow-[0_0_8px_rgba(16,185,129,0.3)]"
         style={{ width: `${progress}%` }}
       />
     </div>

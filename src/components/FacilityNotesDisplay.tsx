@@ -84,7 +84,7 @@ export default function FacilityNotesDisplay({
 
   // Full version for detail pages
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+    <div className="bg-warning-50 border border-warning-200 rounded-lg p-4">
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-semibold text-gray-900 mb-1">
@@ -96,7 +96,7 @@ export default function FacilityNotesDisplay({
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3 py-1.5 bg-warning-100 hover:bg-warning-200 text-warning-900 rounded-lg transition-colors text-sm font-medium"
         >
           <PencilIcon className="w-4 h-4" />
           {hasNote ? 'Edytuj' : 'Dodaj'}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronUpIcon } from '@heroicons/react/24/outline'
+import { ArrowUp } from 'lucide-react'
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false)
@@ -69,8 +69,8 @@ export default function BackToTop() {
       aria-label="Przewiń do góry"
       title="Przewiń do góry"
     >
-      {/* ChevronUp Icon */}
-      <ChevronUpIcon className="w-6 h-6 flex-shrink-0" />
+      {/* ArrowUp Icon */}
+      <ArrowUp size={20} strokeWidth={2.5} className="flex-shrink-0" />
 
       {/* Text - smooth fade */}
       <span className={`

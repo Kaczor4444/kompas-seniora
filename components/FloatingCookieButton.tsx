@@ -170,33 +170,33 @@ export default function FloatingCookieButton() {
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => setIsExpanded(false)}
         className={`
-          fixed bottom-6 right-0 z-50 
-          bg-gradient-to-r from-emerald-500 to-emerald-600
-          hover:from-emerald-600 hover:to-emerald-700
-          text-white 
-          rounded-l-full 
+          fixed bottom-6 right-0 z-50
+          bg-white text-slate-600
+          border border-stone-200
+          hover:bg-stone-50 hover:text-primary-600 hover:border-primary-200
+          rounded-l-full
           shadow-lg
           hover:shadow-xl
           transition-all duration-500 ease-out
-          focus:outline-none focus:ring-4 focus:ring-emerald-300
+          focus:outline-none focus:ring-4 focus:ring-primary-300
           flex items-center gap-2
-          
-          ${isExpanded 
-            ? 'pr-4 pl-4 py-3' 
+
+          ${isExpanded
+            ? 'pr-4 pl-4 py-3'
             : 'pr-4 pl-4 py-3 md:pr-4 md:pl-4 translate-x-[calc(100%-2.5rem)]'
           }
-          
+
           md:translate-x-0 md:right-6 md:rounded-full
         `}
         aria-label="Ustawienia cookies"
         title="Ustawienia cookies"
       >
         {/* Cookie Icon */}
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 24 24" 
-          fill="currentColor" 
-          className="w-6 h-6 flex-shrink-0"
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5 flex-shrink-0"
         >
           <path d="M21.598 11.064a1.006 1.006 0 0 0-.854-.172A2.938 2.938 0 0 1 20 11c-1.654 0-3-1.346-3-3 0-.217.031-.444.099-.716a1 1 0 0 0-1.067-1.236A9.956 9.956 0 0 0 2 12c0 5.514 4.486 10 10 10s10-4.486 10-10c0-.049-.003-.097-.007-.16a1.004 1.004 0 0 0-.395-.776zM8.5 6a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-2 8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm2.5-6.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm3.5 6.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
         </svg>

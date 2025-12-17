@@ -1,30 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @theme inline {
-  --font-serif: 'Playfair Display', serif;
-  /* Emerald Green - świeży zielony (primary) */
-  --color-primary-50: #ecfdf5;
-  --color-primary-100: #d1fae5;
-  --color-primary-200: #a7f3d0;
-  --color-primary-300: #6ee7b7;
-  --color-primary-400: #34d399;
-  --color-primary-500: #10b981;
-  --color-primary-600: #059669;
-  --color-primary-700: #047857;
-  --color-primary-800: #065f46;
-  --color-primary-900: #064e3b;
-  /* Royal Blue - królewski niebieski (secondary) */
-  --color-secondary-50: #eff6ff;
-  --color-secondary-100: #dbeafe;
-  --color-secondary-200: #bfdbfe;
-  --color-secondary-300: #93c5fd;
-  --color-secondary-400: #60a5fa;
-  --color-secondary-500: #3b82f6;
-  --color-secondary-600: #2563eb;
-  --color-secondary-700: #1d4ed8;
-  --color-secondary-800: #1e40af;
-  --color-secondary-900: #1e3a8a;
+  /* Warm Amber - ciepły bursztyn (primary) */
+  --color-primary-50: #FFFBEB;
+  --color-primary-100: #FEF3C7;
+  --color-primary-200: #FDE68A;
+  --color-primary-300: #FCD34D;
+  --color-primary-400: #FBBF24;
+  --color-primary-500: #F59E0B;
+  --color-primary-600: #D97706;
+  --color-primary-700: #B45309;
+  --color-primary-800: #92400E;
+  --color-primary-900: #78350F;
+  /* Soft Peach - delikatny brzoskwiniowy (secondary) */
+  --color-secondary-50: #FFF7ED;
+  --color-secondary-100: #FFEDD5;
+  --color-secondary-200: #FED7AA;
+  --color-secondary-300: #FDBA74;
+  --color-secondary-500: #FB923C;
   /* Coral - łososiowy akcent */
   --color-accent-50: #FFF1F2;
   --color-accent-100: #FFE4E6;
@@ -49,33 +42,9 @@
   --color-success-100: #CCFBF1;
   --color-success-500: #14B8A6;
   --color-success-700: #0F766E;
-  /* Warning - bursztynowy amber */
-  --color-warning-50: #fffbeb;
-  --color-warning-100: #fef3c7;
-  --color-warning-200: #fde68a;
-  --color-warning-300: #fcd34d;
+  /* Warning - bursztynowy (używamy primary) */
   --color-warning-500: #F59E0B;
-  --color-warning-600: #d97706;
   --color-warning-700: #D97706;
-  --color-warning-800: #92400e;
-  --color-warning-900: #78350f;
-
-  /* Semantic tokens - mapowanie do base colors */
-  --color-brand: var(--color-primary-600);
-  --color-brand-50: var(--color-primary-50);
-  --color-brand-100: var(--color-primary-100);
-  --color-brand-500: var(--color-primary-500);
-  --color-brand-600: var(--color-primary-600);
-  --color-brand-700: var(--color-primary-700);
-  --color-brand-800: var(--color-primary-800);
-
-  --color-info: var(--color-secondary-600);
-  --color-info-50: var(--color-secondary-50);
-  --color-info-100: var(--color-secondary-100);
-  --color-info-600: var(--color-secondary-600);
-
-  --color-cta: var(--color-accent-600);
-  --color-cta-hover: var(--color-accent-700);
 }
 
 :root {
@@ -98,13 +67,13 @@ body {
 
 /* Leaflet popup button override */
 .leaflet-popup-content a {
-  background-color: #059669 !important;
+  background-color: #F43F5E !important;
   color: white !important;
   text-decoration: none !important;
 }
 
 .leaflet-popup-content a:hover {
-  background-color: #047857 !important;
+  background-color: #E11D48 !important;
 }
 
 /* ========================================
@@ -122,7 +91,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 2px solid #059669;
+  outline: 2px solid #F43F5E;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -151,12 +120,12 @@ textarea {
 
 /* Better text selection color */
 ::selection {
-  background-color: #d1fae5;
+  background-color: #FECDD3;
   color: #1C1917;
 }
 
 ::-moz-selection {
-  background-color: #d1fae5;
+  background-color: #FECDD3;
   color: #1C1917;
 }
 
@@ -292,13 +261,13 @@ textarea {
 /* Nagłówki tabeli (TH) */
 .dps-comparison-table th {
     /* Użycie ciemniejszego neutralnego tła, aby nagłówki były bardziej wyraźne */
-    background-color: var(--color-neutral-200);
+    background-color: var(--color-neutral-200); 
     padding: 18px 16px; /* Większy padding dla lepszej czytelności */
     text-align: left;
     font-weight: 700;
     color: var(--color-neutral-700);
-    /* Używamy PRIMARY (Emerald) jako separatora wizualnego */
-    border-bottom: 4px solid var(--color-primary-600);
+    /* Używamy PRIMARY (Amber) jako separatora wizualnego */
+    border-bottom: 4px solid var(--color-primary-500); 
 }
 
 /* Komórki danych (TD) */
