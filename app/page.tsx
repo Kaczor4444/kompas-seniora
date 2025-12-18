@@ -1,10 +1,11 @@
 "use client";
 
-import Link from 'next/link'; 
+import Link from 'next/link';
 import MiniFAQSection from '../src/components/faq/MiniFAQSection';
 import NewsletterSection from '../src/components/newsletter/NewsletterSection';
 import KnowledgeCenter from '../src/components/knowledge/KnowledgeCenter';
 import HeroSection from '../src/components/hero/HeroSection';
+import { CategorySelector } from '../src/components/CategorySelector';
 
 export default function Home() {
   return (
@@ -12,175 +13,98 @@ export default function Home() {
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-100 rounded-full mb-4">
-                <span className="text-2xl font-bold text-primary-700">32</span>
-              </div>
-              <h3 className="text-base font-semibold text-neutral-900 mb-1">Placówki w bazie</h3>
-              <p className="text-sm text-neutral-600">Sprawdzone domy pomocy społecznej</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-success-100 rounded-full mb-4">
-                <span className="text-2xl font-bold text-success-700">100%</span>
-              </div>
-              <h3 className="text-base font-semibold text-neutral-900 mb-1">Oficjalne dane</h3>
-              <p className="text-sm text-neutral-600">Ceny z urzędów miast i MOPS</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center px-4 h-14 bg-accent-100 rounded-full mb-4">
-                <span className="text-sm font-bold text-accent-600">Małopolska</span>
-              </div>
-              <h3 className="text-base font-semibold text-neutral-900 mb-1">Aktualnie dostępne</h3>
-              <p className="text-sm text-neutral-600">Rozszerzamy na kolejne województwa</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Category Selector */}
+      <CategorySelector
+        activeTab="Wszystkie"
+        onSearch={(query) => {
+          console.log('CategorySelector search:', query)
+        }}
+        location=""
+      />
 
-      {/* Features Section */}
-      <section className="py-12 md:py-16 bg-neutral-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="md:px-4">
-            {/* Desktop: 3 columns */}
-            <div className="hidden md:grid md:grid-cols-3 gap-8 px-4">
-              {/* Card 1: Search */}
-              <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-                <div className="w-20 h-20 bg-secondary-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-secondary-200 transition-colors">
-                  <svg className="w-10 h-10 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {/* How It Works - 3 Steps */}
+      <section className="bg-white py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-4">
+              Jak znaleźć opiekę?
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Uprościliśmy proces do trzech kroków, abyś mógł szybko znaleźć bezpieczne miejsce dla bliskiego.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 relative">
+            {/* Connecting lines (desktop only) */}
+            <div className="hidden md:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-200 to-transparent"
+                 style={{ width: 'calc(100% - 200px)', margin: '0 100px' }}></div>
+
+            {/* Step 1 */}
+            <div className="relative text-center group">
+              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-emerald-600 rounded-full flex items-center justify-center">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-neutral-900 mb-3 text-center">Wyszukiwarka placówek</h3>
-                <p className="text-neutral-700 text-center mb-6">Znajdź i porównaj domy pomocy w Twojej okolicy z oficjalnymi cenami</p>
-                <a 
-                  href="#search" 
-                  className="flex items-center justify-center gap-2 text-secondary-600 hover:text-secondary-700 font-semibold text-sm group-hover:gap-3 transition-all"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const heroSection = document.querySelector('[class*="hero"]') || document.querySelector('input[type="text"]');
-                    heroSection?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }}
-                >
-                  Rozpocznij wyszukiwanie
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
               </div>
-              
-              {/* Card 2: Pricing */}
-              <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-                <div className="w-20 h-20 bg-success-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-success-200 transition-colors">
-                  <svg className="w-10 h-10 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-neutral-900 mb-3 text-center">Transparentne dane</h3>
-                <p className="text-neutral-700 text-center mb-6">Oficjalne ceny z MOPS. Koniec z dziesiątkami PDF-ów</p>
-                <a 
-                  href="/search" 
-                  className="flex items-center justify-center gap-2 text-success-600 hover:text-success-700 font-semibold text-sm group-hover:gap-3 transition-all"
-                >
-                  Zobacz placówki
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-12 h-12 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg z-10">
+                1
               </div>
-              
-              {/* Card 3: Calculator */}
-              <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-                <div className="w-20 h-20 bg-accent-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-accent-200 transition-colors">
-                  <svg className="w-10 h-10 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Wyszukaj placówkę</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Wpisz miasto lub kod pocztowy. Znajdź domy pomocy w Twojej okolicy.
+              </p>
+            </div>
+
+            {/* Arrow (desktop only) */}
+            <div className="hidden md:flex absolute top-16 left-1/3 -translate-x-1/2 text-emerald-300">
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative text-center group">
+              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-teal-600 rounded-full flex items-center justify-center">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-neutral-900 mb-3 text-center">Kalkulator kosztów</h3>
-                <p className="text-neutral-700 text-center mb-6">Oblicz miesięczne koszty pobytu z uwzględnieniem dofinansowania</p>
-                <Link href="/kalkulator" 
-                  className="flex items-center justify-center gap-2 text-accent-600 hover:text-accent-700 font-semibold text-sm group-hover:gap-3 transition-all w-full"
-                >
-                  Oblicz koszty
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
               </div>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg z-10">
+                2
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Porównaj koszty</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Sprawdź oficjalne ceny, standard pokoi i dostępne miejsca.
+              </p>
             </div>
-            
-            {/* Mobile: Horizontal scroll */}
-            <div className="md:hidden overflow-x-auto scrollbar-hide">
-              <div className="flex gap-4 px-4 pb-4" style={{ width: 'max-content' }}>
-                {/* Card 1: Search */}
-                <div className="bg-white rounded-xl p-6 shadow-sm" style={{ width: '280px' }}>
-                  <div className="w-16 h-16 bg-secondary-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-2 text-center">Wyszukiwarka placówek</h3>
-                  <p className="text-sm text-neutral-700 text-center mb-4">Znajdź domy pomocy w okolicy z oficjalnymi cenami</p>
-                  <a 
-                    href="#search" 
-                    className="flex items-center justify-center gap-2 text-secondary-600 font-semibold text-sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const heroSection = document.querySelector('[class*="hero"]') || document.querySelector('input[type="text"]');
-                      heroSection?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }}
-                  >
-                    Wyszukaj
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-                
-                {/* Card 2: Pricing */}
-                <div className="bg-white rounded-xl p-6 shadow-sm" style={{ width: '280px' }}>
-                  <div className="w-16 h-16 bg-success-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-2 text-center">Transparentne dane</h3>
-                  <p className="text-sm text-neutral-700 text-center mb-4">Oficjalne ceny MOPS bez ukrytych kosztów</p>
-                  <a 
-                    href="/search" 
-                    className="flex items-center justify-center gap-2 text-success-600 font-semibold text-sm"
-                  >
-                    Zobacz placówki
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-                
-                {/* Card 3: Calculator */}
-                <div className="bg-white rounded-xl p-6 shadow-sm" style={{ width: '280px' }}>
-                  <div className="w-16 h-16 bg-accent-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-2 text-center">Kalkulator kosztów</h3>
-                  <p className="text-sm text-neutral-700 text-center mb-4">Oblicz budżet opieki dla bliskiej osoby</p>
-                  <Link href="/kalkulator" 
-                    className="flex items-center justify-center gap-2 text-accent-600 font-semibold text-sm w-full"
-                  >
-                    Oblicz
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
+
+            {/* Arrow (desktop only) */}
+            <div className="hidden md:flex absolute top-16 left-2/3 -translate-x-1/2 text-emerald-300">
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative text-center group">
+              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-cyan-50 to-sky-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-cyan-600 rounded-full flex items-center justify-center">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
                 </div>
               </div>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-12 h-12 bg-cyan-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg z-10">
+                3
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Skontaktuj się</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Zadzwoń bezpośrednio do dyrektora lub wyślij zapytanie online.
+              </p>
             </div>
           </div>
         </div>
