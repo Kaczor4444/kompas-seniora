@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { ChevronRightIcon, ClockIcon, CalendarIcon, ArrowLeftIcon } from '@heroicons/react/24/outline'
+import { ChevronRightIcon, ClockIcon, CalendarIcon, ArrowLeftIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 import TableOfContents from '@/components/articles/TableOfContents'
 import ReadingProgressBar from '@/components/articles/ReadingProgressBar'
 
@@ -150,6 +150,45 @@ export default function ArticleLayout({
             <div className="prose prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:lg:text-4xl prose-h2:mt-16 prose-h2:mb-8 prose-h3:text-xl prose-h3:md:text-2xl prose-h3:font-semibold prose-h3:mt-12 prose-h3:mb-6 prose-p:text-lg prose-p:md:text-xl prose-p:leading-loose prose-p:mb-6 prose-p:md:mb-8 prose-p:text-gray-800 prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:text-emerald-700 hover:prose-a:underline prose-strong:text-gray-900 prose-strong:font-semibold prose-ul:space-y-3 prose-ol:space-y-3 prose-li:text-lg prose-li:md:text-xl prose-li:text-gray-800 prose-li:leading-loose prose-blockquote:border-l-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-6 prose-blockquote:not-italic prose-img:rounded-lg prose-img:shadow-md space-y-8 md:space-y-12">
               {children}
             </div>
+
+            {/* Download Section - Dark Background */}
+            {downloads && downloads.length > 0 && (
+              <div className="mt-16 -mx-4 md:-mx-6 lg:mx-0">
+                <div className="bg-slate-900 rounded-none lg:rounded-2xl px-6 md:px-8 py-10 md:py-12">
+                  <div className="max-w-3xl mx-auto text-center">
+                    {/* Icon + Title */}
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      <ArrowDownTrayIcon className="w-8 h-8 md:w-10 md:h-10 text-emerald-400" />
+                      <h2 className="text-2xl md:text-3xl font-bold text-white">
+                        Materiały do pobrania
+                      </h2>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-lg md:text-xl text-slate-300 mb-8">
+                      Pobierz pomocne materiały i dokumenty do tego artykułu
+                    </p>
+
+                    {/* Download Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                      {downloads.map((item, index) => (
+                        <a
+                          key={index}
+                          href={item.url}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+                          target={item.url.startsWith('http') ? '_blank' : undefined}
+                          rel={item.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        >
+                          <span className="text-2xl">{item.icon || '📄'}</span>
+                          <span>{item.title}</span>
+                          <ArrowDownTrayIcon className="w-5 h-5" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Back Link */}
             <div className="mt-12 pt-8 border-t border-gray-200">

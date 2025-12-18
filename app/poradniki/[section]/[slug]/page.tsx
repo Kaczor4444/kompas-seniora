@@ -11,6 +11,7 @@ import KeyTakeaways from '@/components/articles/KeyTakeaways'
 import InfoBox from '@/components/articles/InfoBox'
 import WarningBox from '@/components/articles/WarningBox'
 import Checklist from '@/components/articles/Checklist'
+import ProcessTimeline from '@/components/articles/ProcessTimeline'
 import { extractHeadings } from '@/lib/mdxUtils'
 
 // Extract text from React children (handles strings and React elements)
@@ -78,12 +79,13 @@ const components = {
   InfoBox,
   WarningBox,
   Checklist,
+  ProcessTimeline,
   h2: ({ children, ...props }: any) => {
     const text = getTextFromChildren(children)
     const id = text ? generateId(text) : undefined
     if (id) console.log('🏷️ H2 rendered with ID:', id, '- Text:', text.slice(0, 60)) // DEBUG
     return (
-      <h2 id={id} className="scroll-mt-24" {...props}>
+      <h2 id={id} className="scroll-mt-32" {...props}>
         {children}
       </h2>
     )
@@ -93,7 +95,7 @@ const components = {
     const id = text ? generateId(text) : undefined
     if (id) console.log('🏷️ H3 rendered with ID:', id, '- Text:', text.slice(0, 60)) // DEBUG
     return (
-      <h3 id={id} className="scroll-mt-24" {...props}>
+      <h3 id={id} className="scroll-mt-32" {...props}>
         {children}
       </h3>
     )
