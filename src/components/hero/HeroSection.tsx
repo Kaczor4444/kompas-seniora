@@ -513,114 +513,123 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Mobile version */}
-          <div className="md:hidden bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
-            {/* Miejscowość */}
-            <div className="px-4 py-4 border-b border-neutral-200 relative">
-              <input
-                ref={inputRefMobile}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Wpisz miejscowość, np. Bochnia"
-                className="w-full text-base focus:outline-none py-4 px-3"
-                autoComplete="off"
-              />
+          {/* Mobile version - v2 Style */}
+          <div className="md:hidden">
+            {/* Mobile Simple Location Input with Search Button */}
+            <div className="flex gap-2 mb-6 relative z-20">
+              <div className="flex-1 relative">
+                <svg 
+                  className="absolute top-3.5 left-3 text-slate-500" 
+                  width="20" 
+                  height="20"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
+                  />
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
+                  />
+                </svg>
+                <label htmlFor="mobile-location" className="sr-only">Wpisz miasto</label>
+                <input 
+                  id="mobile-location"
+                  ref={inputRefMobile}
+                  type="text" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Wpisz miasto..." 
+                  className={`w-full pl-10 pr-10 py-3 rounded-xl border border-stone-200 bg-white shadow-sm outline-none h-full focus:ring-2 
+                    ${selectedType === 'DPS' ? 'focus:ring-primary-500' 
+                    : selectedType === 'ŚDS' ? 'focus:ring-secondary-500'
+                    : 'focus:ring-slate-500'}`}
+                  autoComplete="off"
+                />
+                <button 
+                  onClick={handleGeolocation}
+                  disabled={isGeoLoading}
+                  className="absolute right-2 top-2 p-1.5 text-slate-400 hover:text-primary-600 rounded-lg active:bg-slate-100 transition-colors disabled:opacity-50"
+                  aria-label="Użyj mojej lokalizacji"
+                >
+                  {isGeoLoading ? (
+                    <svg width="18" height="18" className="animate-spin">
+                      <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="44" strokeDashoffset="22"/>
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  )}
+                </button>
 
-              {isLoading && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  <div className="animate-spin h-4 w-4 border-2 border-accent-500 border-t-transparent rounded-full" />
-                </div>
-              )}
+                {isLoading && (
+                  <div className="absolute right-12 top-1/2 -translate-y-1/2">
+                    <div className="animate-spin h-4 w-4 border-2 border-accent-500 border-t-transparent rounded-full" />
+                  </div>
+                )}
 
-              <AutocompleteDropdown />
+                <AutocompleteDropdown />
+              </div>
+              
+              <button 
+                onClick={handleSearch}
+                className={`px-4 rounded-xl font-bold text-white shadow-md active:scale-95 transition-all flex items-center justify-center min-w-[56px]
+                  ${selectedType === 'DPS' ? 'bg-primary-600' 
+                  : selectedType === 'ŚDS' ? 'bg-secondary-600'
+                  : 'bg-slate-800'}`}
+                aria-label="Szukaj"
+              >
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
             </div>
 
-            {/* Type Buttons - Mobile */}
-            <div className="px-4 py-4 border-b border-neutral-200">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-xs text-neutral-500">Typ placówki</label>
-                <TypeTooltip />
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setSelectedType("DPS")}
-                  className={`py-3 rounded-lg text-xs font-medium transition-all ${
-                    selectedType === "DPS"
-                      ? "bg-accent-500 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-accent-50"
-                  }`}
-                >
-                  DPS
-                </button>
-                <button
-                  onClick={() => setSelectedType("ŚDS")}
-                  className={`py-3 rounded-lg text-xs font-medium transition-all ${
-                    selectedType === "ŚDS"
-                      ? "bg-accent-500 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-accent-50"
-                  }`}
-                >
-                  ŚDS
-                </button>
-                <button
-                  onClick={() => setSelectedType("WSZYSTKIE")}
-                  className={`py-3 rounded-lg text-xs font-medium transition-all ${
-                    selectedType === "WSZYSTKIE"
-                      ? "bg-accent-500 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-accent-50"
-                  }`}
-                >
-                  WSZYSTKIE
-                </button>
-              </div>
+            {/* Quick Filters / Tabs - Mobile */}
+            <div className="flex flex-wrap justify-center gap-2">
+              <button 
+                onClick={() => setSelectedType('WSZYSTKIE')}
+                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
+                  ${selectedType === 'WSZYSTKIE' 
+                    ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
+                    : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                Wszystkie
+              </button>
+
+              <button 
+                onClick={() => setSelectedType('DPS')}
+                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
+                  ${selectedType === 'DPS' 
+                    ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
+                    : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
+              >
+                DPS
+              </button>
+              
+              <button 
+                onClick={() => setSelectedType('ŚDS')}
+                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
+                  ${selectedType === 'ŚDS' 
+                    ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
+                    : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
+              >
+                ŚDS
+              </button>
             </div>
-
-            {/* Geo Button */}
-            <button
-              onClick={handleGeolocation}
-              disabled={isGeoLoading}
-              className="w-full px-4 py-4 bg-green-200 hover:bg-green-300 transition-colors flex items-center justify-center gap-2 border-b border-neutral-200 text-green-900 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isGeoLoading ? (
-                <>
-                  <div className="animate-spin h-5 w-5 border-2 border-green-900 border-t-transparent rounded-full" />
-                  Pobieranie lokalizacji...
-                </>
-              ) : (
-                <>
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  Szukaj w okolicy
-                </>
-              )}
-            </button>
-
-            {/* Search Button */}
-            <button
-              onClick={handleSearch}
-              className="w-full px-4 py-4 bg-accent-500 hover:bg-accent-600 transition-colors text-white font-semibold"
-            >
-              Szukaj
-            </button>
           </div>
 
           {/* Helper text POD searchbarem - Mobile */}
