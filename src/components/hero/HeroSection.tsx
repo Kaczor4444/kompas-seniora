@@ -340,7 +340,7 @@ export default function HeroSection() {
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Hero Header */}
         <div className="text-center max-w-5xl mx-auto mb-6 sm:mb-10">
-          {/* Badge - v2 style (no animation) */}
+          {/* Badge - v2 style */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-primary-100 shadow-sm mb-6 md:mb-8">
             <span className="flex h-2 w-2 rounded-full bg-primary-500"></span>
             <span className="text-xs font-semibold uppercase tracking-wide text-primary-600">
@@ -365,123 +365,134 @@ export default function HeroSection() {
 
         {/* Search Bar */}
         <div className="max-w-5xl mx-auto">
-          {/* Desktop version */}
+          {/* Desktop version - v2 Style */}
           <div className="hidden md:block">
-            <div className="flex bg-white rounded-xl shadow-lg border border-neutral-200 relative">
-              {/* Miejscowość Input - NO LABEL */}
-              <div
-                className="flex-1 px-4 py-4 border-r border-neutral-200 relative"
-                style={{ zIndex: 10 }}
-              >
+            <div className="bg-white p-3 rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100 flex flex-row gap-2 relative">
+              {/* Input with Icon - v2 style */}
+              <div className="flex-1 relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg 
+                    className={`transition-colors ${
+                      selectedType === 'DPS' ? 'text-primary-500' : 
+                      selectedType === 'ŚDS' ? 'text-secondary-500' : 
+                      'text-slate-500'
+                    } group-focus-within:text-slate-800`}
+                    width="20" 
+                    height="20" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
+                    />
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
+                    />
+                  </svg>
+                </div>
+                <label htmlFor="desktop-location" className="sr-only">Lokalizacja</label>
                 <input
+                  id="desktop-location"
                   ref={inputRefDesktop}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Wpisz miejscowość, np. Bochnia"
-                  className="w-full text-base focus:outline-none py-4 px-3"
+                  placeholder="Powiat lub miasto (np. Warszawa)"
+                  className={`w-full pl-11 pr-4 py-4 rounded-xl bg-stone-50 border border-transparent outline-none transition-all text-slate-800 font-medium focus:bg-white focus:ring-2 
+                    ${selectedType === 'DPS' ? 'focus:ring-primary-100 focus:border-primary-300' 
+                      : selectedType === 'ŚDS' ? 'focus:ring-secondary-100 focus:border-secondary-300'
+                      : 'focus:ring-slate-200 focus:border-slate-300'}`}
                   autoComplete="off"
                 />
 
                 {isLoading && (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <div className="animate-spin h-4 w-4 border-2 border-accent-500 border-t-transparent rounded-full" />
+                    <div className="animate-spin h-5 w-5 border-2 border-accent-500 border-t-transparent rounded-full" />
                   </div>
                 )}
 
                 <AutocompleteDropdown />
               </div>
 
-              {/* Geo Button */}
-              <button
+              {/* Geo Button - v2 style */}
+              <button 
                 onClick={handleGeolocation}
                 disabled={isGeoLoading}
-                className="px-6 bg-green-200 hover:bg-green-300 transition-colors flex items-center justify-center border-r border-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Znajdź najbliższe placówki"
+                className="bg-stone-100 hover:bg-stone-200 text-slate-600 hover:text-primary-600 p-4 rounded-xl transition-all border border-transparent hover:border-primary-200 flex items-center justify-center min-w-[60px] disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Użyj mojej lokalizacji"
               >
                 {isGeoLoading ? (
-                  <div className="animate-spin h-6 w-6 border-2 border-green-900 border-t-transparent rounded-full" />
+                  <svg width="20" height="20" className="animate-spin">
+                    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="50" strokeDashoffset="25"/>
+                  </svg>
                 ) : (
-                  <svg
-                    className="w-6 h-6 text-green-900"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 )}
               </button>
 
-              {/* Search Button */}
-              <button
+              {/* Search Button - v2 style with dynamic colors */}
+              <button 
                 onClick={handleSearch}
-                className="px-8 bg-accent-500 hover:bg-accent-600 transition-colors flex items-center justify-center rounded-r-xl"
+                className={`text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 min-w-[140px]
+                  ${selectedType === 'DPS' ? 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/30' 
+                  : selectedType === 'ŚDS' ? 'bg-secondary-600 hover:bg-secondary-700 shadow-secondary-500/30'
+                  : 'bg-slate-800 hover:bg-slate-900 shadow-slate-500/30'}`}
               >
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
+                <span>Szukaj</span>
               </button>
             </div>
 
-            {/* Type Buttons - Desktop */}
-            <div className="flex justify-center items-center gap-3 mt-6">
-              <button
-                onClick={() => setSelectedType("DPS")}
-                className={`px-8 py-3 rounded-lg font-medium transition-all ${
-                  selectedType === "DPS"
-                    ? "bg-accent-500 text-white shadow-md"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-accent-300 hover:bg-accent-50"
-                }`}
+            {/* Type Buttons - Desktop - v2 Style with ring-4 and icons */}
+            <div className="mt-4 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
+              <button 
+                onClick={() => setSelectedType('WSZYSTKIE')}
+                className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
+                  ${selectedType === 'WSZYSTKIE' 
+                    ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
+                    : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
               >
-                DPS
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                Wszystkie placówki
               </button>
-              <button
-                onClick={() => setSelectedType("ŚDS")}
-                className={`px-8 py-3 rounded-lg font-medium transition-all ${
-                  selectedType === "ŚDS"
-                    ? "bg-accent-500 text-white shadow-md"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-accent-300 hover:bg-accent-50"
-                }`}
+
+              <button 
+                onClick={() => setSelectedType('DPS')}
+                className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
+                  ${selectedType === 'DPS' 
+                    ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
+                    : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
               >
-                ŚDS
+                DPS (Całodobowe)
               </button>
-              <button
-                onClick={() => setSelectedType("WSZYSTKIE")}
-                className={`px-8 py-3 rounded-lg font-medium transition-all ${
-                  selectedType === "WSZYSTKIE"
-                    ? "bg-accent-500 text-white shadow-md"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-accent-300 hover:bg-accent-50"
-                }`}
+              
+              <button 
+                onClick={() => setSelectedType('ŚDS')}
+                className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
+                  ${selectedType === 'ŚDS' 
+                    ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
+                    : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
               >
-                WSZYSTKIE
+                ŚDS (Dzienne)
               </button>
-              <TypeTooltip />
             </div>
 
-            {/* ✅ NEW: Helper text UNDER buttons - Desktop */}
+            {/* Helper text UNDER buttons - Desktop */}
             <div className="text-center mt-6 space-y-2">
               <p className="text-sm text-neutral-600 flex items-center justify-center gap-1.5">
                 <svg className="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -504,7 +515,7 @@ export default function HeroSection() {
 
           {/* Mobile version */}
           <div className="md:hidden bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
-            {/* Miejscowość - NO LABEL */}
+            {/* Miejscowość */}
             <div className="px-4 py-4 border-b border-neutral-200 relative">
               <input
                 ref={inputRefMobile}
@@ -612,7 +623,7 @@ export default function HeroSection() {
             </button>
           </div>
 
-          {/* ✅ Helper text POD searchbarem - Mobile */}
+          {/* Helper text POD searchbarem - Mobile */}
           <div className="md:hidden text-center mt-4 space-y-2">
               <p className="text-xs text-neutral-600 flex items-center justify-center gap-1.5">
                 <svg className="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
