@@ -2,11 +2,109 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Building2, UserCheck, User, TrendingUp, Scale, Bookmark } from 'lucide-react'
+
+// Article type
+type Article = {
+  id: number
+  title: string
+  excerpt: string
+  category: string
+  badge: 'POLECAMY' | 'NOWE' | 'NOWY ARTYKUŁ' | 'WKRÓTCE'
+  href: string
+  isPlaceholder: boolean
+  isActive: boolean
+}
 
 export default function KnowledgeCenter() {
   const [scrollPosition, setScrollPosition] = useState(0)
+  const [activeFilter, setActiveFilter] = useState('Wszystkie')
+  const [savedArticles, setSavedArticles] = useState<number[]>([])
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  // Articles data
+  const articles: Article[] = [
+    {
+      id: 1,
+      title: 'Jak wybrać odpowiednią placówkę dla seniora?',
+      excerpt: 'Poznaj kryteria wyboru. Dowiedz się na co zwrócić uwagę.',
+      category: 'Wybór opieki',
+      badge: 'POLECAMY',
+      href: '/poradniki/wybor-opieki/wybor-placowki',
+      isPlaceholder: true,
+      isActive: true
+    },
+    {
+      id: 2,
+      title: '6 Typów DPS w Polsce - który wybrać?',
+      excerpt: 'Poznaj rodzaje DPS zgodnie z Art. 54 i sprawdź który typ pasuje do potrzeb Twojego bliskiego',
+      category: 'Wybór opieki',
+      badge: 'NOWE',
+      href: '/poradniki/wybor-opieki/typy-dps',
+      isPlaceholder: false,
+      isActive: true
+    },
+    {
+      id: 3,
+      title: 'Proces Przyjęcia do DPS: Krok po Kroku',
+      excerpt: 'Pełny przewodnik od wniosku w MOPS po dzień przyjęcia. Z oficjalnymi danymi o czasach oczekiwania z 2 województw.',
+      category: 'Wybór opieki',
+      badge: 'NOWY ARTYKUŁ',
+      href: '/poradniki/wybor-opieki/proces-przyjecia-dps',
+      isPlaceholder: true,
+      isActive: true
+    },
+    {
+      id: 4,
+      title: 'Ile kosztuje dom opieki?',
+      excerpt: 'Koszty pobytu i możliwości dofinansowania z MOPS',
+      category: 'Finanse',
+      badge: 'WKRÓTCE',
+      href: '/poradniki/finanse-prawne/koszty-opieki',
+      isPlaceholder: false,
+      isActive: false
+    },
+    {
+      id: 5,
+      title: 'Czym różni się DPS od ŚDS?',
+      excerpt: 'Zrozum różnice i wybierz właściwą formę opieki',
+      category: 'Wybór opieki',
+      badge: 'WKRÓTCE',
+      href: '/poradniki/wybor-opieki/dps-vs-sds',
+      isPlaceholder: false,
+      isActive: false
+    },
+    {
+      id: 6,
+      title: 'Jak przygotować seniora do przeprowadzki do DPS?',
+      excerpt: 'Praktyczne porady jak pomóc bliskiemu zaakceptować zmianę i przygotować się emocjonalnie',
+      category: 'Dla seniora',
+      badge: 'WKRÓTCE',
+      href: '/poradniki/wsparcie-emocjonalne/przygotowanie-seniora',
+      isPlaceholder: false,
+      isActive: false
+    },
+    {
+      id: 7,
+      title: 'Jakie dokumenty potrzebne do złożenia wniosku do DPS?',
+      excerpt: 'Kompletna lista dokumentów i krok po kroku jak przygotować wniosek do MOPS',
+      category: 'Prawne',
+      badge: 'WKRÓTCE',
+      href: '/poradniki/finanse-prawne/dokumenty-wniosek',
+      isPlaceholder: false,
+      isActive: false
+    },
+    {
+      id: 8,
+      title: 'Prawa mieszkańca domu pomocy społecznej',
+      excerpt: 'Poznaj prawa seniora w DPS - od prywatności po możliwość odwiedzin rodziny',
+      category: 'Prawne',
+      badge: 'WKRÓTCE',
+      href: '/poradniki/finanse-prawne/prawa-mieszkanca',
+      isPlaceholder: false,
+      isActive: false
+    }
+  ]
 
   const scrollLeft = () => {
     if (!scrollContainerRef.current) return
@@ -24,6 +122,19 @@ export default function KnowledgeCenter() {
     if (!scrollContainerRef.current) return
     setScrollPosition(scrollContainerRef.current.scrollLeft)
   }
+
+  const toggleSave = (id: number) => {
+    setSavedArticles(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    )
+  }
+
+  // Filter articles
+  const filteredArticles = activeFilter === 'Zakładki'
+    ? articles.filter(a => savedArticles.includes(a.id))
+    : activeFilter === 'Wszystkie'
+      ? articles
+      : articles.filter(a => a.category === activeFilter)
 
   // Keyboard navigation
   useEffect(() => {
@@ -51,30 +162,88 @@ export default function KnowledgeCenter() {
             🎯 Nie wiesz od czego zacząć?
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            Przeczytaj artykuły, które pomogą Ci w poszukiwaniu i podjęciu decyzji.
+            Przygotowaliśmy serię artykułów, które przeprowadzą Cię przez zawiłości systemu opieki senioralnej w Polsce.
           </p>
         </div>
 
-        {/* Kategorie/Tagi */}
+        {/* Kategorie/Tagi - V2 with Icons */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
-          <Link href="/poradniki" className="px-6 py-2 bg-accent-500 hover:bg-accent-600 text-white rounded-lg font-medium transition-colors">
+          <button
+            onClick={() => setActiveFilter('Wszystkie')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2 ${
+              activeFilter === 'Wszystkie'
+                ? 'bg-slate-800 text-white'
+                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+            }`}
+          >
             Wszystkie
-          </Link>
-          <Link href="/poradniki#wybor-opieki" className="px-6 py-2 bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-lg font-medium transition-colors">
+          </button>
+          <button
+            onClick={() => setActiveFilter('Wybór opieki')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2 ${
+              activeFilter === 'Wybór opieki'
+                ? 'bg-slate-800 text-white'
+                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+            }`}
+          >
+            <Building2 size={16} />
             Wybór opieki
-          </Link>
-          <Link href="/poradniki#opiekunowie" className="px-6 py-2 bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-lg font-medium transition-colors">
-            Dla opiekunów
-          </Link>
-          <Link href="/poradniki#seniorzy" className="px-6 py-2 bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-lg font-medium transition-colors">
-            Dla seniorów
-          </Link>
-          <Link href="/poradniki#finanse" className="px-6 py-2 bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-lg font-medium transition-colors">
+          </button>
+          <button
+            onClick={() => setActiveFilter('Dla opiekuna')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2 ${
+              activeFilter === 'Dla opiekuna'
+                ? 'bg-slate-800 text-white'
+                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+            }`}
+          >
+            <UserCheck size={16} />
+            Dla opiekuna
+          </button>
+          <button
+            onClick={() => setActiveFilter('Dla seniora')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2 ${
+              activeFilter === 'Dla seniora'
+                ? 'bg-slate-800 text-white'
+                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+            }`}
+          >
+            <User size={16} />
+            Dla seniora
+          </button>
+          <button
+            onClick={() => setActiveFilter('Finanse')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2 ${
+              activeFilter === 'Finanse'
+                ? 'bg-slate-800 text-white'
+                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+            }`}
+          >
+            <TrendingUp size={16} />
             Finanse
-          </Link>
-          <Link href="/poradniki#prawne" className="px-6 py-2 bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-lg font-medium transition-colors">
+          </button>
+          <button
+            onClick={() => setActiveFilter('Prawne')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2 ${
+              activeFilter === 'Prawne'
+                ? 'bg-slate-800 text-white'
+                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+            }`}
+          >
+            <Scale size={16} />
             Prawne
-          </Link>
+          </button>
+          <button
+            onClick={() => setActiveFilter('Zakładki')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2 ${
+              activeFilter === 'Zakładki'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+            }`}
+          >
+            <Bookmark size={16} className={activeFilter === 'Zakładki' ? 'fill-white' : ''} />
+            Zakładki
+          </button>
         </div>
 
         {/* Desktop & Mobile: Horizontal Scroll with Arrows (Desktop only) */}
@@ -103,265 +272,91 @@ export default function KnowledgeCenter() {
             className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-4 px-2"
             onScroll={handleScroll}
           >
-            {/* Card 1 - Wybór placówki (POLECAMY) */}
-            <Link
-              href="/poradniki/wybor-opieki/wybor-placowki"
-              aria-label="Jak wybrać odpowiednią placówkę dla seniora?"
-              className="group flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full relative">
-                {/* Badge POLECAMY - top right */}
-                <div className="absolute top-4 right-4 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold animate-pulse z-10">
-                  POLECAMY
-                </div>
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=800&q=80"
-                    alt="Jak wybrać placówkę dla seniora"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-emerald-600 transition-colors">
-                    Jak wybrać odpowiednią placówkę dla seniora?
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Poznaj kryteria wyboru. Dowiedz się na co zwrócić uwagę.
-                  </p>
-                  <span className="text-sm text-emerald-600 font-medium inline-flex items-center gap-1">
-                    Rozpocznij czytanie →
-                  </span>
-                </div>
-              </article>
-            </Link>
+            {filteredArticles.map((article) => (
+              <Link
+                key={article.id}
+                href={article.href}
+                aria-label={article.title}
+                className={`group flex-shrink-0 snap-start w-[300px] lg:w-[380px] ${!article.isActive ? 'pointer-events-none' : ''}`}
+              >
+                <article className={`bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full relative ${!article.isActive ? 'opacity-75' : ''}`}>
+                  {/* Bookmark button - top right */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      toggleSave(article.id)
+                    }}
+                    className="absolute top-4 right-14 z-20 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+                  >
+                    <Bookmark
+                      size={20}
+                      className={savedArticles.includes(article.id) ? 'fill-emerald-600 text-emerald-600' : 'text-slate-400'}
+                    />
+                  </button>
 
-            {/* Card 2 - Typy DPS (NOWE!) */}
-            <Link
-              href="/poradniki/wybor-opieki/typy-dps"
-              aria-label="6 Typów DPS w Polsce - który wybrać?"
-              className="group flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full relative">
-                {/* Badge NOWE - top right */}
-                <div className="absolute top-4 right-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold z-10">
-                  NOWE
-                </div>
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
-                    alt="6 typów DPS w Polsce"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-emerald-600 transition-colors">
-                    6 Typów DPS w Polsce - który wybrać?
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Poznaj rodzaje DPS zgodnie z Art. 54 i sprawdź który typ pasuje do potrzeb Twojego bliskiego
-                  </p>
-                  <span className="text-sm text-emerald-600 font-medium inline-flex items-center gap-1">
-                    Przeczytaj teraz →
-                  </span>
-                </div>
-              </article>
-            </Link>
+                  {/* Badge - top left */}
+                  <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold z-10 ${
+                    article.badge === 'POLECAMY' ? 'bg-emerald-100 text-emerald-800 animate-pulse' :
+                    article.badge === 'NOWE' ? 'bg-blue-100 text-blue-800' :
+                    article.badge === 'NOWY ARTYKUŁ' ? 'bg-emerald-100 text-emerald-800 animate-pulse' :
+                    'bg-gray-200 text-gray-600'
+                  }`}>
+                    {article.badge}
+                  </div>
 
-            {/* Card 3 - Proces Przyjęcia do DPS (NOWY ARTYKUŁ) */}
-            <Link
-              href="/poradniki/wybor-opieki/proces-przyjecia-dps"
-              aria-label="Proces Przyjęcia do DPS: Jak to Wygląda Krok po Kroku"
-              className="group flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow h-full relative">
-                {/* Badge NOWY ARTYKUŁ - top right */}
-                <div className="absolute top-4 right-4 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold animate-pulse z-10">
-                  NOWY ARTYKUŁ
-                </div>
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80"
-                    alt="Proces przyjęcia do DPS"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="text-sm text-emerald-600 mb-2 font-medium">Wybór opieki</div>
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-emerald-600 transition-colors">
-                    Proces Przyjęcia do DPS: Krok po Kroku
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Pełny przewodnik od wniosku w MOPS po dzień przyjęcia. Z oficjalnymi danymi o czasach oczekiwania z 2 województw.
-                  </p>
-                  <span className="text-sm text-emerald-600 font-medium inline-flex items-center gap-1">
-                    Czytaj teraz →
-                  </span>
-                </div>
-              </article>
-            </Link>
+                  {/* Image or Placeholder */}
+                  {article.isPlaceholder ? (
+                    <div className="relative h-48 bg-slate-200 flex items-center justify-center">
+                      <h3 className="text-2xl font-serif font-bold text-slate-600">Poradnik Seniora</h3>
 
-            {/* Card 4 - Koszty opieki (WKRÓTCE) */}
-            <Link
-              href="/poradniki/finanse-prawne/koszty-opieki"
-              aria-label="Ile kosztuje dom opieki?"
-              className="group pointer-events-none flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden h-full relative opacity-75">
-                {/* Badge WKRÓTCE - top right */}
-                <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
-                  WKRÓTCE
-                </div>
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80"
-                    alt="Koszty domu opieki"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3">
-                    Ile kosztuje dom opieki?
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Koszty pobytu i możliwości dofinansowania z MOPS
-                  </p>
-                  <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
-                    W przygotowaniu
-                  </span>
-                </div>
-              </article>
-            </Link>
+                      {/* Category badge ON image */}
+                      <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full">
+                        <span className="text-xs font-bold text-emerald-600 uppercase flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                          {article.category.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                      />
 
-            {/* Card 5 - DPS vs ŚDS (WKRÓTCE) */}
-            <Link
-              href="/poradniki/wybor-opieki/dps-vs-sds"
-              aria-label="Czym różni się DPS od ŚDS?"
-              className="group pointer-events-none flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden h-full relative opacity-75">
-                {/* Badge WKRÓTCE - top right */}
-                <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
-                  WKRÓTCE
-                </div>
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
-                    alt="Różnice DPS i ŚDS"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3">
-                    Czym różni się DPS od ŚDS?
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Zrozum różnice i wybierz właściwą formę opieki
-                  </p>
-                  <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
-                    W przygotowaniu
-                  </span>
-                </div>
-              </article>
-            </Link>
+                      {/* Category badge ON image */}
+                      <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full">
+                        <span className="text-xs font-bold text-emerald-600 uppercase flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                          {article.category.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
-            {/* Card 6 - Przygotowanie seniora (WKRÓTCE) */}
-            <Link
-              href="/poradniki/wsparcie-emocjonalne/przygotowanie-seniora"
-              aria-label="Jak przygotować seniora do przeprowadzki do DPS?"
-              className="group pointer-events-none flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden h-full relative opacity-75">
-                {/* Badge WKRÓTCE - top right */}
-                <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
-                  WKRÓTCE
-                </div>
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1566616213894-2d4e1baee5d8?w=800&q=80"
-                    alt="Przygotowanie seniora do DPS"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="text-sm text-gray-500 mb-2">Wsparcie emocjonalne</div>
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3">
-                    Jak przygotować seniora do przeprowadzki do DPS?
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Praktyczne porady jak pomóc bliskiemu zaakceptować zmianę i przygotować się emocjonalnie
-                  </p>
-                  <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
-                    W przygotowaniu
-                  </span>
-                </div>
-              </article>
-            </Link>
-
-            {/* Card 7 - Dokumenty do wniosku (WKRÓTCE) */}
-            <Link
-              href="/poradniki/finanse-prawne/dokumenty-wniosek"
-              aria-label="Jakie dokumenty potrzebne do złożenia wniosku do DPS?"
-              className="group pointer-events-none flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden h-full relative opacity-75">
-                {/* Badge WKRÓTCE - top right */}
-                <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
-                  WKRÓTCE
-                </div>
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80"
-                    alt="Dokumenty do wniosku DPS"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="text-sm text-gray-500 mb-2">Finanse i prawo</div>
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3">
-                    Jakie dokumenty potrzebne do złożenia wniosku do DPS?
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Kompletna lista dokumentów i krok po kroku jak przygotować wniosek do MOPS
-                  </p>
-                  <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
-                    W przygotowaniu
-                  </span>
-                </div>
-              </article>
-            </Link>
-
-            {/* Card 8 - Prawa mieszkańca (WKRÓTCE) */}
-            <Link
-              href="/poradniki/finanse-prawne/prawa-mieszkanca"
-              aria-label="Prawa mieszkańca domu pomocy społecznej"
-              className="group pointer-events-none flex-shrink-0 snap-start w-[300px] lg:w-[380px]"
-            >
-              <article className="bg-white rounded-xl border border-neutral-200 overflow-hidden h-full relative opacity-75">
-                {/* Badge WKRÓTCE - top right */}
-                <div className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold z-10">
-                  WKRÓTCE
-                </div>
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80"
-                    alt="Prawa mieszkańca DPS"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="text-sm text-gray-500 mb-2">Finanse i prawo</div>
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3">
-                    Prawa mieszkańca domu pomocy społecznej
-                  </h3>
-                  <p className="text-neutral-700 mb-3">
-                    Poznaj prawa seniora w DPS - od prywatności po możliwość odwiedzin rodziny
-                  </p>
-                  <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1 opacity-50 cursor-not-allowed">
-                    W przygotowaniu
-                  </span>
-                </div>
-              </article>
-            </Link>
+                  {/* Content - NO category tag here */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-serif font-semibold text-neutral-900 mb-3 group-hover:text-emerald-600 transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-neutral-700 mb-3">
+                      {article.excerpt}
+                    </p>
+                    <span className={`text-sm font-medium inline-flex items-center gap-1 ${
+                      article.isActive ? 'text-emerald-600' : 'text-gray-500 opacity-50 cursor-not-allowed'
+                    }`}>
+                      {article.isActive ? 'Czytaj dalej →' : 'W przygotowaniu'}
+                    </span>
+                  </div>
+                </article>
+              </Link>
+            ))}
           </div>
 
           {/* Right Arrow (Desktop only) */}
@@ -386,7 +381,7 @@ export default function KnowledgeCenter() {
         {/* CTA dla więcej artykułów */}
         <div className="text-center mt-12">
           <Link href="/poradniki" className="bg-white hover:bg-neutral-50 text-neutral-900 px-8 py-3 rounded-lg font-medium border-2 border-neutral-300 transition-colors inline-flex items-center gap-2">
-            Zobacz wszystkie poradniki
+            Zobacz wszystkie poradniki ({articles.length})
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
