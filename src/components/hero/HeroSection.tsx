@@ -17,9 +17,26 @@ interface SuggestResponse {
   showAll: boolean;
 }
 
-export default function HeroSection() {
+// ✅ ADDED: Props interface for callback
+interface HeroSectionProps {
+  onTabChange?: (tab: 'DPS' | 'SDS' | 'Wszystkie') => void;
+}
+
+export default function HeroSection({ onTabChange }: HeroSectionProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("WSZYSTKIE");
+
+  // ✅ ADDED: Handler to sync with parent component
+  const handleTypeChange = (type: string) => {
+    setSelectedType(type);
+    
+    // Notify parent component (page.tsx) about tab change
+    if (onTabChange) {
+      if (type === 'DPS') onTabChange('DPS');
+      else if (type === 'ŚDS') onTabChange('SDS');
+      else onTabChange('Wszystkie');
+    }
+  };
 
   // Autocomplete state
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -459,7 +476,7 @@ export default function HeroSection() {
             {/* Type Buttons - Desktop - v2 Style with ring-4 and icons */}
             <div className="mt-4 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
               <button 
-                onClick={() => setSelectedType('WSZYSTKIE')}
+                onClick={() => handleTypeChange('WSZYSTKIE')}
                 className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
                   ${selectedType === 'WSZYSTKIE' 
                     ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
@@ -472,7 +489,7 @@ export default function HeroSection() {
               </button>
 
               <button 
-                onClick={() => setSelectedType('DPS')}
+                onClick={() => handleTypeChange('DPS')}
                 className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
                   ${selectedType === 'DPS' 
                     ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
@@ -482,7 +499,7 @@ export default function HeroSection() {
               </button>
               
               <button 
-                onClick={() => setSelectedType('ŚDS')}
+                onClick={() => handleTypeChange('ŚDS')}
                 className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
                   ${selectedType === 'ŚDS' 
                     ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
@@ -598,7 +615,7 @@ export default function HeroSection() {
             {/* Quick Filters / Tabs - Mobile */}
             <div className="flex flex-wrap justify-center gap-2">
               <button 
-                onClick={() => setSelectedType('WSZYSTKIE')}
+                onClick={() => handleTypeChange('WSZYSTKIE')}
                 className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
                   ${selectedType === 'WSZYSTKIE' 
                     ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
@@ -611,7 +628,7 @@ export default function HeroSection() {
               </button>
 
               <button 
-                onClick={() => setSelectedType('DPS')}
+                onClick={() => handleTypeChange('DPS')}
                 className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
                   ${selectedType === 'DPS' 
                     ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
@@ -621,7 +638,7 @@ export default function HeroSection() {
               </button>
               
               <button 
-                onClick={() => setSelectedType('ŚDS')}
+                onClick={() => handleTypeChange('ŚDS')}
                 className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
                   ${selectedType === 'ŚDS' 
                     ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 

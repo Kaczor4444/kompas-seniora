@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
 import MiniFAQSection from '../src/components/faq/MiniFAQSection';
 import NewsletterSection from '../src/components/newsletter/NewsletterSection';
@@ -8,16 +9,20 @@ import HeroSection from '../src/components/hero/HeroSection';
 import { CategorySelector } from '../src/components/CategorySelector';
 
 export default function Home() {
+  // ✅ State management for active tab
+  const [activeTab, setActiveTab] = useState<'DPS' | 'SDS' | 'Wszystkie'>('Wszystkie');
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <HeroSection />
+      {/* Hero Section - synced with CategorySelector */}
+      <HeroSection onTabChange={setActiveTab} />
 
-      {/* Category Selector */}
+      {/* Category Selector - receives activeTab from state */}
       <CategorySelector
-        activeTab="Wszystkie"
+        activeTab={activeTab}
         onSearch={(query) => {
-          console.log('CategorySelector search:', query)
+          // CategorySelector handles navigation internally via window.location.href
+          console.log('CategorySelector search:', query);
         }}
         location=""
       />

@@ -3,6 +3,24 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Loader2, Users, Heart, Sun, Accessibility, Shield, Activity, School, Puzzle, Sparkles, Check, Info, ArrowRight, X } from 'lucide-react';
 
+// Mapowanie tytułów kafelków na kody profili opieki w bazie
+const categoryToProfileMap: Record<string, string[]> = {
+  // DPS Categories
+  "Osoby starsze": ["A"],
+  "Somatycznie chorzy": ["B"],
+  "Psychicznie chorzy": ["C"],
+  "Niepełnosprawni intelektualnie": ["D"],
+  "Dzieci i młodzież": ["E"],
+  "Niepełnosprawni fizycznie": ["F"],
+  "Osoby uzależnione": ["G"],
+  
+  // ŚDS Categories  
+  "Typ A - Psychiczny": ["C"],  // Choroba psychiczna
+  "Typ B - Intelektualny": ["D"], // Niepełnosprawność intelektualna
+  "Typ C - Inne zaburzenia": ["H"], // Demencja/Alzheimer
+  "Typ D - Sprzężone": ["I"],  // Autyzm/sprzężone
+};
+
 const dpsCategories = [
   { icon: <Users size={32} />, title: "Osoby starsze", target: "Seniorzy" },
   { icon: <Activity size={32} />, title: "Somatycznie chorzy", target: "Opieka medyczna" },
@@ -48,13 +66,48 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
 
   const handleSearchClick = () => {
     setIsSearching(true);
+    
+    // Mapuj wybrane kategorie na kody profili opieki
+    const profileCodes = selectedCategories.flatMap(category => 
+      categoryToProfileMap[category] || []
+    );
+    
+    // Usuń duplikaty
+    const uniqueProfileCodes = [...new Set(profileCodes)];
+    
+    console.log('🔍 CategorySelector Search:', {
+      selectedCategories,
+      profileCodes: uniqueProfileCodes,
+      activeTab,
+      location
+    });
+    
+    // Przekaż do search page przez URL
+    const params = new URLSearchParams();
+    
+    // ✅ CRITICAL FIX: ZAWSZE dodaj type parameter
+    if (activeTab === 'DPS') {
+      params.append('type', 'dps');
+    } else if (activeTab === 'SDS') {
+      params.append('type', 'sds'); // Lowercase bez polskich znaków!
+    }
+    // Dla "Wszystkie" nie dodawaj type
+    
+    if (location) {
+      params.append('q', location);
+    }
+    
+    // ✅ CRITICAL: Przekaż profile opieki jako parametr 'care'
+    if (uniqueProfileCodes.length > 0) {
+      params.append('care', uniqueProfileCodes.join(','));
+    }
+    
+    const url = `/search?${params.toString()}`;
+    console.log('🔗 Navigating to:', url);
+    
     setTimeout(() => {
       setIsSearching(false);
-      onSearch({
-        location,
-        categories: selectedCategories,
-        type: activeTab
-      });
+      window.location.href = url;
     }, 600);
   };
 

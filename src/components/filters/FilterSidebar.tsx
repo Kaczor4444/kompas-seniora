@@ -61,17 +61,17 @@ const POWIATY_MAP: Record<string, string[]> = {
   ],
 };
 
-// Typy opieki
+// ✅ CRITICAL FIX: Typy opieki - zgodne z CategorySelector!
 const CARE_TYPES = [
-  { value: 'A', label: 'Niepełnosprawność intelektualna (dorośli)' },
-  { value: 'B', label: 'Spektrum autyzmu' },
-  { value: 'C', label: 'Zaburzenia psychiczne, demencja, Alzheimer' },
-  { value: 'D', label: 'Niepełnosprawności sprzężone' },
-  { value: 'E', label: 'Osoby w podeszłym wieku' },
-  { value: 'F', label: 'Przewlekle somatycznie chorzy' },
-  { value: 'G', label: 'Dzieci niepełnosprawne intelektualnie' },
-  { value: 'H', label: 'Młodzież niepełnosprawna intelektualnie' },
-  { value: 'I', label: 'Niepełnosprawność fizyczna (motoryczna)' },
+  { value: 'A', label: 'Osoby starsze' },
+  { value: 'B', label: 'Somatycznie chorzy' },
+  { value: 'C', label: 'Psychicznie chorzy' },
+  { value: 'D', label: 'Niepełnosprawni intelektualnie' },
+  { value: 'E', label: 'Dzieci i młodzież' },
+  { value: 'F', label: 'Niepełnosprawni fizycznie' },
+  { value: 'G', label: 'Osoby uzależnione' },
+  { value: 'H', label: 'Zaburzenia psychiczne, demencja, Alzheimer' }, // ŚDS Typ C
+  { value: 'I', label: 'Spektrum autyzmu' }, // ŚDS Typ D (sprzężone)
 ];
 
 export default function FilterSidebar({ totalResults, careProfileCounts, hasUserLocation = false, showSorting = false }: FilterSidebarProps) {
