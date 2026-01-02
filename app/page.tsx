@@ -11,11 +11,18 @@ import { CategorySelector } from '../src/components/CategorySelector';
 export default function Home() {
   // ✅ State management for active tab
   const [activeTab, setActiveTab] = useState<'DPS' | 'SDS' | 'Wszystkie'>('Wszystkie');
+  
+  // ✅ State management for selected care profiles
+  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section - synced with CategorySelector */}
-      <HeroSection onTabChange={setActiveTab} />
+      <HeroSection 
+        onTabChange={setActiveTab}
+        selectedProfiles={selectedProfiles}
+        activeTab={activeTab}
+      />
 
       {/* Category Selector - receives activeTab from state */}
       <CategorySelector
@@ -24,6 +31,7 @@ export default function Home() {
           // CategorySelector handles navigation internally via window.location.href
           console.log('CategorySelector search:', query);
         }}
+        onProfilesChange={setSelectedProfiles}
         location=""
       />
 

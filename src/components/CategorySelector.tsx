@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Loader2, Users, Heart, Sun, Accessibility, Shield, Activity, School, Puzzle, Sparkles, Check, Info, ArrowRight, X } from 'lucide-react';
 
 // Mapowanie tytułów kafelków na kody profili opieki w bazie
@@ -41,12 +41,36 @@ const sdsCategories = [
 interface CategorySelectorProps {
   activeTab: 'DPS' | 'SDS' | 'Wszystkie';
   onSearch: (query: { location: string; categories: string[]; type: 'DPS' | 'SDS' | 'Wszystkie' }) => void;
+  onProfilesChange?: (profiles: string[]) => void;
   location: string;
 }
 
-export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, onSearch, location }) => {
+export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, onSearch, onProfilesChange, location }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // ✅ NEW: Reset selections when activeTab changes
+  useEffect(() => {
+    console.log('🔄 Tab changed to:', activeTab);
+    setSelectedCategories([]);
+  }, [activeTab]);
+
+  // ✅ Notify parent via useEffect
+  useEffect(() => {
+    if (onProfilesChange) {
+      const profileCodes = selectedCategories.flatMap(category => 
+        categoryToProfileMap[category] || []
+      );
+      const uniqueProfileCodes = [...new Set(profileCodes)];
+      onProfilesChange(uniqueProfileCodes);
+      
+      console.log('📊 Profile selection changed:', {
+        activeTab,
+        selectedCategories,
+        profileCodes: uniqueProfileCodes
+      });
+    }
+  }, [selectedCategories, onProfilesChange, activeTab]);
 
   const handleCategorySelect = (title: string) => {
     setSelectedCategories(prev => {
@@ -89,9 +113,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
     if (activeTab === 'DPS') {
       params.append('type', 'dps');
     } else if (activeTab === 'SDS') {
-      params.append('type', 'sds'); // Lowercase bez polskich znaków!
+      params.append('type', 'sds');
     }
-    // Dla "Wszystkie" nie dodawaj type
     
     if (location) {
       params.append('q', location);
@@ -189,8 +212,9 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
           </div>
       </div>
 
+      {/* ✅ MODIFIED: Hidden on desktop (md:hidden), visible on mobile */}
       <div
-        className={`fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 transition-all duration-300 transform ${
+        className={`md:hidden fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 transition-all duration-300 transform ${
           selectedCategories.length > 0
             ? 'translate-y-0 opacity-100'
             : 'translate-y-20 opacity-0 pointer-events-none'

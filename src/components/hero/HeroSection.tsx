@@ -20,9 +20,11 @@ interface SuggestResponse {
 // ✅ ADDED: Props interface for callback
 interface HeroSectionProps {
   onTabChange?: (tab: 'DPS' | 'SDS' | 'Wszystkie') => void;
+  selectedProfiles?: string[];
+  activeTab?: 'DPS' | 'SDS' | 'Wszystkie';
 }
 
-export default function HeroSection({ onTabChange }: HeroSectionProps = {}) {
+export default function HeroSection({ onTabChange, selectedProfiles = [], activeTab = 'WSZYSTKIE' }: HeroSectionProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("WSZYSTKIE");
 
@@ -149,6 +151,11 @@ export default function HeroSection({ onTabChange }: HeroSectionProps = {}) {
     if (selectedType !== "WSZYSTKIE") {
       params.append("type", selectedType.toLowerCase());
     }
+    
+    // ✅ ADDED: Include selected care profiles
+    if (selectedProfiles && selectedProfiles.length > 0) {
+      params.append("care", selectedProfiles.join(','));
+    }
 
     console.log('🔗 Navigating with params:', params.toString());
     window.location.href = `/search?${params.toString()}`;
@@ -210,6 +217,12 @@ export default function HeroSection({ onTabChange }: HeroSectionProps = {}) {
     }
     if (selectedType !== "WSZYSTKIE") {
       params.append("type", selectedType.toLowerCase());
+    }
+    
+    // ✅ ADDED: Include selected care profiles from CategorySelector
+    if (selectedProfiles && selectedProfiles.length > 0) {
+      params.append("care", selectedProfiles.join(','));
+      console.log('🔗 Main search with profiles:', selectedProfiles);
     }
 
     window.location.href = `/search?${params.toString()}`;
