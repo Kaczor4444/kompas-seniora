@@ -245,7 +245,7 @@ export default function SearchResults({
 
   // ===== RENDER =====
   return (
-    <div className="flex flex-col bg-gray-50 min-h-screen">
+    <div className="flex flex-col bg-gray-50 h-full">
 
       {/* Header */}
       <SearchHeader
@@ -347,7 +347,7 @@ export default function SearchResults({
         <div className={`
           flex-1 md:w-1/2
           bg-gray-100 overflow-hidden
-          ${showMapMobile ? 'block fixed inset-0 z-40 top-[120px]' : 'hidden md:block md:sticky md:top-0 md:h-[calc(100vh-80px)]'}
+          ${showMapMobile ? 'block fixed inset-0 z-40 top-[120px]' : 'hidden md:block md:sticky md:top-0 md:h-[calc(100vh-80px)] md:z-30'}
         `}>
           <FacilityMap
             facilities={facilities}

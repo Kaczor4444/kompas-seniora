@@ -45,14 +45,14 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
       onMouseLeave={() => onHover(null)}
       onClick={onClick}
       className={`
-        group relative
+        group relative z-40 isolate
         bg-white rounded-2xl sm:rounded-3xl
         border-2 transition-all duration-200
         cursor-pointer
         flex flex-col sm:flex-row gap-4 sm:gap-6
         p-4 sm:p-4
-        ${isHovered 
-          ? 'border-emerald-400 shadow-xl -translate-y-0.5' 
+        ${isHovered
+          ? 'border-emerald-400 shadow-xl -translate-y-0.5'
           : 'border-gray-200 shadow-sm hover:shadow-lg hover:border-gray-300'
         }
       `}
@@ -96,7 +96,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-between py-1 sm:py-2">
+      <div className="flex-1 min-w-0 flex flex-col justify-between py-1 sm:py-2">
         
         {/* Top Section */}
         <div>
@@ -106,7 +106,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
           </div>
 
           {/* Title */}
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1.5 sm:mb-2 leading-tight group-hover:text-emerald-600 transition-colors line-clamp-2 break-words overflow-hidden">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1.5 sm:mb-2 leading-tight group-hover:text-emerald-600 transition-colors line-clamp-2">
             {facility.name}
           </h3>
 
@@ -118,7 +118,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
         </div>
 
         {/* Bottom Section */}
-        <div className="flex items-end justify-between pt-3 border-t border-gray-100">
+        <div className="flex flex-wrap items-end justify-between gap-3 min-w-0 pt-3 border-t border-gray-100">
           
           {/* Price */}
           <div>
@@ -135,7 +135,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             
             {/* Rating */}
             <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50">

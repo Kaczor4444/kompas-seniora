@@ -420,12 +420,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {/* Header */}
 
       {/* Main Content */}
-      <main className="w-full">
-        <div className="flex flex-col lg:flex-row gap-6">
-
-          {/* RIGHT: Wyniki wyszukiwania */}
-          <div className="w-full">
-            {/* Mobile: Filter drawer */}
+      <main className="w-full h-screen flex flex-col">
+        <div className="flex flex-col lg:flex-row gap-6 flex-1 overflow-hidden">
+          {/* Mobile: Filter drawer */}
             <div className="lg:hidden">
               <MobileStickyBar
                 totalResults={sortedResults.length}
@@ -465,8 +462,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 showFree: showFree || undefined,
               }}
             />
-          </div>
-
         </div>
       </main>
     </div>
