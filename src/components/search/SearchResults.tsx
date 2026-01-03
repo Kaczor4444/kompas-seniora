@@ -287,15 +287,15 @@ export default function SearchResults({
       />
 
       {/* Content Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex flex-1 h-[calc(100vh-240px)] overflow-hidden">
 
         {/* Results List */}
         <div className={`
-          flex-1 md:w-3/5 lg:w-1/2
-          overflow-y-auto p-4 md:p-8
+          flex-1 md:w-1/2
+          overflow-y-auto p-3 sm:p-4 md:p-8
           ${showMapMobile ? 'hidden md:block' : 'block'}
         `}>
-          <div className="max-w-3xl mx-auto space-y-4">
+          <div className="max-w-4xl mx-auto space-y-3 sm:space-y-4">
 
             {/* Results count */}
             {!isLoading && facilities.length > 0 && (
@@ -345,9 +345,9 @@ export default function SearchResults({
 
         {/* Map */}
         <div className={`
-          flex-1 md:w-2/5 lg:w-1/2
-          bg-gray-100 relative
-          ${showMapMobile ? 'block fixed inset-0 z-40 top-[120px]' : 'hidden md:block'}
+          flex-1 md:w-1/2
+          bg-gray-100 overflow-hidden
+          ${showMapMobile ? 'block fixed inset-0 z-40 top-[120px]' : 'hidden md:block md:sticky md:top-0 md:h-[calc(100vh-80px)]'}
         `}>
           <FacilityMap
             facilities={facilities}

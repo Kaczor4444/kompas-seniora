@@ -165,7 +165,7 @@ export default function FacilityMap({
   const center: [number, number] = [50.0647, 19.9450];
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full">
       <style jsx global>{`
         .custom-dual-cluster {
           background: transparent !important;
@@ -173,7 +173,7 @@ export default function FacilityMap({
         }
       `}</style>
       
-      <div className="h-[400px] rounded-lg overflow-hidden border border-gray-200">
+      <div className="h-full rounded-lg overflow-hidden border border-gray-200">
         <MapContainer
           
           center={center}

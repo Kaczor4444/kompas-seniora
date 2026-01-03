@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SearchResults from '@/components/SearchResults';
-import FilterSidebar from '@/src/components/filters/FilterSidebar';
 import MobileFilterDrawer from '@/src/components/filters/MobileFilterDrawer';
 import MobileStickyBar from '@/src/components/mobile/MobileStickyBar';
 import { calculateDistance } from '@/src/utils/distance';
@@ -421,21 +420,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {/* Header */}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="w-full">
         <div className="flex flex-col lg:flex-row gap-6">
-          
-          {/* LEFT: Sidebar z filtrami (tylko desktop) */}
-          <div className="hidden lg:block lg:w-80 flex-shrink-0 sticky top-20 h-screen overflow-y-auto">
-            <FilterSidebar 
-              totalResults={sortedResults.length}
-              careProfileCounts={careProfileCounts}
-              hasUserLocation={!!(userLat && userLng)}
-              showSorting={true}
-            />
-          </div>
 
           {/* RIGHT: Wyniki wyszukiwania */}
-          <div className="flex-1 min-w-0">
+          <div className="w-full">
             {/* Mobile: Filter drawer */}
             <div className="lg:hidden">
               <MobileStickyBar
