@@ -109,6 +109,7 @@ export default function SearchResults({
 
   const [facilities, setFacilities] = useState<Facility[]>(results);
   const [isLoading, setIsLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
 
   // ===== COMPUTED =====
   const availablePowiats = useMemo(() => {
@@ -311,34 +312,48 @@ export default function SearchResults({
               // Empty State
               <EmptyState onResetFilters={resetFilters} />
             ) : (
-              // Facility Cards
-              facilities.map(fac => (
-                <FacilityCard
-                  key={fac.id}
-                  facility={{
-                    id: fac.id,
-                    name: fac.nazwa,
-                    type: fac.typ_placowki as 'DPS' | 'ŚDS',
-                    city: fac.miejscowosc || '',
-                    powiat: fac.powiat || '',
-                    category: fac.profil_opieki || 'Różne profile',
-                    price: fac.koszt_pobytu || 0,
-                    rating: 4.5, // Default - adjust if you have rating
-                    image: '/images/placeholder-facility.jpg', // Add your image logic
-                    waitTime: 'Brak danych'
-                  }}
-                  isHovered={hoveredId === fac.id}
-                  isSaved={false} // Add your saved logic
-                  isCompared={selectedForCompare.includes(fac.id)}
-                  onHover={setHoveredId}
-                  onClick={() => handleFacilityClick(fac.id)}
-                  onToggleSave={(e) => {
-                    e.stopPropagation();
-                    // Add your save logic
-                  }}
-                  onToggleCompare={(e) => toggleCompare(fac.id, e)}
-                />
-              ))
+              <>
+                {/* Facility Cards */}
+                {facilities.slice(0, visibleCount).map(fac => (
+                  <FacilityCard
+                    key={fac.id}
+                    facility={{
+                      id: fac.id,
+                      name: fac.nazwa,
+                      type: fac.typ_placowki as 'DPS' | 'ŚDS',
+                      city: fac.miejscowosc || '',
+                      powiat: fac.powiat || '',
+                      category: fac.profil_opieki || 'Różne profile',
+                      price: fac.koszt_pobytu || 0,
+                      rating: 4.5, // Default - adjust if you have rating
+                      image: '/images/placeholder-facility.jpg', // Add your image logic
+                      waitTime: 'Brak danych'
+                    }}
+                    isHovered={hoveredId === fac.id}
+                    isSaved={false} // Add your saved logic
+                    isCompared={selectedForCompare.includes(fac.id)}
+                    onHover={setHoveredId}
+                    onClick={() => handleFacilityClick(fac.id)}
+                    onToggleSave={(e) => {
+                      e.stopPropagation();
+                      // Add your save logic
+                    }}
+                    onToggleCompare={(e) => toggleCompare(fac.id, e)}
+                  />
+                ))}
+
+                {/* Load More Button */}
+                {visibleCount < facilities.length && (
+                  <div className="flex justify-center py-8 pb-32 md:pb-8">
+                    <button
+                      onClick={() => setVisibleCount(prev => prev + 20)}
+                      className="px-8 py-3 bg-emerald-600 text-white rounded-full font-semibold hover:bg-emerald-700 transition-colors shadow-lg"
+                    >
+                      Pokaż więcej ({facilities.length - visibleCount} pozostałych)
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -347,14 +362,12 @@ export default function SearchResults({
         <div className={`
           flex-1 md:w-1/2
           bg-gray-100 overflow-hidden
-          ${showMapMobile ? 'block fixed inset-0 z-40 top-[120px]' : 'hidden md:block md:relative md:z-0'}
+          ${showMapMobile ? 'block fixed inset-0 z-40 top-[120px]' : 'hidden md:block md:sticky md:top-0 md:h-[calc(100vh-80px)] md:z-0'}
         `}>
-          <div className="md:sticky md:top-0 md:h-full w-full">
-            <FacilityMap
-              facilities={facilities}
-              userLocation={userLocation}
-            />
-          </div>
+          <FacilityMap
+            facilities={facilities}
+            userLocation={userLocation}
+          />
         </div>
       </div>
 
