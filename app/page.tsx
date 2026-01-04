@@ -7,13 +7,19 @@ import NewsletterSection from '../src/components/newsletter/NewsletterSection';
 import KnowledgeCenter from '../src/components/knowledge/KnowledgeCenter';
 import HeroSection from '../src/components/hero/HeroSection';
 import { CategorySelector } from '../src/components/CategorySelector';
+import RegionalMap from '../src/components/home/RegionalMap';
 
 export default function Home() {
   // ✅ State management for active tab
   const [activeTab, setActiveTab] = useState<'DPS' | 'SDS' | 'Wszystkie'>('Wszystkie');
-  
+
   // ✅ State management for selected care profiles
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
+
+  // ✅ Handler for regional map selection
+  const handleRegionSelect = (regionName: string) => {
+    window.location.href = `/search?q=${encodeURIComponent(regionName)}`;
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -34,6 +40,9 @@ export default function Home() {
         onProfilesChange={setSelectedProfiles}
         location=""
       />
+
+      {/* Regional Map */}
+      <RegionalMap onRegionSelect={handleRegionSelect} />
 
       {/* How It Works - 3 Steps */}
       <section className="bg-white py-16 md:py-24">
