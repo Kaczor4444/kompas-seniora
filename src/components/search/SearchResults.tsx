@@ -110,6 +110,7 @@ export default function SearchResults({
   const [facilities, setFacilities] = useState<Facility[]>(results);
   const [isLoading, setIsLoading] = useState(false);
   const [visibleCount, setVisibleCount] = useState(20);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // ===== COMPUTED =====
   const availablePowiats = useMemo(() => {
@@ -298,13 +299,6 @@ export default function SearchResults({
         `}>
           <div className="max-w-2xl ml-auto mr-0 md:mr-4 space-y-3 sm:space-y-4">
 
-            {/* Results count */}
-            {!isLoading && facilities.length > 0 && (
-              <div className="text-sm text-gray-600 mb-4">
-                Znaleziono <span className="font-semibold">{facilities.length}</span> {facilities.length === 1 ? 'placówkę' : 'placówek'}
-              </div>
-            )}
-
             {isLoading ? (
               // Loading
               [1, 2, 3, 4].map(i => <SkeletonCard key={i} />)
@@ -344,12 +338,31 @@ export default function SearchResults({
 
                 {/* Load More Button */}
                 {visibleCount < facilities.length && (
-                  <div className="flex justify-center py-8 pb-32 md:pb-8">
+                  <div className="pt-8 pb-48 md:pb-8 flex flex-col items-center gap-4">
+                    <div className="text-sm font-bold text-slate-400">
+                      Widzisz <span className="text-slate-900">{Math.min(visibleCount, facilities.length)}</span> z <span className="text-slate-900">{facilities.length}</span> placówek
+                    </div>
                     <button
-                      onClick={() => setVisibleCount(prev => prev + 20)}
-                      className="px-8 py-3 bg-emerald-600 text-white rounded-full font-semibold hover:bg-emerald-700 transition-colors shadow-lg"
+                      onClick={() => {
+                        setIsLoadingMore(true);
+                        setTimeout(() => {
+                          setVisibleCount(prev => prev + 20);
+                          setIsLoadingMore(false);
+                        }, 600);
+                      }}
+                      disabled={isLoadingMore}
+                      className="group bg-white border-2 border-stone-200 text-slate-800 font-bold py-4 px-10 rounded-2xl hover:border-emerald-600 hover:text-emerald-600 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-3"
                     >
-                      Pokaż więcej ({facilities.length - visibleCount} pozostałych)
+                      {isLoadingMore ? (
+                        <span>Ładowanie...</span>
+                      ) : (
+                        <>
+                          <span>Pokaż więcej wyników</span>
+                          <svg className="w-5 h-5 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </>
+                      )}
                     </button>
                   </div>
                 )}
