@@ -45,14 +45,14 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
       onMouseLeave={() => onHover(null)}
       onClick={onClick}
       className={`
-        group relative z-40 isolate
+        group relative z-40
         bg-white rounded-2xl sm:rounded-3xl
         border-2 transition-all duration-200
         cursor-pointer
         flex flex-col sm:flex-row gap-4 sm:gap-6
         p-4 sm:p-4
         ${isHovered
-          ? 'border-emerald-400 shadow-xl -translate-y-0.5'
+          ? 'border-emerald-400 shadow-xl'
           : 'border-gray-200 shadow-sm hover:shadow-lg hover:border-gray-300'
         }
       `}
@@ -135,7 +135,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2">
             
             {/* Rating */}
             <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50">

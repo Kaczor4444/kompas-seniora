@@ -171,6 +171,12 @@ export default function FacilityMap({
           background: transparent !important;
           border: none !important;
         }
+        .leaflet-container {
+          z-index: 0 !important;
+        }
+        .leaflet-pane {
+          z-index: 1 !important;
+        }
       `}</style>
       
       <div className="h-full rounded-lg overflow-hidden border border-gray-200">

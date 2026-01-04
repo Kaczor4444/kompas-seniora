@@ -421,7 +421,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       {/* Main Content */}
       <main className="w-full h-screen flex flex-col">
-        <div className="flex flex-col lg:flex-row gap-6 flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden">
           {/* Mobile: Filter drawer */}
             <div className="lg:hidden">
               <MobileStickyBar
