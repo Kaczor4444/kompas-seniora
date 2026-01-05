@@ -1,26 +1,25 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeftIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { 
+  ArrowLeft, MapPin, CheckCircle2, Phone, 
+  Info, Banknote, CalendarCheck, Building2, 
+  Plus, ArrowRight, Sparkles, Minus, 
+  ArrowLeftRight, Mail, Globe
+} from 'lucide-react';
 import { getFavorites, type FavoriteFacility } from '@/src/utils/favorites';
 import { getFacilityNote } from '@/src/utils/facilityNotes';
 import StarRating from '@/src/components/StarRating';
-import NoteModal from '@/src/components/compare/NoteModal';
 
 function ComparePageContent() {
-  const [facilities, setFacilities] = useState<FavoriteFacility[]>([]);
   const searchParams = useSearchParams();
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [currentPairIndex, setCurrentPairIndex] = useState(0);
-  
-  // Modal state
-  const [selectedNote, setSelectedNote] = useState<{
-    facilityName: string;
-    rating: number;
-    notes: string;
-  } | null>(null);
+  const [facilities, setFacilities] = useState<FavoriteFacility[]>([]);
+  const [selectedFacilities, setSelectedFacilities] = useState<FavoriteFacility[]>([]);
+  const [showOnlyDiffs, setShowOnlyDiffs] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const favs = getFavorites();
@@ -29,66 +28,48 @@ function ComparePageContent() {
     const idsParam = searchParams.get("ids");
     if (idsParam) {
       const parsedIds = idsParam.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-      const validIds = parsedIds.filter(id => favs.some(f => f.id === id));
-      setSelectedIds(validIds.length > 0 ? validIds : favs.map(f => f.id));
+      const selected = favs.filter(f => parsedIds.includes(f.id));
+      setSelectedFacilities(selected.length > 0 ? selected : favs);
     } else {
-      setSelectedIds(favs.map(f => f.id));
+      setSelectedFacilities(favs);
     }
+    window.scrollTo(0, 0);
   }, [searchParams]);
 
-  const selectedFacilities = facilities.filter(f => selectedIds.includes(f.id));
-
-  const removeFromComparison = (id: number) => {
-    setSelectedIds(prev => prev.filter(fid => fid !== id));
-    // Adjust current pair if needed
-    const totalPairs = Math.ceil((selectedFacilities.length - 1) / 2);
-    if (currentPairIndex >= totalPairs) {
-      setCurrentPairIndex(Math.max(0, totalPairs - 1));
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const scrollLeft = scrollContainerRef.current.scrollLeft;
+    const cardWidth = window.innerWidth - 120;
+    const index = Math.round(scrollLeft / cardWidth);
+    if (index !== activeIndex && index >= 0 && index < selectedFacilities.length) {
+      setActiveIndex(index);
     }
   };
 
-  const addToComparison = (id: number) => {
-    if (selectedIds.length >= 10) {
-      // Max 10 for performance
-      return;
-    }
-    setSelectedIds(prev => [...prev, id]);
-  };
+  // Calculate differences
+  const diffs = useMemo(() => {
+    if (selectedFacilities.length < 2) return { price: false, city: false, type: false };
+    return {
+      price: new Set(selectedFacilities.map(f => f.koszt_pobytu)).size > 1,
+      city: new Set(selectedFacilities.map(f => f.miejscowosc)).size > 1,
+      type: new Set(selectedFacilities.map(f => f.typ_placowki)).size > 1
+    };
+  }, [selectedFacilities]);
 
-  // Split facilities into pairs of 2
-  const totalPairs = Math.ceil(selectedFacilities.length / 2);
-  const currentPair = selectedFacilities.slice(currentPairIndex * 2, currentPairIndex * 2 + 2);
+  // Find lowest price
+  const costs = selectedFacilities.map(f => f.koszt_pobytu).filter(c => c !== null && c !== undefined) as number[];
+  const lowestPrice = costs.length > 0 ? Math.min(...costs) : null;
 
-  const nextPair = () => {
-    setCurrentPairIndex(prev => Math.min(prev + 1, totalPairs - 1));
-  };
-
-  const prevPair = () => {
-    setCurrentPairIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  // Find min/max for highlighting
-  const costs = selectedFacilities
-    .map(f => f.koszt_pobytu)
-    .filter(c => c !== null && c !== undefined) as number[];
-  
-  const minCost = costs.length > 0 ? Math.min(...costs) : null;
-  const maxCost = costs.length > 0 ? Math.max(...costs) : null;
-
-  const places = selectedFacilities
-    .map(f => f.liczba_miejsc)
-    .filter(p => p !== null && p !== undefined) as number[];
-  
-  const maxPlaces = places.length > 0 ? Math.max(...places) : null;
-
+  // Find max rating
   const ratings = selectedFacilities.map(f => {
     const note = getFacilityNote(f.id);
     return note?.rating || 0;
   });
-  
   const maxRating = Math.max(...ratings);
 
-  if (facilities.length === 0) {
+  const emptySlotsCount = Math.max(0, 3 - selectedFacilities.length);
+
+  if (selectedFacilities.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 max-w-md text-center">
@@ -100,9 +81,9 @@ function ComparePageContent() {
           </p>
           <Link
             href="/search"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-medium"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
           >
-            <ArrowLeftIcon className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" />
             Wróć do wyszukiwania
           </Link>
         </div>
@@ -110,571 +91,295 @@ function ComparePageContent() {
     );
   }
 
-  if (selectedFacilities.length < 2) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 max-w-md text-center">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-            Wybierz przynajmniej 2 placówki
-          </h3>
-          <p className="text-gray-600 mb-6">
-            Dodaj więcej placówek do ulubionych aby porównać
-          </p>
-          <Link
-            href="/ulubione"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-medium"
-          >
-            <ArrowLeftIcon className="w-5 h-5" />
-            Wróć do ulubionych
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const DataRow = ({ 
+    label, 
+    icon, 
+    children, 
+    isDifferent = false 
+  }: { 
+    label: string; 
+    icon: React.ReactNode; 
+    children: React.ReactNode; 
+    isDifferent?: boolean;
+  }) => {
+    const isDimmed = showOnlyDiffs && !isDifferent;
+    const isHighlighted = showOnlyDiffs && isDifferent;
 
-  const ComparisonRow = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div className="border-b border-gray-200 last:border-b-0">
-      <div className="font-medium text-gray-700 bg-gray-50 px-3 py-2 text-xs border-b border-gray-200">
-        {label}
-      </div>
-      <div className="grid grid-cols-2 gap-px bg-gray-200">
+    return (
+      <div className={`grid grid-cols-[100px_repeat(3,calc(100vw-120px))] md:grid-cols-[200px_repeat(3,1fr)] border-b border-stone-100 items-stretch transition-all duration-500
+        ${isDimmed ? 'opacity-20 grayscale-[1]' : 'opacity-100'}
+        ${isHighlighted ? 'bg-primary-50/30' : 'bg-white'}
+      `}>
+        <div className={`p-4 md:p-10 flex flex-col justify-center border-r border-stone-100 sticky left-0 z-20 transition-colors
+          ${isHighlighted ? 'bg-primary-50' : 'bg-white md:bg-stone-50/50'}
+        `}>
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <span className={`${isHighlighted ? 'text-primary-600' : 'text-slate-400'}`}>{icon}</span>
+            <span className={`text-[10px] md:text-xs font-black uppercase tracking-tighter leading-tight ${isHighlighted ? 'text-primary-700' : 'text-slate-500'}`}>
+              {label}
+            </span>
+          </div>
+        </div>
         {children}
       </div>
+    );
+  };
+
+  const DataCell = ({ children, isBest }: { children: React.ReactNode; isBest?: boolean }) => (
+    <div className={`p-6 md:p-10 flex items-center justify-center text-center border-r border-stone-100 last:border-r-0 snap-center relative transition-colors
+      ${isBest ? 'bg-emerald-50/10' : ''}
+    `}>
+      {children}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Link href="/ulubione" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <ArrowLeftIcon className="w-6 h-6 text-gray-600" />
-            </Link>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Porównanie Placówek
+    <div className="bg-[#FCFCFB] min-h-screen pb-24 animate-fade-in-up">
+      
+      {/* STICKY HEADER */}
+      <div className="bg-white/90 backdrop-blur-xl border-b border-stone-200 sticky top-0 z-[60] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Link href="/ulubione" className="p-2 -ml-2 text-slate-400 hover:text-primary-600 transition-all active:scale-75">
+                <ArrowLeft size={22} />
+              </Link>
+              <h1 className="text-lg md:text-2xl font-serif font-bold text-slate-900 leading-tight">
+                Wybrane <span className="text-primary-600">placówki</span>
               </h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
-                Porównujesz {selectedFacilities.length} placówek
-              </p>
             </div>
-          </div>
 
-          {facilities.length > selectedIds.length && selectedIds.length < 10 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm text-gray-700 mb-2">
-                💡 Możesz dodać więcej placówek (max 10)
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {facilities
-                  .filter(f => !selectedIds.includes(f.id))
-                  .map(f => (
-                    <button
-                      key={f.id}
-                      onClick={() => addToComparison(f.id)}
-                      className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      + {f.nazwa}
-                    </button>
-                  ))}
-              </div>
-            </div>
-          )}
+            <button 
+              onClick={() => setShowOnlyDiffs(!showOnlyDiffs)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all border
+                ${showOnlyDiffs 
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-200' 
+                  : 'bg-stone-50 text-slate-600 border-stone-200 hover:border-primary-300 hover:bg-white hover:text-primary-600'}`}
+            >
+              <ArrowLeftRight size={14} className={showOnlyDiffs ? 'text-primary-400' : ''} />
+              <span className="hidden sm:inline">{showOnlyDiffs ? 'Ukryj różnice' : 'Pokaż różnice'}</span>
+              <span className="sm:hidden">{showOnlyDiffs ? 'Wszystko' : 'Różnice'}</span>
+            </button>
+          </div>
+          
+          {/* Mobile Pager */}
+          <div className="flex md:hidden justify-center gap-2 mt-3">
+             {selectedFacilities.map((_, i) => (
+               <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === activeIndex ? 'w-8 bg-primary-600' : 'w-2 bg-stone-200'}`} />
+             ))}
+          </div>
         </div>
       </div>
 
-      {/* Desktop - Table */}
-      <div className="hidden lg:block max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-lg border-b-2 border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 w-48">
-                    Parametr
-                  </th>
-                  {selectedFacilities.map((facility) => (
-                    <th key={facility.id} className="px-6 py-4 text-left">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <div className="font-semibold text-gray-900 mb-1">
-                            {facility.nazwa}
-                          </div>
-                          <div className="text-xs text-gray-500 font-normal">
-                            {facility.typ_placowki}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => removeFromComparison(facility.id)}
-                          className="p-1 hover:bg-gray-200 rounded transition-colors"
-                          title="Usuń z porównania"
-                        >
-                          <XMarkIcon className="w-4 h-4 text-gray-500" />
-                        </button>
+      <div className="max-w-7xl mx-auto md:py-8">
+        <div className="relative">
+          
+          {/* COMPARISON GRID */}
+          <div 
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x"
+          >
+            <div className="inline-block min-w-full bg-white md:rounded-[3rem] shadow-2xl border-y md:border border-stone-200 overflow-hidden">
+              
+              {/* HEADERS */}
+              <div className="grid grid-cols-[100px_repeat(3,calc(100vw-120px))] md:grid-cols-[200px_repeat(3,1fr)] border-b-2 border-stone-100 bg-white/95 backdrop-blur-md sticky top-[120px] md:top-[140px] z-40">
+                <div className="p-4 md:p-12 flex flex-col justify-end border-r border-stone-100 sticky left-0 z-50 bg-white">
+                   <h3 className="font-serif text-sm md:text-xl font-bold text-slate-900 leading-tight">Zestawienie<br/>szczegółów</h3>
+                </div>
+                
+                {selectedFacilities.map((item, idx) => (
+                  <div key={item.id} className={`p-4 md:p-10 border-r border-stone-100 last:border-r-0 snap-center transition-opacity duration-300 ${activeIndex === idx ? 'opacity-100' : 'opacity-30 md:opacity-100'}`}>
+                    <div className="relative">
+                      {/* Placeholder image */}
+                      <div className="aspect-[3/2] w-full rounded-2xl overflow-hidden mb-3 shadow-sm border border-stone-100 bg-gray-200 flex items-center justify-center">
+                        <Building2 size={48} className="text-gray-400" />
                       </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {/* Cost */}
-                <tr>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Koszt miesięczny
-                  </td>
-                  {selectedFacilities.map((facility) => {
-                    const isMin = facility.koszt_pobytu === minCost && minCost !== null;
-                    const isMax = facility.koszt_pobytu === maxCost && maxCost !== null && minCost !== maxCost;
-                    
-                    return (
-                      <td key={facility.id} className="px-6 py-4">
-                        <div className={`text-lg font-semibold ${
-                          isMin ? 'text-green-600' : 
-                          isMax ? 'text-red-600' : 
-                          facility.koszt_pobytu ? 'text-gray-900' : 'text-green-600'
-                        }`}>
-                          {facility.koszt_pobytu
-                            ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
-                            : 'Bezpłatne'}
-                        </div>
-                        {isMin && minCost !== null && (
-                          <div className="text-xs text-green-600 font-medium mt-1">
-                            ✅ Najtańsza
+                      <div className="text-[8px] md:text-[10px] font-black uppercase text-primary-600 mb-1">{item.typ_placowki}</div>
+                      <h4 className="font-bold text-xs md:text-base text-slate-900 line-clamp-2 min-h-[2.5rem] leading-tight">{item.nazwa}</h4>
+                    </div>
+                  </div>
+                ))}
+
+                {[...Array(emptySlotsCount)].map((_, i) => (
+                  <div key={`head-empty-${i}`} className="p-10 border-r border-stone-100 last:border-r-0 bg-stone-50/20 hidden md:flex flex-col items-center justify-center text-stone-200 border-dashed">
+                    <Plus size={40} className="opacity-20 mb-2" />
+                    <span className="text-[10px] font-bold uppercase opacity-30 tracking-widest text-center">Wolne<br/>miejsce</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* PRICE ROW */}
+              <DataRow label="Koszt mies." icon={<Banknote size={18}/>} isDifferent={diffs.price}>
+                 {selectedFacilities.map(item => {
+                   const isLowest = item.koszt_pobytu === lowestPrice && lowestPrice !== null;
+                   return (
+                     <DataCell key={item.id} isBest={isLowest}>
+                        <div className="w-full">
+                          <div className="text-xl md:text-4xl font-serif font-bold text-slate-900">
+                            {item.koszt_pobytu && item.koszt_pobytu > 0 
+                              ? `${Math.round(item.koszt_pobytu).toLocaleString('pl-PL')} zł` 
+                              : <span className="text-emerald-600">Bezpłatne</span>
+                            }
                           </div>
-                        )}
-                        {isMax && (
-                          <div className="text-xs text-red-600 font-medium mt-1">
-                            ⚠️ Najdroższa
-                          </div>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-
-                {/* Places */}
-                <tr className="bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Liczba miejsc
-                  </td>
-                  {selectedFacilities.map((facility) => {
-                    const isMax = facility.liczba_miejsc === maxPlaces && maxPlaces !== null;
-                    
-                    return (
-                      <td key={facility.id} className="px-6 py-4">
-                        <div className="text-lg font-semibold text-gray-900">
-                          {facility.liczba_miejsc || '—'}
-                        </div>
-                        {isMax && (
-                          <div className="text-xs text-green-600 font-medium mt-1">
-                            ✅ Najwięcej miejsc
-                          </div>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-
-                {/* Location */}
-                <tr>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Lokalizacja
-                  </td>
-                  {selectedFacilities.map((facility) => (
-                    <td key={facility.id} className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {facility.miejscowosc}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {facility.powiat}
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Phone */}
-                <tr className="bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Telefon
-                  </td>
-                  {selectedFacilities.map((facility) => (
-                    <td key={facility.id} className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {facility.telefon || '—'}
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Email */}
-                <tr>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Email
-                  </td>
-                  {selectedFacilities.map((facility) => (
-                    <td key={facility.id} className="px-6 py-4">
-                      {facility.email ? (
-                        <a 
-                          href={`mailto:${facility.email}`}
-                          className="text-sm text-accent-600 hover:text-accent-700 break-all"
-                        >
-                          {facility.email}
-                        </a>
-                      ) : (
-                        <span className="text-sm text-gray-400">—</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-
-                {/* WWW */}
-                <tr className="bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Strona WWW
-                  </td>
-                  {selectedFacilities.map((facility) => (
-                    <td key={facility.id} className="px-6 py-4">
-                      {facility.www ? (
-                        <a 
-                          href={facility.www}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-accent-600 hover:text-accent-700"
-                        >
-                          Odwiedź
-                        </a>
-                      ) : (
-                        <span className="text-sm text-gray-400">—</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-
-                {/* ✅ POPRAWIONE: Your Rating - Desktop */}
-                <tr>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Twoja ocena
-                  </td>
-                  {selectedFacilities.map((facility) => {
-                    const note = getFacilityNote(facility.id);
-                    const rating = note?.rating || 0;
-                    const isMax = rating === maxRating && maxRating > 0;
-                    const hasNote = note?.notes && note.notes.length > 0;
-                    const notePreview = hasNote && note.notes.length > 50 
-                      ? note.notes.substring(0, 50) + '...' 
-                      : note?.notes;
-                    
-                    return (
-                      <td key={facility.id} className="px-6 py-4">
-                        {hasNote ? (
-                          // MA NOTATKĘ - pokazuj i umożliw kliknięcie
-                          <div
-                            onClick={() => {
-                              setSelectedNote({
-                                facilityName: facility.nazwa,
-                                rating: rating,
-                                notes: note.notes
-                              });
-                            }}
-                            className="cursor-pointer hover:opacity-80 transition-opacity"
-                          >
-                            {rating > 0 && (
-                              <>
-                                <StarRating rating={rating} readonly size="sm" />
-                                {isMax && (
-                                  <div className="text-xs text-green-600 font-medium mt-1">
-                                    ✅ Najwyżej oceniona
-                                  </div>
-                                )}
-                              </>
-                            )}
-                            <div className="text-xs text-accent-600 mt-2 font-medium break-words">
-                              📝 "{notePreview}" <span className="text-gray-500">(kliknij aby zobaczyć)</span>
+                          {isLowest && item.koszt_pobytu && item.koszt_pobytu > 0 && (
+                            <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[8px] md:text-[9px] font-black rounded-full uppercase">
+                               <Sparkles size={10}/> Najtaniej
                             </div>
-                          </div>
-                        ) : rating > 0 ? (
-                          // MA TYLKO GWIAZDKI BEZ NOTATKI
+                          )}
+                        </div>
+                     </DataCell>
+                   );
+                 })}
+                 {[...Array(emptySlotsCount)].map((_, i) => <DataCell key={i}><Minus className="text-stone-100"/></DataCell>)}
+              </DataRow>
+
+              {/* LOCATION ROW */}
+              <DataRow label="Lokalizacja" icon={<MapPin size={18}/>} isDifferent={diffs.city}>
+                 {selectedFacilities.map(item => (
+                   <DataCell key={item.id}>
+                      <div className="text-[10px] md:text-sm font-bold text-slate-700 leading-tight">
+                        {item.miejscowosc}<br/>
+                        <span className="text-[9px] font-medium text-slate-400 block mt-1">{item.powiat}</span>
+                      </div>
+                   </DataCell>
+                 ))}
+                 {[...Array(emptySlotsCount)].map((_, i) => <DataCell key={i}><Minus className="text-stone-100"/></DataCell>)}
+              </DataRow>
+
+              {/* TYPE ROW */}
+              <DataRow label="Typ" icon={<Building2 size={18}/>} isDifferent={diffs.type}>
+                 {selectedFacilities.map(item => (
+                   <DataCell key={item.id}>
+                      <div className="text-[9px] md:text-[10px] font-bold uppercase text-slate-500 bg-stone-100 px-3 py-2 rounded-xl border border-stone-200 w-full leading-tight">
+                        {item.typ_placowki}
+                      </div>
+                   </DataCell>
+                 ))}
+                 {[...Array(emptySlotsCount)].map((_, i) => <DataCell key={i}><Minus className="text-stone-100"/></DataCell>)}
+              </DataRow>
+
+              {/* PLACES ROW */}
+              <DataRow label="Miejsca" icon={<CheckCircle2 size={18}/>} isDifferent={false}>
+                 {selectedFacilities.map(item => (
+                   <DataCell key={item.id}>
+                      <div className="text-lg md:text-2xl font-bold text-slate-900">
+                        {item.liczba_miejsc || '—'}
+                      </div>
+                   </DataCell>
+                 ))}
+                 {[...Array(emptySlotsCount)].map((_, i) => <DataCell key={i}><Minus className="text-stone-100"/></DataCell>)}
+              </DataRow>
+
+              {/* RATING ROW */}
+              <DataRow label="Twoja ocena" icon={<Sparkles size={18}/>} isDifferent={false}>
+                 {selectedFacilities.map(item => {
+                   const note = getFacilityNote(item.id);
+                   const rating = note?.rating || 0;
+                   const isBest = rating === maxRating && maxRating > 0;
+                   
+                   return (
+                     <DataCell key={item.id} isBest={isBest}>
+                        {rating > 0 ? (
                           <div>
                             <StarRating rating={rating} readonly size="sm" />
-                            {isMax && (
-                              <div className="text-xs text-green-600 font-medium mt-1">
-                                ✅ Najwyżej oceniona
-                              </div>
+                            {isBest && (
+                              <div className="text-xs text-emerald-600 font-bold mt-1">✨ Najwyższa</div>
                             )}
                           </div>
                         ) : (
-                          // NIE MA NIC
                           <span className="text-sm text-gray-400">Brak oceny</span>
                         )}
-                      </td>
-                    );
-                  })}
-                </tr>
+                     </DataCell>
+                   );
+                 })}
+                 {[...Array(emptySlotsCount)].map((_, i) => <DataCell key={i}><Minus className="text-stone-100"/></DataCell>)}
+              </DataRow>
 
-                {/* Actions */}
-                <tr className="bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Akcje
-                  </td>
-                  {selectedFacilities.map((facility) => (
-                    <td key={facility.id} className="px-6 py-4">
-                      <Link
-                        href={`/placowka/${facility.id}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors text-sm font-medium"
-                      >
-                        Szczegóły
-                      </Link>
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+              {/* CONTACT ROWS */}
+              <DataRow label="Telefon" icon={<Phone size={18}/>} isDifferent={false}>
+                 {selectedFacilities.map(item => (
+                   <DataCell key={item.id}>
+                      {item.telefon ? (
+                        <a href={`tel:${item.telefon}`} className="text-xs md:text-sm text-primary-600 hover:text-primary-700 font-medium">
+                          {item.telefon}
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                   </DataCell>
+                 ))}
+                 {[...Array(emptySlotsCount)].map((_, i) => <DataCell key={i}><Minus className="text-stone-100"/></DataCell>)}
+              </DataRow>
 
-      {/* Mobile - 2x2 Comparison Grid with Swipe */}
-      <div className="lg:hidden max-w-4xl mx-auto px-4 py-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          {/* Headers - 2 facilities side by side */}
-          <div className="bg-gray-50 border-b border-gray-200 p-3">
-            <div className="grid grid-cols-2 gap-3">
-              {currentPair.map((facility) => (
-                <div key={facility.id} className="text-center">
-                  <div className="font-semibold text-xs text-gray-900 mb-1 leading-tight">
-                    {facility.nazwa}
-                  </div>
-                  <div className="text-xs text-gray-500">{facility.typ_placowki}</div>
-                  <button
-                    onClick={() => removeFromComparison(facility.id)}
-                    className="mt-1.5 px-2 py-0.5 bg-red-50 text-red-600 rounded text-xs hover:bg-red-100 transition-colors"
-                  >
-                    Usuń
-                  </button>
+              {/* ACTIONS FOOTER */}
+              <div className="grid grid-cols-[100px_repeat(3,calc(100vw-120px))] md:grid-cols-[200px_repeat(3,1fr)] bg-slate-950 border-t border-slate-800">
+                <div className="p-4 md:p-12 border-r border-white/5 sticky left-0 z-20 bg-slate-950 flex flex-col justify-center">
+                  <Link href="/ulubione" className="text-white hover:text-primary-400 transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                    <ArrowLeft size={16}/> <span className="hidden md:inline">Cofnij</span>
+                  </Link>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Koszt */}
-          <ComparisonRow label="Koszt miesięczny">
-            {currentPair.map((facility) => {
-              const isMin = facility.koszt_pobytu === minCost && minCost !== null;
-              return (
-                <div key={facility.id} className="bg-white p-2.5 text-center">
-                  <div className={`font-bold text-base ${isMin ? 'text-green-600' : 'text-gray-900'}`}>
-                    {facility.koszt_pobytu
-                      ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł`
-                      : 'Bezpłatne'}
-                  </div>
-                  {isMin && <div className="text-xs text-green-600 mt-0.5">✅ Najtańsza</div>}
-                </div>
-              );
-            })}
-          </ComparisonRow>
-
-          {/* Miejsca */}
-          <ComparisonRow label="Liczba miejsc">
-            {currentPair.map((facility) => {
-              const isMax = facility.liczba_miejsc === maxPlaces && maxPlaces !== null;
-              return (
-                <div key={facility.id} className="bg-white p-2.5 text-center">
-                  <div className="font-semibold text-sm text-gray-900">
-                    {facility.liczba_miejsc || '—'}
-                  </div>
-                  {isMax && <div className="text-xs text-green-600 mt-0.5">✅ Najwięcej</div>}
-                </div>
-              );
-            })}
-          </ComparisonRow>
-
-          {/* Lokalizacja */}
-          <ComparisonRow label="Lokalizacja">
-            {currentPair.map((facility) => (
-              <div key={facility.id} className="bg-white p-2.5 text-center">
-                <div className="text-xs font-medium text-gray-900">{facility.miejscowosc}</div>
-                <div className="text-xs text-gray-500">{facility.powiat}</div>
-              </div>
-            ))}
-          </ComparisonRow>
-
-          {/* Telefon */}
-          <ComparisonRow label="Telefon">
-            {currentPair.map((facility) => (
-              <div key={facility.id} className="bg-white p-2.5 text-center">
-                <div className="text-xs text-gray-900 break-all">{facility.telefon || '—'}</div>
-              </div>
-            ))}
-          </ComparisonRow>
-
-          {/* Email */}
-          <ComparisonRow label="Email">
-            {currentPair.map((facility) => (
-              <div key={facility.id} className="bg-white p-2.5 text-center">
-                {facility.email ? (
-                  <a 
-                    href={`mailto:${facility.email}`}
-                    className="text-xs text-accent-600 hover:text-accent-700 break-all"
-                  >
-                    {facility.email}
-                  </a>
-                ) : (
-                  <span className="text-xs text-gray-400">—</span>
-                )}
-              </div>
-            ))}
-          </ComparisonRow>
-
-          {/* WWW */}
-          <ComparisonRow label="Strona WWW">
-            {currentPair.map((facility) => (
-              <div key={facility.id} className="bg-white p-2.5 text-center">
-                {facility.www ? (
-                  <a 
-                    href={facility.www}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-accent-600 hover:text-accent-700"
-                  >
-                    Odwiedź
-                  </a>
-                ) : (
-                  <span className="text-xs text-gray-400">—</span>
-                )}
-              </div>
-            ))}
-          </ComparisonRow>
-
-          {/* Ocena - Mobile (już działa dobrze) */}
-          <ComparisonRow label="Twoja ocena">
-            {currentPair.map((facility) => {
-              const note = getFacilityNote(facility.id);
-              const rating = note?.rating || 0;
-              const isMax = rating === maxRating && maxRating > 0;
-              const hasNote = note?.notes && note.notes.length > 0;
-              
-              return (
-                <div key={facility.id} className="bg-white p-2.5 flex flex-col items-center justify-center">
-                  {hasNote ? (
-                    // MA NOTATKĘ - pokaż button do otwarcia modalu
-                    <div
-                      onClick={() => {
-                        setSelectedNote({
-                          facilityName: facility.nazwa,
-                          rating: rating,
-                          notes: note.notes
-                        });
-                      }}
-                      className="cursor-pointer hover:opacity-80 transition-opacity text-center"
+                
+                {selectedFacilities.map(item => (
+                  <div key={item.id} className="p-4 md:p-10 border-r border-white/5 last:border-r-0 flex flex-col gap-2 snap-center">
+                    <Link 
+                      href={`/placowka/${item.id}`}
+                      className="w-full py-3.5 md:py-5 rounded-xl md:rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-black text-[9px] md:text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-primary-900/40 text-center"
                     >
-                      {rating > 0 && <StarRating rating={rating} readonly size="sm" />}
-                      <div className="text-xs text-accent-600 mt-0.5 font-medium break-words">
-                        📝 Kliknij aby zobaczyć notatkę
-                      </div>
-                      {isMax && <div className="text-xs text-green-600 mt-0.5">✅ Najwyższa</div>}
-                    </div>
-                  ) : rating > 0 ? (
-                    // MA TYLKO GWIAZDKI BEZ NOTATKI
-                    <>
-                      <StarRating rating={rating} readonly size="sm" />
-                      {isMax && <div className="text-xs text-green-600 mt-0.5">✅ Najwyższa</div>}
-                    </>
-                  ) : (
-                    // NIE MA NIC
-                    <span className="text-xs text-gray-400">—</span>
-                  )}
-                </div>
-              );
-            })}
-          </ComparisonRow>
+                      Szczegóły
+                    </Link>
+                    {item.telefon && (
+                      <a 
+                        href={`tel:${item.telefon}`}
+                        className="w-full py-2.5 md:py-3.5 rounded-xl md:rounded-2xl bg-white/5 hover:bg-white/10 text-white font-bold text-[8px] md:text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-white/10"
+                      >
+                        <Phone size={14} /> Kontakt
+                      </a>
+                    )}
+                  </div>
+                ))}
+                {[...Array(emptySlotsCount)].map((_, i) => <div key={i} className="hidden md:block"></div>)}
+              </div>
 
-          {/* Akcje */}
-          <div className="bg-gray-50 p-3 border-t border-gray-200">
-            <div className="grid grid-cols-2 gap-2">
-              {currentPair.map((facility) => (
-                <Link
-                  key={facility.id}
-                  href={`/placowka/${facility.id}`}
-                  className="px-3 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors text-center text-xs font-medium"
-                >
-                  Szczegóły
-                </Link>
-              ))}
             </div>
           </div>
+        </div>
 
-          {/* Navigation - only show if more than 2 facilities */}
-          {selectedFacilities.length > 2 && (
-            <div className="border-t border-gray-200 p-3 bg-white">
-              <div className="flex items-center justify-between mb-2">
-                <button
-                  onClick={prevPair}
-                  disabled={currentPairIndex === 0}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
-                </button>
+        {/* BOTTOM INFO CARDS */}
+        <div className="mt-12 md:mt-24 px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+           <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-stone-200 shadow-sm flex flex-col md:flex-row gap-8 items-start hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                 <Info size={28} />
+              </div>
+              <div>
+                 <h4 className="text-xl font-bold text-slate-900 mb-2 leading-tight">Jak czytać porównanie?</h4>
+                 <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                   Podane kwoty to stawki bazowe ustalane przez samorządy. Ostateczny koszt zależy od dochodu seniora (zazwyczaj 70% emerytury).
+                 </p>
+                 <Link href="/poradniki" className="text-primary-600 font-black text-xs uppercase tracking-widest flex items-center gap-2 group hover:text-primary-700">
+                    Zasady odpłatności <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                 </Link>
+              </div>
+           </div>
 
-                {/* Dots indicator */}
-                <div className="flex items-center gap-2">
-                  {Array.from({ length: totalPairs }).map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentPairIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        index === currentPairIndex
-                          ? 'bg-accent-600 w-6'
-                          : 'bg-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  onClick={nextPair}
-                  disabled={currentPairIndex === totalPairs - 1}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <ChevronRightIcon className="w-5 h-5 text-gray-700" />
+           <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden flex flex-col justify-center">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-primary-500 opacity-20 rounded-full blur-[80px] -mr-20 -mt-20"></div>
+              <div className="relative z-10">
+                <h4 className="text-2xl font-bold mb-3">Eksportuj do PDF</h4>
+                <p className="text-slate-400 text-sm mb-8 max-w-sm font-medium">
+                  Pobierz zestawienie tych placówek, aby móc je wydrukować lub omówić z rodziną przy stole.
+                </p>
+                <button className="bg-white text-slate-900 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-primary-500 hover:text-white transition-all shadow-lg active:scale-95">
+                  Generuj dokument
                 </button>
               </div>
-
-              <div className="text-center text-xs text-gray-600">
-                Para {currentPairIndex + 1} z {totalPairs} 
-                {totalPairs > 1 && ' • Przesuń palcem'}
-              </div>
-            </div>
-          )}
+           </div>
         </div>
       </div>
-
-      {/* Back button */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-8">
-        <Link
-          href="/ulubione"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-        >
-          <ArrowLeftIcon className="w-5 h-5" />
-          Wróć do ulubionych
-        </Link>
-      </div>
-
-      {/* Note Modal */}
-      {selectedNote && (
-        <NoteModal
-          isOpen={selectedNote !== null}
-          onClose={() => setSelectedNote(null)}
-          facilityName={selectedNote.facilityName}
-          rating={selectedNote.rating}
-          notes={selectedNote.notes}
-        />
-      )}
     </div>
-
   );
 }
+
 export default function ComparePage() {
   return (
     <Suspense fallback={
