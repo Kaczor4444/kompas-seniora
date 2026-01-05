@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeftIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
@@ -9,7 +9,7 @@ import { getFacilityNote } from '@/src/utils/facilityNotes';
 import StarRating from '@/src/components/StarRating';
 import NoteModal from '@/src/components/compare/NoteModal';
 
-export default function ComparePage() {
+function ComparePageContent() {
   const [facilities, setFacilities] = useState<FavoriteFacility[]>([]);
   const searchParams = useSearchParams();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -672,5 +672,17 @@ export default function ComparePage() {
         />
       )}
     </div>
+
+  );
+}
+export default function ComparePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin h-12 w-12 border-4 border-primary-500 border-t-transparent rounded-full" />
+      </div>
+    }>
+      <ComparePageContent />
+    </Suspense>
   );
 }
