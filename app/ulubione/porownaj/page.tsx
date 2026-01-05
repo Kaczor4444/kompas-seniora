@@ -192,7 +192,7 @@ function ComparePageContent() {
                   <div key={item.id} className={`px-2 py-1 md:px-6 md:py-2 border-r border-stone-100 last:border-r-0 snap-center transition-opacity duration-300 ${activeIndex === idx ? 'opacity-100' : 'opacity-30 md:opacity-100'}`}>
                     <div className="relative">
                       <div className="text-[10px] md:text-xs font-black uppercase text-primary-600 mb-1">{item.typ_placowki}</div>
-                      <h4 className="font-bold text-sm md:text-lg text-slate-900 font-bold line-clamp-2 min-h-[2.5rem] leading-tight">{item.nazwa}</h4>
+                      <h4 className="font-bold text-sm md:text-lg text-slate-900 font-bold leading-tight break-words">{item.nazwa}</h4>
                     </div>
                   </div>
                 ))}
