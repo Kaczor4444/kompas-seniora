@@ -1,231 +1,457 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Navigation, MousePointer2, CheckCircle2, Sparkles, ArrowRight, Info } from 'lucide-react';
-
-const POLAND_REGIONS = [
-  { id: 'PL-ZP', name: 'Zachodniopomorskie', path: 'M48,135 C52,125 55,120 58,115 C62,110 58,105 53,100 C48,95 45,90 50,98 C55,105 62,90 68,83 C75,75 80,77 88,79 C95,81 105,70 120,76 C135,83 140,75 150,111 C160,145 172,130 180,145 C175,158 165,168 160,183 C155,198 145,203 130,198 C115,193 85,188 70,193 C55,198 52,175 48,135 Z', centroid: { x: 100, y: 150 }, status: 'inactive' },
-  { id: 'PL-PM', name: 'Pomorskie', path: 'M150,111 C160,95 170,90 180,87 C195,83 210,77 230,83 C245,87 260,100 265,115 C270,140 255,160 240,170 C225,180 205,175 180,145 C165,125 155,120 150,111 Z', centroid: { x: 205, y: 125 }, status: 'inactive' },
-  { id: 'PL-WN', name: 'Warmińsko-Mazurskie', path: 'M265,115 C285,110 315,113 345,117 C370,120 380,135 385,160 C390,185 375,205 360,210 C345,215 325,220 305,205 C285,190 270,180 265,115 Z', centroid: { x: 325, y: 160 }, status: 'inactive' },
-  { id: 'PL-PD', name: 'Podlaskie', path: 'M385,160 C405,165 430,180 440,205 C450,245 445,280 430,305 C415,330 385,335 365,320 C350,305 345,275 350,235 C355,195 370,175 385,160 Z', centroid: { x: 395, y: 245 }, status: 'inactive' },
-  { id: 'PL-MZ', name: 'Mazowieckie', path: 'M270,210 C295,220 325,225 350,235 C360,275 370,315 355,355 C340,395 305,415 275,405 C245,395 235,355 245,295 C255,245 260,220 270,210 Z', centroid: { x: 300, y: 310 }, status: 'inactive' },
-  { id: 'PL-WP', name: 'Wielkopolskie', path: 'M130,198 C155,198 185,193 210,183 C230,188 250,203 260,233 C270,283 265,323 245,363 C225,403 175,413 140,383 C115,353 110,293 120,243 C125,218 127,208 130,198 Z', centroid: { x: 190, y: 300 }, status: 'inactive' },
-  { id: 'PL-KP', name: 'Kujawsko-Pomorskie', path: 'M210,183 C230,178 250,173 265,115 C270,140 280,180 270,210 C260,220 235,225 210,183 Z', centroid: { x: 245, y: 170 }, status: 'inactive' },
-  { id: 'PL-LB', name: 'Lubuskie', path: 'M50,193 C75,193 95,198 120,243 C110,273 105,303 110,343 C105,373 75,393 50,378 C40,343 43,243 50,193 Z', centroid: { x: 85, y: 285 }, status: 'inactive' },
-  { id: 'PL-DS', name: 'Dolnośląskie', path: 'M80,393 C115,403 155,413 180,423 C200,453 210,493 195,543 C170,583 115,573 90,533 C80,493 77,443 80,393 Z', centroid: { x: 137, y: 488 }, status: 'inactive' },
-  { id: 'PL-LD', name: 'Łódzkie', path: 'M245,363 C275,378 305,383 315,433 C305,473 275,503 235,493 C215,473 210,433 245,363 Z', centroid: { x: 265, y: 433 }, status: 'inactive' },
-  { id: 'PL-LU', name: 'Lubelskie', path: 'M355,355 C385,365 420,380 430,435 C440,485 415,525 375,545 C345,535 335,485 355,355 Z', centroid: { x: 390, y: 445 }, status: 'inactive' },
-  { id: 'PL-OP', name: 'Opolskie', path: 'M195,443 C225,453 245,463 255,513 C235,553 205,563 185,533 C189,493 192,463 195,443 Z', centroid: { x: 220, y: 503 }, status: 'inactive' },
-  { id: 'PL-SL', name: 'Śląskie', path: 'M255,513 C285,518 315,523 325,573 C305,623 265,633 235,613 C239,573 249,533 255,513 Z', centroid: { x: 280, y: 573 }, status: 'upcoming' },
-  { id: 'PL-MA', name: 'Małopolskie', path: 'M325,523 C365,533 395,543 410,593 C400,663 335,683 305,653 C309,603 319,553 325,523 Z', centroid: { x: 357, y: 603 }, status: 'active' },
-  { id: 'PL-PK', name: 'Podkarpackie', path: 'M410,573 C440,583 470,593 480,673 C460,733 395,733 370,693 C380,643 395,603 410,573 Z', centroid: { x: 435, y: 653 }, status: 'inactive' },
-  { id: 'PL-SK', name: 'Świętokrzyskie', path: 'M315,433 C345,443 375,453 385,503 C365,543 335,553 325,523 C319,483 317,453 315,433 Z', centroid: { x: 350, y: 488 }, status: 'inactive' }
-];
+import React, { useState, useMemo } from 'react';
+import { Navigation, Hand, CheckCircle2, Calendar, ArrowRight, Info, BellRing, MapPin } from 'lucide-react';
+import { POLAND_REGIONS } from '@/data/poland-regions';
 
 interface RegionalMapProps {
   onRegionSelect: (name: string) => void;
 }
 
+// Map POLAND_REGIONS to expected format with correct viewBox
+const mapData = {
+  meta: {
+    viewBox: '0 0 612.76 577.23',
+    waterBodyColor: '#b3e5fc'
+  },
+  regions: POLAND_REGIONS.map(region => ({
+    id: region.id,
+    name: region.name,
+    status: (region.active ? 'active' : (region.upcoming ? 'upcoming' : 'inactive')) as 'active' | 'upcoming' | 'inactive',
+    centroid: region.centroid,
+    path: region.d
+  }))
+};
+
 export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [legendHover, setLegendHover] = useState<'active' | 'upcoming' | null>(null);
+  const [notificationRegion, setNotificationRegion] = useState<string | null>(null);
+  const [isMapActive, setIsMapActive] = useState(false);
 
-  const handleRegionClick = (region: typeof POLAND_REGIONS[0]) => {
+  const handleRegionClick = (region: typeof mapData.regions[0]) => {
     if (region.status === 'active') {
       onRegionSelect(region.name);
+    } else {
+      setNotificationRegion(region.name);
+      setTimeout(() => setNotificationRegion(null), 4000);
     }
   };
 
-  const activeRegion = hoveredId ? POLAND_REGIONS.find(r => r.id === hoveredId) : null;
+  const renderedRegions = useMemo(() => {
+    return [...mapData.regions].sort((a, b) => {
+      let scoreA = 0;
+      let scoreB = 0;
+      if (a.status === 'active') scoreA += 1;
+      if (b.status === 'active') scoreB += 1;
+      if (legendHover === 'upcoming') {
+        if (a.status === 'upcoming') scoreA += 50;
+        if (b.status === 'upcoming') scoreB += 50;
+      }
+      if (a.id === hoveredId) scoreA += 100;
+      if (b.id === hoveredId) scoreB += 100;
+      return scoreA - scoreB;
+    });
+  }, [hoveredId, legendHover]);
+
+  const activeRegion = hoveredId ? mapData.regions.find(r => r.id === hoveredId) : null;
+
+  const getPillPosition = (region: typeof mapData.regions[0]) => {
+    const xPercent = (region.centroid.x / 612.76) * 100;
+    const yPercent = (region.centroid.y / 577.23) * 100;
+    
+    const translateY = yPercent > 65 ? '-135%' : yPercent < 20 ? '25%' : '-115%';
+    
+    const rightSideIds = ['PL-PK', 'PL-LU', 'PL-PD', 'PL-MZ', 'PL-WN'];
+    const leftSideIds = ['PL-ZP', 'PL-LB', 'PL-DS'];
+    
+    let translateX = -50;
+
+    if (rightSideIds.includes(region.id)) {
+      translateX = -85;
+    } else if (leftSideIds.includes(region.id)) {
+      translateX = -15;
+    }
+
+    return {
+      left: `${xPercent}%`,
+      top: `${yPercent}%`,
+      transform: `translate(${translateX}%, ${translateY})`
+    };
+  };
 
   return (
-    <section className="py-24 bg-white overflow-hidden relative" id="regional-coverage">
+    <section 
+      className="py-24 bg-white relative overflow-hidden" 
+      id="regional-coverage"
+      aria-labelledby="regional-coverage-heading"
+    >
       {/* Background soft depth glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] bg-slate-50 rounded-full blur-[160px] pointer-events-none opacity-50"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary-50/40 rounded-full blur-[120px] pointer-events-none animate-pulse-slow"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center gap-20 lg:gap-32">
-
+        <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-28">
+          
           {/* TEXT CONTENT */}
-          <div className="flex-1 space-y-10 order-2 lg:order-1">
+          <div className="flex-1 space-y-10 order-2 lg:order-1 relative z-10">
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-[10px] font-bold uppercase tracking-[0.25em] shadow-sm">
-                <Navigation size={14} className="animate-bounce" /> Zasięg Terytorialny
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-primary-50 border border-primary-100 text-primary-700 text-[10px] font-bold uppercase tracking-[0.25em] shadow-sm">
+                <MapPin size={14} className="text-primary-600" /> Lokalne Wsparcie
               </div>
-              <h2 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 leading-[1.05]">
-                Dostępność w<br/>
+              <h2 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 leading-[1.05]" id="regional-coverage-heading">
+                Gdzie znajdziesz pomoc<br/>
                 <span className="text-primary-600 relative inline-block">
-                  Twoim Regionie
+                  dla bliskich?
                   <svg className="absolute -bottom-4 left-0 w-full h-5 text-primary-200" viewBox="0 0 100 10" preserveAspectRatio="none">
                     <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round" />
                   </svg>
                 </span>
               </h2>
               <p className="text-slate-500 text-xl leading-relaxed max-w-xl font-medium">
-                Naszym celem jest objęcie opieką całej Polski. Aktualnie oferujemy pełną bazę placówek w regionie pilotażowym.
+                Budujemy najbardziej rzetelną mapę opieki w Polsce. <strong className="text-slate-900 font-bold">Nasz pilotaż w Małopolsce to <span className="text-primary-600 font-extrabold">82</span> zweryfikowane placówki DPS i ŚDS</strong>. Na Śląsku zakończyliśmy już 65% prac nad integracją danych.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <RegionMiniCard
-                title="Małopolskie"
-                info="Pełna Baza (Aktywne)"
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 [perspective:1000px]">
+              <RegionMiniCard 
+                title="Małopolskie" 
+                info="82 zweryfikowane placówki" 
                 active={true}
                 onClick={() => onRegionSelect('Małopolskie')}
               />
-              <RegionMiniCard
-                title="Śląskie"
-                info="Integracja danych"
+              <RegionMiniCard 
+                title="Śląskie" 
+                info="" 
                 active={false}
                 upcoming={true}
+                progress={65}
+                onClick={() => handleRegionClick({ name: 'Śląskie', id: 'PL-SL', status: 'upcoming' } as any)}
               />
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 pt-6">
-               <button
+               <button 
                 onClick={() => onRegionSelect('Małopolskie')}
-                className="w-full sm:w-auto bg-slate-900 text-white px-12 py-5 rounded-[2rem] font-bold flex items-center justify-center gap-3 shadow-2xl hover:bg-primary-600 transition-all active:scale-95 group"
+                className="w-full sm:w-auto bg-slate-900 text-white px-12 py-5 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.15)] hover:bg-primary-600 hover:-translate-y-1 transition-all active:scale-95 group"
                >
-                 Przeszukaj Małopolskę <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                 Przeglądaj Małopolskę <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                </button>
                <div className="flex items-center gap-2 text-slate-400 text-sm font-bold">
                   <Info size={18} className="text-primary-400" />
-                  Rozwój ogólnopolski w toku
+                  Pełna baza Śląska już wkrótce
                </div>
             </div>
           </div>
 
           {/* MAP CONTAINER */}
-          <div className="flex-1 order-1 lg:order-2 flex justify-center items-center relative">
-            <div className="relative w-full max-w-[650px] aspect-[4/5] bg-white rounded-[5rem] border border-stone-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] p-12 md:p-16 overflow-hidden">
+          <div className="flex-1 order-1 lg:order-2 flex justify-center items-center relative w-full px-4 md:px-0">
+            <div className="relative w-full max-w-[650px] aspect-[4/5] p-4 md:p-8 group/map">
+              
+              {/* Radial glow on hover */}
+              <div className="absolute inset-0 bg-gradient-radial from-primary-500/5 to-transparent blur-3xl opacity-0 group-hover/map:opacity-100 transition-opacity duration-1000"></div>
 
-              <svg
-                viewBox="0 0 550 750"
-                className="w-full h-full"
+              {/* Interaction Overlay for Mobile */}
+              {!isMapActive && (
+                <div 
+                  onClick={() => setIsMapActive(true)}
+                  className="md:hidden absolute inset-0 z-[110] bg-slate-900/5 backdrop-blur-[1px] flex items-center justify-center cursor-pointer"
+                >
+                  <div className="bg-white/95 p-5 rounded-3xl shadow-2xl flex flex-col items-center gap-2 border border-stone-100 animate-fade-in-up">
+                    <div className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg">
+                      <Hand size={20} />
+                    </div>
+                    <span className="font-bold text-slate-800 text-xs">Dotknij, aby użyć mapy</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Notification banner */}
+              {notificationRegion && (
+                <div className="absolute inset-x-8 top-0 z-[130] animate-fade-in-up">
+                  <div className="bg-white/80 backdrop-blur-2xl p-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/50">
+                    <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-primary-500/20">
+                      <BellRing size={20} className="animate-ring text-white" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm text-slate-900">Region {notificationRegion} wkrótce!</p>
+                      <p className="text-[10px] text-slate-500 font-medium">Powiadomimy Cię po zakończeniu prac.</p>
+                    </div>
+                    <button className="ml-auto bg-slate-900 hover:bg-primary-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all">
+                      Zapisz mnie
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <svg 
+                viewBox={mapData.meta.viewBox} 
+                className={`w-full h-full overflow-visible drop-shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-500 ${!isMapActive ? 'pointer-events-none md:pointer-events-auto opacity-80 md:opacity-100' : 'pointer-events-auto opacity-100'}`}
                 xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Interaktywna mapa Polski pokazująca dostępność placówek opieki senioralnej w poszczególnych województwach"
               >
                 <defs>
-                   <filter id="map-elevate" x="-30%" y="-30%" width="160%" height="160%">
-                     <feGaussianBlur in="SourceAlpha" stdDeviation="15" />
-                     <feOffset dx="0" dy="15" result="offsetblur" />
-                     <feComponentTransfer>
-                       <feFuncA type="linear" slope="0.25" />
-                     </feComponentTransfer>
-                     <feMerge>
-                       <feMergeNode />
-                       <feMergeNode in="SourceGraphic" />
-                     </feMerge>
+                   {/* Physical texture filter */}
+                   <filter id="physical-texture">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
+                      <feColorMatrix type="saturate" values="0" />
+                      <feComponentTransfer><feFuncA type="linear" slope="0.04" /></feComponentTransfer>
+                      <feComposite operator="in" in2="SourceGraphic" />
                    </filter>
 
-                   <linearGradient id="activeRegionFill" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#ffffff" />
-                      <stop offset="100%" stopColor="#ecfdf5" />
+                   {/* Piece depth shadow */}
+                   <filter id="piece-depth" x="-10%" y="-10%" width="120%" height="120%">
+                     <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+                     <feOffset dx="0" dy="2" result="offsetblur" />
+                     <feComponentTransfer><feFuncA type="linear" slope="0.12" /></feComponentTransfer>
+                     <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                   </filter>
+
+                   {/* Hover elevation */}
+                   <filter id="map-elevate" x="-20%" y="-20%" width="140%" height="140%">
+                     <feGaussianBlur in="SourceAlpha" stdDeviation="15" />
+                     <feOffset dx="0" dy="15" result="offsetblur" />
+                     <feComponentTransfer><feFuncA type="linear" slope="0.25" /></feComponentTransfer>
+                     <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                   </filter>
+
+                   {/* Active region gradient fill */}
+                   <linearGradient id="activeFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#334155" /> 
+                      <stop offset="100%" stopColor="#0f172a" />
+                   </linearGradient>
+
+                   {/* Inactive region gradient */}
+                   <linearGradient id="inactiveFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#ffffff" /> 
+                      <stop offset="100%" stopColor="#f8fafc" />
                    </linearGradient>
                 </defs>
 
-                {/* WATER BODY (BALTIC SEA) */}
-                <path
-                  d="M0,80 Q275,100 550,80 L550,0 L0,0 Z"
-                  fill="#b3e5fc"
-                  className="opacity-40"
-                />
-                <path d="M0,80 Q275,100 550,80" stroke="#90caf9" strokeWidth="1" fill="none" opacity="0.3" />
-
-                {/* REGIONS - RENDERED DETERMINISTICALLY */}
-                {POLAND_REGIONS.map((region) => {
+                {/* REGIONS - with all effects */}
+                {renderedRegions.map((region) => {
                   const isActive = region.status === 'active';
-                  const isUpcoming = region.status === 'upcoming';
                   const isHovered = hoveredId === region.id;
-
+                  const isUpcoming = !isActive;
+                  const isGroupHighlight = isUpcoming && legendHover === 'upcoming';
+                  const isIndividualActiveHover = isActive && (isHovered || legendHover === 'active');
+                  
                   return (
-                    <path
-                      key={region.id}
-                      d={region.path}
-                      onMouseEnter={() => setHoveredId(region.id)}
-                      onMouseLeave={() => setHoveredId(null)}
-                      onClick={() => handleRegionClick(region)}
-                      className={`transition-all duration-700 ease-[cubic-bezier(0.2,1,0.3,1)] stroke-black stroke-[0.7]
-                        ${isActive
-                          ? 'fill-[url(#activeRegionFill)] cursor-pointer hover:fill-primary-100 hover:stroke-[1.2]'
-                          : isUpcoming
-                            ? 'fill-white cursor-help hover:fill-slate-50'
-                            : 'fill-white hover:fill-slate-50'
-                        }
-                        ${isHovered ? 'scale-[1.04] translate-y-[-10px]' : ''}
-                      `}
-                      style={{
-                        transformOrigin: 'center center',
-                        filter: isHovered ? 'url(#map-elevate)' : 'none',
-                        zIndex: isHovered ? 50 : 1
-                      }}
-                    />
+                    <g key={region.id}>
+                      <path
+                        d={region.path}
+                        onMouseEnter={() => setHoveredId(region.id)}
+                        onMouseLeave={() => setHoveredId(null)}
+                        onClick={() => handleRegionClick(region)}
+                        aria-label={`${region.name} - ${region.status === 'active' ? 'dostępne' : 'wkrótce dostępne'}`}
+                        role="button"
+                        tabIndex={0}
+                        className={`transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] stroke-slate-200 stroke-[1.2]
+                          ${isActive 
+                            ? 'fill-[url(#activeFill)] cursor-pointer hover:stroke-slate-400 active-region-breath' 
+                            : 'fill-[url(#inactiveFill)] cursor-pointer hover:fill-slate-100 hover:stroke-slate-300'
+                          }
+                          ${isIndividualActiveHover ? 'scale-[1.04] translate-y-[-15px]' : ''}
+                          ${isHovered && isUpcoming && !isGroupHighlight ? 'scale-[1.04] translate-y-[-15px]' : ''}
+                          ${isGroupHighlight ? '!fill-slate-200 !stroke-slate-300' : ''}
+                        `}
+                        style={{ 
+                          transformOrigin: 'center center',
+                          filter: isGroupHighlight 
+                            ? 'none' 
+                            : (isHovered || (isActive && legendHover === 'active')
+                               ? 'url(#map-elevate)' 
+                               : 'url(#piece-depth)'),
+                          pointerEvents: 'auto'
+                        }}
+                      />
+                      {/* Texture overlay */}
+                      <path 
+                        d={region.path} 
+                        className="pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                        fill="transparent" 
+                        filter="url(#physical-texture)"
+                        style={{ 
+                          transformOrigin: 'center center',
+                          transform: (isIndividualActiveHover || (isHovered && isUpcoming && !isGroupHighlight)) ? 'scale(1.04) translateY(-15px)' : 'none'
+                        }}
+                      />
+                    </g>
                   );
                 })}
               </svg>
 
-              {/* DYNAMIC TOOLTIP USING CENTROID FROM DATA */}
+              {/* DYNAMIC TOOLTIP with smart positioning */}
               {activeRegion && (
-                <div
-                  className="absolute z-50 pointer-events-none animate-fade-in-up"
-                  style={{
-                    left: `${(activeRegion.centroid.x / 550) * 100}%`,
-                    top: `${(activeRegion.centroid.y / 750) * 100}%`,
-                    transform: 'translate(-50%, -100%)'
-                  }}
+                <div 
+                  className="absolute z-[140] pointer-events-none animate-fade-in-up"
+                  style={getPillPosition(activeRegion)}
                 >
-                  <div className="bg-slate-900/90 text-white px-5 py-3 rounded-[2rem] shadow-3xl border border-white/10 backdrop-blur-2xl ring-1 ring-white/20 flex flex-col items-center">
-                    <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${activeRegion.status === 'active' ? 'text-primary-400' : 'text-slate-400'}`}>
-                       {activeRegion.status === 'active' ? 'Dostępne' : 'Wkrótce'}
-                    </span>
-                    <span className="font-bold text-sm flex items-center gap-2 mt-1 whitespace-nowrap">
-                       {activeRegion.name}
-                       {activeRegion.status === 'active' && <CheckCircle2 size={14} className="text-primary-400" />}
-                    </span>
+                  <div className="bg-white/80 backdrop-blur-2xl text-slate-900 px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-white/50 ring-1 ring-black/5 flex flex-col gap-1 min-w-[180px] max-w-[calc(100vw-60px)] sm:max-w-[280px]">
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex flex-col overflow-hidden">
+                            <span className={`text-[8px] font-bold uppercase tracking-[0.2em] truncate ${activeRegion.status === 'active' ? 'text-slate-600' : 'text-slate-400'}`}>
+                            {activeRegion.status === 'active' ? 'AKTYWNE' : 'W przygotowaniu'}
+                            </span>
+                            <span className="font-bold text-sm flex items-center gap-2 leading-none mt-1 truncate">
+                            {activeRegion.name}
+                            </span>
+                        </div>
+                        {activeRegion.status === 'active' ? (
+                            <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-900 shadow-inner shrink-0">
+                                <CheckCircle2 size={16} />
+                            </div>
+                        ) : (
+                            <div className="w-8 h-8 rounded-xl bg-stone-100 flex items-center justify-center text-slate-400 shrink-0">
+                                <Calendar size={16} className="text-slate-400" />
+                            </div>
+                        )}
+                    </div>
+                    
+                    {activeRegion.id === 'PL-MA' && (
+                      <div className="text-[10px] font-medium text-slate-500 mt-1">
+                        <span>Baza: <strong className="text-slate-900 font-extrabold text-xs">82</strong> placówki</span>
+                      </div>
+                    )}
+
+                    {activeRegion.id === 'PL-SL' && (
+                      <div className="mt-2 space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                          <span>Postęp prac</span>
+                          <span className="text-slate-600">65%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary-500 rounded-full animate-progress" style={{ width: '65%' }}></div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="w-4 h-4 bg-slate-900/90 rotate-45 mx-auto -mt-2 border-r border-b border-white/10"></div>
                 </div>
               )}
 
-              <div className="absolute top-12 right-12 text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] flex items-center gap-3">
-                 <MousePointer2 size={14} className="animate-pulse" /> Mapa Interaktywna
+              {/* Interactive Legend */}
+              <div className="absolute bottom-0 left-6 md:bottom-4 md:left-8 space-y-3 bg-white/40 backdrop-blur-xl p-5 rounded-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)] z-[120]">
+                 <div 
+                  onMouseEnter={() => setLegendHover('active')}
+                  onMouseLeave={() => setLegendHover(null)}
+                  className={`flex items-center gap-3 cursor-pointer transition-all duration-300 ${legendHover === 'active' ? 'translate-x-2' : ''}`}
+                 >
+                    <div className="w-4 h-4 rounded-full bg-slate-900 shadow-[0_0_15px_rgba(15,23,42,0.4)] animate-pulse"></div>
+                    <span className="text-[10px] font-bold text-slate-800 tracking-widest uppercase">Regiony Aktywne</span>
+                 </div>
+                 <div 
+                  onMouseEnter={() => setLegendHover('upcoming')}
+                  onMouseLeave={() => setLegendHover(null)}
+                  className={`flex items-center gap-3 cursor-pointer transition-all duration-300 ${legendHover === 'upcoming' ? 'translate-x-2 text-slate-900' : ''}`}
+                 >
+                    <div className={`w-4 h-4 rounded-full border border-slate-300 transition-colors ${legendHover === 'upcoming' ? 'bg-slate-400' : 'bg-white'}`}></div>
+                    <span className={`text-[10px] font-bold tracking-widest uppercase transition-colors ${legendHover === 'upcoming' ? 'text-slate-900' : 'text-slate-400'}`}>W przygotowaniu</span>
+                 </div>
               </div>
 
-              <div className="absolute bottom-12 left-12 space-y-3">
-                 <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-primary-500 border-2 border-white shadow-md"></div>
-                    <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Aktywne Regiony</span>
-                 </div>
-                 <div className="flex items-center gap-3 opacity-60">
-                    <div className="w-4 h-4 rounded-full bg-slate-200 border-2 border-white shadow-sm"></div>
-                    <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">W Kolejce</span>
-                 </div>
-              </div>
             </div>
           </div>
 
         </div>
       </div>
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes ring {
+          0% { transform: rotate(0); }
+          10% { transform: rotate(15deg); }
+          20% { transform: rotate(-15deg); }
+          30% { transform: rotate(10deg); }
+          40% { transform: rotate(-10deg); }
+          50% { transform: rotate(0); }
+          100% { transform: rotate(0); }
+        }
+        @keyframes progress {
+          from { width: 0%; }
+          to { width: 65%; }
+        }
+        @keyframes active-breath {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.04); }
+          100% { transform: scale(1); }
+        }
+        .active-region-breath {
+          animation: active-breath 4.5s ease-in-out infinite;
+          transform-origin: center center;
+        }
+        .animate-ring {
+          display: inline-block;
+          animation: ring 2s ease infinite;
+          transform-origin: top center;
+        }
+        .animate-progress {
+          animation: progress 1.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        .bg-gradient-radial {
+          background-image: radial-gradient(var(--tw-gradient-stops));
+        }
+        .animate-pulse-slow {
+          animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+      `}</style>
     </section>
   );
 }
 
-const RegionMiniCard = ({ title, info, active, upcoming, onClick }: any) => (
-  <div
+const RegionMiniCard = ({ title, info, active, upcoming, progress, onClick }: any) => (
+  <div 
     onClick={onClick}
-    className={`p-8 rounded-[3rem] border transition-all duration-500 flex flex-col gap-3 group relative overflow-hidden
-      ${active
-        ? 'bg-white border-primary-100 shadow-sm hover:shadow-2xl hover:shadow-primary-900/10 cursor-pointer'
-        : 'bg-stone-50 border-stone-200 opacity-60'}`}
+    className={`p-7 rounded-3xl border transition-all duration-500 flex flex-col gap-3 group relative overflow-hidden
+      [transform-style:preserve-3d] 
+      ${active 
+        ? 'bg-white border-slate-100 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.08)] hover:shadow-2xl hover:shadow-slate-900/15 cursor-pointer hover:border-slate-200' 
+        : 'bg-slate-50/80 border-slate-100/50 cursor-pointer hover:bg-white hover:border-slate-200 hover:shadow-xl hover:shadow-slate-400/10'}`}
   >
-    <div className="flex justify-between items-center relative z-10">
-      <div className={`text-[10px] font-bold uppercase tracking-widest ${active ? 'text-primary-600' : 'text-slate-400'}`}>
-         {active ? 'Status: Aktywne' : 'Status: Weryfikacja'}
+    {active && (
+      <div className="absolute bottom-0 left-0 w-full h-1.5 bg-slate-900 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+    )}
+
+    <div className={`absolute -bottom-10 -right-10 w-32 h-32 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-full
+      ${active ? 'bg-slate-500' : 'bg-slate-400'}`}></div>
+
+    <div className="flex justify-between items-center relative z-10 [transform:translateZ(20px)]">
+      <div className={`text-[10px] font-bold uppercase tracking-widest ${active ? 'text-slate-600' : 'text-slate-500'}`}>
+         {active ? 'Status: Aktywne' : 'W przygotowaniu'}
       </div>
-      {active && <CheckCircle2 className="text-primary-500" size={24} />}
-      {upcoming && <Sparkles className="text-secondary-400 animate-pulse" size={24} />}
+      {active ? (
+        <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20 group-hover:rotate-12 transition-transform">
+          <CheckCircle2 size={20} />
+        </div>
+      ) : (
+        <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 flex items-center justify-center shadow-sm">
+          <Calendar size={18} />
+        </div>
+      )}
     </div>
-    <div className="text-3xl font-serif font-bold text-slate-900 group-hover:text-primary-700 transition-colors">
+    
+    <div className="text-2xl font-serif font-bold text-slate-900 group-hover:text-slate-700 transition-colors [transform:translateZ(30px)]">
       {title}
     </div>
-    <div className="text-sm font-medium text-slate-500">{info}</div>
+    
+    {info && (
+      <div className={`text-sm font-medium [transform:translateZ(10px)] ${active ? 'text-slate-500' : 'text-slate-600/80'}`}>
+        {info}
+      </div>
+    )}
+
+    {upcoming && progress && (
+      <div className="mt-2 space-y-2 relative z-10">
+        <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+          <span>Postęp prac</span>
+          <span className="text-slate-600">{progress}%</span>
+        </div>
+        <div className="w-full h-1.5 bg-slate-200/50 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-slate-400 group-hover:bg-primary-500 transition-all duration-1000 ease-out" 
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      </div>
+    )}
   </div>
 );
