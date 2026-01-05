@@ -190,7 +190,7 @@ export default function ComparePage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-lg border-b-2 border-gray-200">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 w-48">
                     Parametr
