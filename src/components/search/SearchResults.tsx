@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import { isFavorite, addFavorite, removeFavorite } from '@/src/utils/favorites';
 
 // Import modular components
 import { SearchHeader } from './SearchHeader';
@@ -111,6 +112,7 @@ export default function SearchResults({
   const [isLoading, setIsLoading] = useState(false);
   const [visibleCount, setVisibleCount] = useState(20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [favoritesState, setFavoritesState] = useState<number[]>([]);
 
   // ===== COMPUTED =====
   const availablePowiats = useMemo(() => {
@@ -156,6 +158,21 @@ export default function SearchResults({
     return chips;
   }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfile, priceLimit]);
 
+
+  // Load favorites on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const updateFavorites = () => {
+        const favorites = JSON.parse(localStorage.getItem('kompas-seniora-favorites') || '[]');
+        setFavoritesState(favorites.map((f: any) => f.id));
+      };
+      
+      updateFavorites();
+      window.addEventListener('favoritesChanged', updateFavorites);
+      
+      return () => window.removeEventListener('favoritesChanged', updateFavorites);
+    }
+  }, []);
   // ===== FILTERING LOGIC =====
   useEffect(() => {
     let filtered = results;
@@ -324,13 +341,35 @@ export default function SearchResults({
                       waitTime: 'Brak danych'
                     }}
                     isHovered={hoveredId === fac.id}
-                    isSaved={false} // Add your saved logic
+                    isSaved={favoritesState.includes(fac.id)}
                     isCompared={selectedForCompare.includes(fac.id)}
                     onHover={setHoveredId}
                     onClick={() => handleFacilityClick(fac.id)}
                     onToggleSave={(e) => {
                       e.stopPropagation();
-                      // Add your save logic
+                      
+                      if (isFavorite(fac.id)) {
+                        removeFavorite(fac.id);
+                      } else {
+                        addFavorite({
+                          id: fac.id,
+                          nazwa: fac.nazwa,
+                          miejscowosc: fac.miejscowosc,
+                          powiat: fac.powiat,
+                          typ_placowki: fac.typ_placowki,
+                          koszt_pobytu: fac.koszt_pobytu,
+                          telefon: fac.telefon,
+                          ulica: fac.ulica,
+                          kod_pocztowy: fac.kod_pocztowy,
+                          email: fac.email,
+                          www: fac.www,
+                          liczba_miejsc: fac.liczba_miejsc,
+                          profil_opieki: fac.profil_opieki,
+                          addedAt: new Date().toISOString()
+                        });
+                      }
+                      
+                      window.dispatchEvent(new Event("favoritesChanged"));
                     }}
                     onToggleCompare={(e) => toggleCompare(fac.id, e)}
                   />
@@ -391,8 +430,9 @@ export default function SearchResults({
         onCompare={() => {
           // Navigate to comparison page
           const ids = selectedForCompare.join(',');
-          window.location.href = `/porownaj?ids=${ids}`;
+          window.location.href = `/ulubione/porownaj?ids=${ids}`;
         }}
+        onRemove={(id) => setSelectedForCompare(prev => prev.filter(fid => fid !== id))}
         onClear={() => setSelectedForCompare([])}
       />
 

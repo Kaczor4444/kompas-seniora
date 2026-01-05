@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeftIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { getFavorites, type FavoriteFacility } from '@/src/utils/favorites';
@@ -10,6 +11,7 @@ import NoteModal from '@/src/components/compare/NoteModal';
 
 export default function ComparePage() {
   const [facilities, setFacilities] = useState<FavoriteFacility[]>([]);
+  const searchParams = useSearchParams();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [currentPairIndex, setCurrentPairIndex] = useState(0);
   
@@ -23,9 +25,16 @@ export default function ComparePage() {
   useEffect(() => {
     const favs = getFavorites();
     setFacilities(favs);
-    // Auto-select all favorites (no limit)
-    setSelectedIds(favs.map(f => f.id));
-  }, []);
+    
+    const idsParam = searchParams.get("ids");
+    if (idsParam) {
+      const parsedIds = idsParam.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+      const validIds = parsedIds.filter(id => favs.some(f => f.id === id));
+      setSelectedIds(validIds.length > 0 ? validIds : favs.map(f => f.id));
+    } else {
+      setSelectedIds(favs.map(f => f.id));
+    }
+  }, [searchParams]);
 
   const selectedFacilities = facilities.filter(f => selectedIds.includes(f.id));
 
