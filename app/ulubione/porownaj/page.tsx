@@ -183,20 +183,16 @@ function ComparePageContent() {
             <div className="inline-block min-w-full bg-white md:rounded-[3rem] shadow-2xl border-y md:border border-stone-200 overflow-hidden">
               
               {/* HEADERS */}
-              <div className="grid grid-cols-[100px_repeat(3,calc(100vw-120px))] md:grid-cols-[200px_repeat(3,1fr)] border-b-2 border-stone-100 bg-white/95 backdrop-blur-md sticky top-[120px] md:top-[140px] z-40">
-                <div className="p-4 md:p-12 flex flex-col justify-end border-r border-stone-100 sticky left-0 z-50 bg-white">
+              <div className="grid grid-cols-[100px_repeat(3,calc(100vw-120px))] md:grid-cols-[200px_repeat(3,1fr)] border-b-2 border-stone-100 bg-white/95 backdrop-blur-md sticky top-0 z-40">
+                <div className="px-2 py-1 md:px-6 md:py-2 flex flex-col justify-end border-r border-stone-100 sticky left-0 z-50 bg-white">
                    <h3 className="font-serif text-sm md:text-xl font-bold text-slate-900 leading-tight">Zestawienie<br/>szczegółów</h3>
                 </div>
                 
                 {selectedFacilities.map((item, idx) => (
-                  <div key={item.id} className={`p-4 md:p-10 border-r border-stone-100 last:border-r-0 snap-center transition-opacity duration-300 ${activeIndex === idx ? 'opacity-100' : 'opacity-30 md:opacity-100'}`}>
+                  <div key={item.id} className={`px-2 py-1 md:px-6 md:py-2 border-r border-stone-100 last:border-r-0 snap-center transition-opacity duration-300 ${activeIndex === idx ? 'opacity-100' : 'opacity-30 md:opacity-100'}`}>
                     <div className="relative">
-                      {/* Placeholder image */}
-                      <div className="aspect-[3/2] w-full rounded-2xl overflow-hidden mb-3 shadow-sm border border-stone-100 bg-gray-200 flex items-center justify-center">
-                        <Building2 size={48} className="text-gray-400" />
-                      </div>
-                      <div className="text-[8px] md:text-[10px] font-black uppercase text-primary-600 mb-1">{item.typ_placowki}</div>
-                      <h4 className="font-bold text-xs md:text-base text-slate-900 line-clamp-2 min-h-[2.5rem] leading-tight">{item.nazwa}</h4>
+                      <div className="text-[10px] md:text-xs font-black uppercase text-primary-600 mb-1">{item.typ_placowki}</div>
+                      <h4 className="font-bold text-sm md:text-lg text-slate-900 font-bold line-clamp-2 min-h-[2.5rem] leading-tight">{item.nazwa}</h4>
                     </div>
                   </div>
                 ))}
