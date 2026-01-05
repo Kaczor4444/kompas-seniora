@@ -273,14 +273,25 @@ function ComparePageContent() {
                    const note = getFacilityNote(item.id);
                    const rating = note?.rating || 0;
                    const isBest = rating === maxRating && maxRating > 0;
+                   const hasNote = note?.notes && note.notes.length > 0;
                    
                    return (
                      <DataCell key={item.id} isBest={isBest}>
-                        {rating > 0 ? (
-                          <div>
-                            <StarRating rating={rating} readonly size="sm" />
-                            {isBest && (
-                              <div className="text-xs text-emerald-600 font-bold mt-1">✨ Najwyższa</div>
+                        {rating > 0 || hasNote ? (
+                          <div className="w-full">
+                            {rating > 0 && (
+                              <>
+                                <StarRating rating={rating} readonly size="sm" />
+                                {isBest && (
+                                  <div className="text-xs text-emerald-600 font-bold mt-1">✨ Najwyższa</div>
+                                )}
+                              </>
+                            )}
+                            {hasNote && (
+                              <div className="mt-2 text-xs text-slate-600 bg-blue-50 border border-blue-100 rounded-lg p-2 max-w-[200px] text-left break-words">
+                                <div className="font-bold text-blue-700 mb-1">📝 Notatka:</div>
+                                {note.notes}
+                              </div>
                             )}
                           </div>
                         ) : (
