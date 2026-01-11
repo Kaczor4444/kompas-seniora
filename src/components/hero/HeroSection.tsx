@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import RegionModal from "./RegionModal";
 import TypeTooltip from "./TypeTooltip";
+import { CategorySelector } from '../CategorySelector';
 
 // Type dla suggestion z API
 interface Suggestion {
@@ -24,20 +25,23 @@ interface HeroSectionProps {
   activeTab?: 'DPS' | 'SDS' | 'Wszystkie';
 }
 
-export default function HeroSection({ onTabChange, selectedProfiles = [], activeTab = 'WSZYSTKIE' }: HeroSectionProps = {}) {
+export default function HeroSection({ onTabChange, selectedProfiles = [], activeTab = 'Wszystkie' }: HeroSectionProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("WSZYSTKIE");
 
   // ✅ ADDED: Handler to sync with parent component
   const handleTypeChange = (type: string) => {
     setSelectedType(type);
-    
+
     // Notify parent component (page.tsx) about tab change
     if (onTabChange) {
       if (type === 'DPS') onTabChange('DPS');
       else if (type === 'ŚDS') onTabChange('SDS');
       else onTabChange('Wszystkie');
     }
+
+    console.log('🔄 HeroSection: Tab changed to:', type, '→ mapped to:',
+      type === 'DPS' ? 'DPS' : type === 'ŚDS' ? 'SDS' : 'Wszystkie');
   };
 
   // Autocomplete state
@@ -452,25 +456,6 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
                 <AutocompleteDropdown />
               </div>
 
-              {/* Geo Button - v2 style */}
-              <button 
-                onClick={handleGeolocation}
-                disabled={isGeoLoading}
-                className="bg-stone-100 hover:bg-stone-200 text-slate-600 hover:text-primary-600 p-4 rounded-xl transition-all border border-transparent hover:border-primary-200 flex items-center justify-center min-w-[60px] disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Użyj mojej lokalizacji"
-              >
-                {isGeoLoading ? (
-                  <svg width="20" height="20" className="animate-spin">
-                    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="50" strokeDashoffset="25"/>
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                )}
-              </button>
-
               {/* Search Button - v2 style with dynamic colors */}
               <button 
                 onClick={handleSearch}
@@ -486,60 +471,69 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
               </button>
             </div>
 
-            {/* Type Buttons - Desktop - v2 Style with ring-4 and icons */}
-            <div className="mt-4 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
-              <button 
-                onClick={() => handleTypeChange('WSZYSTKIE')}
-                className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
-                  ${selectedType === 'WSZYSTKIE' 
-                    ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
-              >
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                Wszystkie placówki
-              </button>
+            {/* Type Buttons - Desktop - v2 Style with geolocation text ABOVE */}
+            <div className="mt-6 md:mt-8 space-y-4">
+              {/* Geolocation clickable text ABOVE buttons */}
+              <div className="text-center">
+                <button
+                  onClick={handleGeolocation}
+                  disabled={isGeoLoading}
+                  className="text-sm text-slate-600 hover:text-primary-600 font-medium inline-flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+                >
+                  {isGeoLoading ? (
+                    <>
+                      <svg width="16" height="16" className="animate-spin">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="38" strokeDashoffset="19"/>
+                      </svg>
+                      <span>Wyszukiwanie...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 text-primary-600 group-hover:text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="group-hover:underline">Użyj geolokalizacji — znajdź najbliższe placówki</span>
+                    </>
+                  )}
+                </button>
+              </div>
 
-              <button 
-                onClick={() => handleTypeChange('DPS')}
-                className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                  ${selectedType === 'DPS' 
-                    ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
-              >
-                DPS (Całodobowe)
-              </button>
-              
-              <button 
-                onClick={() => handleTypeChange('ŚDS')}
-                className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                  ${selectedType === 'ŚDS' 
-                    ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
-              >
-                ŚDS (Dzienne)
-              </button>
-            </div>
+              {/* Buttons */}
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+                <button 
+                  onClick={() => handleTypeChange('WSZYSTKIE')}
+                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
+                    ${selectedType === 'WSZYSTKIE' 
+                      ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
+                      : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  Wszystkie placówki
+                </button>
 
-            {/* Helper text UNDER buttons - Desktop */}
-            <div className="text-center mt-6 space-y-2">
-              <p className="text-sm text-neutral-600 flex items-center justify-center gap-1.5">
-                <svg className="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>Kliknij by znaleźć placówki w okolicy</span>
-              </p>
-              <button
-                onClick={() => setShowRegionModal(true)}
-                className="text-sm text-accent-600 hover:text-accent-700 font-medium inline-flex items-center gap-1 hover:underline"
-              >
-                Przeglądaj po województwie
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+                <button 
+                  onClick={() => handleTypeChange('DPS')}
+                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
+                    ${selectedType === 'DPS' 
+                      ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
+                      : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
+                >
+                  DPS (Całodobowe)
+                </button>
+                
+                <button 
+                  onClick={() => handleTypeChange('ŚDS')}
+                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
+                    ${selectedType === 'ŚDS' 
+                      ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
+                      : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
+                >
+                  ŚDS (Dzienne)
+                </button>
+              </div>
             </div>
           </div>
 
@@ -584,23 +578,6 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
                     : 'focus:ring-slate-500'}`}
                   autoComplete="off"
                 />
-                <button 
-                  onClick={handleGeolocation}
-                  disabled={isGeoLoading}
-                  className="absolute right-2 top-2 p-1.5 text-slate-400 hover:text-primary-600 rounded-lg active:bg-slate-100 transition-colors disabled:opacity-50"
-                  aria-label="Użyj mojej lokalizacji"
-                >
-                  {isGeoLoading ? (
-                    <svg width="18" height="18" className="animate-spin">
-                      <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="44" strokeDashoffset="22"/>
-                    </svg>
-                  ) : (
-                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  )}
-                </button>
 
                 {isLoading && (
                   <div className="absolute right-12 top-1/2 -translate-y-1/2">
@@ -622,6 +599,32 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
+              </button>
+            </div>
+
+            {/* Geolocation text ABOVE buttons - Mobile */}
+            <div className="text-center mb-4">
+              <button
+                onClick={handleGeolocation}
+                disabled={isGeoLoading}
+                className="text-xs text-slate-600 hover:text-primary-600 font-medium inline-flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+              >
+                {isGeoLoading ? (
+                  <>
+                    <svg width="14" height="14" className="animate-spin">
+                      <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="31" strokeDashoffset="15.5"/>
+                    </svg>
+                    <span>Wyszukiwanie...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4 text-primary-600 group-hover:text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="group-hover:underline">Użyj geolokalizacji — znajdź najbliższe placówki</span>
+                  </>
+                )}
               </button>
             </div>
 
@@ -662,32 +665,28 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
             </div>
           </div>
 
-          {/* Helper text POD searchbarem - Mobile */}
-          <div className="md:hidden text-center mt-4 space-y-2">
-              <p className="text-xs text-neutral-600 flex items-center justify-center gap-1.5">
-                <svg className="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>Kliknij by znaleźć placówki w okolicy</span>
-              </p>
-              <button
-                onClick={() => setShowRegionModal(true)}
-                className="text-xs text-accent-600 hover:text-accent-700 font-medium inline-flex items-center gap-1 hover:underline"
-              >
-                Przeglądaj po województwie
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+          {/* Profile Selection - CategorySelector Integration */}
+          <div className="mt-8">
+            <CategorySelector
+              activeTab={
+                selectedType === 'DPS' ? 'DPS' :
+                selectedType === 'ŚDS' ? 'SDS' :
+                'Wszystkie'
+              }
+              onSearch={() => {}}
+              onProfilesChange={(profiles) => {
+                console.log('🎯 Hero received profiles:', profiles);
+              }}
+              location={searchQuery}
+            />
           </div>
         </div>
+      </div>
 
       {/* Region Modal */}
-      <RegionModal 
-        isOpen={showRegionModal} 
-        onClose={() => setShowRegionModal(false)} 
+      <RegionModal
+        isOpen={showRegionModal}
+        onClose={() => setShowRegionModal(false)}
       />
     </section>
   );

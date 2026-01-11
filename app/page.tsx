@@ -6,7 +6,6 @@ import MiniFAQSection from '../src/components/faq/MiniFAQSection';
 import NewsletterSection from '../src/components/newsletter/NewsletterSection';
 import KnowledgeCenter from '../src/components/knowledge/KnowledgeCenter';
 import HeroSection from '../src/components/hero/HeroSection';
-import { CategorySelector } from '../src/components/CategorySelector';
 import RegionalMap from '../src/components/home/RegionalMap';
 import { MapPin, ChevronRight, ArrowRight } from 'lucide-react';
 
@@ -25,21 +24,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section - synced with CategorySelector */}
-      <HeroSection 
+      <HeroSection
         onTabChange={setActiveTab}
         selectedProfiles={selectedProfiles}
         activeTab={activeTab}
-      />
-
-      {/* Category Selector - receives activeTab from state */}
-      <CategorySelector
-        activeTab={activeTab}
-        onSearch={(query) => {
-          // CategorySelector handles navigation internally via window.location.href
-          console.log('CategorySelector search:', query);
-        }}
-        onProfilesChange={setSelectedProfiles}
-        location=""
       />
 
       {/* Regional Map */}

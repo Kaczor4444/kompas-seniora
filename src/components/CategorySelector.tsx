@@ -49,6 +49,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  console.log('🔵 CategorySelector RENDER - activeTab:', activeTab, 'selectedCategories:', selectedCategories);
+
   // ✅ NEW: Reset selections when activeTab changes
   useEffect(() => {
     console.log('🔄 Tab changed to:', activeTab);
@@ -73,19 +75,31 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
   }, [selectedCategories, onProfilesChange, activeTab]);
 
   const handleCategorySelect = (title: string) => {
+    console.log('👆 Category clicked:', title, 'Current activeTab:', activeTab);
     setSelectedCategories(prev => {
-      if (prev.includes(title)) {
-        return prev.filter(c => c !== title);
-      } else {
-        return [...prev, title];
-      }
+      const newSelection = prev.includes(title)
+        ? prev.filter(c => c !== title)
+        : [...prev, title];
+      console.log('  → New selection:', newSelection);
+      return newSelection;
     });
   };
 
   const currentCategories = useMemo(() => {
-    if (activeTab === 'DPS') return dpsCategories;
-    if (activeTab === 'SDS') return sdsCategories;
-    return [...dpsCategories.slice(0, 4), ...sdsCategories.slice(0, 3), ...dpsCategories.slice(4)];
+    console.log('🎨 Computing currentCategories for activeTab:', activeTab);
+
+    if (activeTab === 'DPS') {
+      console.log('  ✓ Returning DPS categories:', dpsCategories.length);
+      return dpsCategories;
+    }
+    if (activeTab === 'SDS') {
+      console.log('  ✓ Returning SDS categories:', sdsCategories.length);
+      return sdsCategories;
+    }
+
+    const allCategories = [...dpsCategories.slice(0, 4), ...sdsCategories.slice(0, 3), ...dpsCategories.slice(4)];
+    console.log('  ✓ Returning ALL categories:', allCategories.length);
+    return allCategories;
   }, [activeTab]);
 
   const handleSearchClick = () => {
@@ -141,14 +155,14 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
             <div className="flex items-center justify-between mb-3 md:mb-4 px-4 md:px-0">
                 <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 opacity-80">
                    <Info size={18} />
-                   <span>Dla kogo szukasz:</span>
+                   <span>Dla kogo szukasz?</span>
                 </h3>
                 <div className="hidden md:flex text-xs font-bold text-slate-400 gap-2 items-center">
                     Przewiń <ArrowRight size={12} />
                 </div>
             </div>
 
-            <div className="flex overflow-x-auto p-8 -mx-8 gap-3 snap-x snap-mandatory scrollbar-hide md:mx-0">
+            <div className="flex overflow-x-auto p-6 -mx-6 gap-2 md:gap-3 snap-x snap-mandatory scrollbar-hide md:mx-0 md:py-4 md:px-0">
               {currentCategories.map((cat, idx) => {
                 const isSelected = selectedCategories.includes(cat.title);
 
@@ -170,34 +184,34 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
                   <div key={`${activeTab}-${idx}`} className="snap-center shrink-0">
                     <button
                       onClick={() => handleCategorySelect(cat.title)}
-                      className={`group w-40 sm:w-48 h-full flex flex-col items-center text-center p-4 rounded-xl border transition-all duration-200 relative overflow-hidden ${
+                      className={`group w-28 sm:w-32 md:w-36 h-full flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 relative overflow-hidden ${
                         isSelected
-                          ? `${activeBorder} ${activeBg} shadow-md scale-[1.02]`
+                          ? `${activeBorder} ${activeBg} shadow-md scale-[1.01]`
                           : 'bg-white border-stone-200 shadow-sm hover:border-stone-300 hover:bg-stone-50'
                       }`}
                       aria-pressed={isSelected}
                     >
                       {isSelected && (
-                         <div className="absolute top-2 right-2">
+                         <div className="absolute top-1.5 right-1.5">
                            <div className={`rounded-full p-0.5 ${activeTab === 'DPS' ? 'bg-primary-600 text-white' : activeTab === 'SDS' ? 'bg-secondary-600 text-white' : 'bg-slate-800 text-white'}`}>
-                              <Check size={14} strokeWidth={3} />
+                              <Check size={12} strokeWidth={3} />
                            </div>
                          </div>
                       )}
 
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-colors duration-200 ${
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-colors duration-200 ${
                         isSelected
                           ? `bg-white ${activeIconColor}`
                           : 'bg-stone-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700'
                       }`} aria-hidden="true">
-                        {cat.icon}
+                        {React.cloneElement(cat.icon as React.ReactElement, { size: 20 })}
                       </div>
 
-                      <h4 className={`font-bold text-sm leading-tight mb-1 ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
+                      <h4 className={`font-bold text-xs leading-tight mb-1 ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
                         {cat.title}
                       </h4>
 
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? 'opacity-100' : 'opacity-60'}`}>
+                      <span className={`text-[9px] font-bold uppercase tracking-wider ${isSelected ? 'opacity-100' : 'opacity-60'}`}>
                         {cat.target}
                       </span>
                     </button>
