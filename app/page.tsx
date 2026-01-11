@@ -166,7 +166,7 @@ export default function Home() {
                 Szukaj w <span className="text-primary-600">Twoim mieście</span>
               </h2>
               <p className="mt-4 text-slate-500 text-base md:text-lg font-medium">
-                Szybki dostęp do bazy placówek w najpopularniejszych ośrodkach Małopolski.
+                Placówki w najpopularniejszych miastach Małopolski.
               </p>
             </div>
             <Link 
@@ -186,12 +186,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="bg-slate-900 text-white group-hover:bg-primary-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-md transition-colors">
-                      24
-                    </span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">Placówek</span>
-                  </div>
+                  <span className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">24</span>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Kraków</h3>
@@ -207,12 +202,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="bg-slate-900 text-white group-hover:bg-primary-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-md transition-colors">
-                      8
-                    </span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">Placówek</span>
-                  </div>
+                  <span className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">8</span>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Nowy Sącz</h3>
@@ -228,12 +218,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="bg-slate-900 text-white group-hover:bg-primary-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-md transition-colors">
-                      12
-                    </span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">Placówek</span>
-                  </div>
+                  <span className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">12</span>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Tarnów</h3>
@@ -249,12 +234,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="bg-slate-900 text-white group-hover:bg-primary-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-md transition-colors">
-                      6
-                    </span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">Placówek</span>
-                  </div>
+                  <span className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">6</span>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Nowy Targ</h3>
@@ -270,12 +250,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="bg-slate-900 text-white group-hover:bg-primary-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-md transition-colors">
-                      5
-                    </span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">Placówek</span>
-                  </div>
+                  <span className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">5</span>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Oświęcim</h3>
@@ -291,12 +266,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="bg-slate-900 text-white group-hover:bg-primary-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-md transition-colors">
-                      4
-                    </span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">Placówek</span>
-                  </div>
+                  <span className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">4</span>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Wadowice</h3>
@@ -312,12 +282,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="bg-slate-900 text-white group-hover:bg-primary-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-md transition-colors">
-                      3
-                    </span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">Placówek</span>
-                  </div>
+                  <span className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">3</span>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Zakopane</h3>
@@ -333,12 +298,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="bg-slate-900 text-white group-hover:bg-primary-600 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-md transition-colors">
-                      4
-                    </span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mt-1">Placówek</span>
-                  </div>
+                  <span className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">4</span>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Myślenice</h3>
