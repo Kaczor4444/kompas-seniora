@@ -374,14 +374,6 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Hero Header */}
         <div className="text-center max-w-5xl mx-auto mb-6 sm:mb-10">
-          {/* Badge - v2 style */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-primary-100 shadow-sm mb-6 md:mb-8">
-            <span className="flex h-2 w-2 rounded-full bg-primary-500"></span>
-            <span className="text-xs font-semibold uppercase tracking-wide text-primary-600">
-              Publiczny System Pomocy Społecznej
-            </span>
-          </div>
-
           <h1 className="text-3xl md:text-6xl font-serif font-bold text-slate-900 mb-4 md:mb-6 leading-tight">
             Znajdź publiczną opiekę <br/>
             <span className="text-primary-600 relative inline-block">
@@ -404,33 +396,6 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
             <div className="bg-white p-3 rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100 flex flex-row gap-2 relative">
               {/* Input with Icon - v2 style */}
               <div className="flex-1 relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg 
-                    className={`transition-colors ${
-                      selectedType === 'DPS' ? 'text-primary-500' : 
-                      selectedType === 'ŚDS' ? 'text-secondary-500' : 
-                      'text-slate-500'
-                    } group-focus-within:text-slate-800`}
-                    width="20" 
-                    height="20" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
-                    />
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
-                    />
-                  </svg>
-                </div>
                 <label htmlFor="desktop-location" className="sr-only">Lokalizacja</label>
                 <input
                   id="desktop-location"
@@ -439,8 +404,8 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Powiat lub miasto (np. Warszawa)"
-                  className={`w-full pl-11 pr-4 py-4 rounded-xl bg-stone-50 border border-transparent outline-none transition-all text-slate-800 font-medium focus:bg-white focus:ring-2 
+                  placeholder="Wpisz miejscowość (np. Olkusz)"
+                  className={`w-full pl-4 pr-4 py-4 rounded-xl bg-stone-50 border border-transparent outline-none transition-all text-slate-800 font-medium focus:bg-white focus:ring-2 
                     ${selectedType === 'DPS' ? 'focus:ring-primary-100 focus:border-primary-300' 
                       : selectedType === 'ŚDS' ? 'focus:ring-secondary-100 focus:border-secondary-300'
                       : 'focus:ring-slate-200 focus:border-slate-300'}`}
@@ -542,37 +507,16 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
             {/* Mobile Simple Location Input with Search Button */}
             <div className="flex gap-2 mb-6 relative z-20">
               <div className="flex-1 relative">
-                <svg 
-                  className="absolute top-3.5 left-3 text-slate-500" 
-                  width="20" 
-                  height="20"
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
-                  />
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
-                  />
-                </svg>
                 <label htmlFor="mobile-location" className="sr-only">Wpisz miasto</label>
-                <input 
+                <input
                   id="mobile-location"
                   ref={inputRefMobile}
-                  type="text" 
+                  type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Wpisz miasto..." 
-                  className={`w-full pl-10 pr-10 py-3 rounded-xl border border-stone-200 bg-white shadow-sm outline-none h-full focus:ring-2 
+                  placeholder="Wpisz miejscowość..."
+                  className={`w-full pl-4 pr-10 py-3 rounded-xl border border-stone-200 bg-white shadow-sm outline-none h-full focus:ring-2 
                     ${selectedType === 'DPS' ? 'focus:ring-primary-500' 
                     : selectedType === 'ŚDS' ? 'focus:ring-secondary-500'
                     : 'focus:ring-slate-500'}`}

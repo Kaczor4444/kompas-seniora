@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Loader2, Users, Heart, Sun, Accessibility, Shield, Activity, School, Puzzle, Sparkles, Check, Info, ArrowRight, X } from 'lucide-react';
+import { Search, Loader2, Users, Heart, Sun, Accessibility, Shield, Activity, School, Puzzle, Sparkles, Check, ArrowRight, X } from 'lucide-react';
 
 // Mapowanie tytułów kafelków na kody profili opieki w bazie
 const categoryToProfileMap: Record<string, string[]> = {
@@ -153,9 +153,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-6 md:mt-10 mb-12">
           <div className="text-left relative group">
             <div className="flex items-center justify-between mb-3 md:mb-4 px-4 md:px-0">
-                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 opacity-80">
-                   <Info size={18} />
-                   <span>Dla kogo szukasz?</span>
+                <h3 className="text-lg font-bold text-slate-800 opacity-80">
+                   Dla kogo szukasz?
                 </h3>
                 <div className="hidden md:flex text-xs font-bold text-slate-400 gap-2 items-center">
                     Przewiń <ArrowRight size={12} />
