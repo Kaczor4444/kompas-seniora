@@ -1,104 +1,135 @@
 import Link from 'next/link';
+import { Mail } from 'lucide-react';
+
+const FooterLogo = () => (
+  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10">
+    <path 
+      d="M20 34C20 34 5 26 5 15C5 9 10 5 14 5C17 5 19 7 20 8C21 7 23 5 26 5C30 5 35 9 35 15C35 26 20 34 20 34Z" 
+      className="stroke-primary-500" 
+      strokeWidth="2.5" 
+      strokeLinejoin="round"
+    />
+    <path d="M20 10L23 20H17L20 10Z" className="fill-primary-500" />
+    <path d="M20 30L17 20H23L20 30Z" className="fill-slate-500" />
+    <circle cx="20" cy="20" r="1.5" className="fill-slate-900" />
+  </svg>
+);
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+    <footer className="bg-slate-900 text-slate-300">
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* 3 kolumny - centered na desktop, 3 kolumny też na mobile */}
-        <div className="grid grid-cols-3 gap-4 md:gap-8 mb-8 max-w-5xl mx-auto">
-          {/* Kolumna 1: O nas - teraz 4 linki */}
+        
+        {/* HEADER: Logo + Description + Email */}
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-12 pb-12 border-b border-slate-800">
+          <div className="flex items-center gap-4">
+            <FooterLogo />
+            <div className="flex flex-col">
+              <span className="font-serif text-2xl font-bold text-white leading-none">Kompas</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-400 leading-none mt-1">Seniora</span>
+            </div>
+          </div>
+          
+          <div className="flex-1 text-center md:text-left">
+            <p className="text-slate-400 text-sm leading-relaxed mb-3 max-w-2xl">
+              Twój rzetelny przewodnik po systemie opieki senioralnej. Łączymy sprawdzone dane z ludzkim podejściem, aby ułatwić rodzinom najtrudniejsze decyzje.
+            </p>
+            <a 
+              href="mailto:kontakt@kompaseniora.pl" 
+              className="inline-flex items-center gap-2 text-white hover:text-primary-400 transition-colors text-sm font-bold"
+            >
+              <Mail size={16} />
+              kontakt@kompaseniora.pl
+            </a>
+          </div>
+        </div>
+
+        {/* 3 COLUMNS: O nas, Serwis, Prawne */}
+        <div className="grid grid-cols-3 gap-6 md:gap-12 mb-8 max-w-5xl mx-auto">
+          
+          {/* O nas */}
           <div className="text-center">
-            <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-emerald-400">
+            <h3 className="text-base md:text-lg font-serif font-bold mb-4 text-primary-400">
               O nas
             </h3>
-            <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm">
+            <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
               <li>
-                <Link href="/o-nas" className="text-gray-300 hover:text-emerald-400 transition-colors">
-                  O nas
+                <Link href="/misja" className="text-slate-300 hover:text-primary-400 transition-colors">
+                  Misja
                 </Link>
               </li>
               <li>
-                <Link href="/kontakt" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/kontakt" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Kontakt
                 </Link>
               </li>
               <li>
-                <Link href="/wspolpraca" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/wspolpraca" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Współpraca
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/faq" className="text-slate-300 hover:text-primary-400 transition-colors">
                   FAQ
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Kolumna 2: Serwis */}
+          {/* Serwis */}
           <div className="text-center">
-            <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-emerald-400">
+            <h3 className="text-base md:text-lg font-serif font-bold mb-4 text-primary-400">
               Serwis
             </h3>
-            <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm">
+            <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
               <li>
-                <Link href="/search" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/search" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Wyszukiwarka
                 </Link>
               </li>
               <li>
-                <Link href="/ulubione" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/ulubione" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Ulubione
                 </Link>
               </li>
               <li>
-                <Link href="/kalkulator" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/kalkulator" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Kalkulator
                 </Link>
               </li>
               <li>
-                <Link href="/knowledge" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/knowledge" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Poradnik
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="text-gray-300 hover:text-emerald-400 transition-colors">
-                  Blog
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Kolumna 3: Prawne - teraz 5 linków */}
+          {/* Prawne */}
           <div className="text-center">
-            <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-emerald-400">
+            <h3 className="text-base md:text-lg font-serif font-bold mb-4 text-primary-400">
               Prawne
             </h3>
-            <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm">
+            <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
               <li>
-                <Link href="/polityka-prywatnosci" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/polityka-prywatnosci" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Polityka Prywatności
                 </Link>
               </li>
               <li>
-                <Link href="/regulamin" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/regulamin" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Regulamin
                 </Link>
               </li>
               <li>
-                <Link href="/polityka-cookies" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/polityka-cookies" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Polityka Cookies
                 </Link>
               </li>
               <li>
-                <Link href="/wyglad-strony" className="text-gray-300 hover:text-emerald-400 transition-colors">
-                  Wygląd strony
-                </Link>
-              </li>
-              <li>
-                <Link href="/mapa-strony" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                <Link href="/mapa-strony" className="text-slate-300 hover:text-primary-400 transition-colors">
                   Mapa strony
                 </Link>
               </li>
@@ -106,11 +137,11 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright - jedna linia z źródłami */}
-        <div className="border-t border-gray-700 pt-6 md:pt-8">
-          <div className="text-center text-xs md:text-sm text-gray-400">
+        {/* COPYRIGHT */}
+        <div className="border-t border-slate-800 pt-8">
+          <div className="text-center text-xs md:text-sm text-slate-400">
             <p>
-              © {currentYear} <span className="text-emerald-400 font-semibold">Kompas Seniora</span> | Źródła: MOPS, BIP
+              © {currentYear} <span className="text-primary-400 font-bold">Kompas Seniora</span> - Wspieramy cyfryzację pomocy społecznej w Polsce
             </p>
           </div>
         </div>
