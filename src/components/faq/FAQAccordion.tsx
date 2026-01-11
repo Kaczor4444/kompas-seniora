@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Plus, Minus } from 'lucide-react';
 import { FAQItem } from './faqData';
 
 interface FAQAccordionProps {
@@ -19,7 +20,7 @@ export default function FAQAccordion({ items }: FAQAccordionProps) {
       setTimeout(() => {
         const element = document.getElementById(id);
         if (element) {
-          const offset = 80; // Offset od góry ekranu
+          const offset = 80;
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.scrollY - offset;
           
@@ -36,7 +37,7 @@ export default function FAQAccordion({ items }: FAQAccordionProps) {
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={index}>{part.slice(2, -2)}</strong>;
+        return <strong key={index} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>;
       }
       return part;
     });
@@ -44,37 +45,49 @@ export default function FAQAccordion({ items }: FAQAccordionProps) {
 
   return (
     <div className="space-y-4">
-      {items.map((item) => (
-        <div
-          key={item.id}
-          id={item.id}
-          className="bg-white rounded-xl border border-neutral-200 overflow-hidden transition-all duration-200 hover:border-neutral-300"
-        >
-          <button
-            onClick={() => toggleQuestion(item.id)}
-            className="w-full px-6 py-5 flex items-center justify-between text-left transition-colors hover:bg-neutral-50"
+      {items.map((item) => {
+        const isOpen = openId === item.id;
+        
+        return (
+          <div
+            key={item.id}
+            id={item.id}
+            className={`border rounded-2xl transition-all duration-300 ${
+              isOpen 
+                ? 'bg-stone-50 border-stone-300 shadow-sm' 
+                : 'bg-white border-stone-200 hover:border-primary-200'
+            }`}
           >
-            <span className="text-lg font-semibold text-neutral-900 pr-4">
-              {item.question}
-            </span>
-            <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-neutral-100 text-neutral-600 transition-transform duration-200"
-              style={{ transform: openId === item.id ? 'rotate(45deg)' : 'rotate(0deg)' }}
+            <button
+              onClick={() => toggleQuestion(item.id)}
+              className="w-full flex justify-between items-center p-6 text-left focus:outline-none"
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 5V15M5 10H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </span>
-          </button>
+              <span className={`font-semibold text-lg pr-4 ${
+                isOpen ? 'text-primary-700' : 'text-slate-800'
+              }`}>
+                {item.question}
+              </span>
+              <span className={`flex-shrink-0 ml-4 p-1 rounded-full transition-colors ${
+                isOpen 
+                  ? 'bg-primary-100 text-primary-600' 
+                  : 'bg-stone-100 text-slate-400'
+              }`}>
+                {isOpen ? <Minus size={20} /> : <Plus size={20} />}
+              </span>
+            </button>
 
-          {openId === item.id && (
-            <div className="px-6 pb-5 pt-0">
-              <div className="text-neutral-700 leading-relaxed border-t border-neutral-100 pt-4">
+            <div 
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+              }`}
+            >
+              <div className="p-6 pt-0 text-slate-600 leading-relaxed border-t border-stone-200/50 mt-2">
                 {renderAnswer(item.answer)}
               </div>
             </div>
-          )}
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
