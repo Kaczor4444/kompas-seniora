@@ -45,10 +45,10 @@ export default function MisjaClient() {
         {/* Main Card */}
         <div className="bg-white rounded-[2.5rem] border border-stone-200 shadow-xl shadow-slate-900/5 overflow-hidden">
 
-          {/* Dark Header */}
+          {/* Dark Header - LEFT ALIGNED */}
           <div className="bg-slate-900 p-8 md:p-14 text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-20 -mt-20" />
-            <div className="relative z-10 text-center">
+            <div className="relative z-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-white/10">
                 <svg className="w-3 h-3 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -56,7 +56,7 @@ export default function MisjaClient() {
                 Dlaczego powstaliśmy
               </div>
               <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6">Misja</h1>
-              <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+              <p className="text-slate-400 font-medium">
                 Jesteśmy tu, żebyś w trudnym momencie nie był sam
               </p>
             </div>
