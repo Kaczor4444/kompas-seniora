@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 export default function PolitykaPrywatnosciClient() {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -75,15 +77,15 @@ export default function PolitykaPrywatnosciClient() {
       <div className="max-w-7xl mx-auto px-4 pt-10 pb-24 md:pt-16">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
           {/* Back Button */}
-          <a
+          <Link
             href="/"
-            className="group inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 font-bold mb-12 transition-colors text-sm lg:hidden"
+            className="group flex items-center gap-2 text-slate-600 hover:text-primary-600 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-white/50 w-fit lg:hidden"
           >
-            <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
+            <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center group-hover:border-primary-300 transition-colors shadow-sm">
+              <ArrowLeft size={16} />
+            </div>
             Wróć do strony głównej
-          </a>
+          </Link>
 
           {/* TOC Sidebar - Desktop Only */}
           <aside className="hidden lg:block w-72 sticky top-32 shrink-0">
@@ -635,7 +637,7 @@ export default function PolitykaPrywatnosciClient() {
 
             {/* Footer Navigation */}
             <div className="mt-12 text-center">
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-bold uppercase text-xs tracking-widest transition-all"
               >
@@ -643,7 +645,7 @@ export default function PolitykaPrywatnosciClient() {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-              </a>
+              </Link>
             </div>
           </div> {/* Zamyka flex-1 */}
         </div> {/* Zamyka flex container */}
