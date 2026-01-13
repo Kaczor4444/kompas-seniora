@@ -75,17 +75,18 @@ export default function PolitykaPrywatnosciClient() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 pt-10 pb-24 md:pt-16">
+        {/* Back Button */}
+        <Link
+          href="/"
+          className="group flex items-center gap-2 text-slate-600 hover:text-primary-600 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-white/50 w-fit"
+        >
+          <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center group-hover:border-primary-300 transition-colors shadow-sm">
+            <ArrowLeft size={16} />
+          </div>
+          Wróć do strony głównej
+        </Link>
+
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
-          {/* Back Button */}
-          <Link
-            href="/"
-            className="group flex items-center gap-2 text-slate-600 hover:text-primary-600 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-white/50 w-fit lg:hidden"
-          >
-            <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center group-hover:border-primary-300 transition-colors shadow-sm">
-              <ArrowLeft size={16} />
-            </div>
-            Wróć do strony głównej
-          </Link>
 
           {/* TOC Sidebar - Desktop Only */}
           <aside className="hidden lg:block w-72 sticky top-32 shrink-0">
@@ -129,17 +130,6 @@ export default function PolitykaPrywatnosciClient() {
 
           {/* Main Content - owinięty w flex-1 */}
           <div className="flex-1">
-            {/* Back Button - Desktop */}
-            <Link
-              href="/"
-              className="hidden lg:flex group items-center gap-2 text-slate-600 hover:text-primary-600 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-white/50 w-fit"
-            >
-              <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center group-hover:border-primary-300 transition-colors shadow-sm">
-                <ArrowLeft size={16} />
-              </div>
-              Wróć do strony głównej
-            </Link>
-
             <div className="bg-white rounded-[2.5rem] border border-stone-200 shadow-xl shadow-slate-900/5 overflow-hidden">
               {/* Header Banner */}
               <div className="bg-slate-900 p-8 md:p-14 text-white relative overflow-hidden">
@@ -634,21 +624,21 @@ export default function PolitykaPrywatnosciClient() {
                 </div>
               </div>
             </div>
-
-            {/* Footer Navigation */}
-            <div className="mt-12 text-center">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-bold uppercase text-xs tracking-widest transition-all"
-              >
-                Powrót do strony głównej
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </Link>
-            </div>
           </div> {/* Zamyka flex-1 */}
         </div> {/* Zamyka flex container */}
+
+        {/* Footer Navigation */}
+        <div className="mt-12 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-bold uppercase text-xs tracking-widest transition-all"
+          >
+            Powrót do strony głównej
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </div>
   );
