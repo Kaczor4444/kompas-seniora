@@ -130,15 +130,15 @@ export default function PolitykaPrywatnosciClient() {
           {/* Main Content - owinięty w flex-1 */}
           <div className="flex-1">
             {/* Back Button - Desktop */}
-            <a
+            <Link
               href="/"
-              className="hidden lg:inline-flex group items-center gap-2 text-slate-500 hover:text-primary-600 font-bold mb-12 transition-colors text-sm"
+              className="hidden lg:flex group items-center gap-2 text-slate-600 hover:text-primary-600 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-white/50 w-fit"
             >
-              <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
+              <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center group-hover:border-primary-300 transition-colors shadow-sm">
+                <ArrowLeft size={16} />
+              </div>
               Wróć do strony głównej
-            </a>
+            </Link>
 
             <div className="bg-white rounded-[2.5rem] border border-stone-200 shadow-xl shadow-slate-900/5 overflow-hidden">
               {/* Header Banner */}
