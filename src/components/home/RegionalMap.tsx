@@ -142,7 +142,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
 
           {/* MAP CONTAINER */}
           <div className="flex-1 order-2 lg:order-2 flex justify-center items-center relative w-full px-4 md:px-0">
-            <div className="relative w-full max-w-[650px] aspect-[4/5] p-4 md:p-8 group/map">
+            <div className="relative w-full max-w-[650px] aspect-[3.5/5] p-2 md:p-8 group/map">
               
               {/* Radial glow on hover */}
               <div className="absolute inset-0 bg-gradient-radial from-primary-500/5 to-transparent blur-3xl opacity-0 group-hover/map:opacity-100 transition-opacity duration-1000"></div>
@@ -309,7 +309,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
               )}
 
               {/* Interactive Legend */}
-              <div className="absolute bottom-0 left-6 md:bottom-4 md:left-8 space-y-3 bg-white/40 backdrop-blur-xl p-5 rounded-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)] z-[120]">
+              <div className="absolute bottom-2 left-2 md:bottom-4 md:left-8 space-y-3 bg-white/40 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)] z-[120]">
                  <div 
                   onMouseEnter={() => setLegendHover('active')}
                   onMouseLeave={() => setLegendHover(null)}
