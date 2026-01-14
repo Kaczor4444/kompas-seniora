@@ -93,7 +93,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
         <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-28">
           
           {/* TEXT CONTENT */}
-          <div className="flex-1 space-y-10 order-2 lg:order-1 relative z-10">
+          <div className="flex-1 space-y-10 order-1 lg:order-1 relative z-10">
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-primary-50 border border-primary-100 text-primary-700 text-[10px] font-bold uppercase tracking-[0.25em] shadow-sm">
                 <MapPin size={14} className="text-primary-600" /> Lokalne Wsparcie
@@ -112,16 +112,16 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 [perspective:1000px]">
-              <RegionMiniCard 
-                title="Małopolskie" 
-                info="82 zweryfikowane placówki" 
+            <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 gap-6 [perspective:1000px]">
+              <RegionMiniCard
+                title="Małopolskie"
+                info="82 zweryfikowane placówki"
                 active={true}
                 onClick={() => onRegionSelect('Małopolskie')}
               />
-              <RegionMiniCard 
-                title="Śląskie" 
-                info="" 
+              <RegionMiniCard
+                title="Śląskie"
+                info=""
                 active={false}
                 upcoming={true}
                 progress={65}
@@ -129,8 +129,8 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6 pt-6">
-               <button 
+            <div className="hidden lg:flex flex-col sm:flex-row items-center gap-6 pt-6">
+               <button
                 onClick={() => onRegionSelect('Małopolskie')}
                 className="w-full sm:w-auto bg-slate-900 text-white px-12 py-5 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.15)] hover:bg-primary-600 hover:-translate-y-1 transition-all active:scale-95 group"
                >
@@ -144,7 +144,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
           </div>
 
           {/* MAP CONTAINER */}
-          <div className="flex-1 order-1 lg:order-2 flex justify-center items-center relative w-full px-4 md:px-0">
+          <div className="flex-1 order-2 lg:order-2 flex justify-center items-center relative w-full px-4 md:px-0">
             <div className="relative w-full max-w-[650px] aspect-[4/5] p-4 md:p-8 group/map">
               
               {/* Radial glow on hover */}
@@ -354,6 +354,43 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
 
         </div>
       </div>
+
+      {/* STATUS CARDS - MOBILE ONLY (poza głównym flex) */}
+      <div className="lg:hidden mt-16 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 [perspective:1000px]">
+            <RegionMiniCard
+              title="Małopolskie"
+              info="82 zweryfikowane placówki"
+              active={true}
+              onClick={() => onRegionSelect('Małopolskie')}
+            />
+            <RegionMiniCard
+              title="Śląskie"
+              info=""
+              active={false}
+              upcoming={true}
+              progress={65}
+              onClick={() => handleRegionClick({ name: 'Śląskie', id: 'PL-SL', status: 'upcoming' } as any)}
+            />
+          </div>
+
+          {/* CTA Buttons - MOBILE ONLY */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
+             <button
+              onClick={() => onRegionSelect('Małopolskie')}
+              className="w-full sm:w-auto bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl hover:bg-primary-600 transition-all active:scale-95 group text-sm"
+             >
+               Przeglądaj Małopolskę <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+             </button>
+             <div className="flex items-center gap-2 text-slate-400 text-xs font-bold">
+                <Info size={16} className="text-primary-400" />
+                Pełna baza Śląska już wkrótce
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
       {/* CSS Animations */}
       <style>{`
