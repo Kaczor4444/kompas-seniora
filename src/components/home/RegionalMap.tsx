@@ -90,8 +90,8 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
         <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-12 lg:gap-28">
           
           {/* TEXT CONTENT */}
-          <div className="flex-1 space-y-10 order-1 lg:order-1 relative z-10">
-            <div className="space-y-6">
+          <div className="flex-1 space-y-6 md:space-y-8 order-1 lg:order-1 relative z-10">
+            <div className="space-y-4 md:space-y-6">
               <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-primary-50 border border-primary-100 text-primary-700 text-[10px] font-bold uppercase tracking-[0.25em] shadow-sm">
                 <MapPin size={14} className="text-primary-600" /> Lokalne Wsparcie
               </div>
