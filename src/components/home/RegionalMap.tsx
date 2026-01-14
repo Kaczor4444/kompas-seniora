@@ -390,7 +390,6 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
           </div>
         </div>
       </div>
-    </div>
 
       {/* CSS Animations */}
       <style>{`
