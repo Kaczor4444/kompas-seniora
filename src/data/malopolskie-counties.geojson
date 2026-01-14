@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "id": "1261", "name": "Kraków" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19.85, 50.15], [20.05, 50.15], [20.05, 49.95], [19.85, 49.95], [19.85, 50.15]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "1219", "name": "wielicki" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20.05, 50.05], [20.25, 50.05], [20.25, 49.85], [20.05, 49.85], [20.05, 50.05]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "1263", "name": "Tarnów" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20.90, 50.05], [21.10, 50.05], [21.10, 49.95], [20.90, 49.95], [20.90, 50.05]]]
+      }
+    }
+  ]
+}

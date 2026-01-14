@@ -55,7 +55,6 @@ export default function KontaktPage() {
               </h2>
               <p className="text-slate-500 mb-6 md:mb-0">
                 Preferujesz tradycyjną wiadomość? Napisz do nas. <br/>
-                Odpowiadamy zazwyczaj w ciągu 24 godzin.
               </p>
             </div>
 

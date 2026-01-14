@@ -191,7 +191,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                 aria-label="Interaktywna mapa Polski pokazująca dostępność placówek opieki senioralnej w poszczególnych województwach"
               >
                 <defs>
-                   {/* Physical texture filter */}
+                   {/* Physical texture filter - DISABLED ON MOBILE */}
                    <filter id="physical-texture">
                       <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
                       <feColorMatrix type="saturate" values="0" />
@@ -199,19 +199,19 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                       <feComposite operator="in" in2="SourceGraphic" />
                    </filter>
 
-                   {/* Piece depth shadow */}
+                   {/* Piece depth shadow - SIMPLIFIED ON MOBILE */}
                    <filter id="piece-depth" x="-10%" y="-10%" width="120%" height="120%">
-                     <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
-                     <feOffset dx="0" dy="2" result="offsetblur" />
-                     <feComponentTransfer><feFuncA type="linear" slope="0.12" /></feComponentTransfer>
+                     <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
+                     <feOffset dx="0" dy="1" result="offsetblur" />
+                     <feComponentTransfer><feFuncA type="linear" slope="0.08" /></feComponentTransfer>
                      <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
                    </filter>
 
-                   {/* Hover elevation */}
+                   {/* Hover elevation - DISABLED ON MOBILE */}
                    <filter id="map-elevate" x="-20%" y="-20%" width="140%" height="140%">
-                     <feGaussianBlur in="SourceAlpha" stdDeviation="15" />
-                     <feOffset dx="0" dy="15" result="offsetblur" />
-                     <feComponentTransfer><feFuncA type="linear" slope="0.25" /></feComponentTransfer>
+                     <feGaussianBlur in="SourceAlpha" stdDeviation="10" />
+                     <feOffset dx="0" dy="10" result="offsetblur" />
+                     <feComponentTransfer><feFuncA type="linear" slope="0.2" /></feComponentTransfer>
                      <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
                    </filter>
 
@@ -248,11 +248,11 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                         tabIndex={0}
                         className={`transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] stroke-slate-200 stroke-[1.2]
                           ${isActive 
-                            ? 'fill-[url(#activeFill)] cursor-pointer hover:stroke-slate-400 active-region-breath' 
+                            ? 'fill-[url(#activeFill)] cursor-pointer hover:stroke-slate-400 md:active-region-breath' 
                             : 'fill-[url(#inactiveFill)] cursor-pointer hover:fill-slate-100 hover:stroke-slate-300'
                           }
-                          ${isIndividualActiveHover ? 'scale-[1.04] translate-y-[-15px]' : ''}
-                          ${isHovered && isUpcoming && !isGroupHighlight ? 'scale-[1.04] translate-y-[-15px]' : ''}
+                          ${isIndividualActiveHover ? 'md:scale-[1.04] md:translate-y-[-15px] scale-[1.02] translate-y-[-8px]' : ''}
+                          ${isHovered && isUpcoming && !isGroupHighlight ? 'md:scale-[1.04] md:translate-y-[-15px] scale-[1.02] translate-y-[-8px]' : ''}
                           ${isGroupHighlight ? '!fill-slate-200 !stroke-slate-300' : ''}
                         `}
                         style={{ 
@@ -265,10 +265,10 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                           pointerEvents: 'auto'
                         }}
                       />
-                      {/* Texture overlay */}
+                      {/* Texture overlay - ONLY ON DESKTOP */}
                       <path 
                         d={region.path} 
-                        className="pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                        className="pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hidden md:block"
                         fill="transparent" 
                         filter="url(#physical-texture)"
                         style={{ 
