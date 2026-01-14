@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Navigation, Hand, CheckCircle2, Calendar, ArrowRight, Info, BellRing, MapPin } from 'lucide-react';
+import { Navigation, Hand, CheckCircle2, Calendar, ArrowRight, Info, MapPin } from 'lucide-react';
 import { POLAND_REGIONS } from '@/data/poland-regions';
 
 interface RegionalMapProps {
@@ -26,16 +26,13 @@ const mapData = {
 export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [legendHover, setLegendHover] = useState<'active' | 'upcoming' | null>(null);
-  const [notificationRegion, setNotificationRegion] = useState<string | null>(null);
   const [isMapActive, setIsMapActive] = useState(false);
 
   const handleRegionClick = (region: typeof mapData.regions[0]) => {
     if (region.status === 'active') {
       onRegionSelect(region.name);
-    } else {
-      setNotificationRegion(region.name);
-      setTimeout(() => setNotificationRegion(null), 4000);
     }
+    // Dla nieaktywnych: tooltip pokazuje "W przygotowaniu" automatycznie
   };
 
   const renderedRegions = useMemo(() => {
@@ -161,24 +158,6 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                       <Hand size={20} />
                     </div>
                     <span className="font-bold text-slate-800 text-xs">Dotknij, aby użyć mapy</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Notification banner */}
-              {notificationRegion && (
-                <div className="absolute inset-x-8 top-0 z-[130] animate-fade-in-up">
-                  <div className="bg-white/80 backdrop-blur-2xl p-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/50">
-                    <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-primary-500/20">
-                      <BellRing size={20} className="animate-ring text-white" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm text-slate-900">Region {notificationRegion} wkrótce!</p>
-                      <p className="text-[10px] text-slate-500 font-medium">Powiadomimy Cię po zakończeniu prac.</p>
-                    </div>
-                    <button className="ml-auto bg-slate-900 hover:bg-primary-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all">
-                      Zapisz mnie
-                    </button>
                   </div>
                 </div>
               )}
@@ -393,15 +372,6 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
 
       {/* CSS Animations */}
       <style>{`
-        @keyframes ring {
-          0% { transform: rotate(0); }
-          10% { transform: rotate(15deg); }
-          20% { transform: rotate(-15deg); }
-          30% { transform: rotate(10deg); }
-          40% { transform: rotate(-10deg); }
-          50% { transform: rotate(0); }
-          100% { transform: rotate(0); }
-        }
         @keyframes progress {
           from { width: 0%; }
           to { width: 65%; }
@@ -414,11 +384,6 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
         .active-region-breath {
           animation: active-breath 4.5s ease-in-out infinite;
           transform-origin: center center;
-        }
-        .animate-ring {
-          display: inline-block;
-          animation: ring 2s ease infinite;
-          transform-origin: top center;
         }
         .animate-progress {
           animation: progress 1.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
