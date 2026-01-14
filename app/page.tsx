@@ -169,7 +169,7 @@ export default function Home() {
             
             {/* Kraków */}
             <Link href="/search?q=krakow" className="group">
-              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-32 md:h-40">
+              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
                 <div className="flex justify-between items-start">
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
@@ -185,7 +185,7 @@ export default function Home() {
 
             {/* Nowy Sącz */}
             <Link href="/search?q=nowy+sacz" className="group">
-              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-32 md:h-40">
+              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
                 <div className="flex justify-between items-start">
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
@@ -201,7 +201,7 @@ export default function Home() {
 
             {/* Tarnów */}
             <Link href="/search?q=tarnow" className="group">
-              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-32 md:h-40">
+              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
                 <div className="flex justify-between items-start">
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
@@ -217,7 +217,7 @@ export default function Home() {
 
             {/* Nowy Targ */}
             <Link href="/search?q=nowy+targ" className="group">
-              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-32 md:h-40">
+              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
                 <div className="flex justify-between items-start">
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
@@ -233,7 +233,7 @@ export default function Home() {
 
             {/* Oświęcim */}
             <Link href="/search?q=oswiecim" className="group">
-              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-32 md:h-40">
+              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
                 <div className="flex justify-between items-start">
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
@@ -249,7 +249,7 @@ export default function Home() {
 
             {/* Wadowice */}
             <Link href="/search?q=wadowice" className="group">
-              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-32 md:h-40">
+              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
                 <div className="flex justify-between items-start">
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
@@ -265,7 +265,7 @@ export default function Home() {
 
             {/* Zakopane */}
             <Link href="/search?q=zakopane" className="group">
-              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-32 md:h-40">
+              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
                 <div className="flex justify-between items-start">
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
@@ -281,7 +281,7 @@ export default function Home() {
 
             {/* Myślenice */}
             <Link href="/search?q=myslenice" className="group">
-              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-32 md:h-40">
+              <div className="relative bg-white rounded-3xl p-6 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
                 <div className="flex justify-between items-start">
                   <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                     <MapPin size={20} />
