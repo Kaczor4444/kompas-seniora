@@ -206,10 +206,10 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                       <stop offset="100%" stopColor="#e2e8f0" />
                    </linearGradient>
 
-                   {/* Upcoming region highlight gradient (legend hover) */}
+                   {/* Upcoming region highlight (legend hover) - same as region hover */}
                    <linearGradient id="upcomingHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#cbd5e1" />
-                      <stop offset="100%" stopColor="#94a3b8" />
+                      <stop offset="0%" stopColor="#f1f5f9" />
+                      <stop offset="100%" stopColor="#f1f5f9" />
                    </linearGradient>
                 </defs>
 
@@ -238,7 +238,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                           }
                           ${isIndividualActiveHover ? 'md:scale-[1.04] md:translate-y-[-15px] scale-[1.02] translate-y-[-8px]' : ''}
                           ${isHovered && isUpcoming && !isGroupHighlight ? 'md:scale-[1.04] md:translate-y-[-15px] scale-[1.02] translate-y-[-8px]' : ''}
-                          ${isGroupHighlight ? '!fill-[url(#upcomingHighlight)] !stroke-slate-400' : ''}
+                          ${isGroupHighlight ? '!fill-[url(#upcomingHighlight)] !stroke-slate-300' : ''}
                         `}
                         style={{ 
                           transformOrigin: 'center center',
