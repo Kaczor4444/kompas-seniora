@@ -39,19 +39,31 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
     return [...mapData.regions].sort((a, b) => {
       let scoreA = 0;
       let scoreB = 0;
+
+      // Base score for active regions
       if (a.status === 'active') scoreA += 1;
       if (b.status === 'active') scoreB += 1;
-      // Legend hover: bring hovered category to front
+
+      // Legend hover: boost hovered category, push down others
       if (legendHover === 'active') {
         if (a.status === 'active') scoreA += 50;
         if (b.status === 'active') scoreB += 50;
+        // Push upcoming regions DOWN
+        if (a.status === 'upcoming') scoreA -= 50;
+        if (b.status === 'upcoming') scoreB -= 50;
       }
       if (legendHover === 'upcoming') {
         if (a.status === 'upcoming') scoreA += 50;
         if (b.status === 'upcoming') scoreB += 50;
+        // Push active regions DOWN
+        if (a.status === 'active') scoreA -= 50;
+        if (b.status === 'active') scoreB -= 50;
       }
+
+      // Individual region hover always wins
       if (a.id === hoveredId) scoreA += 100;
       if (b.id === hoveredId) scoreB += 100;
+
       return scoreA - scoreB;
     });
   }, [hoveredId, legendHover]);
