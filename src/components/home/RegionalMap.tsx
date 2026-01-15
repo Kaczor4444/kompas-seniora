@@ -48,13 +48,14 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
       if (legendHover === 'active') {
         if (a.status === 'active') scoreA += 50;
         if (b.status === 'active') scoreB += 50;
-        // Push upcoming regions DOWN
-        if (a.status === 'upcoming') scoreA -= 50;
-        if (b.status === 'upcoming') scoreB -= 50;
+        // Push ALL non-active regions DOWN
+        if (a.status !== 'active') scoreA -= 50;
+        if (b.status !== 'active') scoreB -= 50;
       }
       if (legendHover === 'upcoming') {
-        if (a.status === 'upcoming') scoreA += 50;
-        if (b.status === 'upcoming') scoreB += 50;
+        // Boost ALL non-active regions (upcoming + inactive)
+        if (a.status !== 'active') scoreA += 50;
+        if (b.status !== 'active') scoreB += 50;
         // Push active regions DOWN
         if (a.status === 'active') scoreA -= 50;
         if (b.status === 'active') scoreB -= 50;
