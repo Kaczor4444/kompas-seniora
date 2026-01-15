@@ -79,7 +79,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
 
   return (
     <section
-      className="py-12 md:py-20 bg-stone-50 relative overflow-hidden" 
+      className="py-12 md:py-20 bg-white relative overflow-hidden" 
       id="regional-coverage"
       aria-labelledby="regional-coverage-heading"
     >
@@ -141,8 +141,8 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
           </div>
 
           {/* MAP CONTAINER */}
-          <div className="flex-1 order-2 lg:order-2 flex justify-center items-center relative w-full px-4 md:px-0 -mt-8 md:-mt-12 lg:mt-0">
-            <div className="relative w-full max-w-[650px] aspect-[3.5/5] p-2 md:p-8 group/map bg-white rounded-3xl border-4 border-white shadow-2xl">
+          <div className="flex-1 order-2 lg:order-2 flex justify-center items-start relative w-full px-4 md:px-0 -mt-8 md:-mt-12 lg:mt-0">
+            <div className="relative w-full max-w-[650px] aspect-[3.5/5] p-2 md:p-8 group/map">
               
               {/* Radial glow on hover */}
               <div className="absolute inset-0 bg-gradient-radial from-primary-500/5 to-transparent blur-3xl opacity-0 group-hover/map:opacity-100 transition-opacity duration-1000"></div>
@@ -202,8 +202,8 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
 
                    {/* Inactive region gradient */}
                    <linearGradient id="inactiveFill" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#ffffff" /> 
-                      <stop offset="100%" stopColor="#f8fafc" />
+                      <stop offset="0%" stopColor="#e2e8f0" />
+                      <stop offset="100%" stopColor="#cbd5e1" />
                    </linearGradient>
                 </defs>
 
@@ -225,7 +225,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                         aria-label={`${region.name} - ${region.status === 'active' ? 'dostępne' : 'wkrótce dostępne'}`}
                         role="button"
                         tabIndex={0}
-                        className={`transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] stroke-slate-200 stroke-[1.2]
+                        className={`transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] stroke-slate-300 stroke-[1.5]
                           ${isActive 
                             ? 'fill-[url(#activeFill)] cursor-pointer hover:stroke-slate-400 md:active-region-breath' 
                             : 'fill-[url(#inactiveFill)] cursor-pointer hover:fill-slate-100 hover:stroke-slate-300'
