@@ -200,8 +200,14 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                       <stop offset="100%" stopColor="#0f172a" />
                    </linearGradient>
 
-                   {/* Inactive region gradient */}
+                   {/* Inactive region gradient - light default */}
                    <linearGradient id="inactiveFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#f1f5f9" />
+                      <stop offset="100%" stopColor="#e2e8f0" />
+                   </linearGradient>
+
+                   {/* Inactive region gradient - dark hover */}
+                   <linearGradient id="inactiveFillHover" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#e2e8f0" />
                       <stop offset="100%" stopColor="#cbd5e1" />
                    </linearGradient>
@@ -226,9 +232,9 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                         role="button"
                         tabIndex={0}
                         className={`transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] stroke-slate-300 stroke-[1.5]
-                          ${isActive 
-                            ? 'fill-[url(#activeFill)] cursor-pointer hover:stroke-slate-400 md:active-region-breath' 
-                            : 'fill-[url(#inactiveFill)] cursor-pointer hover:fill-slate-100 hover:stroke-slate-300'
+                          ${isActive
+                            ? 'fill-[url(#activeFill)] cursor-pointer hover:stroke-slate-400 md:active-region-breath'
+                            : 'fill-[url(#inactiveFill)] cursor-pointer hover:fill-slate-300 hover:stroke-slate-400'
                           }
                           ${isIndividualActiveHover ? 'md:scale-[1.04] md:translate-y-[-15px] scale-[1.02] translate-y-[-8px]' : ''}
                           ${isHovered && isUpcoming && !isGroupHighlight ? 'md:scale-[1.04] md:translate-y-[-15px] scale-[1.02] translate-y-[-8px]' : ''}
