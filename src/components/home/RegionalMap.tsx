@@ -79,7 +79,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
 
   return (
     <section
-      className="py-12 md:py-20 bg-white relative overflow-hidden" 
+      className="py-12 md:py-20 bg-stone-50 relative overflow-hidden" 
       id="regional-coverage"
       aria-labelledby="regional-coverage-heading"
     >
@@ -141,8 +141,8 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
           </div>
 
           {/* MAP CONTAINER */}
-          <div className="flex-1 order-2 lg:order-2 flex justify-center items-center relative w-full px-4 md:px-0">
-            <div className="relative w-full max-w-[650px] aspect-[3.5/5] p-2 md:p-8 group/map">
+          <div className="flex-1 order-2 lg:order-2 flex justify-center items-center relative w-full px-4 md:px-0 -mt-8 md:-mt-12 lg:mt-0">
+            <div className="relative w-full max-w-[650px] aspect-[3.5/5] p-2 md:p-8 group/map bg-white rounded-3xl border-4 border-white shadow-2xl">
               
               {/* Radial glow on hover */}
               <div className="absolute inset-0 bg-gradient-radial from-primary-500/5 to-transparent blur-3xl opacity-0 group-hover/map:opacity-100 transition-opacity duration-1000"></div>
