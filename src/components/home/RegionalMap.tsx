@@ -205,6 +205,12 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                       <stop offset="0%" stopColor="#e2e8f0" />
                       <stop offset="100%" stopColor="#e2e8f0" />
                    </linearGradient>
+
+                   {/* Upcoming region highlight gradient (legend hover) */}
+                   <linearGradient id="upcomingHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#cbd5e1" />
+                      <stop offset="100%" stopColor="#94a3b8" />
+                   </linearGradient>
                 </defs>
 
                 {/* REGIONS - with all effects */}
@@ -232,7 +238,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                           }
                           ${isIndividualActiveHover ? 'md:scale-[1.04] md:translate-y-[-15px] scale-[1.02] translate-y-[-8px]' : ''}
                           ${isHovered && isUpcoming && !isGroupHighlight ? 'md:scale-[1.04] md:translate-y-[-15px] scale-[1.02] translate-y-[-8px]' : ''}
-                          ${isGroupHighlight ? '!fill-slate-200 !stroke-slate-300' : ''}
+                          ${isGroupHighlight ? '!fill-[url(#upcomingHighlight)] !stroke-slate-400' : ''}
                         `}
                         style={{ 
                           transformOrigin: 'center center',
@@ -262,8 +268,8 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
 
               {/* DYNAMIC TOOLTIP with smart positioning */}
               {activeRegion && (
-                <div 
-                  className="absolute z-[140] pointer-events-none animate-fade-in-up"
+                <div
+                  className="absolute z-40 pointer-events-none animate-fade-in-up"
                   style={getPillPosition(activeRegion)}
                 >
                   <div className="bg-white/80 backdrop-blur-2xl text-slate-900 px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-white/50 ring-1 ring-black/5 flex flex-col gap-1 min-w-[180px] max-w-[calc(100vw-60px)] sm:max-w-[280px]">
@@ -309,7 +315,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
               )}
 
               {/* Interactive Legend */}
-              <div className="absolute bottom-2 left-2 md:bottom-4 md:left-8 space-y-3 bg-white/40 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)] z-[120]">
+              <div className="absolute bottom-2 left-2 md:bottom-4 md:left-8 space-y-3 bg-white/40 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)] z-30">
                  <div 
                   onMouseEnter={() => setLegendHover('active')}
                   onMouseLeave={() => setLegendHover(null)}
