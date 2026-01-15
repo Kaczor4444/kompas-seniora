@@ -41,6 +41,11 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
       let scoreB = 0;
       if (a.status === 'active') scoreA += 1;
       if (b.status === 'active') scoreB += 1;
+      // Legend hover: bring hovered category to front
+      if (legendHover === 'active') {
+        if (a.status === 'active') scoreA += 50;
+        if (b.status === 'active') scoreB += 50;
+      }
       if (legendHover === 'upcoming') {
         if (a.status === 'upcoming') scoreA += 50;
         if (b.status === 'upcoming') scoreB += 50;
