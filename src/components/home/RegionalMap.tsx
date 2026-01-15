@@ -141,7 +141,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
           </div>
 
           {/* MAP CONTAINER */}
-          <div className="flex-1 order-2 lg:order-2 flex justify-center items-start relative w-full px-4 md:px-0 -mt-16 md:-mt-20 lg:mt-0">
+          <div className="flex-1 order-2 lg:order-2 flex justify-center items-start relative w-full px-4 md:px-0 -mt-40 md:-mt-48 lg:mt-0">
             <div className="relative w-full max-w-[650px] aspect-[3.5/5] p-2 md:p-8 group/map">
               
               {/* Radial glow on hover */}
