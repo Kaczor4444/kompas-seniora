@@ -87,7 +87,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary-50/40 rounded-full blur-[120px] pointer-events-none animate-pulse-slow"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-12 lg:gap-28">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8 md:gap-12 lg:gap-28">
           
           {/* TEXT CONTENT */}
           <div className="flex-1 space-y-6 md:space-y-8 order-1 lg:order-1 relative z-10">
@@ -141,7 +141,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
           </div>
 
           {/* MAP CONTAINER */}
-          <div className="flex-1 order-2 lg:order-2 flex justify-center items-start relative w-full px-4 md:px-0 -mt-8 md:-mt-12 lg:mt-0">
+          <div className="flex-1 order-2 lg:order-2 flex justify-center items-start relative w-full px-4 md:px-0 -mt-16 md:-mt-20 lg:mt-0">
             <div className="relative w-full max-w-[650px] aspect-[3.5/5] p-2 md:p-8 group/map">
               
               {/* Radial glow on hover */}
