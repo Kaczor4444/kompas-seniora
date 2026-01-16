@@ -25,46 +25,58 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [legendHover, setLegendHover] = useState<'active' | 'upcoming' | null>(null);
   const [isMapActive, setIsMapActive] = useState(false);
+  const [clickedActiveRegion, setClickedActiveRegion] = useState<string | null>(null);
 
   const handleRegionClick = (region: any) => {
     if (region.status === 'active') {
-      onRegionSelect(region.name);
+      // Double-click logic for active regions
+      if (clickedActiveRegion === region.id) {
+        // Second click - navigate
+        onRegionSelect(region.name);
+        setClickedActiveRegion(null);
+      } else {
+        // First click - just mark as clicked
+        setClickedActiveRegion(region.id);
+        // Reset after 2 seconds
+        setTimeout(() => setClickedActiveRegion(null), 2000);
+      }
     }
   };
 
   const renderedRegions = useMemo(() => {
     return [...mapData.regions].sort((a, b) => {
-      let scoreA = 0;
-      let scoreB = 0;
-
-      // Individual hover wins
-      if (a.id === hoveredId) scoreA += 100;
-      if (b.id === hoveredId) scoreB += 100;
-
-      // Legend hover: boost hovered category, push down others
-      if (legendHover === 'active') {
-        if (a.status === 'active') scoreA += 50;
-        if (b.status === 'active') scoreB += 50;
-        if (a.status !== 'active') scoreA -= 50;
-        if (b.status !== 'active') scoreB -= 50;
-      }
-      if (legendHover === 'upcoming') {
-        if (a.status !== 'active') scoreA += 50;
-        if (b.status !== 'active') scoreB += 50;
-        if (a.status === 'active') scoreA -= 50;
-        if (b.status === 'active') scoreB -= 50;
-      }
-
+      let scoreA = a.id === hoveredId ? 10 : 0;
+      let scoreB = b.id === hoveredId ? 10 : 0;
       return scoreA - scoreB;
     });
-  }, [hoveredId, legendHover]);
+  }, [hoveredId]);
 
   const activeRegion = hoveredId ? mapData.regions.find(r => r.id === hoveredId) : null;
 
   const getPillStyle = (region: typeof mapData.regions[0]) => {
     const xPercent = (region.centroid.x / 612.76) * 100;
     const yPercent = (region.centroid.y / 577.23) * 100;
-    return { left: `${xPercent}%`, top: `${yPercent}%` };
+    
+    // Mobile-specific adjustments per region
+    const mobileAdjustments: Record<string, { x: number; y: number }> = {
+      'PL-DS': { x: 10, y: 0 },      // Dolnośląskie: prawo 10%
+      'PL-SL': { x: 10, y: 15 },     // Śląskie: prawo 10%, dół 5% (było 10%, teraz 15% total)
+      'PL-PM': { x: 0, y: 10 },      // Pomorskie: dół 10%
+      'PL-WN': { x: 0, y: 10 },      // Warmińsko-Mazurskie: dół 10%
+      'PL-PD': { x: 0, y: 20 },      // Podlaskie: dół 20%
+      'PL-MZ': { x: 5, y: 0 },       // Mazowieckie: prawo 5%
+      'PL-LU': { x: 0, y: 10 },      // Lubelskie: dół 10%
+      'PL-PK': { x: 0, y: 10 },      // Podkarpackie: dół 10%
+      'PL-OP': { x: 0, y: 10 },      // Opolskie: dół 10%
+      'PL-LB': { x: 15, y: 0 },      // Lubuskie: prawo 15%
+    };
+    
+    const adjustment = mobileAdjustments[region.id] || { x: 0, y: 0 };
+    
+    return { 
+      left: `${xPercent + adjustment.x}%`, 
+      top: `${yPercent + adjustment.y}%` 
+    };
   };
 
   return (
@@ -100,7 +112,10 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                 title="Małopolskie" 
                 info="82 zweryfikowane placówki" 
                 active={true}
-                onClick={() => onRegionSelect('Małopolskie')}
+                onClick={() => {
+                  // Status cards bypass double-click (direct navigation)
+                  onRegionSelect('Małopolskie');
+                }}
               />
               <RegionMiniCard 
                 title="Śląskie" 
@@ -115,7 +130,10 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
             {/* CTA BUTTONS - DESKTOP ONLY */}
             <div className="hidden lg:flex flex-col sm:flex-row items-center gap-6 pt-6">
                <button 
-                onClick={() => onRegionSelect('Małopolskie')}
+                onClick={() => {
+                  // CTA button bypasses double-click
+                  onRegionSelect('Małopolskie');
+                }}
                 className="w-full sm:w-auto bg-slate-900 text-white px-12 py-5 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.15)] hover:bg-emerald-600 hover:-translate-y-1 transition-all active:scale-95 group"
                >
                  Przeglądaj Małopolskę <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
@@ -174,7 +192,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
 
                   return (
                     <path
-                      key={`${region.id}-${legendHover || 'none'}`}
+                      key={region.id}
                       d={region.path}
                       onMouseEnter={() => setHoveredId(region.id)}
                       onMouseLeave={() => setHoveredId(null)}
@@ -268,7 +286,10 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
               title="Małopolskie" 
               info="82 zweryfikowane placówki" 
               active={true}
-              onClick={() => onRegionSelect('Małopolskie')}
+              onClick={() => {
+                // Status cards bypass double-click (direct navigation)
+                onRegionSelect('Małopolskie');
+              }}
             />
             <RegionMiniCard 
               title="Śląskie" 
@@ -283,7 +304,10 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
           {/* CTA Buttons - MOBILE ONLY */}
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
              <button 
-              onClick={() => onRegionSelect('Małopolskie')}
+              onClick={() => {
+                // CTA button bypasses double-click
+                onRegionSelect('Małopolskie');
+              }}
               className="w-full sm:w-auto bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl hover:bg-emerald-600 transition-all active:scale-95 group text-sm"
              >
                Przeglądaj Małopolskę <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
