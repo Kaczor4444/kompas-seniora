@@ -1,20 +1,67 @@
-export const popularCities = [
-  { name: 'Kraków', slug: 'krakow', count: 24, voivodeship: 'małopolskie' },
-  { name: 'Nowy Sącz', slug: 'nowy+sacz', count: 8, voivodeship: 'małopolskie' },
-  { name: 'Tarnów', slug: 'tarnow', count: 12, voivodeship: 'małopolskie' },
-  { name: 'Nowy Targ', slug: 'nowy+targ', count: 6, voivodeship: 'małopolskie' },
-  { name: 'Oświęcim', slug: 'oswiecim', count: 5, voivodeship: 'małopolskie' },
-  { name: 'Wadowice', slug: 'wadowice', count: 4, voivodeship: 'małopolskie' },
-  { name: 'Zakopane', slug: 'zakopane', count: 3, voivodeship: 'małopolskie' },
-  { name: 'Myślenice', slug: 'myslenice', count: 4, voivodeship: 'małopolskie' },
+import { getFacilityStats, type CityStats } from './facility-stats';
+
+export const POPULAR_CITIES_CONFIG = [
+  { name: 'Kraków', slug: 'krakow', voivodeship: 'małopolskie' },
+  { name: 'Nowy Sącz', slug: 'nowy+sacz', voivodeship: 'małopolskie' },
+  { name: 'Tarnów', slug: 'tarnow', voivodeship: 'małopolskie' },
+  { name: 'Nowy Targ', slug: 'nowy+targ', voivodeship: 'małopolskie' },
+  { name: 'Oświęcim', slug: 'oswiecim', voivodeship: 'małopolskie' },
+  { name: 'Wadowice', slug: 'wadowice', voivodeship: 'małopolskie' },
+  { name: 'Zakopane', slug: 'zakopane', voivodeship: 'małopolskie' },
+  { name: 'Myślenice', slug: 'myslenice', voivodeship: 'małopolskie' },
 ] as const;
 
-export type City = typeof popularCities[number];
+export type PopularCity = CityStats;
 
-export const getTotalFacilities = () => {
-  return popularCities.reduce((sum, city) => sum + city.count, 0);
-};
+export async function getPopularCities(): Promise<PopularCity[]> {
+  try {
+    const stats = await getFacilityStats();
 
-export const getCityBySlug = (slug: string) => {
-  return popularCities.find(city => city.slug === slug);
-};
+    const popularCities = POPULAR_CITIES_CONFIG.map(config => {
+      const cityStats = stats.topCities.find(
+        city => city.name.toLowerCase() === config.name.toLowerCase()
+      );
+
+      return {
+        name: config.name,
+        slug: config.slug,
+        count: cityStats?.count || 0,
+        voivodeship: config.voivodeship,
+      };
+    });
+
+    return popularCities.sort((a, b) => b.count - a.count);
+
+  } catch (error) {
+    console.error('Error fetching popular cities:', error);
+
+    return POPULAR_CITIES_CONFIG.map(config => ({
+      name: config.name,
+      slug: config.slug,
+      count: 0,
+      voivodeship: config.voivodeship,
+    }));
+  }
+}
+
+export async function getTotalFacilities(): Promise<number> {
+  try {
+    const stats = await getFacilityStats();
+    return stats.total;
+  } catch (error) {
+    console.error('Error fetching total facilities:', error);
+    return 0;
+  }
+}
+
+export async function getVoivodeshipFacilities(voivodeship: string): Promise<number> {
+  try {
+    const stats = await getFacilityStats();
+    return stats.byVoivodeship[voivodeship.toLowerCase()] || 0;
+  } catch (error) {
+    console.error(`Error fetching facilities for ${voivodeship}:`, error);
+    return 0;
+  }
+}
+
+export type City = PopularCity;
