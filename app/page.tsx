@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import MiniFAQSection from '../src/components/faq/MiniFAQSection';
 import NewsletterSection from '../src/components/newsletter/NewsletterSection';
 import KnowledgeCenter from '../src/components/knowledge/KnowledgeCenter';
 import HeroSection from '../src/components/hero/HeroSection';
 import RegionalMap from '../src/components/home/RegionalMap';
-import { MapPin, ChevronRight, ArrowRight } from 'lucide-react';
+import CityCard from '../src/components/home/CityCard';
+import { popularCities } from '../lib/popular-cities';
+import { MapPin, ArrowRight } from 'lucide-react';
 
 export default function Home() {
+  const router = useRouter();
   // ✅ State management for active tab
   const [activeTab, setActiveTab] = useState<'DPS' | 'SDS' | 'Wszystkie'>('Wszystkie');
 
@@ -18,7 +22,7 @@ export default function Home() {
 
   // ✅ Handler for regional map selection
   const handleRegionSelect = (regionName: string) => {
-    window.location.href = `/search?q=${encodeURIComponent(regionName)}`;
+    router.push(`/search?q=${encodeURIComponent(regionName)}`);
   };
 
   return (
@@ -150,135 +154,14 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5 mb-10">
-            
-            {/* Kraków */}
-            <Link href="/search?q=krakow" className="group">
-              <div className="relative bg-white rounded-3xl p-5 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                    <MapPin size={20} />
-                  </div>
-                  <span className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">24</span>
-                </div>
-                <div className="flex items-center justify-between mt-auto">
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Kraków</h3>
-                  <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Nowy Sącz */}
-            <Link href="/search?q=nowy+sacz" className="group">
-              <div className="relative bg-white rounded-3xl p-5 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                    <MapPin size={20} />
-                  </div>
-                  <span className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">8</span>
-                </div>
-                <div className="flex items-center justify-between mt-auto">
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Nowy Sącz</h3>
-                  <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Tarnów */}
-            <Link href="/search?q=tarnow" className="group">
-              <div className="relative bg-white rounded-3xl p-5 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                    <MapPin size={20} />
-                  </div>
-                  <span className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">12</span>
-                </div>
-                <div className="flex items-center justify-between mt-auto">
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Tarnów</h3>
-                  <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Nowy Targ */}
-            <Link href="/search?q=nowy+targ" className="group">
-              <div className="relative bg-white rounded-3xl p-5 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                    <MapPin size={20} />
-                  </div>
-                  <span className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">6</span>
-                </div>
-                <div className="flex items-center justify-between mt-auto">
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Nowy Targ</h3>
-                  <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Oświęcim */}
-            <Link href="/search?q=oswiecim" className="group">
-              <div className="relative bg-white rounded-3xl p-5 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                    <MapPin size={20} />
-                  </div>
-                  <span className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">5</span>
-                </div>
-                <div className="flex items-center justify-between mt-auto">
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Oświęcim</h3>
-                  <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Wadowice */}
-            <Link href="/search?q=wadowice" className="group">
-              <div className="relative bg-white rounded-3xl p-5 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                    <MapPin size={20} />
-                  </div>
-                  <span className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">4</span>
-                </div>
-                <div className="flex items-center justify-between mt-auto">
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Wadowice</h3>
-                  <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Zakopane */}
-            <Link href="/search?q=zakopane" className="group">
-              <div className="relative bg-white rounded-3xl p-5 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                    <MapPin size={20} />
-                  </div>
-                  <span className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">3</span>
-                </div>
-                <div className="flex items-center justify-between mt-auto">
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Zakopane</h3>
-                  <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Myślenice */}
-            <Link href="/search?q=myslenice" className="group">
-              <div className="relative bg-white rounded-3xl p-5 border border-stone-100 transition-all duration-300 hover:border-primary-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 text-left flex flex-col justify-between h-28 md:h-36">
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-2xl bg-stone-50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                    <MapPin size={20} />
-                  </div>
-                  <span className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">4</span>
-                </div>
-                <div className="flex items-center justify-between mt-auto">
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">Myślenice</h3>
-                  <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
-
+            {popularCities.map((city) => (
+              <CityCard
+                key={city.slug}
+                name={city.name}
+                slug={city.slug}
+                count={city.count}
+              />
+            ))}
           </div>
 
           <div className="md:hidden">
