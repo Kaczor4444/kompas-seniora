@@ -1,10 +1,73 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MapPin, ArrowRight } from 'lucide-react';
 import CityCard from './CityCard';
-import { getPopularCities } from '../../../lib/popular-cities';
+import { POPULAR_CITIES_CONFIG } from '../../../lib/popular-cities';
 
-export default async function PopularLocationsSection() {
-  const popularCities = await getPopularCities();
+interface CityData {
+  name: string;
+  slug: string;
+  count: number;
+  voivodeship: string;
+}
+
+export default function PopularLocationsSection() {
+  const [popularCities, setPopularCities] = useState<CityData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCityCounts() {
+      try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
+
+        if (data.success && data.data.byCities) {
+          const citiesWithCounts = POPULAR_CITIES_CONFIG.map(config => {
+            const cityStats = data.data.byCities.find(
+              (city: { name: string; count: number }) =>
+                city.name.toLowerCase() === config.name.toLowerCase()
+            );
+
+            return {
+              name: config.name,
+              slug: config.slug,
+              count: cityStats?.count || 0,
+              voivodeship: config.voivodeship,
+            };
+          });
+
+          setPopularCities(citiesWithCounts.sort((a, b) => b.count - a.count));
+        } else {
+          // Fallback to config with 0 counts
+          setPopularCities(
+            POPULAR_CITIES_CONFIG.map(config => ({
+              name: config.name,
+              slug: config.slug,
+              count: 0,
+              voivodeship: config.voivodeship,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error('Error fetching city counts:', error);
+        // Fallback to config with 0 counts
+        setPopularCities(
+          POPULAR_CITIES_CONFIG.map(config => ({
+            name: config.name,
+            slug: config.slug,
+            count: 0,
+            voivodeship: config.voivodeship,
+          }))
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchCityCounts();
+  }, []);
 
   return (
     <section className="py-16 md:py-24 bg-white">
@@ -32,14 +95,32 @@ export default async function PopularLocationsSection() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5 mb-10">
-          {popularCities.map((city) => (
-            <CityCard
-              key={city.slug}
-              name={city.name}
-              slug={city.slug}
-              count={city.count}
-            />
-          ))}
+          {isLoading ? (
+            // Loading skeleton
+            POPULAR_CITIES_CONFIG.map((config) => (
+              <div
+                key={config.slug}
+                className="relative bg-white rounded-3xl p-5 border border-stone-100 h-28 md:h-36 animate-pulse"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="w-10 h-10 rounded-2xl bg-stone-100"></div>
+                  <div className="w-8 h-6 bg-stone-100 rounded"></div>
+                </div>
+                <div className="mt-auto">
+                  <div className="w-24 h-6 bg-stone-100 rounded mt-4"></div>
+                </div>
+              </div>
+            ))
+          ) : (
+            popularCities.map((city) => (
+              <CityCard
+                key={city.slug}
+                name={city.name}
+                slug={city.slug}
+                count={city.count}
+              />
+            ))
+          )}
         </div>
 
         <div className="md:hidden">
