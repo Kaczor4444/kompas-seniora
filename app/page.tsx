@@ -124,22 +124,6 @@ export default function Home() {
       {/* Knowledge Center */}
       <KnowledgeCenter />
 
-      {/* CTA Section */}
-      <section className="py-16 bg-neutral-50">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">Rozpocznij poszukiwania już dziś</h2>
-          <p className="text-xl text-neutral-700 mb-8">Pomożemy Ci znaleźć najlepszą opiekę dla Twojego bliskiego</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/search" className="bg-accent-500 hover:bg-accent-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-sm hover:shadow-md">
-              Znajdź dom opieki
-            </Link>
-            <Link href="/kalkulator" className="bg-white hover:bg-neutral-50 text-neutral-900 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-neutral-300 transition-colors">
-              Użyj kalkulatora
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* POPULAR LOCATIONS SECTION - GEMINI DESIGN 1:1 */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
