@@ -30,6 +30,7 @@ const placowkaSchema = z.object({
   www: z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
   liczba_miejsc: z.coerce.number().int().positive().optional(),
   koszt_pobytu: z.coerce.number().nonnegative().optional(),
+  rok_ceny: z.coerce.number().int().min(2024).max(2030).default(2026),
   latitude: z.coerce.number().nullable().optional(),
   longitude: z.coerce.number().nullable().optional(),
   profil_opieki: z.string().optional(),
@@ -634,6 +635,28 @@ export default function DodajPlacowkePage() {
                   placeholder="np. 2500"
                   min="0"
                 />
+              </div>
+
+              {/* ROK CENY - NEW FIELD */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Rok obowiązywania ceny *
+                </label>
+                <select
+                  {...register('rok_ceny')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="2026">2026 (aktualny)</option>
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                  <option value="2027">2027</option>
+                </select>
+                {errors.rok_ceny && (
+                  <p className="mt-1 text-sm text-red-600">{errors.rok_ceny.message}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Wybierz rok, którego dotyczy podana cena powyżej
+                </p>
               </div>
             </div>
 

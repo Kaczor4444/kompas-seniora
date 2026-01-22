@@ -102,6 +102,7 @@ const placowkaSchema = z.object({
   www: z.string().url().optional().or(z.literal('')),
   liczba_miejsc: z.number().int().positive().optional(),
   koszt_pobytu: z.number().nonnegative().optional(),
+  rok_ceny: z.number().int().min(2024).max(2030).default(2026),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   profil_opieki: z.string().optional(),
@@ -183,6 +184,23 @@ export async function POST(request: NextRequest) {
     const newPlacowka = await prisma.placowka.create({
       data: dataToSave,
     });
+
+    // 💰 ZAPISZ CENĘ DO HISTORII
+    if (validatedData.koszt_pobytu && validatedData.rok_ceny) {
+      await prisma.placowkaCena.create({
+        data: {
+          placowkaId: newPlacowka.id,
+          rok: validatedData.rok_ceny,
+          kwota: validatedData.koszt_pobytu,
+          typ_kosztu: 'podstawowy',
+          zrodlo: validatedData.zrodlo_cena || null,
+          data_pobrania: validatedData.data_zrodla_cena
+            ? new Date(validatedData.data_zrodla_cena)
+            : new Date(),
+          verified: validatedData.verified || false,
+        }
+      });
+    }
 
     const currentYear = new Date().getFullYear();
     await prisma.placowkaSnapshot.create({
