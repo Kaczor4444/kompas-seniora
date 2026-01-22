@@ -73,14 +73,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   if (isNearSearch && userLat && userLng && !query) {
     console.log('🗺️ Mode: GEOLOCATION SEARCH');
 
-    const typeFilter = type === 'dps' 
-      ? { typ_placowki: 'DPS' }
-      : (type === 'sds' || type === 'śds')
-      ? { typ_placowki: 'ŚDS' }
-      : {};
-
+    // ✅ Don't filter by type on server - let client handle it
     results = await prisma.placowka.findMany({
-      where: typeFilter,
       orderBy: { nazwa: 'asc' },
     });
 
@@ -91,16 +85,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   else if (!query && wojewodztwo !== 'all') {
     console.log('🗺️ Mode: WOJEWÓDZTWO ONLY (from RegionModal)');
 
-    const typeFilter = type === 'dps' 
-      ? { typ_placowki: 'DPS' }
-      : (type === 'sds' || type === 'śds')
-      ? { typ_placowki: 'ŚDS' }
-      : {};
-
+    // ✅ Don't filter by type on server - let client handle it
     const wojewodztwoDbName = wojewodztwo;
 
     const allFacilities = await prisma.placowka.findMany({
-      where: typeFilter,
       orderBy: { nazwa: 'asc' },
     });
 
@@ -187,14 +175,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       console.log('  🗺️ Unique powiaty to search:', uniquePowiaty);
 
       if (uniquePowiaty.length > 0) {
-        const typeFilter = type === 'dps' 
-          ? { typ_placowki: 'DPS' }
-          : (type === 'sds' || type === 'śds')
-          ? { typ_placowki: 'ŚDS' }
-          : {};
-
+        // ✅ Don't filter by type on server - let client handle it
         const allFacilities = await prisma.placowka.findMany({
-          where: typeFilter,
           orderBy: { nazwa: 'asc' },
         });
 
@@ -258,14 +240,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     else {
       console.log('🔍 NO TERYT MODE (fallback)');
 
-      const where: any = type === 'dps' 
-        ? { typ_placowki: 'DPS' }
-        : (type === 'sds' || type === 'śds')
-        ? { typ_placowki: 'ŚDS' }
-        : {};
-
+      // ✅ Don't filter by type on server - let client handle it
       const allFacilities = await prisma.placowka.findMany({
-        where,
         orderBy: { nazwa: 'asc' },
       });
 
@@ -273,7 +249,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         if (wojewodztwo !== 'all') {
           const normalizedFacilityWoj = normalizePolish(facility.wojewodztwo);
           const normalizedTargetWoj = normalizePolish(wojewodztwoDbName);
-          
+
           if (normalizedFacilityWoj !== normalizedTargetWoj) {
             return false;
           }
@@ -284,7 +260,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       });
 
       const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
-      
+
       if (results.length > 0) {
         message = '';
       } else {

@@ -61,7 +61,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             value={selectedType}
             onChange={onTypeChange}
             options={[
-              { value: "Wszystkie", label: "Wszystkie" },
+              { value: "all", label: "Wszystkie" },
               { value: "DPS", label: "DPS (Całodobowe)" },
               { value: "ŚDS", label: "ŚDS (Dzienne)" }
             ]}

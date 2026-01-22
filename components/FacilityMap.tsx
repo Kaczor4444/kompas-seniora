@@ -111,30 +111,66 @@ function AutoFitBounds({ facilities }: { facilities: Facility[] }) {
   const map = useMap();
 
   useEffect(() => {
-    if (facilities.length === 0) return;
+    if (!map) return;
 
-    // Fix map size
-    setTimeout(() => map.invalidateSize(), 100);
+    // Check if map is properly initialized
+    const isMapReady = map &&
+                       typeof map.invalidateSize === 'function' &&
+                       map.getContainer &&
+                       map.getContainer();
 
-    // Fit bounds
-    if (facilities.length === 1) {
-      map.setView([facilities[0].latitude!, facilities[0].longitude!], 13);
-    } else {
-      const bounds = L.latLngBounds(
-        facilities.map(f => [f.latitude!, f.longitude!] as [number, number])
-      );
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+    if (!isMapReady) {
+      console.warn('Map not ready for invalidateSize');
+      return;
     }
 
-    // Resize listener
-    const handleResize = () => {
-      setTimeout(() => map.invalidateSize(), 100);
-      // Re-fit bounds on resize
-      if (facilities.length > 1) {
+    // Fix map size with error handling
+    setTimeout(() => {
+      try {
+        if (map && typeof map.invalidateSize === 'function') {
+          map.invalidateSize();
+        }
+      } catch (error) {
+        console.error('Map invalidateSize error:', error);
+      }
+    }, 100);
+
+    // Fit bounds with error handling
+    try {
+      if (facilities.length === 1 && map.setView) {
+        map.setView([facilities[0].latitude!, facilities[0].longitude!], 13);
+      } else if (facilities.length > 1 && map.fitBounds) {
         const bounds = L.latLngBounds(
           facilities.map(f => [f.latitude!, f.longitude!] as [number, number])
         );
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+      }
+    } catch (error) {
+      console.error('Map bounds error:', error);
+    }
+
+    // Resize listener with error handling
+    const handleResize = () => {
+      setTimeout(() => {
+        try {
+          if (map && typeof map.invalidateSize === 'function') {
+            map.invalidateSize();
+          }
+        } catch (error) {
+          console.error('Map resize invalidateSize error:', error);
+        }
+      }, 100);
+
+      // Re-fit bounds on resize
+      try {
+        if (facilities.length > 1 && map.fitBounds) {
+          const bounds = L.latLngBounds(
+            facilities.map(f => [f.latitude!, f.longitude!] as [number, number])
+          );
+          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+        }
+      } catch (error) {
+        console.error('Map resize bounds error:', error);
       }
     };
 

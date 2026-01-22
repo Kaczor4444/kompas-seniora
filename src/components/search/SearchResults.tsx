@@ -179,9 +179,10 @@ export default function SearchResults({
 
     // Type filter
     if (selectedType !== 'all') {
-      filtered = filtered.filter(f =>
-        f.typ_placowki.toLowerCase() === selectedType.toLowerCase()
-      );
+      filtered = filtered.filter(f => {
+        // Direct comparison - selectedType is now "DPS" or "ŚDS" from FilterPanel
+        return f.typ_placowki === selectedType;
+      });
     }
 
     // City search
