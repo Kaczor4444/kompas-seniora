@@ -39,6 +39,7 @@ model Placowka {
   analytics         PlacowkaAnalytics?
   events            PlacowkaEvent[]
   snapshots         PlacowkaSnapshot[]
+  ceny              PlacowkaCena[]     @relation("PlacowkaCeny")
 
   @@index([powiat])
   @@index([wojewodztwo])
@@ -200,9 +201,31 @@ model PartnerInquiry {
   adminUser     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
+
   @@index([status])
   @@index([createdAt])
   @@index([email, createdAt])
   @@map("partner_inquiries")
+}
+
+model PlacowkaCena {
+  id              Int       @id @default(autoincrement())
+  placowkaId      Int
+  rok             Int       // 2024, 2025, 2026
+  kwota           Float
+  typ_kosztu      String    @default("podstawowy") // "podstawowy" | "maksymalny"
+  zrodlo          String?   // URL do dokumentu MOPS
+  data_pobrania   DateTime  @default(now())
+  data_obowiazuje DateTime? // Od kiedy obowiązuje ta cena
+  verified        Boolean   @default(false)
+  notatki         String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  placowka        Placowka  @relation("PlacowkaCeny", fields: [placowkaId], references: [id], onDelete: Cascade)
+
+  @@unique([placowkaId, rok, typ_kosztu])
+  @@index([placowkaId])
+  @@index([rok])
+  @@index([placowkaId, rok])
 }
