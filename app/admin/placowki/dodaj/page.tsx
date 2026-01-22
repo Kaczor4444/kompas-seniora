@@ -29,7 +29,7 @@ const placowkaSchema = z.object({
   email: z.string().email('Nieprawidłowy email').optional().or(z.literal('')),
   www: z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
   liczba_miejsc: z.coerce.number().int().positive().optional(),
-  koszt_pobytu: z.coerce.number().positive().optional(),
+  koszt_pobytu: z.coerce.number().nonnegative().optional(),
   latitude: z.coerce.number().nullable().optional(),
   longitude: z.coerce.number().nullable().optional(),
   profil_opieki: z.string().optional(),
