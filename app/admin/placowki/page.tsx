@@ -161,6 +161,8 @@ export default function ListaPlacowekPage() {
 
     setIsDeleting(true);
     try {
+      console.log("DELETE URL:", `/api/admin/placowki/${deleteModal.id}`);
+      console.log("deleteModal.id:", deleteModal.id, "type:", typeof deleteModal.id);
       const res = await fetch(`/api/admin/placowki/${deleteModal.id}`, {
         method: 'DELETE',
       });
