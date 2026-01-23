@@ -34,9 +34,11 @@ export default function EditCenaModal({
   const [notatki, setNotatki] = useState<string>('');
   const [verified, setVerified] = useState<boolean>(false);
   const [saving, setSaving] = useState(false);
+  const [selectedRok, setSelectedRok] = useState<number>(rok);
 
   // Initialize form with current values
   useEffect(() => {
+    setSelectedRok(rok); // Reset when modal opens
     if (currentPrice) {
       setKwota(currentPrice.kwota.toString());
       setZrodlo(currentPrice.zrodlo || '');
@@ -49,7 +51,18 @@ export default function EditCenaModal({
       setNotatki('');
       setVerified(false);
     }
-  }, [currentPrice]);
+  }, [currentPrice, rok]);
+
+  // Clear form when year changes
+  useEffect(() => {
+    if (selectedRok !== rok && placowka) {
+      // Clear the form when year changes
+      setKwota('');
+      setZrodlo('');
+      setNotatki('');
+      setVerified(false);
+    }
+  }, [selectedRok, rok, placowka]);
 
   if (!placowka) return null;
 
@@ -69,7 +82,7 @@ export default function EditCenaModal({
           updates: [
             {
               placowkaId: placowka.id,
-              rok,
+              rok: selectedRok,
               kwota: Number(kwota),
               zrodlo: zrodlo || null,
               notatki: notatki || null,
@@ -109,10 +122,10 @@ export default function EditCenaModal({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                {currentPrice ? 'Edytuj cenę' : 'Dodaj cenę'}
+                {currentPrice ? `Edytuj cenę za ${selectedRok}` : `Dodaj cenę za ${selectedRok}`}
               </h3>
               <p className="text-sm text-gray-600">
-                {placowka.nazwa} • {rok}
+                {placowka.nazwa} • Rok {selectedRok}
               </p>
             </div>
           </div>
@@ -126,6 +139,25 @@ export default function EditCenaModal({
 
         {/* Form */}
         <div className="space-y-4">
+          {/* Rok */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Rok *
+            </label>
+            <select
+              value={selectedRok}
+              onChange={(e) => setSelectedRok(Number(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            >
+              <option value={2024}>2024</option>
+              <option value={2025}>2025</option>
+              <option value={2026}>2026</option>
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              Wybierz rok dla którego chcesz dodać/edytować cenę
+            </p>
+          </div>
+
           {/* Kwota */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
