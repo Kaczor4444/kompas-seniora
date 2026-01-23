@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle, Edit2, BarChart3, FileDown, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EditCenaModal from './_components/EditCenaModal';
+import ImportCSVModal from './_components/ImportCSVModal';
 
 interface PlacowkaWithCeny {
   id: number;
@@ -58,6 +59,9 @@ export default function AdminCenyPage() {
     rok: number;
     currentPrice: any | null;
   } | null>(null);
+
+  // Import modal state
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const wojewodztwa = [
     'dolnośląskie', 'kujawsko-pomorskie', 'lubelskie', 'lubuskie',
@@ -159,8 +163,8 @@ export default function AdminCenyPage() {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => toast('Import CSV - funkcja w przygotowaniu')}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              onClick={() => setShowImportModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Upload className="w-4 h-4" />
               Import CSV
@@ -451,6 +455,19 @@ export default function AdminCenyPage() {
           onSave={() => {
             setEditModal(null);
             fetchData(); // Refresh data
+          }}
+        />
+      )}
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <ImportCSVModal
+          selectedYear={selectedYear}
+          onClose={() => setShowImportModal(false)}
+          onSuccess={() => {
+            setShowImportModal(false);
+            fetchData(); // Refresh data
+            toast.success('Import zakończony pomyślnie!');
           }}
         />
       )}
