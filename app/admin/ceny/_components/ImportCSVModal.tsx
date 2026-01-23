@@ -26,6 +26,7 @@ interface MatchedRow extends CSVRow {
   matchedPlacowka: any | null;
   matchStatus: 'matched' | 'unmatched' | 'fuzzy';
   cena: number;
+  isDuplicate: boolean;
 }
 
 export default function ImportCSVModal({
@@ -108,8 +109,32 @@ export default function ImportCSVModal({
           ...row,
           matchedPlacowka: found || null,
           matchStatus: status,
-          cena
+          cena,
+          isDuplicate: false // Will be set below
         };
+      });
+
+      // Detect duplicates - check for repeated placowka IDs
+      const placowkaIdCounts = new Map<number, number>();
+      matched.forEach(row => {
+        if (row.matchedPlacowka) {
+          const id = row.matchedPlacowka.id;
+          placowkaIdCounts.set(id, (placowkaIdCounts.get(id) || 0) + 1);
+        }
+      });
+
+      // Mark duplicates
+      const seenIds = new Set<number>();
+      matched.forEach(row => {
+        if (row.matchedPlacowka) {
+          const id = row.matchedPlacowka.id;
+          if (placowkaIdCounts.get(id)! > 1) {
+            if (seenIds.has(id)) {
+              row.isDuplicate = true;
+            }
+            seenIds.add(id);
+          }
+        }
       });
 
       setMatchedData(matched);
@@ -168,6 +193,7 @@ export default function ImportCSVModal({
 
   const matchedCount = matchedData.filter(r => r.matchStatus === 'matched' || r.matchStatus === 'fuzzy').length;
   const unmatchedCount = matchedData.filter(r => r.matchStatus === 'unmatched').length;
+  const duplicateCount = matchedData.filter(r => r.isDuplicate).length;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -287,11 +313,18 @@ export default function ImportCSVModal({
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {matchedData.slice(0, 20).map((row, idx) => (
-                        <tr key={idx} className={row.matchStatus === 'unmatched' ? 'bg-red-50' : ''}>
+                        <tr key={idx} className={row.matchStatus === 'unmatched' ? 'bg-red-50' : row.isDuplicate ? 'bg-orange-50' : ''}>
                           <td className="px-3 py-2 text-sm text-gray-900">{row.lp}</td>
                           <td className="px-3 py-2 text-sm text-gray-900">
-                            <div className="max-w-xs truncate" title={row.nazwa}>
-                              {row.nazwa.substring(0, 40)}...
+                            <div className="flex items-center gap-2">
+                              <div className="max-w-xs truncate" title={row.nazwa}>
+                                {row.nazwa.substring(0, 40)}...
+                              </div>
+                              {row.isDuplicate && (
+                                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                  ⚠️ Duplikat
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className="px-3 py-2 text-sm text-right text-gray-900">
@@ -328,6 +361,21 @@ export default function ImportCSVModal({
                 <p className="text-sm text-gray-500 text-center">
                   Pokazano pierwsze 20 z {matchedData.length} wierszy
                 </p>
+              )}
+
+              {duplicateCount > 0 && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-orange-900">Błąd - znaleziono duplikaty!</h4>
+                      <p className="text-sm text-orange-800 mt-1">
+                        {duplicateCount} wierszy to duplikaty tej samej placówki.
+                        Usuń duplikaty z pliku CSV i spróbuj ponownie.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {unmatchedCount > 0 && (
@@ -398,10 +446,10 @@ export default function ImportCSVModal({
               </button>
               <button
                 onClick={handleImport}
-                disabled={matchedCount === 0 || loading}
+                disabled={matchedCount === 0 || loading || duplicateCount > 0}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Importuj {matchedCount} {matchedCount === 1 ? 'cenę' : 'cen'}
+                {duplicateCount > 0 ? 'Nie można importować - usuń duplikaty' : `Importuj ${matchedCount} ${matchedCount === 1 ? 'cenę' : 'cen'}`}
               </button>
             </>
           )}

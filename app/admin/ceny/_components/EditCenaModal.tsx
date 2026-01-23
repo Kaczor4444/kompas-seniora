@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, DollarSign } from 'lucide-react';
+import { X, DollarSign, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface EditCenaModalProps {
@@ -34,6 +34,7 @@ export default function EditCenaModal({
   const [notatki, setNotatki] = useState<string>('');
   const [verified, setVerified] = useState<boolean>(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [selectedRok, setSelectedRok] = useState<number>(rok);
 
   // Initialize form with current values
@@ -106,6 +107,33 @@ export default function EditCenaModal({
       toast.error(error instanceof Error ? error.message : 'Błąd podczas zapisywania');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!currentPrice) {
+      toast.error('Nie ma ceny do usunięcia');
+      return;
+    }
+    if (!window.confirm('Czy na pewno chcesz usunąć tę cenę? Ta operacja jest nieodwracalna.')) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/admin/ceny/${placowka.id}/${selectedRok}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Błąd podczas usuwania');
+      }
+      toast.success('Cena została usunięta');
+      onSave();
+      onClose();
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Błąd podczas usuwania ceny');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -223,21 +251,35 @@ export default function EditCenaModal({
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-          <button
-            onClick={onClose}
-            disabled={saving}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            Anuluj
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
-          >
-            {saving ? 'Zapisywanie...' : 'Zapisz'}
-          </button>
+        <div className="flex justify-between items-center mt-6 pt-4 border-t">
+          <div>
+            {currentPrice && (
+              <button
+                onClick={handleDelete}
+                disabled={saving || deleting}
+                className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                {deleting ? 'Usuwanie...' : 'Usuń'}
+              </button>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={saving || deleting}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              Anuluj
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving || deleting}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {saving ? 'Zapisywanie...' : 'Zapisz'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -381,25 +381,30 @@ export default function AdminCenyPage() {
                           <span className="text-gray-400">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-center">
-                        <div className="flex items-center justify-center gap-2">
+                      <td className="px-4 py-4 text-center">
+                        <div className="flex flex-col items-center gap-1">
                           {currentPrice ? (
                             <>
-                              {currentPrice.verified ? (
-                                <CheckCircle className="w-4 h-4 text-emerald-600" />
-                              ) : (
-                                <AlertCircle className="w-4 h-4 text-yellow-600" />
-                              )}
-                              {currentPrice.zrodlo && (
-                                <a
-                                  href={currentPrice.zrodlo}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-800 text-xs"
-                                >
-                                  PDF
-                                </a>
-                              )}
+                              <div className="flex items-center gap-2">
+                                {currentPrice.verified ? (
+                                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                                ) : (
+                                  <AlertCircle className="w-4 h-4 text-yellow-600" />
+                                )}
+                                {currentPrice.zrodlo && (
+                                  <a
+                                    href={currentPrice.zrodlo}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:text-blue-800 text-xs"
+                                  >
+                                    PDF
+                                  </a>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {new Date(currentPrice.updatedAt).toLocaleDateString('pl-PL')}
+                              </div>
                             </>
                           ) : (
                             <span className="text-gray-400">—</span>
