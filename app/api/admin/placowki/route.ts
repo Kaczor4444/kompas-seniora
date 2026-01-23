@@ -102,7 +102,7 @@ const placowkaSchema = z.object({
   www: z.string().url().optional().or(z.literal('')),
   liczba_miejsc: z.number().int().positive().optional(),
   koszt_pobytu: z.number().nonnegative().optional(),
-  rok_ceny: z.number().int().min(2024).max(2030).default(2026),
+  rok_ceny: z.number().int().min(2024).max(2030).optional(),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   profil_opieki: z.string().optional(),
@@ -129,12 +129,15 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const validatedData = placowkaSchema.parse(body);
-    
+
+    // Extract rok_ceny - it's NOT a Placowka field, only for PlacowkaCena
+    const { rok_ceny, ...placowkaData } = validatedData;
+
     // 🆕 FORMATUJ TELEFON
-    if (validatedData.telefon) {
-      validatedData.telefon = formatPhoneNumber(validatedData.telefon);
+    if (placowkaData.telefon) {
+      placowkaData.telefon = formatPhoneNumber(placowkaData.telefon);
     }
-    
+
     // Sprawdź czy to force add
     const forceAdd = body.forceAdd === true;
 
@@ -142,8 +145,8 @@ export async function POST(request: NextRequest) {
     if (!forceAdd) {
       const existing = await prisma.placowka.findFirst({
         where: {
-          nazwa: validatedData.nazwa,
-          miejscowosc: validatedData.miejscowosc,
+          nazwa: placowkaData.nazwa,
+          miejscowosc: placowkaData.miejscowosc,
         },
       });
 
@@ -156,28 +159,28 @@ export async function POST(request: NextRequest) {
     }
 
     const dataToSave = {
-      ...validatedData,
-      prowadzacy: validatedData.prowadzacy || null,
-      ulica: validatedData.ulica || null,
-      kod_pocztowy: validatedData.kod_pocztowy || null,
-      gmina: validatedData.gmina || null,
-      telefon: validatedData.telefon || null,
-      email: validatedData.email || null,
-      www: validatedData.www || null,
-      liczba_miejsc: validatedData.liczba_miejsc || null,
-      koszt_pobytu: validatedData.koszt_pobytu || null,
-      latitude: validatedData.latitude || null,
-      longitude: validatedData.longitude || null,
-      profil_opieki: validatedData.profil_opieki || null,
-      
+      ...placowkaData,
+      prowadzacy: placowkaData.prowadzacy || null,
+      ulica: placowkaData.ulica || null,
+      kod_pocztowy: placowkaData.kod_pocztowy || null,
+      gmina: placowkaData.gmina || null,
+      telefon: placowkaData.telefon || null,
+      email: placowkaData.email || null,
+      www: placowkaData.www || null,
+      liczba_miejsc: placowkaData.liczba_miejsc || null,
+      koszt_pobytu: placowkaData.koszt_pobytu || null,
+      latitude: placowkaData.latitude || null,
+      longitude: placowkaData.longitude || null,
+      profil_opieki: placowkaData.profil_opieki || null,
+
       // Źródła - konwersja dat
-      zrodlo_dane: validatedData.zrodlo_dane || null,
-      zrodlo_cena: validatedData.zrodlo_cena || null,
-      data_zrodla_dane: validatedData.data_zrodla_dane ? new Date(validatedData.data_zrodla_dane) : null,
-      data_zrodla_cena: validatedData.data_zrodla_cena ? new Date(validatedData.data_zrodla_cena) : null,
-      data_weryfikacji: validatedData.data_weryfikacji ? new Date(validatedData.data_weryfikacji) : null,
-      notatki: validatedData.notatki || null,
-      
+      zrodlo_dane: placowkaData.zrodlo_dane || null,
+      zrodlo_cena: placowkaData.zrodlo_cena || null,
+      data_zrodla_dane: placowkaData.data_zrodla_dane ? new Date(placowkaData.data_zrodla_dane) : null,
+      data_zrodla_cena: placowkaData.data_zrodla_cena ? new Date(placowkaData.data_zrodla_cena) : null,
+      data_weryfikacji: placowkaData.data_weryfikacji ? new Date(placowkaData.data_weryfikacji) : null,
+      notatki: placowkaData.notatki || null,
+
       data_aktualizacji: new Date(),
     };
 
@@ -186,18 +189,18 @@ export async function POST(request: NextRequest) {
     });
 
     // 💰 ZAPISZ CENĘ DO HISTORII
-    if (validatedData.koszt_pobytu && validatedData.rok_ceny) {
+    if (placowkaData.koszt_pobytu && rok_ceny) {
       await prisma.placowkaCena.create({
         data: {
           placowkaId: newPlacowka.id,
-          rok: validatedData.rok_ceny,
-          kwota: validatedData.koszt_pobytu,
+          rok: rok_ceny, // ← Use extracted variable
+          kwota: placowkaData.koszt_pobytu,
           typ_kosztu: 'podstawowy',
-          zrodlo: validatedData.zrodlo_cena || null,
-          data_pobrania: validatedData.data_zrodla_cena
-            ? new Date(validatedData.data_zrodla_cena)
+          zrodlo: placowkaData.zrodlo_cena || null,
+          data_pobrania: placowkaData.data_zrodla_cena
+            ? new Date(placowkaData.data_zrodla_cena)
             : new Date(),
-          verified: validatedData.verified || false,
+          verified: placowkaData.verified || false,
         }
       });
     }
