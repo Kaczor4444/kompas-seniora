@@ -17,6 +17,7 @@ interface CSVRow {
   nazwa: string;
   adres?: string;
   typ?: string;
+  cena?: string;
   cena_2024?: string;
   cena_2025?: string;
   cena_2026?: string;
@@ -83,7 +84,7 @@ export default function ImportCSVModal({
       const matched = csvData.map(row => {
         const normalized = normalizeNazwa(row.nazwa);
         const cenaField = `cena_${selectedYear}` as keyof CSVRow;
-        const cenaValue = row[cenaField];
+        const cenaValue = row.cena || row[cenaField];
         const cena = cenaValue ? parseFloat(cenaValue) : 0;
 
         // Try exact match first
@@ -241,15 +242,15 @@ export default function ImportCSVModal({
                   <span className="text-gray-600"> lub przeciągnij tutaj</span>
                 </label>
                 <p className="text-sm text-gray-500 mt-2">
-                  Format: lp, powiat, nazwa, cena_{selectedYear}
+                  Format: lp, powiat, nazwa, cena (lub cena_{selectedYear})
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-2">Wymagany format CSV:</h4>
                 <code className="text-xs text-gray-600 block whitespace-pre">
-                  lp,powiat,nazwa,cena_2024,cena_2025,cena_2026{'\n'}
-                  1,bocheński,Dom Pomocy Społecznej ul. Karolina,5950.00,6499.00,
+                  lp,powiat,nazwa,cena (lub cena_2024,cena_2025,cena_2026){'\n'}
+                  1,bocheński,Dom Pomocy Społecznej ul. Karolina,5950.00
                 </code>
                 <a
                   href="/templates/ceny-import-template.csv"
