@@ -58,6 +58,7 @@ export default function AdminCenyPage() {
     placowka: { id: number; nazwa: string; miejscowosc: string; typ_placowki: string };
     rok: number;
     currentPrice: any | null;
+    allPrices: any[];
   } | null>(null);
 
   // Import modal state
@@ -425,6 +426,7 @@ export default function AdminCenyPage() {
                                 },
                                 rok: selectedYear,
                                 currentPrice: currentPrice || null,
+                                allPrices: placowka.ceny || [],
                               });
                             }}
                             className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
@@ -456,6 +458,7 @@ export default function AdminCenyPage() {
           placowka={editModal.placowka}
           rok={editModal.rok}
           currentPrice={editModal.currentPrice}
+          allPrices={editModal.allPrices || []}
           onClose={() => setEditModal(null)}
           onSave={() => {
             setEditModal(null);

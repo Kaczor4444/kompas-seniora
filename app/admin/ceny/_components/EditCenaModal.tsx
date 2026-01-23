@@ -18,6 +18,13 @@ interface EditCenaModalProps {
     verified: boolean;
     notatki: string | null;
   } | null;
+  allPrices: Array<{
+    rok: number;
+    kwota: number;
+    zrodlo: string | null;
+    verified: boolean;
+    notatki: string | null;
+  }>;
   onClose: () => void;
   onSave: () => void;
 }
@@ -26,6 +33,7 @@ export default function EditCenaModal({
   placowka,
   rok,
   currentPrice,
+  allPrices,
   onClose,
   onSave,
 }: EditCenaModalProps) {
@@ -37,33 +45,27 @@ export default function EditCenaModal({
   const [deleting, setDeleting] = useState(false);
   const [selectedRok, setSelectedRok] = useState<number>(rok);
 
-  // Initialize form with current values
+  // Initialize form with price for selected year
   useEffect(() => {
-    setSelectedRok(rok); // Reset when modal opens
-    if (currentPrice) {
-      setKwota(currentPrice.kwota.toString());
-      setZrodlo(currentPrice.zrodlo || '');
-      setNotatki(currentPrice.notatki || '');
-      setVerified(currentPrice.verified);
-    } else {
-      // New price entry
-      setKwota('');
-      setZrodlo('');
-      setNotatki('');
-      setVerified(false);
-    }
-  }, [currentPrice, rok]);
+    if (!placowka) return;
 
-  // Clear form when year changes
-  useEffect(() => {
-    if (selectedRok !== rok && placowka) {
-      // Clear the form when year changes
+    // Find price for selected year from allPrices
+    const priceForYear = allPrices.find(p => p.rok === selectedRok);
+
+    if (priceForYear) {
+      // Load existing price
+      setKwota(priceForYear.kwota.toString());
+      setZrodlo(priceForYear.zrodlo || '');
+      setNotatki(priceForYear.notatki || '');
+      setVerified(priceForYear.verified);
+    } else {
+      // No price for this year - clear form
       setKwota('');
       setZrodlo('');
       setNotatki('');
       setVerified(false);
     }
-  }, [selectedRok, rok, placowka]);
+  }, [selectedRok, allPrices, placowka]);
 
   if (!placowka) return null;
 
@@ -111,22 +113,35 @@ export default function EditCenaModal({
   };
 
   const handleDelete = async () => {
-    if (!currentPrice) {
-      toast.error('Nie ma ceny do usunięcia');
+    const priceForYear = allPrices.find(p => p.rok === selectedRok);
+
+    if (!priceForYear) {
+      toast.error('Nie ma ceny do usunięcia dla roku ' + selectedRok);
       return;
     }
-    if (!window.confirm('Czy na pewno chcesz usunąć tę cenę? Ta operacja jest nieodwracalna.')) {
+
+    const kwotaText = priceForYear.kwota === 0 ? 'NFZ' : `${priceForYear.kwota.toLocaleString('pl-PL')} zł`;
+
+    const message = `Czy na pewno chcesz usunąć cenę za rok ${selectedRok}?\n\n` +
+      `Placówka: ${placowka?.nazwa}\n` +
+      `Cena: ${kwotaText}\n\n` +
+      `Ta operacja jest nieodwracalna.`;
+
+    if (!window.confirm(message)) {
       return;
     }
+
     setDeleting(true);
     try {
-      const response = await fetch(`/api/admin/ceny/${placowka.id}/${selectedRok}`, {
+      const response = await fetch(`/api/admin/ceny/${placowka?.id}/${selectedRok}`, {
         method: 'DELETE',
       });
+
       if (!response.ok) {
         throw new Error('Błąd podczas usuwania');
       }
-      toast.success('Cena została usunięta');
+
+      toast.success(`Cena za rok ${selectedRok} została usunięta`);
       onSave();
       onClose();
     } catch (error) {
@@ -138,6 +153,7 @@ export default function EditCenaModal({
   };
 
   const isSDSFree = placowka.typ_placowki === 'ŚDS' && kwota === '0';
+  const priceExists = allPrices.some(p => p.rok === selectedRok);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -150,7 +166,7 @@ export default function EditCenaModal({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                {currentPrice ? `Edytuj cenę za ${selectedRok}` : `Dodaj cenę za ${selectedRok}`}
+                {priceExists ? `Edytuj cenę za ${selectedRok}` : `Dodaj cenę za ${selectedRok}`}
               </h3>
               <p className="text-sm text-gray-600">
                 {placowka.nazwa} • Rok {selectedRok}
@@ -253,14 +269,14 @@ export default function EditCenaModal({
         {/* Actions */}
         <div className="flex justify-between items-center mt-6 pt-4 border-t">
           <div>
-            {currentPrice && (
+            {priceExists && (
               <button
                 onClick={handleDelete}
                 disabled={saving || deleting}
                 className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 flex items-center gap-2"
               >
                 <Trash2 className="h-4 w-4" />
-                {deleting ? 'Usuwanie...' : 'Usuń'}
+                {deleting ? 'Usuwanie...' : `Usuń cenę ${selectedRok}`}
               </button>
             )}
           </div>
