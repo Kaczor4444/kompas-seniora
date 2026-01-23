@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { TrendingUp, TrendingDown, AlertCircle, CheckCircle, Edit2, BarChart3, FileDown, Upload } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle, CheckCircle, Edit2, BarChart3, FileDown, Upload, Database } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EditCenaModal from './_components/EditCenaModal';
 import ImportCSVModal from './_components/ImportCSVModal';
+import RestoreBackupModal from './_components/RestoreBackupModal';
 
 interface PlacowkaWithCeny {
   id: number;
@@ -63,6 +64,9 @@ export default function AdminCenyPage() {
 
   // Import modal state
   const [showImportModal, setShowImportModal] = useState(false);
+
+  // Restore modal state
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
 
   const wojewodztwa = [
     'dolnośląskie', 'kujawsko-pomorskie', 'lubelskie', 'lubuskie',
@@ -169,6 +173,13 @@ export default function AdminCenyPage() {
             >
               <Upload className="w-4 h-4" />
               Import CSV
+            </button>
+            <button
+              onClick={() => setShowRestoreModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            >
+              <Database className="w-4 h-4" />
+              Przywróć z backupu
             </button>
             <Link
               href={`/api/admin/ceny/export?rok=${selectedYear}`}
@@ -476,6 +487,18 @@ export default function AdminCenyPage() {
             setShowImportModal(false);
             fetchData(); // Refresh data
             toast.success('Import zakończony pomyślnie!');
+          }}
+        />
+      )}
+
+      {/* Restore Backup Modal */}
+      {showRestoreModal && (
+        <RestoreBackupModal
+          onClose={() => setShowRestoreModal(false)}
+          onSuccess={() => {
+            setShowRestoreModal(false);
+            fetchData();
+            toast.success('Backup przywrócony!');
           }}
         />
       )}
