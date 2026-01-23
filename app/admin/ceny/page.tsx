@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle, Edit2, BarChart3, FileDown, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
+import EditCenaModal from './_components/EditCenaModal';
 
 interface PlacowkaWithCeny {
   id: number;
@@ -50,6 +51,13 @@ export default function AdminCenyPage() {
   const [typ, setTyp] = useState('');
   const [missingPrice, setMissingPrice] = useState(false);
   const [unverified, setUnverified] = useState(false);
+
+  // Edit modal state
+  const [editModal, setEditModal] = useState<{
+    placowka: { id: number; nazwa: string; miejscowosc: string; typ_placowki: string };
+    rok: number;
+    currentPrice: any | null;
+  } | null>(null);
 
   const wojewodztwa = [
     'dolnośląskie', 'kujawsko-pomorskie', 'lubelskie', 'lubuskie',
@@ -397,11 +405,23 @@ export default function AdminCenyPage() {
                       <td className="px-4 py-4 whitespace-nowrap text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => toast('Edycja - funkcja w przygotowaniu')}
-                            className="text-gray-600 hover:text-emerald-600"
-                            title="Edytuj"
+                            onClick={() => {
+                              const currentPrice = getPriceForYear(placowka, selectedYear);
+                              setEditModal({
+                                placowka: {
+                                  id: placowka.id,
+                                  nazwa: placowka.nazwa,
+                                  miejscowosc: placowka.miejscowosc,
+                                  typ_placowki: placowka.typ_placowki,
+                                },
+                                rok: selectedYear,
+                                currentPrice: currentPrice || null,
+                              });
+                            }}
+                            className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
+                            title="Edytuj cenę"
                           >
-                            <Edit2 className="w-4 h-4" />
+                            <Edit2 className="h-4 w-4" />
                           </button>
                           <Link
                             href={`/admin/ceny/${placowka.id}/historia`}
@@ -420,6 +440,20 @@ export default function AdminCenyPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {editModal && (
+        <EditCenaModal
+          placowka={editModal.placowka}
+          rok={editModal.rok}
+          currentPrice={editModal.currentPrice}
+          onClose={() => setEditModal(null)}
+          onSave={() => {
+            setEditModal(null);
+            fetchData(); // Refresh data
+          }}
+        />
+      )}
     </div>
   );
 }
