@@ -94,10 +94,10 @@ export default function EdytujPlacowkePage() {
           telefon: data.placowka.telefon || '',
           email: data.placowka.email || '',
           www: data.placowka.www || '',
-          liczba_miejsc: data.placowka.liczba_miejsc || undefined,
+          liczba_miejsc: data.placowka.liczba_miejsc ?? undefined,
           koszt_pobytu: data.placowka.koszt_pobytu ?? undefined,
-          latitude: data.placowka.latitude || undefined,
-          longitude: data.placowka.longitude || undefined,
+          latitude: data.placowka.latitude ?? undefined,
+          longitude: data.placowka.longitude ?? undefined,
           profil_opieki: data.placowka.profil_opieki || '',
           zrodlo_dane: data.placowka.zrodlo_dane || '',
           zrodlo_cena: data.placowka.zrodlo_cena || '',
@@ -136,8 +136,8 @@ export default function EdytujPlacowkePage() {
     }
 
     // 🆕 Użyj ręcznych współrzędnych jeśli są podane, lub spróbuj auto-geocoding
-    let latitude = data.latitude || undefined;
-    let longitude = data.longitude || undefined;
+    let latitude = data.latitude ?? undefined;
+    let longitude = data.longitude ?? undefined;
 
     // Auto-geocoding tylko jeśli nie ma ręcznych współrzędnych
     if (data.miejscowosc && !latitude && !longitude) {
