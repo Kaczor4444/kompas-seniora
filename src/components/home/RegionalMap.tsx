@@ -6,6 +6,7 @@ import { POLAND_REGIONS } from '@/data/poland-regions';
 
 interface RegionalMapProps {
   onRegionSelect: (name: string) => void;
+  totalFacilities?: number;
 }
 
 const mapData = {
@@ -21,7 +22,7 @@ const mapData = {
   }))
 };
 
-export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
+export default function RegionalMap({ onRegionSelect, totalFacilities = 82 }: RegionalMapProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [legendHover, setLegendHover] = useState<'active' | 'upcoming' | null>(null);
   const [isMapActive, setIsMapActive] = useState(false);
@@ -102,7 +103,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                 </span>
               </h2>
               <p className="text-slate-500 text-xl leading-relaxed max-w-xl font-medium">
-                Budujemy najbardziej rzetelną mapę opieki w Polsce. <strong className="text-slate-900 font-bold">Nasz pilotaż w Małopolsce to <span className="text-emerald-600 font-extrabold">82</span> zweryfikowane placówki DPS i ŚDS</strong>. Na Śląsku zakończyliśmy już 65% prac nad integracją danych.
+                Budujemy najbardziej rzetelną mapę opieki w Polsce. <strong className="text-slate-900 font-bold">Nasz pilotaż w Małopolsce to <span className="text-emerald-600 font-extrabold">{totalFacilities}</span> zweryfikowane placówki DPS i ŚDS</strong>. Na Śląsku zakończyliśmy już 65% prac nad integracją danych.
               </p>
             </div>
 
@@ -235,7 +236,7 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
                     
                     {activeRegion.id === 'PL-MA' && (
                       <div className="text-[10px] font-medium text-emerald-300 mt-1">
-                        <span>Baza: <strong className="text-white font-extrabold text-xs">82</strong> placówki</span>
+                        <span>Baza: <strong className="text-white font-extrabold text-xs">{totalFacilities}</strong> placówki</span>
                       </div>
                     )}
 
@@ -282,9 +283,9 @@ export default function RegionalMap({ onRegionSelect }: RegionalMapProps) {
       <div className="lg:hidden mt-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 [perspective:1000px]">
-            <RegionMiniCard 
-              title="Małopolskie" 
-              info="82 zweryfikowane placówki" 
+            <RegionMiniCard
+              title="Małopolskie"
+              info={`${totalFacilities} zweryfikowane placówki`}
               active={true}
               onClick={() => {
                 // Status cards bypass double-click (direct navigation)
