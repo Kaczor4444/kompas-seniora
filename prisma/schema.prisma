@@ -22,6 +22,7 @@ model Placowka {
   email             String?
   www               String?
   liczba_miejsc     Int?
+  miejsca_za_zyciem Int?     // Miejsca z programu "Za życiem" - część z liczba_miejsc (tylko ŚDS)
   profil_opieki     String?
   koszt_pobytu      Float?
   data_aktualizacji DateTime?

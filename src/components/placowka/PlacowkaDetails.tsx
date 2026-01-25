@@ -46,6 +46,7 @@ interface Placowka {
   email: string | null;
   www: string | null;
   liczba_miejsc: number | null;
+  miejsca_za_zyciem?: number | null;
   profil_opieki: string | null;
   koszt_pobytu: number | null;
   data_aktualizacji: Date;
@@ -431,10 +432,17 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                               {placowka.liczba_miejsc && (
                                 <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-100">
                                   <span className="text-slate-600 font-medium flex items-center gap-2">
-                                    <Bed size={18} className="text-primary-600" /> 
+                                    <Bed size={18} className="text-primary-600" />
                                     Liczba miejsc
                                   </span>
-                                  <span className="font-bold text-slate-900">{placowka.liczba_miejsc}</span>
+                                  <div className="text-right">
+                                    <div className="font-bold text-slate-900">{placowka.liczba_miejsc}</div>
+                                    {placowka.miejsca_za_zyciem && placowka.miejsca_za_zyciem > 0 && (
+                                      <div className="text-xs text-emerald-700 font-medium mt-0.5">
+                                        💚 {placowka.miejsca_za_zyciem} z programu "Za życiem"
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               )}
 
