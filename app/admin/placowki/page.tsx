@@ -378,23 +378,24 @@ export default function ListaPlacowekPage() {
       ) : (
         <>
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
+            <div className="overflow-x-auto">
+              <table className="min-w-max w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nazwa</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ulica</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Miejscowość</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Powiat</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Geo</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Verified</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Akcje</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-16">ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase min-w-[250px]">Nazwa</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-24">Typ</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase min-w-[200px]">Ulica</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase min-w-[150px]">Miejscowość</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase min-w-[120px]">Powiat</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-16">Geo</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-24">Verified</th>
+                  <th className="sticky right-0 bg-gray-50 px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase w-28 shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)]">Akcje</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredPlacowki.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-50">
+                  <tr key={p.id} className="hover:bg-gray-50 group">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{p.id}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{p.nazwa}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -423,7 +424,7 @@ export default function ListaPlacowekPage() {
                         <XCircle className="h-5 w-5 text-gray-400 mx-auto" />
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right text-sm font-medium">
+                    <td className="sticky right-0 bg-white group-hover:bg-gray-50 px-6 py-4 text-right text-sm font-medium shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)]">
                       <div className="flex justify-end gap-2">
                         <Link
                           href={`/admin/placowki/${p.id}/edytuj`}
@@ -445,6 +446,12 @@ export default function ListaPlacowekPage() {
                 ))}
               </tbody>
             </table>
+            </div>
+          </div>
+
+          {/* Scroll hint for narrow screens */}
+          <div className="text-sm text-gray-500 mt-2 text-center lg:hidden">
+            💡 Przesuń w prawo/lewo aby zobaczyć wszystkie kolumny
           </div>
 
           {/* Pagination */}
