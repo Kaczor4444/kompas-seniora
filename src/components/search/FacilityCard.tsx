@@ -16,6 +16,7 @@ interface FacilityCardProps {
     street?: string | null;
     image: string;
     waitTime: string;
+    profileLabels?: string[];
   };
   isHovered: boolean;
   isSaved: boolean;
@@ -100,6 +101,20 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               {facility.street ? `${facility.street}, ` : ''}{facility.city}
             </span>
           </div>
+
+          {/* Profile Badges */}
+          {facility.profileLabels && facility.profileLabels.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+              {facility.profileLabels.map((label, idx) => (
+                <span
+                  key={idx}
+                  className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-slate-100 text-slate-700 text-[10px] sm:text-xs font-medium rounded-full"
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Bottom Section */}

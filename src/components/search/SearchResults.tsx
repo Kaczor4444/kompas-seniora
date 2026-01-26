@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { isFavorite, addFavorite, removeFavorite } from '@/src/utils/favorites';
+import { getShortProfileLabels } from '@/src/lib/profileLabels';
 
 // Import modular components
 import { SearchHeader } from './SearchHeader';
@@ -339,7 +340,8 @@ export default function SearchResults({
                       price: fac.koszt_pobytu || 0,
                       street: fac.ulica,
                       image: '/images/placeholder-facility.jpg', // Add your image logic
-                      waitTime: 'Brak danych'
+                      waitTime: 'Brak danych',
+                      profileLabels: getShortProfileLabels(fac.profil_opieki, fac.typ_placowki)
                     }}
                     isHovered={hoveredId === fac.id}
                     isSaved={favoritesState.includes(fac.id)}
