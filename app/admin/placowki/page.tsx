@@ -58,7 +58,11 @@ function DeleteModal({ placowka, onClose, onConfirm, isDeleting }: DeleteModalPr
               {placowka.nazwa}
             </p>
             <p className="text-sm text-gray-500">
-              {placowka.miejscowosc}, {placowka.wojewodztwo}
+              {placowka.ulica && <span>{placowka.ulica}, </span>}
+              {placowka.miejscowosc} (powiat: {placowka.powiat})
+            </p>
+            <p className="text-sm text-gray-400">
+              {placowka.wojewodztwo}
             </p>
             <p className="mt-2 text-sm text-red-600">
               ⚠️ Ta operacja jest nieodwracalna!
@@ -382,6 +386,7 @@ export default function ListaPlacowekPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ulica</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Miejscowość</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Powiat</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Geo</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Verified</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Akcje</th>
@@ -403,6 +408,7 @@ export default function ListaPlacowekPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{p.ulica || "—"}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{p.miejscowosc}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{p.powiat}</td>
                     <td className="px-6 py-4 text-center">
                       {p.latitude && p.longitude ? (
                         <MapPin className="h-5 w-5 text-emerald-600 mx-auto" />
