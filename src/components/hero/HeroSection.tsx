@@ -57,6 +57,13 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
   // Region modal state
   const [showRegionModal, setShowRegionModal] = useState(false);
 
+  // NEW: Geo mode toggle
+  const [geoMode, setGeoMode] = useState(false);
+  const [radius, setRadius] = useState(20);
+
+  // NEW: Budget slider
+  const [budget, setBudget] = useState(6000);
+
   // Refs for click outside detection
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRefDesktop = useRef<HTMLInputElement>(null);
@@ -214,6 +221,75 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
     }
   };
 
+  // NEW: Main search button handler (combines text/geo search + budget)
+  const handleMainSearch = () => {
+    if (geoMode) {
+      // Geo mode: trigger geolocation with radius
+      if (!navigator.geolocation) {
+        alert("Twoja przeglądarka nie obsługuje geolokalizacji");
+        return;
+      }
+
+      setIsGeoLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          const params = new URLSearchParams({
+            lat: latitude.toString(),
+            lng: longitude.toString(),
+            radius: radius.toString(),
+            near: 'true'
+          });
+
+          if (selectedType !== "WSZYSTKIE") {
+            params.append("type", selectedType.toLowerCase());
+          }
+
+          if (selectedProfiles && selectedProfiles.length > 0) {
+            params.append("care", selectedProfiles.join(','));
+          }
+
+          if (selectedType === 'DPS' && budget) {
+            params.append("maxPrice", budget.toString());
+          }
+
+          window.location.href = `/search?${params.toString()}`;
+        },
+        (error) => {
+          setIsGeoLoading(false);
+          let message = "Nie udało się pobrać lokalizacji.";
+          if (error.code === error.PERMISSION_DENIED) {
+            message = "Dostęp do lokalizacji został zablokowany.";
+          }
+          alert(message);
+        },
+        {
+          timeout: 10000,
+          maximumAge: 60000,
+          enableHighAccuracy: false,
+        }
+      );
+    } else {
+      // Text mode: use existing handleSearch logic
+      const params = new URLSearchParams();
+      if (searchQuery) {
+        params.append("q", searchQuery);
+      }
+      if (selectedType !== "WSZYSTKIE") {
+        params.append("type", selectedType.toLowerCase());
+      }
+      if (selectedProfiles && selectedProfiles.length > 0) {
+        params.append("care", selectedProfiles.join(','));
+      }
+      if (selectedType === 'DPS' && budget) {
+        params.append("maxPrice", budget.toString());
+      }
+
+      window.location.href = `/search?${params.toString()}`;
+    }
+  };
+
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchQuery) {
@@ -222,7 +298,7 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
     if (selectedType !== "WSZYSTKIE") {
       params.append("type", selectedType.toLowerCase());
     }
-    
+
     // ✅ ADDED: Include selected care profiles from CategorySelector
     if (selectedProfiles && selectedProfiles.length > 0) {
       params.append("care", selectedProfiles.join(','));
@@ -391,86 +467,16 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
 
         {/* Search Bar */}
         <div className="max-w-5xl mx-auto">
-          {/* Desktop version - v2 Style */}
+          {/* Desktop version - NEW LAYOUT */}
           <div className="hidden md:block">
-            <div className="bg-white p-3 rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100 flex flex-row gap-2 relative">
-              {/* Input with Icon - v2 style */}
-              <div className="flex-1 relative group">
-                <label htmlFor="desktop-location" className="sr-only">Lokalizacja</label>
-                <input
-                  id="desktop-location"
-                  ref={inputRefDesktop}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Wpisz miejscowość (np. Olkusz)"
-                  className={`w-full pl-4 pr-4 py-4 rounded-xl bg-stone-50 border border-transparent outline-none transition-all text-slate-800 font-medium focus:bg-white focus:ring-2 
-                    ${selectedType === 'DPS' ? 'focus:ring-primary-100 focus:border-primary-300' 
-                      : selectedType === 'ŚDS' ? 'focus:ring-secondary-100 focus:border-secondary-300'
-                      : 'focus:ring-slate-200 focus:border-slate-300'}`}
-                  autoComplete="off"
-                />
-
-                {isLoading && (
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <div className="animate-spin h-5 w-5 border-2 border-accent-500 border-t-transparent rounded-full" />
-                  </div>
-                )}
-
-                <AutocompleteDropdown />
-              </div>
-
-              {/* Search Button - v2 style with dynamic colors */}
-              <button 
-                onClick={handleSearch}
-                className={`text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 min-w-[140px]
-                  ${selectedType === 'DPS' ? 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/30' 
-                  : selectedType === 'ŚDS' ? 'bg-secondary-600 hover:bg-secondary-700 shadow-secondary-500/30'
-                  : 'bg-slate-800 hover:bg-slate-900 shadow-slate-500/30'}`}
-              >
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <span>Szukaj</span>
-              </button>
-            </div>
-
-            {/* Type Buttons - Desktop - v2 Style with geolocation text ABOVE */}
-            <div className="mt-6 md:mt-8 space-y-4">
-              {/* Geolocation clickable text ABOVE buttons */}
-              <div className="text-center">
+            {/* STEP 1: Type Selection - MOVED TO TOP */}
+            <div className="mb-6">
+              <div className="flex flex-wrap justify-center gap-3">
                 <button
-                  onClick={handleGeolocation}
-                  disabled={isGeoLoading}
-                  className="text-sm text-slate-600 hover:text-primary-600 font-medium inline-flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
-                >
-                  {isGeoLoading ? (
-                    <>
-                      <svg width="16" height="16" className="animate-spin">
-                        <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="38" strokeDashoffset="19"/>
-                      </svg>
-                      <span>Wyszukiwanie...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4 text-primary-600 group-hover:text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <span className="group-hover:underline">Użyj geolokalizacji — znajdź najbliższe placówki</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-                <button 
                   onClick={() => handleTypeChange('WSZYSTKIE')}
-                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
-                    ${selectedType === 'WSZYSTKIE' 
-                      ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
+                  className={`px-6 py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
+                    ${selectedType === 'WSZYSTKIE'
+                      ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200'
                       : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
                 >
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -479,150 +485,388 @@ export default function HeroSection({ onTabChange, selectedProfiles = [], active
                   Wszystkie placówki
                 </button>
 
-                <button 
+                <button
                   onClick={() => handleTypeChange('DPS')}
-                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                    ${selectedType === 'DPS' 
-                      ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
+                  className={`px-6 py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border
+                    ${selectedType === 'DPS'
+                      ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100'
                       : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
                 >
                   DPS (Całodobowe)
                 </button>
-                
-                <button 
+
+                <button
                   onClick={() => handleTypeChange('ŚDS')}
-                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                    ${selectedType === 'ŚDS' 
-                      ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
+                  className={`px-6 py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border
+                    ${selectedType === 'ŚDS'
+                      ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100'
                       : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
                 >
                   ŚDS (Dzienne)
                 </button>
               </div>
             </div>
+
+            {/* STEP 2: Location Input/Display with Geo Toggle */}
+            <div className="bg-white p-3 rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100 mb-4">
+              <div className="flex gap-2">
+                <div className="flex-1 relative group">
+                  {!geoMode ? (
+                    <>
+                      <label htmlFor="desktop-location" className="sr-only">Lokalizacja</label>
+                      <input
+                        id="desktop-location"
+                        ref={inputRefDesktop}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Wpisz miejscowość (np. Olkusz)"
+                        className={`w-full pl-4 pr-4 py-4 rounded-xl bg-stone-50 border border-transparent outline-none transition-all text-slate-800 font-medium focus:bg-white focus:ring-2
+                          ${selectedType === 'DPS' ? 'focus:ring-primary-100 focus:border-primary-300'
+                            : selectedType === 'ŚDS' ? 'focus:ring-secondary-100 focus:border-secondary-300'
+                            : 'focus:ring-slate-200 focus:border-slate-300'}`}
+                        autoComplete="off"
+                      />
+                      {isLoading && (
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                          <div className="animate-spin h-5 w-5 border-2 border-accent-500 border-t-transparent rounded-full" />
+                        </div>
+                      )}
+                      <AutocompleteDropdown />
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full px-4 py-4 rounded-xl bg-stone-50">
+                      <span className="text-slate-700 font-medium">
+                        📍 Szukaj w promieniu: <strong>{radius} km</strong>
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setGeoMode(!geoMode)}
+                  className={`px-6 py-4 rounded-xl font-bold transition-all shadow-md flex items-center gap-2 whitespace-nowrap
+                    ${geoMode
+                      ? 'bg-primary-600 text-white hover:bg-primary-700'
+                      : 'bg-stone-100 text-slate-700 hover:bg-stone-200'}`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {geoMode ? 'Wpisz miasto' : 'Szukaj blisko mnie'}
+                </button>
+              </div>
+            </div>
+
+            {geoMode && (
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 mb-4">
+                <label className="block text-sm font-medium text-primary-900 mb-3">
+                  Szukaj w promieniu:
+                </label>
+                <input
+                  type="range"
+                  min="5"
+                  max="100"
+                  step="5"
+                  value={radius}
+                  onChange={(e) => setRadius(Number(e.target.value))}
+                  className="w-full h-2 bg-primary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+                />
+                <div className="flex justify-between text-xs text-primary-700 mt-2">
+                  <span>5 km</span>
+                  <span className="font-bold text-base">{radius} km</span>
+                  <span>100 km</span>
+                </div>
+              </div>
+            )}
+
+            {selectedType === 'DPS' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                <label className="block text-sm font-medium text-blue-900 mb-3">
+                  Twój maksymalny budżet miesięczny:
+                </label>
+                <input
+                  type="range"
+                  min="1500"
+                  max="10000"
+                  step="100"
+                  value={budget}
+                  onChange={(e) => setBudget(Number(e.target.value))}
+                  className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between text-xs text-blue-700 mt-2">
+                  <span>1 500 zł</span>
+                  <span className="font-bold text-base">Do {budget.toLocaleString('pl-PL')} zł</span>
+                  <span>10 000 zł</span>
+                </div>
+              </div>
+            )}
+
+            {selectedType === 'ŚDS' && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 flex items-center gap-3">
+                <svg className="w-6 h-6 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm font-medium text-green-900">
+                  ✨ ŚDS są <strong>całkowicie bezpłatne</strong> (dzienna opieka finansowana przez gminę)
+                </p>
+              </div>
+            )}
+
+            <div className="mt-8">
+              <CategorySelector
+                activeTab={
+                  selectedType === 'DPS' ? 'DPS' :
+                  selectedType === 'ŚDS' ? 'SDS' :
+                  'Wszystkie'
+                }
+                onSearch={() => {}}
+                onProfilesChange={(profiles) => {
+                  console.log('🎯 Hero received profiles:', profiles);
+                }}
+                location={searchQuery}
+              />
+            </div>
+
+            <div className="mt-6">
+              <button
+                onClick={handleMainSearch}
+                disabled={isGeoLoading}
+                className={`w-full py-5 rounded-2xl text-white font-bold text-lg shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed
+                  ${selectedType === 'DPS' ? 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/30'
+                  : selectedType === 'ŚDS' ? 'bg-secondary-600 hover:bg-secondary-700 shadow-secondary-500/30'
+                  : 'bg-slate-800 hover:bg-slate-900 shadow-slate-500/30'}`}
+              >
+                {isGeoLoading ? (
+                  <>
+                    <svg className="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Pobieranie lokalizacji...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span>SZUKAJ PLACÓWEK</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Mobile version - v2 Style */}
           <div className="md:hidden">
-            {/* Mobile Simple Location Input with Search Button */}
-            <div className="flex gap-2 mb-6 relative z-20">
-              <div className="flex-1 relative">
-                <label htmlFor="mobile-location" className="sr-only">Wpisz miasto</label>
-                <input
-                  id="mobile-location"
-                  ref={inputRefMobile}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Wpisz miejscowość..."
-                  className={`w-full pl-4 pr-10 py-3 rounded-xl border border-stone-200 bg-white shadow-sm outline-none h-full focus:ring-2 
-                    ${selectedType === 'DPS' ? 'focus:ring-primary-500' 
-                    : selectedType === 'ŚDS' ? 'focus:ring-secondary-500'
-                    : 'focus:ring-slate-500'}`}
-                  autoComplete="off"
-                />
+            {/* Type buttons FIRST - Mobile */}
+            <div className="mb-4">
+              <div className="flex flex-wrap justify-center gap-2">
+                <button
+                  onClick={() => handleTypeChange('WSZYSTKIE')}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
+                    ${selectedType === 'WSZYSTKIE'
+                      ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200'
+                      : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  Wszystkie
+                </button>
 
-                {isLoading && (
-                  <div className="absolute right-12 top-1/2 -translate-y-1/2">
-                    <div className="animate-spin h-4 w-4 border-2 border-accent-500 border-t-transparent rounded-full" />
-                  </div>
-                )}
+                <button
+                  onClick={() => handleTypeChange('DPS')}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border
+                    ${selectedType === 'DPS'
+                      ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100'
+                      : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
+                >
+                  DPS
+                </button>
 
-                <AutocompleteDropdown />
+                <button
+                  onClick={() => handleTypeChange('ŚDS')}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border
+                    ${selectedType === 'ŚDS'
+                      ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100'
+                      : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
+                >
+                  ŚDS
+                </button>
               </div>
-              
-              <button 
-                onClick={handleSearch}
-                className={`px-4 rounded-xl font-bold text-white shadow-md active:scale-95 transition-all flex items-center justify-center min-w-[56px]
-                  ${selectedType === 'DPS' ? 'bg-primary-600' 
-                  : selectedType === 'ŚDS' ? 'bg-secondary-600'
-                  : 'bg-slate-800'}`}
-                aria-label="Szukaj"
-              >
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
             </div>
 
-            {/* Geolocation text ABOVE buttons - Mobile */}
-            <div className="text-center mb-4">
+            {/* Location input OR geo display with toggle - Mobile */}
+            <div className="bg-white p-2.5 rounded-xl shadow-lg shadow-stone-200/50 border border-stone-100 mb-3">
+              <div className="flex gap-2">
+                <div className="flex-1 relative group">
+                  {!geoMode ? (
+                    <>
+                      <label htmlFor="mobile-location" className="sr-only">Wpisz miasto</label>
+                      <input
+                        id="mobile-location"
+                        ref={inputRefMobile}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Wpisz miejscowość..."
+                        className={`w-full pl-3 pr-10 py-3 rounded-lg border border-stone-200 bg-white shadow-sm outline-none focus:ring-2
+                          ${selectedType === 'DPS' ? 'focus:ring-primary-500'
+                          : selectedType === 'ŚDS' ? 'focus:ring-secondary-500'
+                          : 'focus:ring-slate-500'}`}
+                        autoComplete="off"
+                      />
+
+                      {isLoading && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <div className="animate-spin h-4 w-4 border-2 border-accent-500 border-t-transparent rounded-full" />
+                        </div>
+                      )}
+
+                      <AutocompleteDropdown />
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full px-3 py-3 rounded-lg bg-stone-50 border border-stone-200">
+                      <span className="text-sm text-stone-700">
+                        📍 Szukaj w promieniu: <strong>{radius} km</strong>
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setGeoMode(!geoMode)}
+                  className={`px-3 py-3 rounded-lg font-medium text-sm transition-all active:scale-95 whitespace-nowrap flex items-center gap-1.5 shadow-sm
+                    ${geoMode
+                      ? 'bg-primary-600 text-white'
+                      : 'bg-white border border-stone-200 text-slate-700 hover:border-primary-300 hover:text-primary-600'
+                    }`}
+                >
+                  {geoMode ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                      <span className="text-xs">Wpisz</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="text-xs">Blisko</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Radius slider - conditional on geoMode - Mobile */}
+            {geoMode && (
+              <div className="bg-primary-50 border border-primary-200 rounded-lg p-3 mb-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-primary-900">Zasięg wyszukiwania</label>
+                  <span className="text-sm font-bold text-primary-700">{radius} km</span>
+                </div>
+                <input
+                  type="range"
+                  min="5"
+                  max="100"
+                  step="5"
+                  value={radius}
+                  onChange={(e) => setRadius(Number(e.target.value))}
+                  className="w-full h-2 bg-primary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+                />
+                <div className="flex justify-between text-[10px] text-primary-600 mt-1">
+                  <span>5 km</span>
+                  <span>100 km</span>
+                </div>
+              </div>
+            )}
+
+            {/* Budget slider - conditional on DPS type - Mobile */}
+            {selectedType === 'DPS' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-blue-900">Maksymalny koszt pobytu</label>
+                  <span className="text-sm font-bold text-blue-700">{budget} zł/mies.</span>
+                </div>
+                <input
+                  type="range"
+                  min="1500"
+                  max="10000"
+                  step="100"
+                  value={budget}
+                  onChange={(e) => setBudget(Number(e.target.value))}
+                  className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between text-[10px] text-blue-600 mt-1">
+                  <span>1 500 zł</span>
+                  <span>10 000 zł</span>
+                </div>
+              </div>
+            )}
+
+            {/* ŚDS info badge - conditional on ŚDS type - Mobile */}
+            {selectedType === 'ŚDS' && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3 text-center">
+                <p className="text-xs text-green-800">
+                  ✨ Środowiskowe Domy Samopomocy są <strong>całkowicie bezpłatne</strong> (finansowane z NFZ)
+                </p>
+              </div>
+            )}
+
+            {/* CategorySelector - Mobile */}
+            <div className="mt-6">
+              <CategorySelector
+                activeTab={
+                  selectedType === 'DPS' ? 'DPS' :
+                  selectedType === 'ŚDS' ? 'SDS' :
+                  'Wszystkie'
+                }
+                onSearch={() => {}}
+                onProfilesChange={(profiles) => {
+                  console.log('🎯 Hero (mobile) received profiles:', profiles);
+                }}
+                location={searchQuery}
+              />
+            </div>
+
+            {/* Main Search Button - Mobile */}
+            <div className="mt-5">
               <button
-                onClick={handleGeolocation}
+                onClick={handleMainSearch}
                 disabled={isGeoLoading}
-                className="text-xs text-slate-600 hover:text-primary-600 font-medium inline-flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+                className={`w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base
+                  ${selectedType === 'DPS'
+                    ? 'bg-primary-600 hover:bg-primary-700'
+                    : selectedType === 'ŚDS'
+                    ? 'bg-secondary-600 hover:bg-secondary-700'
+                    : 'bg-slate-800 hover:bg-slate-900'
+                  }`}
               >
                 {isGeoLoading ? (
-                  <>
-                    <svg width="14" height="14" className="animate-spin">
-                      <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="31" strokeDashoffset="15.5"/>
+                  <span className="flex items-center justify-center gap-2">
+                    <svg width="20" height="20" className="animate-spin">
+                      <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="50" strokeDashoffset="25"/>
                     </svg>
-                    <span>Wyszukiwanie...</span>
-                  </>
+                    Szukam lokalizacji...
+                  </span>
                 ) : (
-                  <>
-                    <svg className="w-4 h-4 text-primary-600 group-hover:text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <span className="flex items-center justify-center gap-2">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <span className="group-hover:underline">Użyj geolokalizacji — znajdź najbliższe placówki</span>
-                  </>
+                    SZUKAJ PLACÓWEK
+                  </span>
                 )}
               </button>
             </div>
-
-            {/* Quick Filters / Tabs - Mobile */}
-            <div className="flex flex-wrap justify-center gap-2">
-              <button 
-                onClick={() => handleTypeChange('WSZYSTKIE')}
-                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
-                  ${selectedType === 'WSZYSTKIE' 
-                    ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
-              >
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                Wszystkie
-              </button>
-
-              <button 
-                onClick={() => handleTypeChange('DPS')}
-                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                  ${selectedType === 'DPS' 
-                    ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
-              >
-                DPS
-              </button>
-              
-              <button 
-                onClick={() => handleTypeChange('ŚDS')}
-                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                  ${selectedType === 'ŚDS' 
-                    ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
-              >
-                ŚDS
-              </button>
-            </div>
-          </div>
-
-          {/* Profile Selection - CategorySelector Integration */}
-          <div className="mt-8">
-            <CategorySelector
-              activeTab={
-                selectedType === 'DPS' ? 'DPS' :
-                selectedType === 'ŚDS' ? 'SDS' :
-                'Wszystkie'
-              }
-              onSearch={() => {}}
-              onProfilesChange={(profiles) => {
-                console.log('🎯 Hero received profiles:', profiles);
-              }}
-              location={searchQuery}
-            />
           </div>
         </div>
       </div>
