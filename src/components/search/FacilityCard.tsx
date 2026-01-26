@@ -13,7 +13,7 @@ interface FacilityCardProps {
     powiat: string;
     category: string;
     price: number;
-    rating: number;
+    street?: string | null;
     image: string;
     waitTime: string;
   };
@@ -36,8 +36,6 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
   onToggleSave,
   onToggleCompare
 }) => {
-  const isHighlighted = facility.rating >= 4.7;
-
   return (
     <div
       id={`facility-${facility.id}`}
@@ -57,21 +55,6 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
         }
       `}
     >
-      {/* Top Left Badge - WYRÓŻNIONA */}
-      {isHighlighted && (
-        <div className="absolute -top-2 -left-2 z-10">
-          <div className="
-            bg-yellow-400 text-gray-900
-            px-3 sm:px-4 py-1 sm:py-1.5 rounded-full
-            text-[10px] sm:text-xs font-bold uppercase tracking-wide
-            shadow-md
-            flex items-center gap-1 sm:gap-1.5
-          ">
-            <Star size={12} className="fill-gray-900" />
-            WYRÓŻNIONA
-          </div>
-        </div>
-      )}
 
       {/* Image - RESPONSIVE */}
       <div className="relative w-full sm:w-[245px] h-48 sm:h-[195px] flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden bg-gray-100">
@@ -113,7 +96,9 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
           {/* Location */}
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-3">
             <MapPin size={14} className="text-gray-400 flex-shrink-0" />
-            <span className="truncate">{facility.city}, {facility.powiat}</span>
+            <span className="truncate">
+              {facility.street ? `${facility.street}, ` : ''}{facility.city}
+            </span>
           </div>
         </div>
 
@@ -136,12 +121,6 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2">
-            
-            {/* Rating */}
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50">
-              <Star size={14} className="text-yellow-500 fill-yellow-500" />
-              <span className="text-xs sm:text-sm font-bold text-gray-900">{facility.rating}</span>
-            </div>
 
             {/* Compare Button */}
             <button

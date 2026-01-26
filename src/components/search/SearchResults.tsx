@@ -337,7 +337,7 @@ export default function SearchResults({
                       powiat: fac.powiat || '',
                       category: fac.profil_opieki || 'Różne profile',
                       price: fac.koszt_pobytu || 0,
-                      rating: 4.5, // Default - adjust if you have rating
+                      street: fac.ulica,
                       image: '/images/placeholder-facility.jpg', // Add your image logic
                       waitTime: 'Brak danych'
                     }}
