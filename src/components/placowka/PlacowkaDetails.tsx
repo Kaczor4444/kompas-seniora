@@ -45,6 +45,7 @@ interface Placowka {
   telefon: string | null;
   email: string | null;
   www: string | null;
+  facebook: string | null;
   liczba_miejsc: number | null;
   miejsca_za_zyciem?: number | null;
   profil_opieki: string | null;
@@ -620,7 +621,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
 
                         {/* Website */}
                         {placowka.www && (
-                          <a 
+                          <a
                             href={placowka.www}
                             onClick={handleWebsiteClick}
                             target="_blank"
@@ -634,6 +635,28 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                                 <div className="text-xs text-slate-400 font-bold mb-1">Strona WWW</div>
                                 <div className="font-bold text-slate-900 group-hover:text-primary-600 transition-colors text-sm truncate">
                                   {placowka.www.replace(/^https?:\/\//, '')}
+                                </div>
+                             </div>
+                          </a>
+                        )}
+
+                        {/* Facebook */}
+                        {placowka.facebook && (
+                          <a
+                            href={placowka.facebook}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-start gap-3 p-4 rounded-xl hover:bg-blue-50 transition-colors group border border-stone-100 hover:border-blue-200"
+                          >
+                             <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors shrink-0">
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                             </div>
+                             <div className="min-w-0 flex-1">
+                                <div className="text-xs text-slate-400 font-bold mb-1">Facebook</div>
+                                <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-sm truncate">
+                                  Odwiedź nasz profil
                                 </div>
                              </div>
                           </a>

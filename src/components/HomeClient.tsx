@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { SparklesIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import MiniFAQSection from './faq/MiniFAQSection';
 import NewsletterSection from './newsletter/NewsletterSection';
 import KnowledgeCenter from './knowledge/KnowledgeCenter';
@@ -124,6 +126,53 @@ export default function HomeClient({ totalFacilities }: HomeClientProps) {
               <p className="text-slate-600 leading-relaxed">
                 Zadzwoń bezpośrednio do dyrektora lub wyślij zapytanie online.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA - Asystent Wyboru */}
+      <section className="py-16 bg-gradient-to-br from-primary-50 to-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-3xl p-8 md:p-16 shadow-xl border border-stone-100 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-full text-xs font-bold uppercase mb-6 border border-primary-200">
+              <SparklesIcon className="w-4 h-4" /> Potrzebujesz pomocy?
+            </div>
+
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-slate-900 mb-4">
+              Nie wiesz, od czego zacząć?
+            </h3>
+
+            <p className="text-slate-600 text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+              Wypełnij 4 proste pytania, a pomożemy Ci wybrać odpowiednią formę opieki dla Twojego bliskiego.
+            </p>
+
+            <Link
+              href="/asystent"
+              className="inline-flex items-center gap-3 bg-slate-900 hover:bg-primary-600 text-white px-8 md:px-10 py-4 md:py-5 rounded-2xl font-bold text-base md:text-lg transition-all shadow-xl hover:scale-105 active:scale-95"
+            >
+              Rozpocznij analizę <ChevronRightIcon className="w-5 h-5" />
+            </Link>
+
+            <div className="flex items-center justify-center flex-wrap gap-4 md:gap-6 mt-6 text-sm text-slate-500">
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                2 minuty
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Bez rejestracji
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Konkretny plan
+              </span>
             </div>
           </div>
         </div>

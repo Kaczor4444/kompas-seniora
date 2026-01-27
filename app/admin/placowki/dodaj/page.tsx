@@ -28,6 +28,7 @@ const placowkaSchema = z.object({
   telefon: z.string().optional(),
   email: z.string().email('Nieprawidłowy email').optional().or(z.literal('')),
   www: z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
+  facebook: z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
   liczba_miejsc: z.coerce.number().int().positive().optional(),
   miejsca_za_zyciem: z.coerce.number().nonnegative().optional().nullable(),
   koszt_pobytu: z.coerce.number().nonnegative().optional(),
@@ -602,6 +603,25 @@ export default function DodajPlacowkePage() {
               {errors.www && (
                 <p className="mt-1 text-sm text-red-600">{errors.www.message}</p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Facebook
+                <span className="text-xs text-gray-500 ml-2">(opcjonalnie)</span>
+              </label>
+              <input
+                type="url"
+                placeholder="https://facebook.com/..."
+                {...register('facebook')}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {errors.facebook && (
+                <p className="mt-1 text-sm text-red-600">{errors.facebook.message}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Link do profilu Facebook placówki
+              </p>
             </div>
           </div>
         </div>

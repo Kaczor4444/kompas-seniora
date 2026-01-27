@@ -10,7 +10,8 @@ import {
   EnvelopeIcon,
   XMarkIcon,
   PhoneIcon,
-  HeartIcon
+  HeartIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import { getFavoritesCount } from '@/src/utils/favorites';
 
@@ -64,6 +65,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { href: '/', label: 'Strona główna', icon: HomeIcon },
     { href: '/search', label: 'Wyszukiwarka', icon: MagnifyingGlassIcon },
     { href: '/ulubione', label: 'Ulubione', icon: HeartIcon },
+    { href: '/asystent', label: 'Asystent', icon: SparklesIcon },
     { href: '/kalkulator', label: 'Kalkulator', icon: CalculatorIcon },
     { href: '/poradniki', label: 'Poradniki', icon: BookOpenIcon },
     { href: '/kontakt', label: 'Kontakt', icon: EnvelopeIcon },

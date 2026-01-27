@@ -7,7 +7,8 @@ import {
   CalculatorIcon,
   BookOpenIcon,
   EnvelopeIcon,
-  HeartIcon
+  HeartIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import MobileMenu from './MobileMenu';
 import { getFavoritesCount } from '@/src/utils/favorites';
@@ -90,9 +91,21 @@ export default function Navbar() {
                   </span>
                 )}
               </Link>
-              
-              <a 
-                href="/kalkulator" 
+
+              <Link
+                href="/asystent"
+                className={`flex items-center gap-2 font-medium transition-colors ${
+                  isActive('/asystent')
+                    ? 'text-accent-600'
+                    : 'text-neutral-700 hover:text-neutral-900'
+                }`}
+              >
+                <SparklesIcon className="w-5 h-5" />
+                Asystent
+              </Link>
+
+              <a
+                href="/kalkulator"
                 className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900 font-medium transition-colors"
               >
                 <CalculatorIcon className="w-5 h-5" />
