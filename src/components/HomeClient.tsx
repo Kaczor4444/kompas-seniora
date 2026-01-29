@@ -148,7 +148,7 @@ export default function HomeClient({ totalFacilities }: HomeClientProps) {
             </p>
 
             <Link
-              href="/asystent"
+              href="/asystent?start=true"
               className="inline-flex items-center gap-3 bg-slate-900 hover:bg-primary-600 text-white px-8 md:px-10 py-4 md:py-5 rounded-2xl font-bold text-base md:text-lg transition-all shadow-xl hover:scale-105 active:scale-95"
             >
               Rozpocznij analizę <ChevronRightIcon className="w-5 h-5" />
