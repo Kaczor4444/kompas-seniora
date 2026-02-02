@@ -7,24 +7,14 @@ import {
   Check, ShieldCheck, Building2
 } from 'lucide-react';
 
-interface HeroProps {
-  onStartAssistant: (prefilledLocation?: string) => void;
-  onSearch?: (query: { location: string; categories: string[]; type: 'DPS' | 'ŚDS' | 'Wszystkie'; voivodeship?: string }) => void;
-}
-
-const Hero: React.FC<HeroProps> = ({ onStartAssistant, onSearch }) => {
+const Hero = () => {
   const [activeTab, setActiveTab] = useState<'search' | 'assistant'>('search');
   const [cityInput, setCityInput] = useState("");
   const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>('Wszystkie');
+  const [isGeoLoading, setIsGeoLoading] = useState(false);
   
   // API-based validation state
   const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid'>('idle');
-
-  const handleSearchClick = () => {
-    if (onSearch) {
-      onSearch({ location: cityInput, categories: [], type: selectedType });
-    }
-  };
 
   // API-based location validation
   useEffect(() => {
@@ -46,6 +36,62 @@ const Hero: React.FC<HeroProps> = ({ onStartAssistant, onSearch }) => {
 
     return () => clearTimeout(timer);
   }, [cityInput]);
+
+  const handleSearchClick = () => {
+    const params = new URLSearchParams();
+    if (cityInput) {
+      params.append("q", cityInput);
+    }
+    if (selectedType !== 'Wszystkie') {
+      params.append("type", selectedType === 'DPS' ? 'dps' : 'śds');
+    }
+    window.location.href = `/search?${params.toString()}`;
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearchClick();
+    }
+  };
+
+  const handleGeolocation = () => {
+    if (!navigator.geolocation) {
+      alert("Twoja przeglądarka nie obsługuje geolokalizacji");
+      return;
+    }
+
+    setIsGeoLoading(true);
+    console.log("📍 Requesting geolocation...");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        console.log("✅ Geolocation success:", { latitude, longitude });
+        window.location.href = `/search?lat=${latitude}&lng=${longitude}&near=true`;
+      },
+      (error) => {
+        setIsGeoLoading(false);
+        console.error("❌ Geolocation error:", error);
+
+        let message = "Nie udało się pobrać lokalizacji.";
+
+        if (error.code === error.PERMISSION_DENIED) {
+          message = "Dostęp do lokalizacji został zablokowany.\n\nWłącz w ustawieniach przeglądarki.";
+        } else if (error.code === error.TIMEOUT) {
+          message = "Przekroczono czas oczekiwania.\n\nSpróbuj ponownie lub wpisz miasto ręcznie.";
+        } else {
+          message = "Nie można określić lokalizacji.\n\nUpewnij się że masz włączone usługi lokalizacji.";
+        }
+
+        alert(message);
+      },
+      {
+        timeout: 10000,
+        maximumAge: 60000,
+        enableHighAccuracy: false,
+      }
+    );
+  };
 
   return (
     <div className="bg-white pt-6 pb-12 md:pt-12 md:pb-24 relative overflow-hidden">
@@ -134,6 +180,7 @@ const Hero: React.FC<HeroProps> = ({ onStartAssistant, onSearch }) => {
                              type="text" 
                              value={cityInput} 
                              onChange={(e) => setCityInput(e.target.value)}
+                             onKeyDown={handleKeyDown}
                              placeholder="Miejscowość lub powiat..."
                              enterKeyHint="search"
                              autoComplete="off"
@@ -182,9 +229,15 @@ const Hero: React.FC<HeroProps> = ({ onStartAssistant, onSearch }) => {
                   </div>
 
                   <div className="text-center pt-2">
-                     <button className="inline-flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tracking-widest hover:text-primary-600 transition-colors group">
+                     <button 
+                       onClick={handleGeolocation}
+                       disabled={isGeoLoading}
+                       className="inline-flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tracking-widest hover:text-primary-600 transition-colors group disabled:opacity-50 disabled:cursor-not-allowed"
+                     >
                         <Navigation size={14} className="text-primary-500 group-hover:animate-bounce" />
-                        <span className="underline decoration-dotted underline-offset-4 decoration-2">Namierz moją lokalizację</span>
+                        <span className="underline decoration-dotted underline-offset-4 decoration-2">
+                          {isGeoLoading ? 'Wyszukiwanie...' : 'Namierz moją lokalizację'}
+                        </span>
                      </button>
                   </div>
                </div>
