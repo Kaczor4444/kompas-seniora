@@ -1,11 +1,25 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowRight, Sparkles, MapPin, 
   Search, Navigation, AlertCircle,
-  Check, ShieldCheck, Building2
+  Check, ShieldCheck, Building2, ChevronRight
 } from 'lucide-react';
+
+// Type dla suggestion z API
+interface Suggestion {
+  nazwa: string;
+  powiat: string;
+  wojewodztwo: string;
+  facilitiesCount: number;
+}
+
+interface SuggestResponse {
+  suggestions: Suggestion[];
+  totalCount: number;
+  showAll: boolean;
+}
 
 const Hero = () => {
   const [activeTab, setActiveTab] = useState<'search' | 'assistant'>('search');
@@ -13,29 +27,114 @@ const Hero = () => {
   const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>('Wszystkie');
   const [isGeoLoading, setIsGeoLoading] = useState(false);
   
+  // Autocomplete state
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  
   // API-based validation state
   const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid'>('idle');
 
-  // API-based location validation
+  // Refs for click outside detection
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Helper function for Polish pluralization
+  const getPluralForm = (count: number): string => {
+    if (count === 1) return "placówka";
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return "placówek";
+    if (lastDigit >= 2 && lastDigit <= 4) return "placówki";
+    return "placówek";
+  };
+
+  // Debounced fetch autocomplete suggestions
   useEffect(() => {
     if (cityInput.length < 2) {
+      setSuggestions([]);
+      setShowDropdown(false);
       setValidationState('idle');
       return;
     }
 
     const timer = setTimeout(async () => {
+      setIsLoading(true);
+
       try {
-        const res = await fetch(`/api/teryt/suggest?q=${cityInput}`);
-        const data = await res.json();
-        setValidationState(data.suggestions?.length > 0 ? 'valid' : 'invalid');
+        const params = new URLSearchParams({ q: cityInput });
+        if (selectedType !== 'Wszystkie') {
+          params.append("typ", selectedType);
+        }
+
+        const response = await fetch(`/api/teryt/suggest?${params}`);
+        const data: SuggestResponse = await response.json();
+
+        const suggestions = data.suggestions || [];
+        setSuggestions(suggestions.slice(0, 5)); // Max 5 suggestions
+        setTotalCount(data.totalCount || 0);
+        setShowDropdown(suggestions.length > 0);
+        setValidationState(suggestions.length > 0 ? 'valid' : 'invalid');
+        setHighlightedIndex(-1);
       } catch (error) {
-        console.error('Validation error:', error);
+        console.error('Autocomplete error:', error);
+        setSuggestions([]);
+        setShowDropdown(false);
         setValidationState('idle');
+      } finally {
+        setIsLoading(false);
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [cityInput]);
+  }, [cityInput, selectedType]);
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        !inputRef.current?.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSuggestionClick = (suggestion: Suggestion) => {
+    setCityInput(suggestion.nazwa);
+    setShowDropdown(false);
+
+    const params = new URLSearchParams();
+    params.append("q", suggestion.nazwa);
+    params.append("powiat", suggestion.powiat);
+    
+    if (selectedType !== 'Wszystkie') {
+      params.append("type", selectedType === 'DPS' ? 'dps' : 'śds');
+    }
+
+    window.location.href = `/search?${params.toString()}`;
+  };
+
+  const handleShowAllClick = () => {
+    setShowDropdown(false);
+
+    const params = new URLSearchParams();
+    params.append("q", cityInput);
+    params.append("partial", "true");
+
+    if (selectedType !== 'Wszystkie') {
+      params.append("type", selectedType === 'DPS' ? 'dps' : 'śds');
+    }
+
+    window.location.href = `/search?${params.toString()}`;
+  };
 
   const handleSearchClick = () => {
     const params = new URLSearchParams();
@@ -49,8 +148,35 @@ const Hero = () => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearchClick();
+    if (!showDropdown || suggestions.length === 0) {
+      if (e.key === "Enter") {
+        handleSearchClick();
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (highlightedIndex >= 0) {
+          handleSuggestionClick(suggestions[highlightedIndex]);
+        } else {
+          handleSearchClick();
+        }
+        break;
+      case "Escape":
+        setShowDropdown(false);
+        break;
     }
   };
 
@@ -61,20 +187,17 @@ const Hero = () => {
     }
 
     setIsGeoLoading(true);
-    console.log("📍 Requesting geolocation...");
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        console.log("✅ Geolocation success:", { latitude, longitude });
         window.location.href = `/search?lat=${latitude}&lng=${longitude}&near=true`;
       },
       (error) => {
         setIsGeoLoading(false);
-        console.error("❌ Geolocation error:", error);
+        console.error("Geolocation error:", error);
 
         let message = "Nie udało się pobrać lokalizacji.";
-
         if (error.code === error.PERMISSION_DENIED) {
           message = "Dostęp do lokalizacji został zablokowany.\n\nWłącz w ustawieniach przeglądarki.";
         } else if (error.code === error.TIMEOUT) {
@@ -82,7 +205,6 @@ const Hero = () => {
         } else {
           message = "Nie można określić lokalizacji.\n\nUpewnij się że masz włączone usługi lokalizacji.";
         }
-
         alert(message);
       },
       {
@@ -90,6 +212,58 @@ const Hero = () => {
         maximumAge: 60000,
         enableHighAccuracy: false,
       }
+    );
+  };
+
+  // Autocomplete Dropdown Component - Seamless Design (Fixed clipping)
+  const AutocompleteDropdown = () => {
+    if (!showDropdown || suggestions.length === 0) return null;
+
+    console.log('🎨 RENDERING DROPDOWN:', {
+      suggestionsLength: suggestions.length,
+      totalCount,
+      showDropdown,
+      suggestions: suggestions.map(s => `${s.nazwa} (${s.powiat}) - ${s.facilitiesCount}`)
+    });
+
+    return (
+      <div
+        ref={dropdownRef}
+        className="absolute top-[100%] -translate-y-3 left-0 right-0 bg-white rounded-b-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border-2 border-primary-200 border-t-0 z-[100] overflow-visible"
+      >
+        {/* Lista - BEZ max-height aby pokazać wszystkie 5 sugestii */}
+        <ul className="divide-y divide-stone-50 bg-white pt-3">
+          {suggestions.map((suggestion, index) => (
+            <li
+              key={`sugg-${suggestion.nazwa}-${suggestion.powiat}-${index}`}
+              onMouseDown={() => handleSuggestionClick(suggestion)}
+              onMouseEnter={() => setHighlightedIndex(index)}
+              className={`px-6 py-4 cursor-pointer transition-colors ${
+                highlightedIndex === index ? "bg-stone-50" : "bg-white"
+              }`}
+            >
+              <div className="flex justify-between items-center">
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-slate-900 text-base truncate">{suggestion.nazwa}</p>
+                  <p className="text-xs text-slate-400 truncate">Powiat {suggestion.powiat}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        
+          {suggestions.length < totalCount && (
+            <li
+              onMouseDown={handleShowAllClick}
+              className="px-6 py-4 bg-primary-50/30 hover:bg-primary-50 cursor-pointer border-t border-primary-100 transition-colors group"
+            >
+              <div className="flex items-center justify-between text-primary-600">
+                <span className="font-bold text-sm">Zobacz wszystkie wyniki ({totalCount})</span>
+                <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </li>
+          )}
+        </ul>
+      </div>
     );
   };
 
@@ -120,10 +294,10 @@ const Hero = () => {
         </div>
 
         {/* COMMAND CENTER HUB */}
-        <div className="bg-white rounded-[2.5rem] p-2.5 md:p-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200">
+        <div className="bg-white rounded-[2.5rem] p-2.5 md:p-3 pb-32 md:pb-40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[20]">
           
           {/* TAB SWITCHER */}
-          <div className="flex p-1 bg-stone-100/80 rounded-[2rem] mb-2 relative overflow-hidden">
+          <div className="flex p-1 bg-stone-100/80 rounded-[2rem] mb-2 relative">
             <div 
               className="absolute top-1 bottom-1 bg-slate-900 rounded-[1.8rem] shadow-lg transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-0"
               style={{
@@ -153,7 +327,7 @@ const Hero = () => {
           </div>
 
           {/* CONTENT AREA */}
-          <div className="relative overflow-hidden min-h-auto sm:min-h-[320px]">
+          <div className="relative overflow-visible">
             
             {/* SEARCH VIEW */}
             <div className={`p-4 md:p-8 transition-all duration-300 ease-out flex flex-col justify-center w-full
@@ -177,6 +351,7 @@ const Hero = () => {
                              <MapPin size={22} />
                           </div>
                           <input 
+                             ref={inputRef}
                              type="text" 
                              value={cityInput} 
                              onChange={(e) => setCityInput(e.target.value)}
@@ -188,6 +363,14 @@ const Hero = () => {
                              className={`w-full bg-stone-50 border-2 py-5 pl-14 pr-6 rounded-2xl text-lg font-bold text-slate-900 focus:bg-white outline-none transition-all placeholder:text-slate-300 shadow-inner
                                ${validationState === 'invalid' ? 'border-amber-200' : 'border-transparent focus:border-primary-200'}`}
                           />
+
+                          {isLoading && (
+                            <div className="absolute right-5 top-1/2 -translate-y-1/2">
+                              <div className="animate-spin h-5 w-5 border-2 border-primary-500 border-t-transparent rounded-full" />
+                            </div>
+                          )}
+
+                          <AutocompleteDropdown />
                        </div>
 
                        <div className="md:col-span-4">
@@ -220,7 +403,7 @@ const Hero = () => {
                               </button>
                             ))}
                          </div>
-                       ) : validationState === 'valid' ? (
+                       ) : validationState === 'valid' && !showDropdown ? (
                          <p className="text-[11px] font-bold text-emerald-600 flex items-center gap-1.5 animate-fade-in">
                             <Check size={14} /> Region Małopolski zweryfikowany
                          </p>
