@@ -1,637 +1,256 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import RegionModal from "./RegionModal";
-import TypeTooltip from "./TypeTooltip";
-import { CategorySelector } from '../CategorySelector';
+'use client';
 
-// Type dla suggestion z API
-interface Suggestion {
-  nazwa: string;
-  powiat: string;
-  wojewodztwo: string;
-  facilitiesCount: number;
+import React, { useState, useEffect } from 'react';
+import { 
+  ArrowRight, Sparkles, MapPin, 
+  Search, Navigation, AlertCircle,
+  Check, ShieldCheck, Building2
+} from 'lucide-react';
+
+interface HeroProps {
+  onStartAssistant: (prefilledLocation?: string) => void;
+  onSearch?: (query: { location: string; categories: string[]; type: 'DPS' | 'ŚDS' | 'Wszystkie'; voivodeship?: string }) => void;
 }
 
-interface SuggestResponse {
-  suggestions: Suggestion[];
-  totalCount: number;
-  showAll: boolean;
-}
-
-// ✅ ADDED: Props interface for callback
-interface HeroSectionProps {
-  onTabChange?: (tab: 'DPS' | 'SDS' | 'Wszystkie') => void;
-  selectedProfiles?: string[];
-  activeTab?: 'DPS' | 'SDS' | 'Wszystkie';
-}
-
-export default function HeroSection({ onTabChange, selectedProfiles = [], activeTab = 'Wszystkie' }: HeroSectionProps = {}) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState("WSZYSTKIE");
-
-  // ✅ ADDED: Handler to sync with parent component
-  const handleTypeChange = (type: string) => {
-    setSelectedType(type);
-
-    // Notify parent component (page.tsx) about tab change
-    if (onTabChange) {
-      if (type === 'DPS') onTabChange('DPS');
-      else if (type === 'ŚDS') onTabChange('SDS');
-      else onTabChange('Wszystkie');
-    }
-
-    console.log('🔄 HeroSection: Tab changed to:', type, '→ mapped to:',
-      type === 'DPS' ? 'DPS' : type === 'ŚDS' ? 'SDS' : 'Wszystkie');
-  };
-
-  // Autocomplete state
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+const Hero: React.FC<HeroProps> = ({ onStartAssistant, onSearch }) => {
+  const [activeTab, setActiveTab] = useState<'search' | 'assistant'>('search');
+  const [cityInput, setCityInput] = useState("");
+  const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>('Wszystkie');
   
-  // Geolocation loading state
-  const [isGeoLoading, setIsGeoLoading] = useState(false);
+  // API-based validation state
+  const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid'>('idle');
 
-  // Region modal state
-  const [showRegionModal, setShowRegionModal] = useState(false);
-
-  // Refs for click outside detection
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const inputRefDesktop = useRef<HTMLInputElement>(null);
-  const inputRefMobile = useRef<HTMLInputElement>(null);
-
-  // Helper function for Polish pluralization
-  const getPluralForm = (count: number): string => {
-    if (count === 1) return "placówka";
-    const lastDigit = count % 10;
-    const lastTwoDigits = count % 100;
-
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return "placówek";
-    if (lastDigit >= 2 && lastDigit <= 4) return "placówki";
-    return "placówek";
+  const handleSearchClick = () => {
+    if (onSearch) {
+      onSearch({ location: cityInput, categories: [], type: selectedType });
+    }
   };
 
-  // Debounced fetch autocomplete suggestions
+  // API-based location validation
   useEffect(() => {
-    console.log("⚡ useEffect triggered:", {
-      searchQuery,
-      length: searchQuery.length,
-    });
-
-    if (searchQuery.length < 2) {
-      console.log("⏸️ Query too short, resetting");
-      setSuggestions([]);
-      setShowDropdown(false);
+    if (cityInput.length < 2) {
+      setValidationState('idle');
       return;
     }
 
     const timer = setTimeout(async () => {
-      console.log("🔍 Fetching suggestions for:", searchQuery);
-      setIsLoading(true);
-
       try {
-        const params = new URLSearchParams({
-          q: searchQuery,
-        });
-
-        if (selectedType !== "WSZYSTKIE") {
-          params.append("typ", selectedType);
-        }
-
-        const apiUrl = `/api/teryt/suggest?${params}`;
-        console.log("🌐 API URL:", apiUrl);
-
-        const response = await fetch(apiUrl);
-        const data: SuggestResponse = await response.json();
-
-        console.log("✅ API Response:", data);
-        setSuggestions(data.suggestions || []);
-        setTotalCount(data.totalCount || 0);
-        setShowDropdown((data.suggestions?.length || 0) > 0);
-        setHighlightedIndex(-1);
+        const res = await fetch(`/api/teryt/suggest?q=${cityInput}`);
+        const data = await res.json();
+        setValidationState(data.suggestions?.length > 0 ? 'valid' : 'invalid');
       } catch (error) {
-        console.error("❌ Autocomplete error:", error);
-        setSuggestions([]);
-        setShowDropdown(false);
-      } finally {
-        setIsLoading(false);
+        console.error('Validation error:', error);
+        setValidationState('idle');
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, selectedType]);
-
-  // Click outside to close dropdown
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !inputRefDesktop.current?.contains(event.target as Node) &&
-        !inputRefMobile.current?.contains(event.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // ✅ FIX: Handle suggestion click - pass powiat to search
-  const handleSuggestionClick = (suggestion: Suggestion) => {
-    setSearchQuery(suggestion.nazwa);
-    setShowDropdown(false);
-
-    const params = new URLSearchParams();
-    params.append("q", suggestion.nazwa);
-    
-    // ✅ CRITICAL FIX: Pass powiat from suggestion to search page
-    // This ensures "Kraków" (m. Kraków) doesn't show results from "krakowski" powiat
-    params.append("powiat", suggestion.powiat);
-    
-    if (selectedType !== "WSZYSTKIE") {
-      params.append("type", selectedType.toLowerCase());
-    }
-    
-    // ✅ ADDED: Include selected care profiles
-    if (selectedProfiles && selectedProfiles.length > 0) {
-      params.append("care", selectedProfiles.join(','));
-    }
-
-    console.log('🔗 Navigating with params:', params.toString());
-    window.location.href = `/search?${params.toString()}`;
-  };
-
-  // Handle "Show All" click
-  const handleShowAllClick = () => {
-    setShowDropdown(false);
-
-    const params = new URLSearchParams();
-    params.append("q", searchQuery);
-    params.append("partial", "true");
-
-    if (selectedType !== "WSZYSTKIE") {
-      params.append("type", selectedType.toLowerCase());
-    }
-
-    window.location.href = `/search?${params.toString()}`;
-  };
-
-  // Keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showDropdown || suggestions.length === 0) {
-      if (e.key === "Enter") {
-        handleSearch();
-      }
-      return;
-    }
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : prev
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (highlightedIndex >= 0) {
-          handleSuggestionClick(suggestions[highlightedIndex]);
-        } else {
-          handleSearch();
-        }
-        break;
-      case "Escape":
-        setShowDropdown(false);
-        break;
-    }
-  };
-
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (searchQuery) {
-      params.append("q", searchQuery);
-    }
-    if (selectedType !== "WSZYSTKIE") {
-      params.append("type", selectedType.toLowerCase());
-    }
-    
-    // ✅ ADDED: Include selected care profiles from CategorySelector
-    if (selectedProfiles && selectedProfiles.length > 0) {
-      params.append("care", selectedProfiles.join(','));
-      console.log('🔗 Main search with profiles:', selectedProfiles);
-    }
-
-    window.location.href = `/search?${params.toString()}`;
-  };
-
-  const handleGeolocation = () => {
-    if (!navigator.geolocation) {
-      alert("Twoja przeglądarka nie obsługuje geolokalizacji");
-      return;
-    }
-
-    setIsGeoLoading(true);
-    console.log("📍 Requesting geolocation...");
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        console.log("✅ Geolocation success:", { latitude, longitude });
-        window.location.href = `/search?lat=${latitude}&lng=${longitude}&near=true`;
-      },
-      (error) => {
-        setIsGeoLoading(false);
-        console.error("❌ Geolocation error:", error);
-
-        let message = "Nie udało się pobrać lokalizacji.";
-
-        if (error.code === error.PERMISSION_DENIED) {
-          message =
-            "Dostęp do lokalizacji został zablokowany.\n\nWłącz w ustawieniach przeglądarki.";
-        } else if (error.code === error.TIMEOUT) {
-          message =
-            "Przekroczono czas oczekiwania.\n\nSpróbuj ponownie lub wpisz miasto ręcznie w polu wyszukiwania.";
-        } else {
-          message =
-            "Nie można określić lokalizacji.\n\nUpewnij się że masz włączone usługi lokalizacji i spróbuj ponownie.";
-        }
-
-        alert(message);
-      },
-      {
-        timeout: 10000,
-        maximumAge: 60000,
-        enableHighAccuracy: false,
-      }
-    );
-  };
-
-  // Autocomplete Dropdown Component
-  const AutocompleteDropdown = () => {
-    if (!showDropdown || suggestions.length === 0) return null;
-
-    return (
-      <div
-        ref={dropdownRef}
-        className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-2xl border border-neutral-300 max-h-96 overflow-y-auto"
-        style={{
-          boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
-          width:
-            typeof window !== "undefined" && window.innerWidth < 768
-              ? "100%"
-              : "500px",
-          minWidth: "280px",
-          zIndex: 1000,
-        }}
-      >
-        <div className="p-5 border-b border-neutral-200 bg-neutral-50">
-          <p className="text-sm text-neutral-600">
-            {suggestions.length < totalCount ? (
-              <>
-                Pokazano <strong>{suggestions.length}</strong> z{" "}
-                <strong>{totalCount}</strong>{" "}
-                {getPluralForm(totalCount)}
-              </>
-            ) : (
-              <>
-                Znaleziono <strong>{totalCount}</strong>{" "}
-                {getPluralForm(totalCount)}
-              </>
-            )}
-          </p>
-        </div>
-
-        <ul className="divide-y divide-neutral-100">
-          {suggestions.map((suggestion, index) => (
-            <li
-              key={`${suggestion.nazwa}-${suggestion.powiat}-${index}`}
-              onMouseDown={() => handleSuggestionClick(suggestion)}
-              className={`px-6 py-5 hover:bg-accent-50 cursor-pointer transition-colors ${
-                highlightedIndex === index ? "bg-accent-50" : ""
-              }`}
-            >
-              <div className="flex justify-between items-start gap-5">
-                <div className="flex-1">
-                  <p className="font-medium text-neutral-900">
-                    {suggestion.nazwa}
-                  </p>
-                  <p className="text-sm text-neutral-500 mt-0.5">
-                    {suggestion.powiat}, woj. {suggestion.wojewodztwo}
-                  </p>
-                </div>
-                <div className="px-2.5 py-1 bg-accent-100 text-accent-700 rounded-md text-xs font-semibold whitespace-nowrap">
-                  {suggestion.facilitiesCount}{" "}
-                  {getPluralForm(suggestion.facilitiesCount)}
-                </div>
-              </div>
-            </li>
-          ))}
-
-          {suggestions.length < totalCount && (
-            <li
-              onMouseDown={handleShowAllClick}
-              className="px-6 py-5 bg-neutral-50 hover:bg-accent-50 cursor-pointer border-t-2 border-neutral-200 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <p className="font-medium text-accent-600">
-                  Pokaż wszystkie ({totalCount} {getPluralForm(totalCount)})
-                </p>
-                <svg
-                  className="w-5 h-5 text-accent-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </div>
-            </li>
-          )}
-        </ul>
-      </div>
-    );
-  };
+  }, [cityInput]);
 
   return (
-    <section className="bg-gradient-to-b from-primary-50/50 via-white to-stone-50 pt-10 pb-8 md:pt-16 md:pb-12 relative overflow-hidden">
-      {/* Abstract shapes decorations */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-100 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-secondary-500/10 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
-
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        {/* Hero Header */}
-        <div className="text-center max-w-5xl mx-auto mb-6 sm:mb-10">
-          <h1 className="text-3xl md:text-6xl font-serif font-bold text-slate-900 mb-4 md:mb-6 leading-tight">
-            Znajdź publiczną opiekę <br/>
-            <span className="text-primary-600 relative inline-block">
-              dostosowaną do potrzeb
-              <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+    <div className="bg-white pt-6 pb-12 md:pt-12 md:pb-24 relative overflow-hidden">
+      {/* Background Decor - Subtle Grid */}
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:32px_32px] opacity-20 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />
+      
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
+        
+        {/* HEADER */}
+        <div className="text-center mb-10">
+          <h1 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 leading-[1.1] tracking-tight mb-4">
+            Szukasz opieki <br />
+            <span className="relative inline-block text-primary-600">
+              dla seniora?
+              <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary-200/60" viewBox="0 0 100 10" preserveAspectRatio="none">
+                <path d="M0 5 Q 50 12 100 5" stroke="currentColor" strokeWidth="10" fill="none" />
               </svg>
             </span>
           </h1>
-
-          <p className="text-base md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Porównaj, oblicz koszty i dowiedz się więcej
+          <p className="text-slate-400 text-lg md:text-xl font-medium max-w-xl mx-auto leading-relaxed h-12 md:h-auto">
+            {activeTab === 'search' 
+              ? "Przeszukaj bazę publicznych placówek w Małopolsce."
+              : "Dobierzemy odpowiedni typ opieki w 2 minuty."}
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="max-w-5xl mx-auto">
-          {/* Desktop version - v2 Style */}
-          <div className="hidden md:block">
-            <div className="bg-white p-3 rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100 flex flex-row gap-2 relative">
-              {/* Input with Icon - v2 style */}
-              <div className="flex-1 relative group">
-                <label htmlFor="desktop-location" className="sr-only">Lokalizacja</label>
-                <input
-                  id="desktop-location"
-                  ref={inputRefDesktop}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Wpisz miejscowość (np. Olkusz)"
-                  className={`w-full pl-4 pr-4 py-4 rounded-xl bg-stone-50 border border-transparent outline-none transition-all text-slate-800 font-medium focus:bg-white focus:ring-2 
-                    ${selectedType === 'DPS' ? 'focus:ring-primary-100 focus:border-primary-300' 
-                      : selectedType === 'ŚDS' ? 'focus:ring-secondary-100 focus:border-secondary-300'
-                      : 'focus:ring-slate-200 focus:border-slate-300'}`}
-                  autoComplete="off"
-                />
-
-                {isLoading && (
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <div className="animate-spin h-5 w-5 border-2 border-accent-500 border-t-transparent rounded-full" />
-                  </div>
-                )}
-
-                <AutocompleteDropdown />
-              </div>
-
-              {/* Search Button - v2 style with dynamic colors */}
-              <button 
-                onClick={handleSearch}
-                className={`text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 min-w-[140px]
-                  ${selectedType === 'DPS' ? 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/30' 
-                  : selectedType === 'ŚDS' ? 'bg-secondary-600 hover:bg-secondary-700 shadow-secondary-500/30'
-                  : 'bg-slate-800 hover:bg-slate-900 shadow-slate-500/30'}`}
-              >
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <span>Szukaj</span>
-              </button>
-            </div>
-
-            {/* Type Buttons - Desktop - v2 Style with geolocation text ABOVE */}
-            <div className="mt-6 md:mt-8 space-y-4">
-              {/* Geolocation clickable text ABOVE buttons */}
-              <div className="text-center">
-                <button
-                  onClick={handleGeolocation}
-                  disabled={isGeoLoading}
-                  className="text-sm text-slate-600 hover:text-primary-600 font-medium inline-flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
-                >
-                  {isGeoLoading ? (
-                    <>
-                      <svg width="16" height="16" className="animate-spin">
-                        <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="38" strokeDashoffset="19"/>
-                      </svg>
-                      <span>Wyszukiwanie...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4 text-primary-600 group-hover:text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <span className="group-hover:underline">Użyj geolokalizacji — znajdź najbliższe placówki</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-                <button 
-                  onClick={() => handleTypeChange('WSZYSTKIE')}
-                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
-                    ${selectedType === 'WSZYSTKIE' 
-                      ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
-                      : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
-                >
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  Wszystkie placówki
-                </button>
-
-                <button 
-                  onClick={() => handleTypeChange('DPS')}
-                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                    ${selectedType === 'DPS' 
-                      ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
-                      : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
-                >
-                  DPS (Całodobowe)
-                </button>
-                
-                <button 
-                  onClick={() => handleTypeChange('ŚDS')}
-                  className={`px-4 py-2.5 md:px-6 md:py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                    ${selectedType === 'ŚDS' 
-                      ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
-                      : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
-                >
-                  ŚDS (Dzienne)
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile version - v2 Style */}
-          <div className="md:hidden">
-            {/* Mobile Simple Location Input with Search Button */}
-            <div className="flex gap-2 mb-6 relative z-20">
-              <div className="flex-1 relative">
-                <label htmlFor="mobile-location" className="sr-only">Wpisz miasto</label>
-                <input
-                  id="mobile-location"
-                  ref={inputRefMobile}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Wpisz miejscowość..."
-                  className={`w-full pl-4 pr-10 py-3 rounded-xl border border-stone-200 bg-white shadow-sm outline-none h-full focus:ring-2 
-                    ${selectedType === 'DPS' ? 'focus:ring-primary-500' 
-                    : selectedType === 'ŚDS' ? 'focus:ring-secondary-500'
-                    : 'focus:ring-slate-500'}`}
-                  autoComplete="off"
-                />
-
-                {isLoading && (
-                  <div className="absolute right-12 top-1/2 -translate-y-1/2">
-                    <div className="animate-spin h-4 w-4 border-2 border-accent-500 border-t-transparent rounded-full" />
-                  </div>
-                )}
-
-                <AutocompleteDropdown />
-              </div>
-              
-              <button 
-                onClick={handleSearch}
-                className={`px-4 rounded-xl font-bold text-white shadow-md active:scale-95 transition-all flex items-center justify-center min-w-[56px]
-                  ${selectedType === 'DPS' ? 'bg-primary-600' 
-                  : selectedType === 'ŚDS' ? 'bg-secondary-600'
-                  : 'bg-slate-800'}`}
-                aria-label="Szukaj"
-              >
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Geolocation text ABOVE buttons - Mobile */}
-            <div className="text-center mb-4">
-              <button
-                onClick={handleGeolocation}
-                disabled={isGeoLoading}
-                className="text-xs text-slate-600 hover:text-primary-600 font-medium inline-flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
-              >
-                {isGeoLoading ? (
-                  <>
-                    <svg width="14" height="14" className="animate-spin">
-                      <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="31" strokeDashoffset="15.5"/>
-                    </svg>
-                    <span>Wyszukiwanie...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 text-primary-600 group-hover:text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="group-hover:underline">Użyj geolokalizacji — znajdź najbliższe placówki</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Quick Filters / Tabs - Mobile */}
-            <div className="flex flex-wrap justify-center gap-2">
-              <button 
-                onClick={() => handleTypeChange('WSZYSTKIE')}
-                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border flex items-center gap-2
-                  ${selectedType === 'WSZYSTKIE' 
-                    ? 'bg-slate-800 border-slate-800 text-white ring-4 ring-slate-200' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-slate-300 hover:text-slate-800'}`}
-              >
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                Wszystkie
-              </button>
-
-              <button 
-                onClick={() => handleTypeChange('DPS')}
-                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                  ${selectedType === 'DPS' 
-                    ? 'bg-primary-600 border-primary-600 text-white ring-4 ring-primary-100' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-primary-300 hover:text-primary-600'}`}
-              >
-                DPS
-              </button>
-              
-              <button 
-                onClick={() => handleTypeChange('ŚDS')}
-                className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-sm border 
-                  ${selectedType === 'ŚDS' 
-                    ? 'bg-secondary-600 border-secondary-600 text-white ring-4 ring-secondary-100' 
-                    : 'bg-white border-stone-200 text-slate-600 hover:border-secondary-300 hover:text-secondary-600'}`}
-              >
-                ŚDS
-              </button>
-            </div>
-          </div>
-
-          {/* Profile Selection - CategorySelector Integration */}
-          <div className="mt-8">
-            <CategorySelector
-              activeTab={
-                selectedType === 'DPS' ? 'DPS' :
-                selectedType === 'ŚDS' ? 'SDS' :
-                'Wszystkie'
-              }
-              onSearch={() => {}}
-              onProfilesChange={(profiles) => {
-                console.log('🎯 Hero received profiles:', profiles);
+        {/* COMMAND CENTER HUB */}
+        <div className="bg-white rounded-[2.5rem] p-2.5 md:p-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200">
+          
+          {/* TAB SWITCHER */}
+          <div className="flex p-1 bg-stone-100/80 rounded-[2rem] mb-2 relative overflow-hidden">
+            <div 
+              className="absolute top-1 bottom-1 bg-slate-900 rounded-[1.8rem] shadow-lg transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-0"
+              style={{
+                left: activeTab === 'search' ? '4px' : 'calc(50%)',
+                width: 'calc(50% - 4px)',
               }}
-              location={searchQuery}
             />
+            
+            <button 
+              onClick={() => setActiveTab('search')}
+              className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-[1.8rem] text-xs font-black uppercase tracking-widest transition-all relative z-10
+                ${activeTab === 'search' ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
+            >
+              <Search size={16} />
+              <span className="hidden sm:inline">Szybka wyszukiwarka</span>
+              <span className="sm:hidden">Wyszukiwarka</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('assistant')}
+              className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-[1.8rem] text-xs font-black uppercase tracking-widest transition-all relative z-10
+                ${activeTab === 'assistant' ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
+            >
+              <Sparkles size={16} />
+              <span className="hidden sm:inline">Inteligentny doradca</span>
+              <span className="sm:hidden">Doradca</span>
+            </button>
+          </div>
+
+          {/* CONTENT AREA */}
+          <div className="relative overflow-hidden min-h-auto sm:min-h-[320px]">
+            
+            {/* SEARCH VIEW */}
+            <div className={`p-4 md:p-8 transition-all duration-300 ease-out flex flex-col justify-center w-full
+              ${activeTab === 'search' 
+                ? 'opacity-100 translate-y-0 pointer-events-auto relative' 
+                : 'opacity-0 -translate-y-4 pointer-events-none absolute inset-0'}`}
+            >
+               <div className="space-y-6 md:space-y-8">
+                  {/* Facility Type Selection */}
+                  <div className="flex justify-center gap-2 flex-wrap">
+                     <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
+                     <TypeChip active={selectedType === 'DPS'} label="DPS" sub="Całodobowe" onClick={() => setSelectedType('DPS')} />
+                     <TypeChip active={selectedType === 'ŚDS'} label="ŚDS" sub="Dzienne" onClick={() => setSelectedType('ŚDS')} />
+                  </div>
+
+                  {/* Form Row */}
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                       <div className="md:col-span-8 relative group">
+                          <div className={`absolute left-5 top-1/2 -translate-y-1/2 transition-colors ${validationState === 'invalid' ? 'text-amber-500' : 'text-slate-300 group-focus-within:text-primary-500'}`}>
+                             <MapPin size={22} />
+                          </div>
+                          <input 
+                             type="text" 
+                             value={cityInput} 
+                             onChange={(e) => setCityInput(e.target.value)}
+                             placeholder="Miejscowość lub powiat..."
+                             enterKeyHint="search"
+                             autoComplete="off"
+                             spellCheck="false"
+                             className={`w-full bg-stone-50 border-2 py-5 pl-14 pr-6 rounded-2xl text-lg font-bold text-slate-900 focus:bg-white outline-none transition-all placeholder:text-slate-300 shadow-inner
+                               ${validationState === 'invalid' ? 'border-amber-200' : 'border-transparent focus:border-primary-200'}`}
+                          />
+                       </div>
+
+                       <div className="md:col-span-4">
+                          <button 
+                             onClick={handleSearchClick}
+                             className={`w-full h-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] text-white shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3
+                               ${selectedType === 'DPS' ? 'bg-primary-600 hover:bg-primary-500 shadow-primary-600/20' : selectedType === 'ŚDS' ? 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20' : 'bg-slate-900 hover:bg-slate-800 shadow-slate-900/20'}`}
+                          >
+                             Szukaj <ArrowRight size={18} />
+                          </button>
+                       </div>
+                    </div>
+
+                    {/* INLINE VALIDATION & QUICK LINKS */}
+                    <div className="min-h-[24px] px-2">
+                       {validationState === 'invalid' ? (
+                         <p className="text-[11px] font-bold text-amber-600 flex items-center gap-1.5 animate-fade-in">
+                            <AlertCircle size={14} /> {cityInput} nie jest w naszej bazie. Teraz obejmujemy Małopolskę.
+                         </p>
+                       ) : cityInput.length === 0 ? (
+                         <div className="flex flex-wrap items-center gap-3 animate-fade-in">
+                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Popularne:</span>
+                            {["Kraków", "Tarnów", "Nowy Sącz"].map(city => (
+                              <button 
+                                key={city}
+                                onClick={() => setCityInput(city)}
+                                className="text-[10px] font-bold text-slate-500 hover:text-primary-600 underline decoration-slate-200 underline-offset-4 hover:decoration-primary-300 transition-all"
+                              >
+                                {city}
+                              </button>
+                            ))}
+                         </div>
+                       ) : validationState === 'valid' ? (
+                         <p className="text-[11px] font-bold text-emerald-600 flex items-center gap-1.5 animate-fade-in">
+                            <Check size={14} /> Region Małopolski zweryfikowany
+                         </p>
+                       ) : null}
+                    </div>
+                  </div>
+
+                  <div className="text-center pt-2">
+                     <button className="inline-flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tracking-widest hover:text-primary-600 transition-colors group">
+                        <Navigation size={14} className="text-primary-500 group-hover:animate-bounce" />
+                        <span className="underline decoration-dotted underline-offset-4 decoration-2">Namierz moją lokalizację</span>
+                     </button>
+                  </div>
+               </div>
+            </div>
+
+            {/* ASSISTANT VIEW */}
+            <div className={`p-6 md:p-14 transition-all duration-300 ease-out flex flex-col items-center text-center justify-center w-full
+              ${activeTab === 'assistant' 
+                ? 'opacity-100 translate-y-0 pointer-events-auto relative' 
+                : 'opacity-0 translate-y-4 pointer-events-none absolute inset-0'}`}
+            >
+                <div className="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 mb-6 border border-primary-100 shadow-sm">
+                  <Sparkles size={28} />
+                </div>
+                
+                <h3 className="text-2xl md:text-4xl font-serif font-bold text-slate-900 mb-3 tracking-tight">
+                  Potrzebujesz przewodnika?
+                </h3>
+                
+                <p className="text-slate-500 text-base md:text-lg max-w-lg mb-8 leading-relaxed font-medium px-4">
+                  Odpowiedz na 4 pytania o stan zdrowia seniora. System podpowie czy lepszy będzie DPS czy ŚDS i przygotuje plan działania.
+                </p>
+                
+                <div className="flex flex-col items-center gap-4">
+                  <button 
+                    onClick={() => window.location.href = '/asystent?start=true'}
+                    className="inline-flex items-center gap-4 bg-primary-600 hover:bg-primary-700 text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-primary-600/20 transition-all active:scale-95 group"
+                  >
+                    Uruchom Doradcę <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
+                  </button>
+                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Zajmie to mniej niż 2 minuty</span>
+                </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Region Modal */}
-      <RegionModal
-        isOpen={showRegionModal}
-        onClose={() => setShowRegionModal(false)}
-      />
-    </section>
+        {/* TRUST BAR */}
+        <div className="mt-12 flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+           <TrustItem icon={<ShieldCheck size={18}/>} text="Oficjalne dane BIP" />
+           <TrustItem icon={<Building2 size={18}/>} text="36 Placówek Małopolski" />
+           <TrustItem icon={<Check size={18}/>} text="Brak opłat i reklam" />
+        </div>
+
+      </div>
+    </div>
   );
-}
+};
+
+const TypeChip = ({ active, label, sub, onClick }: { active: boolean, label: string, sub?: string, onClick: () => void }) => (
+  <button 
+    onClick={onClick}
+    className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl border-2 transition-all flex flex-col items-center justify-center min-w-[85px] sm:min-w-[110px]
+      ${active 
+        ? 'bg-white border-primary-500 shadow-md ring-4 ring-primary-50 scale-105' 
+        : 'bg-stone-50 border-transparent text-slate-400 hover:bg-white hover:border-stone-200'}`}
+  >
+    <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${active ? 'text-slate-900' : ''}`}>{label}</span>
+    {sub && <span className={`hidden sm:block text-[8px] font-bold uppercase tracking-widest mt-0.5 ${active ? 'text-primary-600' : 'opacity-50'}`}>{sub}</span>}
+  </button>
+);
+
+const TrustItem = ({ icon, text }: { icon: React.ReactNode, text: string }) => (
+  <div className="flex items-center gap-2 group cursor-default">
+    <div className="text-primary-600 transition-transform group-hover:scale-110">{icon}</div>
+    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900">{text}</span>
+  </div>
+);
+
+export default Hero;
