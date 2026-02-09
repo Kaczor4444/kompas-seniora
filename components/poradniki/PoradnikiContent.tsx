@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import {
   ArrowRight,
   Clock,
@@ -24,6 +23,7 @@ interface PoradnikiContentProps {
   isFullPage?: boolean
   onBack?: () => void
   showHero?: boolean
+  initialCategory?: string
 }
 
 const categories = ["Wszystkie", "Wybór opieki", "Dla opiekuna", "Dla seniora", "Finanse", "Prawne", "Zakładki"]
@@ -43,20 +43,17 @@ export default function PoradnikiContent({
   initialArticles,
   isFullPage = true,
   onBack,
-  showHero = true
+  showHero = true,
+  initialCategory = "Wszystkie"
 }: PoradnikiContentProps) {
-  const searchParams = useSearchParams()
-  const [activeCategory, setActiveCategory] = useState("Wszystkie")
+  const [activeCategory, setActiveCategory] = useState(initialCategory)
   const [searchQuery, setSearchQuery] = useState("")
   const [savedArticleIds, setSavedArticleIds] = useState<string[]>([])
 
-  // Sync activeCategory with URL params on mount and when searchParams change
+  // Update activeCategory when initialCategory prop changes
   useEffect(() => {
-    const categoryParam = searchParams?.get('category')
-    if (categoryParam) {
-      setActiveCategory(categoryParam)
-    }
-  }, [searchParams])
+    setActiveCategory(initialCategory)
+  }, [initialCategory])
 
   // Load saved articles from localStorage
   useEffect(() => {
