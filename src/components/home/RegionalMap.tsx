@@ -256,7 +256,7 @@ export default function RegionalMap({ onRegionSelect, totalFacilities = 82 }: Re
               )}
 
               {/* LEGEND */}
-              <div className="absolute bottom-2 left-2 md:bottom-4 md:left-4 space-y-3 bg-white/90 backdrop-blur-xl p-3 md:p-4 rounded-2xl border border-emerald-200 shadow-[0_8px_32px_rgba(0,0,0,0.05)] z-[120]">
+              <div className="absolute bottom-2 left-2 md:bottom-4 md:left-4 space-y-3 bg-white/90 backdrop-blur-xl p-3 md:p-4 rounded-2xl border border-emerald-200 shadow-[0_8px_32px_rgba(0,0,0,0.05)] z-40">
                  <div 
                   onMouseEnter={() => setLegendHover('active')} 
                   onMouseLeave={() => setLegendHover(null)} 
