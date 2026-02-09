@@ -434,19 +434,20 @@ body.accessibility-high-contrast {
 }
 
 /* Bardziej selektywne style - bez gwiazdki która psuje wszystko */
-body.accessibility-high-contrast p,
-body.accessibility-high-contrast h1,
-body.accessibility-high-contrast h2,
-body.accessibility-high-contrast h3,
-body.accessibility-high-contrast h4,
-body.accessibility-high-contrast h5,
-body.accessibility-high-contrast h6,
-body.accessibility-high-contrast span:not([class*="bg-"]),
-body.accessibility-high-contrast div:not([class*="bg-"]):not([class*="border"]),
-body.accessibility-high-contrast li,
-body.accessibility-high-contrast td,
-body.accessibility-high-contrast th,
-body.accessibility-high-contrast label {
+/* Wykluczamy elementy wewnątrz linków i przycisków aby zachować ich kolory */
+body.accessibility-high-contrast p:not(a *):not(button *),
+body.accessibility-high-contrast h1:not(a *):not(button *),
+body.accessibility-high-contrast h2:not(a *):not(button *),
+body.accessibility-high-contrast h3:not(a *):not(button *),
+body.accessibility-high-contrast h4:not(a *):not(button *),
+body.accessibility-high-contrast h5:not(a *):not(button *),
+body.accessibility-high-contrast h6:not(a *):not(button *),
+body.accessibility-high-contrast span:not([class*="bg-"]):not(a *):not(button *),
+body.accessibility-high-contrast div:not([class*="bg-"]):not([class*="border"]):not(a *):not(button *),
+body.accessibility-high-contrast li:not(a *):not(button *),
+body.accessibility-high-contrast td:not(a *):not(button *),
+body.accessibility-high-contrast th:not(a *):not(button *),
+body.accessibility-high-contrast label:not(a *):not(button *) {
   color: inherit;
   background: transparent;
 }
@@ -455,6 +456,12 @@ body.accessibility-high-contrast label {
 body.accessibility-high-contrast a,
 body.accessibility-high-contrast button {
   border: 2px solid currentColor !important;
+}
+
+/* Zachowaj kolory tekstu dla linków i przycisków oraz ich dzieci */
+body.accessibility-high-contrast a *,
+body.accessibility-high-contrast button * {
+  color: inherit !important;
 }
 
 /* Obrazy i ikony z wyższym kontrastem */
