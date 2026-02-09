@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Heart, Calculator, BookOpen, Menu, X, Eye, ChevronDown, Phone, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, Heart, Calculator, BookOpen, Menu, X, Eye, ChevronDown, Mail, ChevronRight, Sparkles } from 'lucide-react';
 import { getFavoritesCount } from '@/src/utils/favorites';
 import { AccessibilityPanel } from './AccessibilityPanel';
 
@@ -330,7 +330,7 @@ export default function Navbar() {
                     : (isActive('/kontakt') ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:text-primary-600 hover:bg-stone-50')
                   }`}
               >
-                <Phone size={16} />
+                <Mail size={16} />
                 Kontakt
               </Link>
             </div>
@@ -421,7 +421,7 @@ export default function Navbar() {
                     : (isActive('/kontakt') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-slate-700 hover:bg-stone-50 hover:text-primary-600')
                 }`}
               >
-                <Phone size={20} />
+                <Mail size={20} />
                 <span className="font-bold">Kontakt bezpośredni</span>
               </Link>
 
