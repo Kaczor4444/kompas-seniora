@@ -470,26 +470,28 @@ body.accessibility-high-contrast svg {
   filter: contrast(1.3);
 }
 
-/* Specjalne reguły dla navbar - wymuszenie widoczności linków */
-/* Nieaktywne linki - żółty tekst */
+/* Specjalne reguły dla navbar - elegancki wysoki kontrast */
+/* Nieaktywne linki - białe teksty */
 body.accessibility-high-contrast nav a,
 body.accessibility-high-contrast nav button {
-  color: #fbbf24 !important; /* yellow-400 */
+  color: #fff !important; /* biały tekst */
 }
 
 body.accessibility-high-contrast nav a:hover,
 body.accessibility-high-contrast nav button:hover {
-  color: #fcd34d !important; /* yellow-300 - lighter for hover */
+  color: #fef08a !important; /* jasny żółty na hover */
+  text-shadow: 0 0 8px rgba(254, 240, 138, 0.5) !important;
 }
 
-/* Aktywne linki - białe tło z czarnym tekstem dla maksymalnego kontrastu */
+/* Aktywne linki - żółte tło z czarnym tekstem + subtelny efekt świecenia */
 body.accessibility-high-contrast nav a[class*="bg-yellow"],
 body.accessibility-high-contrast nav button[class*="bg-yellow"],
 body.accessibility-high-contrast nav a[class*="bg-primary"],
 body.accessibility-high-contrast nav button[class*="bg-primary"] {
-  background-color: #fff !important; /* białe tło */
+  background-color: #fbbf24 !important; /* żółte tło */
   color: #000 !important; /* czarny tekst */
-  border: 3px solid #fbbf24 !important; /* żółta ramka dla wyróżnienia */
+  border: 2px solid #fbbf24 !important;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.6) !important; /* subtelne świecenie */
 }
 
 /* Elementy wewnątrz aktywnych linków też czarne */
@@ -500,9 +502,39 @@ body.accessibility-high-contrast nav button[class*="bg-primary"] * {
   color: #000 !important;
 }
 
+/* Dropdown menu (Poradniki) - specjalne reguły */
+body.accessibility-high-contrast nav div[class*="absolute"] {
+  background-color: #000 !important; /* czarne tło dla dropdownu */
+  border: 2px solid #fbbf24 !important; /* żółta ramka */
+}
+
+/* Linki w dropdown - białe normalne, żółte na hover */
+body.accessibility-high-contrast nav div[class*="absolute"] a {
+  color: #fff !important;
+  background-color: transparent !important;
+}
+
+body.accessibility-high-contrast nav div[class*="absolute"] a:hover {
+  background-color: #fbbf24 !important;
+  color: #000 !important;
+}
+
+/* Tekst w linkach dropdown też zmienia kolor */
+body.accessibility-high-contrast nav div[class*="absolute"] a:hover * {
+  color: #000 !important;
+}
+
 /* Ikony w navbar */
 body.accessibility-high-contrast nav svg {
   color: inherit !important;
+}
+
+/* Badge z liczbą (ulubione) - wyraźnie widoczny */
+body.accessibility-high-contrast nav span[class*="absolute"] {
+  background-color: #fbbf24 !important; /* żółte tło */
+  color: #000 !important; /* czarny tekst */
+  border-color: #000 !important; /* czarna ramka */
+  font-weight: 900 !important;
 }
 
 /* Large Font */
