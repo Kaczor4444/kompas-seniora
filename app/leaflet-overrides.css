@@ -1,3 +1,10 @@
+/* Leaflet z-index - kontrolki mapy nie mogą zachodzić na navbar (z-50) */
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-control {
+  z-index: 40 !important;
+}
+
 /* Leaflet Popup Overrides - bardziej specyficzne */
 .leaflet-popup-content a,
 .leaflet-popup-content-wrapper a,
