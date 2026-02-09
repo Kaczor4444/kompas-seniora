@@ -429,15 +429,38 @@ textarea {
 
 /* High Contrast Mode */
 body.accessibility-high-contrast {
-  filter: contrast(1.5);
+  filter: contrast(1.5) brightness(1.1);
   background: #000 !important;
-  color: #ffff00 !important;
 }
 
-body.accessibility-high-contrast * {
-  color: #ffff00 !important;
-  background: #000 !important;
-  border-color: #ffff00 !important;
+/* Bardziej selektywne style - bez gwiazdki która psuje wszystko */
+body.accessibility-high-contrast p,
+body.accessibility-high-contrast h1,
+body.accessibility-high-contrast h2,
+body.accessibility-high-contrast h3,
+body.accessibility-high-contrast h4,
+body.accessibility-high-contrast h5,
+body.accessibility-high-contrast h6,
+body.accessibility-high-contrast span:not([class*="bg-"]),
+body.accessibility-high-contrast div:not([class*="bg-"]):not([class*="border"]),
+body.accessibility-high-contrast li,
+body.accessibility-high-contrast td,
+body.accessibility-high-contrast th,
+body.accessibility-high-contrast label {
+  color: inherit;
+  background: transparent;
+}
+
+/* Przyciski i linki bardziej widoczne */
+body.accessibility-high-contrast a,
+body.accessibility-high-contrast button {
+  border: 2px solid currentColor !important;
+}
+
+/* Obrazy i ikony z wyższym kontrastem */
+body.accessibility-high-contrast img,
+body.accessibility-high-contrast svg {
+  filter: contrast(1.3);
 }
 
 /* Large Font */

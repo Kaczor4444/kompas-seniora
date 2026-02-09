@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 export default function ReadingProgressBar() {
   const [progress, setProgress] = useState(0)
+  const [isHighContrast, setIsHighContrast] = useState(false)
 
   useEffect(() => {
     const updateProgress = () => {
@@ -18,18 +19,33 @@ export default function ReadingProgressBar() {
       setProgress(Math.min(currentProgress, 100))
     }
 
+    // Check high contrast mode
+    const checkHighContrast = () => {
+      setIsHighContrast(document.body.classList.contains('accessibility-high-contrast'))
+    }
+
     // Update on scroll
     window.addEventListener('scroll', updateProgress)
 
-    // Initial calculation
+    // Initial calculations
     updateProgress()
+    checkHighContrast()
 
-    return () => window.removeEventListener('scroll', updateProgress)
+    // Observer for body class changes
+    const observer = new MutationObserver(checkHighContrast)
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
+
+    return () => {
+      window.removeEventListener('scroll', updateProgress)
+      observer.disconnect()
+    }
   }, [])
 
   return (
     <div
-      className="fixed top-[66px] left-0 right-0 h-1 bg-gray-200 z-[51] pointer-events-none shadow-sm"
+      className={`fixed top-20 left-0 right-0 h-1 z-[51] pointer-events-none shadow-sm hidden md:block ${
+        isHighContrast ? 'bg-slate-800' : 'bg-stone-100'
+      }`}
       role="progressbar"
       aria-valuenow={Math.round(progress)}
       aria-valuemin={0}
@@ -37,7 +53,9 @@ export default function ReadingProgressBar() {
       aria-label={`Przeczytano ${Math.round(progress)}% artykułu`}
     >
       <div
-        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-150 ease-out shadow-[0_0_8px_rgba(16,185,129,0.3)]"
+        className={`h-full transition-all duration-150 ease-linear shadow-[0_0_12px_rgba(5,150,105,0.4)] ${
+          isHighContrast ? 'bg-yellow-400' : 'bg-primary-600'
+        }`}
         style={{ width: `${progress}%` }}
       />
     </div>

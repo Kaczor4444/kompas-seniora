@@ -2,10 +2,18 @@
 
 import React from 'react';
 import {
-  X, Type, Eye, Link2, ZapOff, Check, MoveVertical,
+  X, Type, Link2, ZapOff, Check, MoveVertical,
   MousePointer2, ImageOff, AlignLeft, MoveHorizontal, Droplet, ArrowUpFromLine,
   MessageSquare, RotateCcw
 } from 'lucide-react';
+
+const AccessibilityIcon = ({ className, size = 24 }: { className?: string; size?: number }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} width={size} height={size}>
+    <circle cx="50" cy="50" r="44" stroke="currentColor" strokeWidth="8"/>
+    <circle cx="50" cy="30" r="7" fill="currentColor"/>
+    <path d="M50 40 L50 65 M50 42 L25 55 M50 42 L75 55 M50 65 L35 88 M50 65 L65 88" stroke="currentColor" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
 interface AccessibilitySettings {
   isHighContrast: boolean;
@@ -54,7 +62,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
         <div className="p-6 border-b border-stone-100 flex justify-between items-center bg-white z-10">
             <div>
                 <h2 className="text-xl font-bold font-serif text-slate-900 flex items-center gap-2">
-                <Eye className="text-primary-600" size={24} />
+                <AccessibilityIcon className="text-primary-600" size={24} />
                 Dostępność
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">Dostosuj widok strony</p>
@@ -75,7 +83,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                 {/* Contrast */}
                 <GridToggle
                     label="Kontrast +"
-                    icon={<Eye size={24} />}
+                    icon={<AccessibilityIcon size={24} />}
                     isActive={settings.isHighContrast}
                     onClick={() => toggleSetting('isHighContrast')}
                 />

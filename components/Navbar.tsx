@@ -3,9 +3,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Heart, Calculator, BookOpen, Menu, X, Eye, ChevronDown, Mail, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, Heart, Calculator, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Sparkles } from 'lucide-react';
 import { getFavoritesCount } from '@/src/utils/favorites';
 import { AccessibilityPanel } from './AccessibilityPanel';
+
+const AccessibilityIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="50" cy="50" r="44" stroke="currentColor" strokeWidth="8"/>
+    <circle cx="50" cy="30" r="7" fill="currentColor"/>
+    <path d="M50 40 L50 65 M50 42 L25 55 M50 42 L75 55 M50 65 L35 88 M50 65 L65 88" stroke="currentColor" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
 const HeartCompassLogo = ({ isHighContrast }: { isHighContrast: boolean }) => (
   <div className="relative w-12 h-12 flex items-center justify-center group">
@@ -50,6 +58,8 @@ export default function Navbar() {
   const [isMobileGuidesExpanded, setIsMobileGuidesExpanded] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Accessibility settings
   const [accessibilitySettings, setAccessibilitySettings] = useState({
@@ -132,12 +142,26 @@ export default function Navbar() {
       }
 
       lastScrollY.current = currentScrollY;
+
+      // Progress bar visibility during scrolling
+      setIsScrolling(true);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 1500); // Hide after 1.5s of no scrolling
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
   }, []);
 
   const isNavbarVisible = isOpen || isVisible;
@@ -315,10 +339,10 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-3">
               <button
                 onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all font-bold border ${isHighContrast ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-stone-50 text-slate-600 border-stone-200 hover:border-primary-300 hover:text-primary-700 hover:bg-white'}`}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all font-bold border ${isHighContrast ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-stone-50 text-slate-600 border-stone-200 hover:border-primary-300 hover:text-primary-700 hover:bg-white'}`}
                 aria-label="Otwórz panel dostępności"
               >
-                <Eye size={18} />
+                <AccessibilityIcon className="w-[18px] h-[18px]" />
                 <span className="text-xs uppercase tracking-wider">Dostępność</span>
               </button>
 
@@ -428,9 +452,9 @@ export default function Navbar() {
               <div className="mt-8 pt-8 border-t border-stone-100">
                  <button
                     onClick={() => { setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen); setIsOpen(false); }}
-                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
+                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-full border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
                   >
-                    <Eye size={20} /> <span>Ułatwienia dostępu</span>
+                    <AccessibilityIcon className="w-[20px] h-[20px]" /> <span>Ułatwienia dostępu</span>
                  </button>
               </div>
             </div>
@@ -439,9 +463,13 @@ export default function Navbar() {
       </nav>
 
       {/* Progress Bar with shadow */}
+      {/* Desktop: UKRYTY (w artykułach jest ReadingProgressBar) */}
+      {/* Mobile: Widoczny podczas scrollu WSZĘDZIE (jeden uniwersalny pasek) */}
       <div
-        className={`fixed left-0 w-full h-1 z-[45] transition-all duration-300 ease-in-out ${isHighContrast ? 'bg-slate-800' : 'bg-stone-100'}
-        ${isNavbarVisible ? 'top-20' : 'top-0 md:top-20'}`}
+        className={`fixed left-0 w-full h-1 z-[45] transition-all duration-300 ease-in-out
+        ${isHighContrast ? 'bg-slate-800' : 'bg-stone-100'}
+        ${isNavbarVisible ? 'top-20' : 'top-0'}
+        md:hidden ${isScrolling ? 'block' : 'hidden'}`}
       >
         <div
           className={`h-full transition-all duration-150 ease-linear shadow-[0_0_12px_rgba(5,150,105,0.4)] ${
