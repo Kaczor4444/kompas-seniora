@@ -422,3 +422,104 @@ textarea {
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
+
+/* ========================================
+   ♿ ACCESSIBILITY SETTINGS
+   ======================================== */
+
+/* High Contrast Mode */
+body.accessibility-high-contrast {
+  filter: contrast(1.5);
+  background: #000 !important;
+  color: #ffff00 !important;
+}
+
+body.accessibility-high-contrast * {
+  color: #ffff00 !important;
+  background: #000 !important;
+  border-color: #ffff00 !important;
+}
+
+/* Large Font */
+body.accessibility-large-font {
+  font-size: 125% !important;
+}
+
+body.accessibility-large-font * {
+  font-size: inherit !important;
+}
+
+/* Links Underlined */
+body.accessibility-links-underlined a {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+}
+
+/* Reduce Motion */
+body.accessibility-reduce-motion,
+body.accessibility-reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Dyslexia Friendly Font */
+body.accessibility-dyslexia-friendly,
+body.accessibility-dyslexia-friendly * {
+  font-family: 'Arial', 'Comic Sans MS', sans-serif !important;
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+}
+
+/* Text Spacing */
+body.accessibility-text-spacing {
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+  line-height: 1.8 !important;
+}
+
+body.accessibility-text-spacing p {
+  margin-bottom: 2em !important;
+}
+
+/* Hide Images */
+body.accessibility-hide-images img,
+body.accessibility-hide-images picture,
+body.accessibility-hide-images svg[role="img"],
+body.accessibility-hide-images [style*="background-image"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Big Cursor */
+body.accessibility-big-cursor,
+body.accessibility-big-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="black" stroke="white" stroke-width="2" d="M3,3 L13,23 L17,18 L23,22 L28,17 L21,11 L26,7 Z"/></svg>') 16 16, auto !important;
+}
+
+/* Increased Line Height */
+body.accessibility-line-height,
+body.accessibility-line-height * {
+  line-height: 2 !important;
+}
+
+/* Text Align Left */
+body.accessibility-text-align-left,
+body.accessibility-text-align-left * {
+  text-align: left !important;
+}
+
+/* Monochrome/Saturation */
+body.accessibility-saturation {
+  filter: grayscale(100%) !important;
+}
+
+/* Tooltips - Enhanced visible tooltips */
+body.accessibility-tooltips [title]::after {
+  content: " [" attr(title) "]";
+  font-size: 0.85em;
+  color: var(--color-primary-600);
+  font-weight: bold;
+}

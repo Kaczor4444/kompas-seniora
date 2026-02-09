@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, Heart, Calculator, BookOpen, Menu, X, Eye, ChevronDown, Phone, ChevronRight, Sparkles } from 'lucide-react';
 import { getFavoritesCount } from '@/src/utils/favorites';
+import { AccessibilityPanel } from './AccessibilityPanel';
 
 const HeartCompassLogo = ({ isHighContrast }: { isHighContrast: boolean }) => (
   <div className="relative w-12 h-12 flex items-center justify-center group">
@@ -48,8 +49,40 @@ export default function Navbar() {
   const [isGuidesHovered, setIsGuidesHovered] = useState(false);
   const [isMobileGuidesExpanded, setIsMobileGuidesExpanded] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState(0);
-  const [isHighContrast, setIsHighContrast] = useState(false);
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
+
+  // Accessibility settings
+  const [accessibilitySettings, setAccessibilitySettings] = useState({
+    isHighContrast: false,
+    isLargeFont: false,
+    linksUnderlined: false,
+    reduceMotion: false,
+    dyslexiaFriendly: false,
+    textSpacing: false,
+    hideImages: false,
+    bigCursor: false,
+    lineHeight: false,
+    textAlignLeft: false,
+    saturation: false,
+    tooltips: false,
+  });
+
+  // Load accessibility settings from localStorage on mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('accessibility-settings');
+    if (savedSettings) {
+      try {
+        setAccessibilitySettings(JSON.parse(savedSettings));
+      } catch (e) {
+        console.error('Failed to parse accessibility settings:', e);
+      }
+    }
+  }, []);
+
+  // Save accessibility settings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('accessibility-settings', JSON.stringify(accessibilitySettings));
+  }, [accessibilitySettings]);
 
   const pathname = usePathname();
   const lastScrollY = useRef(0);
@@ -116,6 +149,75 @@ export default function Navbar() {
     "Finanse i świadczenia",
     "Prawne aspekty"
   ];
+
+  // Accessibility functions
+  const toggleSetting = (key: keyof typeof accessibilitySettings) => {
+    setAccessibilitySettings(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const resetSettings = () => {
+    setAccessibilitySettings({
+      isHighContrast: false,
+      isLargeFont: false,
+      linksUnderlined: false,
+      reduceMotion: false,
+      dyslexiaFriendly: false,
+      textSpacing: false,
+      hideImages: false,
+      bigCursor: false,
+      lineHeight: false,
+      textAlignLeft: false,
+      saturation: false,
+      tooltips: false,
+    });
+  };
+
+  // Alias for backward compatibility with existing code
+  const isHighContrast = accessibilitySettings.isHighContrast;
+
+  // Apply accessibility settings globally to body element
+  useEffect(() => {
+    const body = document.body;
+
+    // High Contrast
+    body.classList.toggle('accessibility-high-contrast', accessibilitySettings.isHighContrast);
+
+    // Large Font
+    body.classList.toggle('accessibility-large-font', accessibilitySettings.isLargeFont);
+
+    // Links Underlined
+    body.classList.toggle('accessibility-links-underlined', accessibilitySettings.linksUnderlined);
+
+    // Reduce Motion
+    body.classList.toggle('accessibility-reduce-motion', accessibilitySettings.reduceMotion);
+
+    // Dyslexia Friendly
+    body.classList.toggle('accessibility-dyslexia-friendly', accessibilitySettings.dyslexiaFriendly);
+
+    // Text Spacing
+    body.classList.toggle('accessibility-text-spacing', accessibilitySettings.textSpacing);
+
+    // Hide Images
+    body.classList.toggle('accessibility-hide-images', accessibilitySettings.hideImages);
+
+    // Big Cursor
+    body.classList.toggle('accessibility-big-cursor', accessibilitySettings.bigCursor);
+
+    // Line Height
+    body.classList.toggle('accessibility-line-height', accessibilitySettings.lineHeight);
+
+    // Text Align Left
+    body.classList.toggle('accessibility-text-align-left', accessibilitySettings.textAlignLeft);
+
+    // Saturation (Monochrome)
+    body.classList.toggle('accessibility-saturation', accessibilitySettings.saturation);
+
+    // Tooltips
+    body.classList.toggle('accessibility-tooltips', accessibilitySettings.tooltips);
+  }, [accessibilitySettings]);
 
   return (
     <>
@@ -338,7 +440,7 @@ export default function Navbar() {
 
       {/* Progress Bar with shadow */}
       <div
-        className={`fixed left-0 w-full h-1 z-[51] transition-all duration-300 ease-in-out ${isHighContrast ? 'bg-slate-800' : 'bg-stone-100'}
+        className={`fixed left-0 w-full h-1 z-[45] transition-all duration-300 ease-in-out ${isHighContrast ? 'bg-slate-800' : 'bg-stone-100'}
         ${isNavbarVisible ? 'top-20' : 'top-0 md:top-20'}`}
       >
         <div
@@ -351,31 +453,14 @@ export default function Navbar() {
         ></div>
       </div>
 
-      {/* Simple Accessibility Panel (placeholder - to be enhanced) */}
-      {isAccessibilityPanelOpen && (
-        <div className="fixed top-20 right-4 z-50 bg-white border border-stone-200 rounded-2xl shadow-2xl p-6 w-80">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-lg">Dostępność</h3>
-            <button onClick={() => setIsAccessibilityPanelOpen(false)} className="text-slate-500 hover:text-slate-700">
-              <X size={20} />
-            </button>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <label className="flex items-center justify-between">
-                <span className="font-medium">Wysoki kontrast</span>
-                <input
-                  type="checkbox"
-                  checked={isHighContrast}
-                  onChange={(e) => setIsHighContrast(e.target.checked)}
-                  className="w-5 h-5"
-                />
-              </label>
-            </div>
-            <p className="text-sm text-slate-600">Więcej opcji dostępności wkrótce...</p>
-          </div>
-        </div>
-      )}
+      {/* Full Accessibility Panel */}
+      <AccessibilityPanel
+        isOpen={isAccessibilityPanelOpen}
+        onClose={() => setIsAccessibilityPanelOpen(false)}
+        settings={accessibilitySettings}
+        toggleSetting={toggleSetting}
+        resetSettings={resetSettings}
+      />
     </>
   );
 }
