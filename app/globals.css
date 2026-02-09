@@ -470,6 +470,41 @@ body.accessibility-high-contrast svg {
   filter: contrast(1.3);
 }
 
+/* Specjalne reguły dla navbar - wymuszenie widoczności linków */
+/* Nieaktywne linki - żółty tekst */
+body.accessibility-high-contrast nav a,
+body.accessibility-high-contrast nav button {
+  color: #fbbf24 !important; /* yellow-400 */
+}
+
+body.accessibility-high-contrast nav a:hover,
+body.accessibility-high-contrast nav button:hover {
+  color: #fcd34d !important; /* yellow-300 - lighter for hover */
+}
+
+/* Aktywne linki - białe tło z czarnym tekstem dla maksymalnego kontrastu */
+body.accessibility-high-contrast nav a[class*="bg-yellow"],
+body.accessibility-high-contrast nav button[class*="bg-yellow"],
+body.accessibility-high-contrast nav a[class*="bg-primary"],
+body.accessibility-high-contrast nav button[class*="bg-primary"] {
+  background-color: #fff !important; /* białe tło */
+  color: #000 !important; /* czarny tekst */
+  border: 3px solid #fbbf24 !important; /* żółta ramka dla wyróżnienia */
+}
+
+/* Elementy wewnątrz aktywnych linków też czarne */
+body.accessibility-high-contrast nav a[class*="bg-yellow"] *,
+body.accessibility-high-contrast nav button[class*="bg-yellow"] *,
+body.accessibility-high-contrast nav a[class*="bg-primary"] *,
+body.accessibility-high-contrast nav button[class*="bg-primary"] * {
+  color: #000 !important;
+}
+
+/* Ikony w navbar */
+body.accessibility-high-contrast nav svg {
+  color: inherit !important;
+}
+
 /* Large Font */
 body.accessibility-large-font {
   font-size: 125% !important;
