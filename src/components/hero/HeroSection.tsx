@@ -268,7 +268,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="bg-white pt-6 pb-12 md:pt-12 md:pb-24 relative overflow-hidden">
+    <div className="bg-white pt-6 pb-8 md:pt-10 md:pb-16 relative overflow-hidden">
       {/* Background Decor - Subtle Grid */}
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:32px_32px] opacity-20 pointer-events-none" />
       <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />
@@ -276,7 +276,7 @@ const Hero = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
         
         {/* HEADER */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-6 md:mb-8">
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 leading-[1.1] tracking-tight mb-4">
             Szukasz opieki <br />
             <span className="relative inline-block text-primary-600">
@@ -294,7 +294,7 @@ const Hero = () => {
         </div>
 
         {/* COMMAND CENTER HUB */}
-        <div className="bg-white rounded-[2.5rem] p-2.5 md:p-3 pb-32 md:pb-40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[20]">
+        <div className="bg-white rounded-[2.5rem] p-2.5 md:p-3 pb-16 md:pb-20 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[20]">
           
           {/* TAB SWITCHER */}
           <div className="flex p-1 bg-stone-100/80 rounded-[2rem] mb-2 relative">
@@ -458,7 +458,7 @@ const Hero = () => {
         </div>
 
         {/* TRUST BAR */}
-        <div className="mt-12 flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+        <div className="mt-6 md:mt-8 flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
            <TrustItem icon={<ShieldCheck size={18}/>} text="Oficjalne dane BIP" />
            <TrustItem icon={<Building2 size={18}/>} text="36 Placówek Małopolski" />
            <TrustItem icon={<Check size={18}/>} text="Brak opłat i reklam" />
