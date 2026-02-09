@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Building2, UserCheck, User, TrendingUp, Scale, Bookmark } from 'lucide-react'
 
 // Article type
@@ -18,12 +19,21 @@ type Article = {
 }
 
 export default function KnowledgeCenter() {
+  const searchParams = useSearchParams()
   const [scrollPosition, setScrollPosition] = useState(0)
   const [activeFilter, setActiveFilter] = useState('Wszystkie')
   const [savedArticles, setSavedArticles] = useState<number[]>([])
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  // Sync activeFilter with URL params on mount and when searchParams change
+  useEffect(() => {
+    const categoryParam = searchParams?.get('category')
+    if (categoryParam) {
+      setActiveFilter(categoryParam)
+    }
+  }, [searchParams])
 
   // Articles data
   const articles: Article[] = [

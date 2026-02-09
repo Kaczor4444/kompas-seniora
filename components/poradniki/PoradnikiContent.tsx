@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   ArrowRight,
   Clock,
@@ -25,7 +26,7 @@ interface PoradnikiContentProps {
   showHero?: boolean
 }
 
-const categories = ["Wszystkie", "Wybór opieki", "Dla opiekuna", "Dla seniora", "Finanse i świadczenia", "Prawne aspekty", "Zakładki"]
+const categories = ["Wszystkie", "Wybór opieki", "Dla opiekuna", "Dla seniora", "Finanse", "Prawne", "Zakładki"]
 const popularTags = ["Koszty DPS 2025", "Wniosek do MOPS", "Różnice DPS vs ŚDS", "Dodatek pielęgnacyjny", "Prawa mieszkańców"]
 
 // Icon mapping for categories
@@ -33,9 +34,9 @@ const categoryIcons: Record<string, any> = {
   "Zakładki": Bookmark,
   "Dla opiekuna": UserCheck,
   "Dla seniora": User,
-  "Finanse i świadczenia": TrendingUp,
+  "Finanse": TrendingUp,
   "Wybór opieki": Building2,
-  "Prawne aspekty": Scale,
+  "Prawne": Scale,
 }
 
 export default function PoradnikiContent({
@@ -44,9 +45,18 @@ export default function PoradnikiContent({
   onBack,
   showHero = true
 }: PoradnikiContentProps) {
+  const searchParams = useSearchParams()
   const [activeCategory, setActiveCategory] = useState("Wszystkie")
   const [searchQuery, setSearchQuery] = useState("")
   const [savedArticleIds, setSavedArticleIds] = useState<string[]>([])
+
+  // Sync activeCategory with URL params on mount and when searchParams change
+  useEffect(() => {
+    const categoryParam = searchParams?.get('category')
+    if (categoryParam) {
+      setActiveCategory(categoryParam)
+    }
+  }, [searchParams])
 
   // Load saved articles from localStorage
   useEffect(() => {

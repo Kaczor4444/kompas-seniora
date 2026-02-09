@@ -146,8 +146,8 @@ export default function Navbar() {
     "Wybór opieki",
     "Dla opiekuna",
     "Dla seniora",
-    "Finanse i świadczenia",
-    "Prawne aspekty"
+    "Finanse",
+    "Prawne"
   ];
 
   // Accessibility functions
