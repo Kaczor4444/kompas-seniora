@@ -432,10 +432,6 @@ const Hero = () => {
                 ? 'opacity-100 translate-y-0 pointer-events-auto relative' 
                 : 'opacity-0 translate-y-4 pointer-events-none absolute inset-0'}`}
             >
-                <div className="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 mb-6 border border-primary-100 shadow-sm">
-                  <Sparkles size={28} />
-                </div>
-                
                 <h3 className="text-2xl md:text-4xl font-serif font-bold text-slate-900 mb-3 tracking-tight">
                   Potrzebujesz przewodnika?
                 </h3>
