@@ -495,7 +495,7 @@ export default function KalkulatorPage() {
             </div>
 
             {/* MOPS contact */}
-            {result.mopsContact && (
+            {result.mopsContact ? (
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
                 <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
                   <Phone className="w-5 h-5" /> Kluczowy kontakt: Wniosek o dopłatę
@@ -545,8 +545,34 @@ export default function KalkulatorPage() {
                   )}
                 </div>
                 <p className="text-sm text-blue-700 mt-4 bg-blue-100 p-3 rounded-xl">
-                  💡 Zadzwoń i umów się na rozmowę. To pierwszy krok do uzyskania dopłaty Gminy.
+                  Zadzwoń i umów się na rozmowę. To pierwszy krok do uzyskania dopłaty Gminy.
                 </p>
+              </div>
+            ) : (
+              <div className="bg-stone-50 border border-stone-200 rounded-2xl p-6">
+                <h3 className="font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <Phone className="w-5 h-5 text-slate-400" /> Kontakt z właściwym MOPS / OPS
+                </h3>
+                <p className="text-sm text-slate-600 mb-4">
+                  Nie mamy jeszcze danych kontaktowych MOPS-u dla powiatu <strong>{result.facilities[0]?.powiat || result.city}</strong> w naszej bazie.
+                  Skontaktuj się bezpośrednio — to pierwszy krok do złożenia wniosku o dopłatę gminy.
+                </p>
+                <div className="space-y-2 text-sm">
+                  <p className="text-slate-700">
+                    <span className="font-bold">Znajdź swój MOPS:</span>{' '}
+                    <a
+                      href={`https://www.google.com/search?q=MOPS+${encodeURIComponent(result.city)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-600 hover:text-primary-700 font-semibold underline underline-offset-2"
+                    >
+                      Wyszukaj &quot;MOPS {result.city}&quot; w Google
+                    </a>
+                  </p>
+                  <p className="text-slate-500 text-xs">
+                    Możesz też zadzwonić do Urzędu Gminy lub Starostwa Powiatowego — oni skierują Cię do właściwego ośrodka.
+                  </p>
+                </div>
               </div>
             )}
 
