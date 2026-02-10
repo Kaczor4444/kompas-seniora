@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, Info, ShieldAlert, Pill, ShoppingBag, CheckCircle2, Wallet, Scale, Building2 } from 'lucide-react';
+import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, Info, ShieldAlert, Pill, ShoppingBag, CheckCircle2, Wallet, Scale, Building2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
@@ -496,81 +496,134 @@ export default function KalkulatorPage() {
 
             {/* MOPS contact */}
             {result.mopsContact ? (
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
-                  <Phone className="w-5 h-5" /> Kluczowy kontakt: Wniosek o dopłatę
-                </h3>
-                {result.mopsFallbackUsed && result.mopsFallbackCity && (
-                  <div className="bg-blue-100 border-l-4 border-blue-400 p-3 mb-4 text-sm rounded-r-lg">
-                    <p className="text-blue-900">
-                      Nie znaleźliśmy MOPS-u dla <strong>{result.city}</strong>. Poniżej kontakt do MOPS-u
-                      w <strong className="capitalize">{result.mopsFallbackCity}</strong>, który obsługuje Twój powiat.
-                    </p>
-                  </div>
-                )}
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <span className="font-bold text-blue-900">Właściwy urząd{result.mopsFallbackUsed ? ' dla Twojego powiatu' : ` dla ${result.city}`}:</span>
-                    <p className="text-blue-800 mt-0.5">{result.mopsContact.name}</p>
-                  </div>
-                  <div>
-                    <span className="font-bold text-blue-900">Telefon:</span>
-                    <p className="mt-0.5">
-                      <a href={`tel:${result.mopsContact.phone.replace(/\s/g, '')}`} className="text-primary-600 hover:text-primary-700 font-semibold">
-                        {result.mopsContact.phone}
-                      </a>
-                    </p>
-                  </div>
-                  {result.mopsContact.email && (
-                    <div>
-                      <span className="font-bold text-blue-900">Email:</span>
-                      <p className="mt-0.5">
-                        <a href={`mailto:${result.mopsContact.email}`} className="text-primary-600 hover:text-primary-700">{result.mopsContact.email}</a>
-                      </p>
+              <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+                {/* Header */}
+                <div className="bg-primary-600 px-6 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                      <Phone className="w-5 h-5 text-white" />
                     </div>
-                  )}
-                  <div>
-                    <span className="font-bold text-blue-900">Adres:</span>
-                    <p className="text-blue-800 mt-0.5">{result.mopsContact.address}</p>
-                  </div>
-                  {result.mopsContact.website && (
                     <div>
-                      <span className="font-bold text-blue-900">Strona:</span>
-                      <p className="mt-0.5">
-                        <a href={result.mopsContact.website} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700">
-                          {result.mopsContact.website}
-                        </a>
-                      </p>
+                      <p className="text-primary-100 text-xs font-bold uppercase tracking-wide">Kluczowy kontakt</p>
+                      <h3 className="text-white font-bold text-lg leading-tight">Wniosek o dopłatę gminy</h3>
                     </div>
-                  )}
+                  </div>
                 </div>
-                <p className="text-sm text-blue-700 mt-4 bg-blue-100 p-3 rounded-xl">
-                  Zadzwoń i umów się na rozmowę. To pierwszy krok do uzyskania dopłaty Gminy.
-                </p>
+
+                <div className="p-6">
+                  {result.mopsFallbackUsed && result.mopsFallbackCity && (
+                    <div className="bg-amber-50 border-l-4 border-amber-400 p-3 mb-5 rounded-r-xl text-sm">
+                      <p className="text-amber-900">
+                        Brak MOPS-u dla <strong>{result.city}</strong> w naszej bazie.
+                        Poniżej dane MOPS-u w <strong className="capitalize">{result.mopsFallbackCity}</strong>, który obsługuje Twój powiat.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Name */}
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">
+                    {result.mopsFallbackUsed ? 'Urząd dla Twojego powiatu' : `Urząd dla ${result.city}`}
+                  </p>
+                  <p className="text-lg font-bold text-slate-900 mb-5">{result.mopsContact.name}</p>
+
+                  {/* Contact grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                    <a
+                      href={`tel:${result.mopsContact.phone.replace(/\s/g, '')}`}
+                      className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group"
+                    >
+                      <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                        <Phone size={15} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Telefon</p>
+                        <p className="text-sm font-bold text-slate-800">{result.mopsContact.phone}</p>
+                      </div>
+                    </a>
+
+                    <div className="flex items-center gap-3 bg-stone-50 border border-stone-200 rounded-xl px-4 py-3">
+                      <div className="w-8 h-8 bg-stone-200 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <MapPin size={15} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Adres</p>
+                        <p className="text-sm text-slate-700">{result.mopsContact.address}</p>
+                      </div>
+                    </div>
+
+                    {result.mopsContact.email && (
+                      <a
+                        href={`mailto:${result.mopsContact.email}`}
+                        className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group"
+                      >
+                        <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                          <Info size={15} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Email</p>
+                          <p className="text-sm text-slate-800 truncate">{result.mopsContact.email}</p>
+                        </div>
+                      </a>
+                    )}
+
+                    {result.mopsContact.website && (
+                      <a
+                        href={result.mopsContact.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group"
+                      >
+                        <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                          <ArrowLeft size={15} className="rotate-[135deg]" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Strona www</p>
+                          <p className="text-sm text-primary-600 truncate">{result.mopsContact.website.replace(/^https?:\/\//, '')}</p>
+                        </div>
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-start gap-2">
+                    <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-emerald-800">
+                      Zadzwoń i umów się na rozmowę z pracownikiem socjalnym. To pierwszy krok do uzyskania dopłaty gminy do kosztów DPS.
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="bg-stone-50 border border-stone-200 rounded-2xl p-6">
-                <h3 className="font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <Phone className="w-5 h-5 text-slate-400" /> Kontakt z właściwym MOPS / OPS
-                </h3>
-                <p className="text-sm text-slate-600 mb-4">
-                  Nie mamy jeszcze danych kontaktowych MOPS-u dla powiatu <strong>{result.facilities[0]?.powiat || result.city}</strong> w naszej bazie.
-                  Skontaktuj się bezpośrednio — to pierwszy krok do złożenia wniosku o dopłatę gminy.
-                </p>
-                <div className="space-y-2 text-sm">
-                  <p className="text-slate-700">
-                    <span className="font-bold">Znajdź swój MOPS:</span>{' '}
-                    <a
-                      href={`https://www.google.com/search?q=MOPS+${encodeURIComponent(result.city)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary-600 hover:text-primary-700 font-semibold underline underline-offset-2"
-                    >
-                      Wyszukaj &quot;MOPS {result.city}&quot; w Google
-                    </a>
+              <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+                <div className="bg-stone-100 px-6 py-4 flex items-center gap-3 border-b border-stone-200">
+                  <div className="w-9 h-9 bg-stone-200 rounded-xl flex items-center justify-center">
+                    <Phone className="w-5 h-5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-wide">Kontakt</p>
+                    <h3 className="text-slate-700 font-bold text-lg leading-tight">Właściwy MOPS / OPS</h3>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-sm text-slate-600 mb-5">
+                    Nie mamy jeszcze danych kontaktowych dla powiatu <strong>{result.facilities[0]?.powiat || result.city}</strong> w naszej bazie.
+                    Skontaktuj się bezpośrednio — to pierwszy krok do złożenia wniosku o dopłatę gminy.
                   </p>
-                  <p className="text-slate-500 text-xs">
-                    Możesz też zadzwonić do Urzędu Gminy lub Starostwa Powiatowego — oni skierują Cię do właściwego ośrodka.
+                  <a
+                    href={`https://www.google.com/search?q=MOPS+${encodeURIComponent(result.city)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group mb-3"
+                  >
+                    <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                      <Search size={15} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Wyszukaj w Google</p>
+                      <p className="text-sm font-bold text-primary-600">MOPS {result.city}</p>
+                    </div>
+                  </a>
+                  <p className="text-xs text-slate-400">
+                    Możesz też zadzwonić do Urzędu Gminy lub Starostwa Powiatowego — skierują Cię do właściwego ośrodka.
                   </p>
                 </div>
               </div>
