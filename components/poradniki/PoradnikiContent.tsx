@@ -93,7 +93,7 @@ export default function PoradnikiContent({
   const displayArticles = isFullPage ? filteredArticles : filteredArticles.slice(0, 3)
 
   // Popular articles for sidebar (top 5 by featured or first 5)
-  const popularArticles = initialArticles
+  const popularArticles = [...initialArticles]
     .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
     .slice(0, 5)
 
