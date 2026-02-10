@@ -519,8 +519,7 @@ export default function KalkulatorPage() {
                   {result.mopsFallbackUsed && result.mopsFallbackCity && (
                     <div className="bg-amber-50 border-l-4 border-amber-400 p-3 mb-5 rounded-r-xl text-sm">
                       <p className="text-amber-900">
-                        Brak MOPS-u dla <strong>{result.city}</strong> w naszej bazie.
-                        Poniżej dane MOPS-u w <strong className="capitalize">{result.mopsFallbackCity}</strong>, który obsługuje Twój powiat.
+                        Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest MOPS w <strong className="capitalize">{result.mopsFallbackCity}</strong> — tam złożysz wniosek o dopłatę do DPS.
                       </p>
                     </div>
                   )}
