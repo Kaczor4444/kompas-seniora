@@ -161,7 +161,7 @@ export default function PoradnikiContent({
           <div className="flex-1 min-w-0">
 
             {/* Filter Tabs - V2 STYLE */}
-            <div id="filtry" className="relative group mb-4 md:mb-8">
+            <div id="filtry" className="relative group mb-4 md:mb-8 scroll-mt-24">
               <div className="flex overflow-x-auto lg:overflow-x-visible pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:flex-wrap lg:justify-center scrollbar-hide gap-2 items-center snap-x">
                 {categories.map((cat) => {
                   const Icon = categoryIcons[cat]
