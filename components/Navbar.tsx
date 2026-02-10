@@ -22,13 +22,13 @@ const NavbarLogo = ({ isHighContrast }: { isHighContrast: boolean }) => (
       stroke={isHighContrast ? "#fbbf24" : undefined}
       strokeWidth="2.5"
       strokeLinejoin="round"
-      className={isHighContrast ? undefined : "stroke-primary-500"}
+      className={isHighContrast ? undefined : "stroke-primary-600"}
     />
     <g
       className="transition-transform duration-500 ease-in-out group-hover:rotate-[20deg]"
       style={{ transformOrigin: '20px 20px' }}
     >
-      <path d="M20 10L23 20H17L20 10Z" className={isHighContrast ? undefined : "fill-primary-500"} fill={isHighContrast ? "#fbbf24" : undefined} />
+      <path d="M20 10L23 20H17L20 10Z" className={isHighContrast ? undefined : "fill-primary-600"} fill={isHighContrast ? "#fbbf24" : undefined} />
       <path d="M20 30L17 20H23L20 30Z" className={isHighContrast ? undefined : "fill-slate-500"} fill={isHighContrast ? "#9ca3af" : undefined} />
       <circle cx="20" cy="20" r="1.5" className={isHighContrast ? undefined : "fill-slate-900"} fill={isHighContrast ? "#111827" : undefined} />
     </g>
@@ -247,7 +247,7 @@ export default function Navbar() {
                 <div className={`font-serif text-2xl font-bold leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
                   Kompas
                 </div>
-                <div className={`text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${isHighContrast ? 'text-yellow-200' : 'text-primary-400'}`}>
+                <div className={`text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${isHighContrast ? 'text-yellow-200' : 'text-primary-700'}`}>
                   Seniora
                 </div>
               </div>
