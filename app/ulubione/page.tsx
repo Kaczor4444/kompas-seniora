@@ -132,7 +132,7 @@ export default function FavoritesPage() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 gap-6 no-print">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-50 text-red-600 rounded-full text-[10px] font-extrabold uppercase tracking-widest border border-red-100">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-50 text-primary-700 rounded-full text-[10px] font-extrabold uppercase tracking-widest border border-primary-100">
               <Heart size={12} className="fill-current" /> Schowek ulubionych
             </div>
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 tracking-tight leading-none">
@@ -166,7 +166,7 @@ export default function FavoritesPage() {
               {selectedForCompare.length > 0 && (
                 <button
                   onClick={() => setSelectedForCompare([])}
-                  className="text-slate-400 hover:text-red-500 font-bold text-sm underline underline-offset-4 transition-colors"
+                  className="text-slate-400 hover:text-slate-700 font-bold text-sm underline underline-offset-4 transition-colors"
                 >
                   Wyczyść wybór
                 </button>
@@ -182,8 +182,8 @@ export default function FavoritesPage() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-3xl border border-stone-100 shadow-sm p-12 text-center max-w-lg mx-auto"
           >
-            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-red-50/50">
-              <Heart size={36} className="text-red-300" />
+            <div className="w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-primary-50/50">
+              <Heart size={36} className="text-primary-400" />
             </div>
             <h2 className="text-2xl font-serif font-bold text-slate-900 mb-3">Twój schowek jest pusty</h2>
             <p className="text-slate-500 mb-8 leading-relaxed">
@@ -229,7 +229,7 @@ export default function FavoritesPage() {
                         {/* Remove button */}
                         <button
                           onClick={(e) => handleRemove(facility.id, facility.nazwa, e)}
-                          className="absolute top-4 right-4 w-9 h-9 bg-white/20 hover:bg-red-500 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all no-print"
+                          className="absolute top-4 right-4 w-9 h-9 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all no-print"
                           title="Usuń z ulubionych"
                         >
                           <Trash2 size={16} />
