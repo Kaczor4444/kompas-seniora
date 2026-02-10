@@ -6,6 +6,35 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
 
+// Locative case (miejscownik) for Polish city names
+const cityLocative: Record<string, string> = {
+  'kraków': 'Krakowie',
+  'nowy sącz': 'Nowym Sączu',
+  'tarnów': 'Tarnowie',
+  'bochnia': 'Bochni',
+  'brzesko': 'Brzesku',
+  'chrzanów': 'Chrzanowie',
+  'dąbrowa tarnowska': 'Dąbrowie Tarnowskiej',
+  'gorlice': 'Gorlicach',
+  'limanowa': 'Limanowej',
+  'miechów': 'Miechowie',
+  'myślenice': 'Myślenicach',
+  'nowy targ': 'Nowym Targu',
+  'olkusz': 'Olkuszu',
+  'oświęcim': 'Oświęcimiu',
+  'proszowice': 'Proszowicach',
+  'sucha beskidzka': 'Suchej Beskidzkiej',
+  'zakopane': 'Zakopanem',
+  'wadowice': 'Wadowicach',
+  'wieliczka': 'Wieliczce',
+  'bielsko-biała': 'Bielsku-Białej',
+};
+
+const toCityLocative = (city: string): string => {
+  const key = city.toLowerCase().trim();
+  return cityLocative[key] ?? city.charAt(0).toUpperCase() + city.slice(1);
+};
+
 // Types
 interface Facility {
   id: number;
@@ -519,7 +548,7 @@ export default function KalkulatorPage() {
                   {result.mopsFallbackUsed && result.mopsFallbackCity && (
                     <div className="bg-amber-50 border-l-4 border-amber-400 p-3 mb-5 rounded-r-xl text-sm">
                       <p className="text-amber-900">
-                        Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest MOPS w <strong className="capitalize">{result.mopsFallbackCity}</strong> — tam złożysz wniosek o dopłatę do DPS.
+                        Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest MOPS w <strong>{toCityLocative(result.mopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
                       </p>
                     </div>
                   )}
