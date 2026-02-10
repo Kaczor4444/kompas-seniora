@@ -238,10 +238,36 @@ export default function Navbar() {
         onMouseLeave={() => setIsGuidesHovered(false)}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
+          <div className="flex justify-between h-20 items-center relative">
 
-            {/* Logo Section */}
-            <Link href="/" className="flex-shrink-0 flex items-center mr-4 group">
+            {/* LEFT: Hamburger (mobile) | Logo (desktop) */}
+            <div className="flex items-center">
+              {/* Mobile hamburger */}
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`md:hidden p-2 rounded-xl ${isHighContrast ? 'text-yellow-400' : 'text-slate-700'}`}
+                aria-label={isOpen ? "Zamknij menu" : "Otwórz menu"}
+                aria-expanded={isOpen}
+              >
+                {isOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+
+              {/* Desktop logo */}
+              <Link href="/" className="hidden md:flex flex-shrink-0 items-center mr-4 group">
+                <NavbarLogo isHighContrast={isHighContrast} />
+                <div className="flex flex-col ml-3">
+                  <div className={`font-serif text-2xl font-bold leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
+                    Kompas
+                  </div>
+                  <div className={`text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${isHighContrast ? 'text-yellow-200' : 'text-primary-700'}`}>
+                    Seniora
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            {/* Mobile logo - absolutnie wyśrodkowane */}
+            <Link href="/" className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center group">
               <NavbarLogo isHighContrast={isHighContrast} />
               <div className="flex flex-col ml-3">
                 <div className={`font-serif text-2xl font-bold leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
@@ -320,11 +346,11 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Desktop Right Side */}
-            <div className="hidden md:flex items-center gap-3">
+            {/* RIGHT: Accessibility + Mail/Kontakt (mobile i desktop) */}
+            <div className="flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
-                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all border group
+                className={`w-10 h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center transition-all border group
                   ${isHighContrast
                     ? 'bg-yellow-400 text-black border-yellow-400'
                     : 'bg-white text-primary-600 border-stone-200 hover:border-primary-500 hover:bg-primary-50 shadow-sm'
@@ -332,40 +358,24 @@ export default function Navbar() {
                 title="Dostępność"
                 aria-label="Otwórz panel dostępności"
               >
-                <AccessibilityIcon className="w-7 h-7 group-hover:scale-110 transition-transform" />
+                <AccessibilityIcon className="w-6 h-6 md:w-7 md:h-7 group-hover:scale-110 transition-transform" />
               </button>
 
               <Link
                 href="/kontakt"
-                className={`font-black uppercase tracking-widest text-[11px] flex items-center gap-2 transition-all px-4 py-2.5 rounded-2xl
+                className={`flex items-center gap-2 transition-all rounded-2xl
+                  px-2.5 py-2.5 md:px-4 md:py-2.5
                   ${isHighContrast
                     ? (isActive('/kontakt') ? 'bg-yellow-400 text-black' : 'text-yellow-400 hover:underline')
                     : (isActive('/kontakt') ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:text-primary-600 hover:bg-stone-50')
                   }`}
               >
-                <Mail size={16} />
-                Kontakt
+                <Mail size={20} className="md:hidden" />
+                <span className="hidden md:flex items-center gap-2 font-black uppercase tracking-widest text-[11px]">
+                  <Mail size={16} />
+                  Kontakt
+                </span>
               </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center gap-3">
-              <button
-                onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
-                className={`w-10 h-10 rounded-full border flex items-center justify-center ${isHighContrast ? 'text-yellow-400 border-yellow-400' : 'text-primary-600 border-stone-200 bg-white shadow-sm'}`}
-                title="Dostępność"
-                aria-label="Otwórz panel dostępności"
-              >
-                <AccessibilityIcon className="w-7 h-7" />
-              </button>
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`p-2 rounded-xl ${isHighContrast ? 'text-yellow-400' : 'text-slate-700'}`}
-                aria-label={isOpen ? "Zamknij menu" : "Otwórz menu"}
-                aria-expanded={isOpen}
-              >
-                {isOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
             </div>
           </div>
         </div>
