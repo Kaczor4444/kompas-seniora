@@ -268,7 +268,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="bg-white pt-6 pb-8 md:pt-10 md:pb-16 relative overflow-hidden">
+    <div className="bg-white pt-6 pb-4 md:pt-8 md:pb-8 relative overflow-hidden">
       {/* Background Decor - Subtle Grid */}
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:32px_32px] opacity-20 pointer-events-none" />
       <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />
@@ -276,7 +276,7 @@ const Hero = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
         
         {/* HEADER */}
-        <div className="text-center mb-6 md:mb-8">
+        <div className="text-center mb-4 md:mb-6">
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 leading-[1.1] tracking-tight mb-4">
             Szukasz opieki <br />
             <span className="relative inline-block text-primary-600">
@@ -294,7 +294,7 @@ const Hero = () => {
         </div>
 
         {/* COMMAND CENTER HUB */}
-        <div className="bg-white rounded-2xl p-2.5 md:p-3 pb-16 md:pb-20 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[20]">
+        <div className="bg-white rounded-2xl p-2.5 md:p-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[20]">
 
           {/* TAB SWITCHER */}
           <div className="flex p-1 bg-stone-100/80 rounded-xl mb-2 relative">
@@ -330,12 +330,12 @@ const Hero = () => {
           <div className="relative overflow-visible">
             
             {/* SEARCH VIEW */}
-            <div className={`p-4 md:p-8 transition-all duration-300 ease-out flex flex-col justify-center w-full
+            <div className={`p-4 md:p-6 transition-all duration-300 ease-out flex flex-col justify-center w-full
               ${activeTab === 'search' 
                 ? 'opacity-100 translate-y-0 pointer-events-auto relative' 
                 : 'opacity-0 -translate-y-4 pointer-events-none absolute inset-0'}`}
             >
-               <div className="space-y-6 md:space-y-8">
+               <div className="space-y-4 md:space-y-5">
                   {/* Facility Type Selection */}
                   <div className="flex justify-center gap-2 flex-wrap">
                      <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
@@ -427,7 +427,7 @@ const Hero = () => {
             </div>
 
             {/* ASSISTANT VIEW */}
-            <div className={`p-6 md:p-14 transition-all duration-300 ease-out flex flex-col items-center text-center justify-center w-full
+            <div className={`p-4 md:p-8 transition-all duration-300 ease-out flex flex-col items-center text-center justify-center w-full
               ${activeTab === 'assistant' 
                 ? 'opacity-100 translate-y-0 pointer-events-auto relative' 
                 : 'opacity-0 translate-y-4 pointer-events-none absolute inset-0'}`}
@@ -458,7 +458,7 @@ const Hero = () => {
         </div>
 
         {/* TRUST BAR */}
-        <div className="mt-6 md:mt-8 flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+        <div className="mt-4 md:mt-6 flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
            <TrustItem icon={<ShieldCheck size={18}/>} text="Oficjalne dane BIP" />
            <TrustItem icon={<Building2 size={18}/>} text="36 Placówek Małopolski" />
            <TrustItem icon={<Check size={18}/>} text="Brak opłat i reklam" />
