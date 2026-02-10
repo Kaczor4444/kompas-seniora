@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, Info, ShieldAlert, Pill, ShoppingBag, CheckCircle2, Wallet, Scale, Building2, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, Info, ShieldAlert, Pill, ShoppingBag, CheckCircle2, Wallet, Scale, Building2, Search, Heart, ArrowLeftRight, ChevronRight, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
+import { addFavorite, removeFavorite, isFavorite, getFavorites } from '@/src/utils/favorites';
 
 // Locative case (miejscownik) for Polish city names
 const cityLocative: Record<string, string> = {
@@ -92,6 +93,48 @@ export default function KalkulatorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [showAllFacilities, setShowAllFacilities] = useState(false);
+
+  // Favorites & comparison state
+  const [savedIds, setSavedIds] = useState<number[]>([]);
+  const [compareIds, setCompareIds] = useState<number[]>([]);
+
+  // Sync savedIds from localStorage on mount and on changes
+  useEffect(() => {
+    const sync = () => setSavedIds(getFavorites().map(f => f.id));
+    sync();
+    window.addEventListener('favoritesChanged', sync);
+    return () => window.removeEventListener('favoritesChanged', sync);
+  }, []);
+
+  const toggleFavorite = (facility: Facility) => {
+    if (isFavorite(facility.id)) {
+      removeFavorite(facility.id);
+    } else {
+      addFavorite({
+        id: facility.id,
+        nazwa: facility.nazwa,
+        miejscowosc: facility.miejscowosc,
+        powiat: facility.powiat,
+        typ_placowki: facility.typ_placowki,
+        koszt_pobytu: facility.koszt_pobytu,
+        telefon: facility.telefon ?? null,
+        ulica: null,
+        kod_pocztowy: null,
+        email: null,
+        www: null,
+        liczba_miejsc: null,
+        profil_opieki: facility.profil_opieki ?? null,
+        addedAt: new Date().toISOString(),
+      });
+    }
+    window.dispatchEvent(new Event('favoritesChanged'));
+  };
+
+  const toggleCompare = (id: number) => {
+    setCompareIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : prev.length >= 3 ? prev : [...prev, id]
+    );
+  };
 
   // Legal thresholds (300% kryterium dochodowego)
   const THRESHOLD_SINGLE = 2328;
@@ -712,7 +755,7 @@ export default function KalkulatorPage() {
                             Koszt całkowity: <span className="font-bold text-slate-800">{formatCurrency(facility.koszt_pobytu!)}/mc</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-3 mt-3 justify-center md:justify-start">
+                        <div className="flex items-center gap-3 mt-3 justify-center md:justify-start flex-wrap">
                           <Link href={`/placowka/${facility.id}`} className="text-primary-600 hover:text-primary-700 text-sm font-bold">
                             Zobacz profil →
                           </Link>
@@ -721,6 +764,30 @@ export default function KalkulatorPage() {
                               <Phone size={12} /> {facility.telefon}
                             </a>
                           )}
+                          <div className="flex items-center gap-1.5 ml-auto">
+                            <button
+                              onClick={() => toggleCompare(facility.id)}
+                              title={compareIds.includes(facility.id) ? 'Usuń z porównania' : 'Dodaj do porównania'}
+                              className={`p-2 rounded-full transition-all ${
+                                compareIds.includes(facility.id)
+                                  ? 'bg-slate-900 text-white'
+                                  : 'bg-stone-100 text-slate-500 hover:bg-stone-200'
+                              }`}
+                            >
+                              <ArrowLeftRight size={15} />
+                            </button>
+                            <button
+                              onClick={() => toggleFavorite(facility)}
+                              title={savedIds.includes(facility.id) ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+                              className={`p-2 rounded-full transition-all ${
+                                savedIds.includes(facility.id)
+                                  ? 'bg-red-500 text-white'
+                                  : 'bg-stone-100 text-slate-500 hover:bg-stone-200'
+                              }`}
+                            >
+                              <Heart size={15} className={savedIds.includes(facility.id) ? 'fill-current' : ''} />
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -777,6 +844,38 @@ export default function KalkulatorPage() {
                 >
                   Pokaż więcej ({result.facilities.length - 5} kolejnych placówek)
                 </button>
+              </div>
+            )}
+
+            {/* Comparison bar */}
+            {compareIds.length > 0 && (
+              <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl">
+                <div className="bg-slate-900 text-white rounded-2xl px-5 py-4 shadow-2xl flex items-center gap-4">
+                  <div className="flex-1">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Porównanie</p>
+                    <p className="text-sm font-bold">
+                      {compareIds.length} / 3 placówk{compareIds.length === 1 ? 'a' : 'i'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => router.push(`/ulubione/porownaj?ids=${compareIds.join(',')}`)}
+                    disabled={compareIds.length < 2}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
+                      compareIds.length >= 2
+                        ? 'bg-primary-500 hover:bg-primary-400 text-white'
+                        : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                    }`}
+                  >
+                    Porównaj <ChevronRight size={16} />
+                  </button>
+                  <button
+                    onClick={() => setCompareIds([])}
+                    className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white"
+                    title="Wyczyść"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               </div>
             )}
 
