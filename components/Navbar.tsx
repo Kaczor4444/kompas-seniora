@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Heart, Calculator, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, Calculator, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Sparkles, Heart } from 'lucide-react';
 import { getFavoritesCount } from '@/src/utils/favorites';
 import { AccessibilityPanel } from './AccessibilityPanel';
 
@@ -15,39 +15,24 @@ const AccessibilityIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const HeartCompassLogo = ({ isHighContrast }: { isHighContrast: boolean }) => (
-  <div className="relative w-12 h-12 flex items-center justify-center group">
-    {/* Classic Heart Icon */}
-    <Heart
-      size={40}
-      className={`${isHighContrast ? 'text-yellow-400' : 'text-primary-600'} transition-transform duration-500 group-hover:scale-105`}
-      strokeWidth={1.5}
+const NavbarLogo = ({ isHighContrast }: { isHighContrast: boolean }) => (
+  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10">
+    <path
+      d="M20 34C20 34 5 26 5 15C5 9 10 5 14 5C17 5 19 7 20 8C21 7 23 5 26 5C30 5 35 9 35 15C35 26 20 34 20 34Z"
+      stroke={isHighContrast ? "#fbbf24" : undefined}
+      strokeWidth="2.5"
+      strokeLinejoin="round"
+      className={isHighContrast ? undefined : "stroke-primary-500"}
     />
-
-    {/* Compass Dial Dots */}
-    <div className={`absolute inset-0 flex items-center justify-center pointer-events-none opacity-25 ${isHighContrast ? 'text-yellow-200' : 'text-slate-400'}`}>
-      <div className="absolute top-[28%] left-1/2 -translate-x-1/2 w-0.5 h-0.5 bg-current rounded-full" />
-      <div className="absolute bottom-[28%] left-1/2 -translate-x-1/2 w-0.5 h-0.5 bg-current rounded-full" />
-      <div className="absolute left-[28%] top-1/2 -translate-y-1/2 w-0.5 h-0.5 bg-current rounded-full" />
-      <div className="absolute right-[28%] top-1/2 -translate-y-1/2 w-0.5 h-0.5 bg-current rounded-full" />
-    </div>
-
-    {/* Long, Distinct 3D Needle - pointed at 13:00 and 19:00 */}
-    <div className="absolute inset-0 flex items-center justify-center transition-transform duration-700 ease-out group-hover:rotate-[-8deg]">
-      <svg viewBox="0 0 24 24" className="w-8 h-8 rotate-[30deg] drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Upper Part (13:00) */}
-        <path d="M12 1L14.5 12L12 12V1Z" fill={isHighContrast ? "#fef08a" : "#064e3b"} /> {/* Dark Emerald */}
-        <path d="M12 1L9.5 12L12 12V1Z" fill={isHighContrast ? "#eab308" : "#334155"} />  {/* Dark Gray */}
-
-        {/* Lower Part (19:00) */}
-        <path d="M12 23L9.5 12L12 12V23Z" fill={isHighContrast ? "#eab308" : "#064e3b"} /> {/* Dark Emerald */}
-        <path d="M12 23L14.5 12L12 12V23Z" fill={isHighContrast ? "#fef08a" : "#334155"} /> {/* Dark Gray */}
-
-        {/* Central Pin */}
-        <circle cx="12" cy="12" r="0.8" fill={isHighContrast ? "#000" : "#fff"} />
-      </svg>
-    </div>
-  </div>
+    <g
+      className="transition-transform duration-500 ease-in-out group-hover:rotate-[20deg]"
+      style={{ transformOrigin: '20px 20px' }}
+    >
+      <path d="M20 10L23 20H17L20 10Z" className={isHighContrast ? undefined : "fill-primary-500"} fill={isHighContrast ? "#fbbf24" : undefined} />
+      <path d="M20 30L17 20H23L20 30Z" className={isHighContrast ? undefined : "fill-slate-500"} fill={isHighContrast ? "#9ca3af" : undefined} />
+      <circle cx="20" cy="20" r="1.5" className={isHighContrast ? undefined : "fill-slate-900"} fill={isHighContrast ? "#111827" : undefined} />
+    </g>
+  </svg>
 );
 
 export default function Navbar() {
@@ -257,12 +242,12 @@ export default function Navbar() {
 
             {/* Logo Section */}
             <Link href="/" className="flex-shrink-0 flex items-center mr-4 group">
-              <HeartCompassLogo isHighContrast={isHighContrast} />
+              <NavbarLogo isHighContrast={isHighContrast} />
               <div className="flex flex-col ml-3">
-                <div className={`font-serif text-xl md:text-2xl font-bold tracking-tight leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
+                <div className={`font-serif text-2xl font-bold leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
                   Kompas
                 </div>
-                <div className={`text-[9px] md:text-[11px] font-black uppercase tracking-[0.4em] mt-1.5 ml-0.5 ${isHighContrast ? 'text-yellow-200' : 'text-primary-700/80'}`}>
+                <div className={`text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${isHighContrast ? 'text-yellow-200' : 'text-primary-400'}`}>
                   Seniora
                 </div>
               </div>
@@ -339,11 +324,15 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-3">
               <button
                 onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all font-bold border ${isHighContrast ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-stone-50 text-slate-600 border-stone-200 hover:border-primary-300 hover:text-primary-700 hover:bg-white'}`}
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all border group
+                  ${isHighContrast
+                    ? 'bg-yellow-400 text-black border-yellow-400'
+                    : 'bg-white text-primary-600 border-stone-200 hover:border-primary-500 hover:bg-primary-50 shadow-sm'
+                  }`}
+                title="Dostępność"
                 aria-label="Otwórz panel dostępności"
               >
-                <AccessibilityIcon className="w-[18px] h-[18px]" />
-                <span className="text-xs uppercase tracking-wider">Dostępność</span>
+                <AccessibilityIcon className="w-7 h-7 group-hover:scale-110 transition-transform" />
               </button>
 
               <Link
@@ -360,14 +349,22 @@ export default function Navbar() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center gap-2">
+            <div className="md:hidden flex items-center gap-3">
+              <button
+                onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
+                className={`w-10 h-10 rounded-full border flex items-center justify-center ${isHighContrast ? 'text-yellow-400 border-yellow-400' : 'text-primary-600 border-stone-200 bg-white shadow-sm'}`}
+                title="Dostępność"
+                aria-label="Otwórz panel dostępności"
+              >
+                <AccessibilityIcon className="w-7 h-7" />
+              </button>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`p-3 rounded-2xl transition-all ${isHighContrast ? 'text-yellow-400' : 'bg-stone-100 text-slate-700 hover:text-primary-600'}`}
+                className={`p-2 rounded-xl ${isHighContrast ? 'text-yellow-400' : 'text-slate-700'}`}
                 aria-label={isOpen ? "Zamknij menu" : "Otwórz menu"}
                 aria-expanded={isOpen}
               >
-                {isOpen ? <X size={22} /> : <Menu size={22} />}
+                {isOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
             </div>
           </div>
@@ -452,7 +449,7 @@ export default function Navbar() {
               <div className="mt-8 pt-8 border-t border-stone-100">
                  <button
                     onClick={() => { setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen); setIsOpen(false); }}
-                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-full border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
+                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
                   >
                     <AccessibilityIcon className="w-[20px] h-[20px]" /> <span>Ułatwienia dostępu</span>
                  </button>
