@@ -294,30 +294,30 @@ const Hero = () => {
         </div>
 
         {/* COMMAND CENTER HUB */}
-        <div className="bg-white rounded-[2.5rem] p-2.5 md:p-3 pb-16 md:pb-20 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[20]">
-          
+        <div className="bg-white rounded-2xl p-2.5 md:p-3 pb-16 md:pb-20 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[20]">
+
           {/* TAB SWITCHER */}
-          <div className="flex p-1 bg-stone-100/80 rounded-[2rem] mb-2 relative">
-            <div 
-              className="absolute top-1 bottom-1 bg-slate-900 rounded-[1.8rem] shadow-lg transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-0"
+          <div className="flex p-1 bg-stone-100/80 rounded-xl mb-2 relative">
+            <div
+              className="absolute top-1 bottom-1 bg-slate-900 rounded-lg shadow-lg transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-0"
               style={{
                 left: activeTab === 'search' ? '4px' : 'calc(50%)',
                 width: 'calc(50% - 4px)',
               }}
             />
             
-            <button 
+            <button
               onClick={() => setActiveTab('search')}
-              className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-[1.8rem] text-xs font-black uppercase tracking-widest transition-all relative z-10
+              className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-lg text-xs font-black uppercase tracking-widest transition-all relative z-10
                 ${activeTab === 'search' ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
             >
               <Search size={16} />
               <span className="hidden sm:inline">Szybka wyszukiwarka</span>
               <span className="sm:hidden">Wyszukiwarka</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('assistant')}
-              className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-[1.8rem] text-xs font-black uppercase tracking-widest transition-all relative z-10
+              className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-lg text-xs font-black uppercase tracking-widest transition-all relative z-10
                 ${activeTab === 'assistant' ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
             >
               <Sparkles size={16} />

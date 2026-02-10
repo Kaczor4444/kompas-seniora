@@ -311,7 +311,7 @@ export default function Navbar() {
               >
                 <Link
                   href="/poradniki"
-                  className={`flex items-center gap-2 font-bold transition-all px-4 py-2.5 rounded-2xl relative z-10 group
+                  className={`flex items-center gap-2 font-bold transition-all px-4 py-2.5 rounded-xl relative z-10 group
                   ${isHighContrast
                       ? (isActive('/poradniki') ? 'bg-yellow-400 text-black font-bold' : 'text-white hover:text-yellow-400')
                       : (isActive('/poradniki') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:text-primary-700 hover:bg-stone-50')
@@ -326,7 +326,7 @@ export default function Navbar() {
                   className={`absolute top-full left-0 w-60 pt-2 transition-all duration-300 origin-top-left
                   ${isGuidesHovered ? 'opacity-100 scale-100 translate-y-0 visible' : 'opacity-0 scale-95 -translate-y-2 invisible'}`}
                 >
-                  <div className={`rounded-2xl shadow-2xl border overflow-hidden p-2.5 ${isHighContrast ? 'bg-black border-yellow-400' : 'bg-white border-stone-100'}`}>
+                  <div className={`rounded-xl shadow-2xl border overflow-hidden p-2.5 ${isHighContrast ? 'bg-black border-yellow-400' : 'bg-white border-stone-100'}`}>
                     {guideCategories.map((cat, idx) => (
                       <Link
                         key={idx}
@@ -364,7 +364,7 @@ export default function Navbar() {
 
               <Link
                 href="/kontakt"
-                className={`flex items-center gap-2 transition-all rounded-2xl
+                className={`flex items-center gap-2 transition-all rounded-xl
                   px-2.5 py-2.5 md:px-4 md:py-2.5
                   ${isHighContrast
                     ? (isActive('/kontakt') ? 'bg-yellow-400 text-black' : 'text-yellow-400 hover:underline')
@@ -410,10 +410,10 @@ export default function Navbar() {
                 <MobileNavLink isHighContrast={isHighContrast} icon={<Calculator size={20} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
               </Link>
 
-              <div className={`rounded-2xl overflow-hidden transition-all border ${isMobileGuidesExpanded ? 'bg-stone-50 border-stone-200' : 'border-transparent'}`}>
+              <div className={`rounded-xl overflow-hidden transition-all border ${isMobileGuidesExpanded ? 'bg-stone-50 border-stone-200' : 'border-transparent'}`}>
                 <button
                   onClick={() => setIsMobileGuidesExpanded(!isMobileGuidesExpanded)}
-                  className={`w-full flex items-center justify-between px-4 py-4 rounded-2xl transition-all ${
+                  className={`w-full flex items-center justify-between px-4 py-4 rounded-xl transition-all ${
                     isHighContrast
                       ? 'text-white hover:bg-yellow-400 hover:text-black'
                       : (isActive('/poradniki') ? 'text-primary-700 font-bold bg-primary-50' : 'text-slate-600 hover:text-primary-600')
@@ -447,7 +447,7 @@ export default function Navbar() {
               <Link
                 href="/kontakt"
                 onClick={() => setIsOpen(false)}
-                className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all ${
+                className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${
                   isHighContrast
                     ? (isActive('/kontakt') ? 'bg-yellow-400 text-black' : 'text-white hover:bg-yellow-400 hover:text-black')
                     : (isActive('/kontakt') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-slate-700 hover:bg-stone-50 hover:text-primary-600')
@@ -460,7 +460,7 @@ export default function Navbar() {
               <div className="mt-8 pt-8 border-t border-stone-100">
                  <button
                     onClick={() => { setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen); setIsOpen(false); }}
-                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
+                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
                   >
                     <AccessibilityIcon className="w-[20px] h-[20px]" /> <span>Ułatwienia dostępu</span>
                  </button>
@@ -502,7 +502,7 @@ export default function Navbar() {
 }
 
 const NavLink = ({ icon, text, badge, isHighContrast, isActive }: { icon: React.ReactNode; text: string; badge?: string; isHighContrast: boolean; isActive?: boolean }) => (
-  <div className={`flex items-center gap-2.5 font-bold transition-all relative group px-4 py-2.5 rounded-2xl text-sm
+  <div className={`flex items-center gap-2.5 font-bold transition-all relative group px-4 py-2.5 rounded-xl text-sm
     ${isHighContrast
       ? (isActive ? 'bg-yellow-400 text-black' : 'text-white hover:text-yellow-400')
       : (isActive ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:text-primary-700 hover:bg-stone-50')
@@ -518,7 +518,7 @@ const NavLink = ({ icon, text, badge, isHighContrast, isActive }: { icon: React.
 );
 
 const MobileNavLink = ({ icon, text, badge, isHighContrast, isActive }: { icon: React.ReactNode; text: string; badge?: string; isHighContrast: boolean; isActive?: boolean }) => (
-  <div className={`flex items-center gap-4 px-4 py-4 rounded-2xl transition-all ${
+  <div className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${
     isHighContrast
       ? (isActive ? 'bg-yellow-400 text-black' : 'text-white hover:bg-yellow-400 hover:text-black')
       : (isActive ? 'bg-primary-50 text-primary-700 font-bold border border-primary-100 shadow-sm' : 'text-slate-700 hover:bg-stone-50 hover:text-primary-600 border border-transparent')
