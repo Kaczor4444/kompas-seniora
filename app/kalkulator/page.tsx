@@ -62,6 +62,7 @@ export default function KalkulatorPage() {
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [showAllFacilities, setShowAllFacilities] = useState(false);
 
   // Legal thresholds (300% kryterium dochodowego)
   const THRESHOLD_SINGLE = 2328;
@@ -163,6 +164,7 @@ export default function KalkulatorPage() {
     // Reset previous state
     setError('');
     setResult(null);
+    setShowAllFacilities(false);
     
     // Validate
     const validationError = validateInputs();
@@ -291,11 +293,11 @@ export default function KalkulatorPage() {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 mb-4">
-            Symulator Kosztów DPS
+            Symulator Kosztów DPS / ŚDS
           </h1>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-            Sprawdź orientacyjny podział kosztów (zasada 70/30) dla oficjalnych placówek w Twoim regionie.
-            Ostateczną decyzję zawsze wydaje gmina po wywiادzie środowiskowym.
+            Sprawdź orientacyjny podział kosztów (zasada 70/30) dla oficjalnych placówek DPS i ŚDS w Twoim regionie.
+            Ostateczną decyzję zawsze wydaje gmina po wywiadzie środowiskowym.
           </p>
         </div>
 
@@ -561,7 +563,7 @@ export default function KalkulatorPage() {
               </div>
 
               <div className="space-y-4">
-                {result.facilities.map((facility) => {
+                {(showAllFacilities ? result.facilities : result.facilities.slice(0, 5)).map((facility) => {
                   const hasPrice = facility.koszt_pobytu && facility.koszt_pobytu > 0;
                   const gap = hasPrice ? facility.koszt_pobytu! - result.maxContribution : 0;
                   const isCovered = hasPrice && gap <= 0;
@@ -645,6 +647,18 @@ export default function KalkulatorPage() {
                 })}
               </div>
             </div>
+
+            {/* Show more */}
+            {!showAllFacilities && result.facilities.length > 5 && (
+              <div className="text-center">
+                <button
+                  onClick={() => setShowAllFacilities(true)}
+                  className="bg-white border-2 border-stone-200 text-slate-700 font-bold py-3 px-8 rounded-xl hover:border-primary-400 hover:text-primary-700 transition-all"
+                >
+                  Pokaż więcej ({result.facilities.length - 5} kolejnych placówek)
+                </button>
+              </div>
+            )}
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row gap-4">
