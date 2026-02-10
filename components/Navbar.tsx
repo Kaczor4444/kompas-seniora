@@ -314,7 +314,7 @@ export default function Navbar() {
                   className={`flex items-center gap-2 font-bold transition-all px-4 py-2.5 rounded-xl relative z-10 group
                   ${isHighContrast
                       ? (isActive('/poradniki') ? 'bg-yellow-400 text-black font-bold' : 'text-white hover:text-yellow-400')
-                      : (isActive('/poradniki') ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:text-primary-700 hover:bg-stone-50')
+                      : (isActive('/poradniki') ? 'bg-primary-100 text-primary-700 shadow-sm' : 'text-slate-600 hover:text-primary-700 hover:bg-stone-100')
                   }`}
                 >
                   <BookOpen size={18} className={`${isHighContrast ? '' : (isActive('/poradniki') ? 'text-primary-600' : 'text-primary-500')}`} />
@@ -335,7 +335,7 @@ export default function Navbar() {
                         className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-between group
                           ${isHighContrast
                             ? 'text-white hover:bg-yellow-400 hover:text-black'
-                            : 'text-slate-600 hover:bg-stone-50 hover:text-primary-700'
+                            : 'text-slate-600 hover:bg-stone-100 hover:text-primary-700'
                           }`}
                       >
                         {cat}
@@ -505,7 +505,7 @@ const NavLink = ({ icon, text, badge, isHighContrast, isActive }: { icon: React.
   <div className={`flex items-center gap-2.5 font-bold transition-all relative group px-4 py-2.5 rounded-xl text-sm
     ${isHighContrast
       ? (isActive ? 'bg-yellow-400 text-black' : 'text-white hover:text-yellow-400')
-      : (isActive ? 'bg-primary-50 text-primary-700 shadow-sm' : 'text-slate-600 hover:text-primary-700 hover:bg-stone-50')
+      : (isActive ? 'bg-primary-100 text-primary-700 shadow-sm' : 'text-slate-600 hover:text-primary-700 hover:bg-stone-100')
     }`}>
     <span className={`transition-all duration-300 ${isHighContrast ? '' : (isActive ? 'text-primary-600' : 'text-primary-500 group-hover:scale-110')}`}>{icon}</span>
     {text}
@@ -521,7 +521,7 @@ const MobileNavLink = ({ icon, text, badge, isHighContrast, isActive }: { icon: 
   <div className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${
     isHighContrast
       ? (isActive ? 'bg-yellow-400 text-black' : 'text-white hover:bg-yellow-400 hover:text-black')
-      : (isActive ? 'bg-primary-50 text-primary-700 font-bold border border-primary-100 shadow-sm' : 'text-slate-700 hover:bg-stone-50 hover:text-primary-600 border border-transparent')
+      : (isActive ? 'bg-primary-100 text-primary-700 font-bold border border-primary-200 shadow-sm' : 'text-slate-700 hover:bg-stone-100 hover:text-primary-600 border border-transparent')
   }`}>
     {icon}
     <span className="font-bold">{text}</span>
