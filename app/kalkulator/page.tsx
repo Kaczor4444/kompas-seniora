@@ -198,9 +198,12 @@ export default function KalkulatorPage() {
         return;
       }
       
+      // Show only DPS (exclude ŚDS)
+      const dpsFacilities = facilities.filter(f => f.typ_placowki === 'DPS');
+
       // Separate facilities with and without prices
-      const facilitiesWithPrices = facilities.filter(f => f.koszt_pobytu && f.koszt_pobytu > 0);
-      const facilitiesWithoutPrices = facilities.filter(f => !f.koszt_pobytu || f.koszt_pobytu === 0);
+      const facilitiesWithPrices = dpsFacilities.filter(f => f.koszt_pobytu && f.koszt_pobytu > 0);
+      const facilitiesWithoutPrices = dpsFacilities.filter(f => !f.koszt_pobytu || f.koszt_pobytu === 0);
       
       // Categorize facilities with prices
       const affordableFacilities = facilitiesWithPrices.filter(f => f.koszt_pobytu! <= maxContribution);
@@ -227,7 +230,7 @@ export default function KalkulatorPage() {
         contributionPercent: 70,
         city,
         wojewodztwo,
-        facilities,
+        facilities: dpsFacilities,
         facilitiesWithPrices,
         facilitiesWithoutPrices,
         affordableFacilities,
@@ -293,10 +296,10 @@ export default function KalkulatorPage() {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 mb-4">
-            Symulator Kosztów DPS / ŚDS
+            Symulator Kosztów DPS
           </h1>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-            Sprawdź orientacyjny podział kosztów (zasada 70/30) dla oficjalnych placówek DPS i ŚDS w Twoim regionie.
+            Sprawdź orientacyjny podział kosztów (zasada 70/30) dla oficjalnych placówek w Twoim regionie.
             Ostateczną decyzję zawsze wydaje gmina po wywiadzie środowiskowym.
           </p>
         </div>
