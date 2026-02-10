@@ -495,7 +495,7 @@ export default function KalkulatorPage() {
             </div>
 
             {/* MOPS contact */}
-            {result.mopsContact && (result.allNeedSubsidy || result.facilitiesWithoutPrices.length > 0) && (
+            {result.mopsContact && (
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
                 <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
                   <Phone className="w-5 h-5" /> Kluczowy kontakt: Wniosek o dopłatę
