@@ -457,14 +457,6 @@ export default function Navbar() {
                 <span className="font-bold">Kontakt bezpośredni</span>
               </Link>
 
-              <div className="mt-8 pt-8 border-t border-stone-100">
-                 <button
-                    onClick={() => { setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen); setIsOpen(false); }}
-                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
-                  >
-                    <AccessibilityIcon className="w-[20px] h-[20px]" /> <span>Ułatwienia dostępu</span>
-                 </button>
-              </div>
             </div>
           </div>
         )}
