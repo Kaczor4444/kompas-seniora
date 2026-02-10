@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, Info, ShieldAlert, Pill, ShoppingBag, CheckCircle2, Wallet, Scale } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
@@ -445,71 +445,82 @@ export default function KalkulatorPage() {
             )}
 
             {/* Budget Visualization */}
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 md:p-8">
-              <h2 className="text-xl font-semibold text-neutral-900 mb-6">
-                📊 Analiza Finansowa
+            <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 md:p-8">
+              <h2 className="text-xl font-semibold text-neutral-900 mb-6 flex items-center gap-2">
+                <Scale size={20} className="text-primary-600" /> Analiza Finansowa
               </h2>
 
               {/* Budget Bar */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-neutral-600">
-                    Dochód miesięczny
-                  </span>
-                  <span className="text-lg font-bold text-neutral-900">
-                    {formatCurrency(result.income)}
-                  </span>
+                  <span className="text-sm font-medium text-neutral-600">Dochód miesięczny</span>
+                  <span className="text-lg font-bold text-neutral-900">{formatCurrency(result.income)}</span>
                 </div>
-
-                <div className="h-10 bg-neutral-200 rounded-lg overflow-hidden flex">
-                  <div 
-                    className="bg-accent-600 flex items-center justify-center text-white text-sm font-semibold"
-                    style={{ width: '70%' }}
-                  >
+                <div className="h-10 bg-neutral-200 rounded-xl overflow-hidden flex">
+                  <div className="bg-primary-600 flex items-center justify-center text-white text-sm font-semibold" style={{ width: '70%' }}>
                     70% na opiekę
                   </div>
-                  <div 
-                    className="bg-success-500 flex items-center justify-center text-white text-sm font-semibold"
-                    style={{ width: '30%' }}
-                  >
+                  <div className="bg-emerald-500 flex items-center justify-center text-white text-sm font-semibold" style={{ width: '30%' }}>
                     30% na życie
                   </div>
                 </div>
-
                 <div className="flex items-center justify-between mt-2 text-sm">
-                  <span className="text-accent-700 font-medium">
-                    {formatCurrency(result.maxContribution)}
-                  </span>
-                  <span className="text-success-700 font-medium">
-                    {formatCurrency(result.remainingFunds)}
-                  </span>
+                  <span className="text-primary-700 font-medium">{formatCurrency(result.maxContribution)}</span>
+                  <span className="text-emerald-700 font-medium">{formatCurrency(result.remainingFunds)}</span>
                 </div>
               </div>
 
               {/* Key Numbers */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-accent-50 rounded-lg p-4">
-                  <div className="text-sm text-accent-700 font-medium mb-1">
-                    Maksymalny wkład na DPS (70%)
+                {/* Senior contribution */}
+                <div className="bg-primary-50 rounded-xl p-5 border border-primary-100">
+                  <div className="flex items-center gap-2 mb-2 text-primary-700 font-bold text-sm uppercase tracking-wide">
+                    <Calculator size={16} /> Wkład seniora (70%)
                   </div>
-                  <div className="text-2xl font-bold text-accent-900">
+                  <div className="text-3xl font-serif font-bold text-primary-900 mb-1">
                     {formatCurrency(result.maxContribution)}
                   </div>
+                  <p className="text-primary-700 text-xs leading-relaxed border-t border-primary-100 pt-2 mt-2">
+                    Kwota wynikająca z ustawy — automatycznie potrącana na rzecz DPS.
+                  </p>
                 </div>
-                <div className="bg-success-50 rounded-lg p-4">
-                  <div className="text-sm text-success-700 font-medium mb-1">
-                    Zostanie "na rękę" (30%)
+
+                {/* Pocket money */}
+                <div className="bg-white rounded-xl p-5 border border-stone-200 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2 text-emerald-700 font-bold text-sm uppercase tracking-wide">
+                    <Wallet size={16} /> Zostaje &quot;na rękę&quot; (30%)
                   </div>
-                  <div className="text-2xl font-bold text-success-900">
+                  <div className="text-3xl font-serif font-bold text-slate-800 mb-1">
                     {formatCurrency(result.remainingFunds)}
+                  </div>
+                  <div className="border-t border-stone-100 pt-2 mt-2">
+                    <p className="text-xs text-slate-500 font-bold mb-2">Budżet na potrzeby własne:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 text-xs">
+                        <Pill size={11} /> Leki
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 text-xs">
+                        <ShoppingBag size={11} /> Higiena
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 text-xs">
+                        <Phone size={11} /> Telefon
+                      </span>
+                    </div>
+                    {result.remainingFunds < 300 && (
+                      <div className="mt-2 text-amber-700 flex items-start gap-1.5 font-medium bg-amber-50 p-2 rounded-lg text-xs border border-amber-100">
+                        <AlertCircle size={13} className="flex-shrink-0 mt-0.5" />
+                        Uwaga: ta kwota może nie wystarczyć na leki nierefundowane.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Legal Info */}
-              <div className="mt-6 text-sm text-neutral-600 bg-neutral-50 p-4 rounded-lg">
-                ℹ️ Zgodnie z ustawą o pomocy społecznej, senior może przeznaczyć <strong>maksymalnie 70% dochodu</strong> na opiekę w DPS/ŚDS. 
-                Pozostałe 30% musi pozostać do dyspozycji seniora.
+              <div className="mt-5 text-sm text-neutral-600 bg-neutral-50 p-4 rounded-xl border border-neutral-100">
+                <Info size={14} className="inline mr-1.5 text-neutral-400" />
+                Zgodnie z ustawą o pomocy społecznej, senior może przeznaczyć <strong>maksymalnie 70% dochodu</strong> na opiekę w DPS/ŚDS.
+                Pozostałe 30% musi pozostać do jego dyspozycji.
               </div>
             </div>
 
@@ -666,23 +677,31 @@ export default function KalkulatorPage() {
                               </div>
                             )}
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-6 py-4 min-w-[200px]">
                             {hasPrice ? (
                               isAffordable ? (
-                                <div className="flex items-center gap-2 text-success-700">
-                                  <TrendingDown className="w-4 h-4" />
-                                  <span className="text-sm font-medium">
-                                    Budżet wystarczający
-                                  </span>
+                                <div>
+                                  <div className="flex items-center gap-1.5 text-emerald-700 font-bold text-xs mb-2">
+                                    <CheckCircle2 size={14} /> Budżet wystarczający
+                                  </div>
+                                  <div className="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden">
+                                    <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${Math.min((result.maxContribution / facility.koszt_pobytu!) * 100, 100)}%` }} />
+                                  </div>
+                                  <div className="text-[10px] text-emerald-600 mt-1 font-medium">100% pokryte z dochodu</div>
                                 </div>
                               ) : (
-                                <div className="text-sm">
-                                  <div className="flex items-center gap-2 text-red-700 font-medium mb-1">
-                                    <TrendingUp className="w-4 h-4" />
-                                    Brakuje: {formatCurrency(difference)}
+                                <div>
+                                  <div className="flex justify-between items-center mb-1.5">
+                                    <span className="text-xs font-bold text-slate-500 uppercase">Brakuje:</span>
+                                    <span className="text-sm font-bold text-red-600">{formatCurrency(difference)}</span>
                                   </div>
-                                  <div className="text-xs text-neutral-600">
-                                    (Potencjalna dopłata Rodziny/Gminy)
+                                  <div className="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden flex">
+                                    <div className="bg-emerald-500 h-full" style={{ width: `${(result.maxContribution / facility.koszt_pobytu!) * 100}%` }} />
+                                    <div className="bg-amber-300 h-full opacity-70" style={{ width: `${(difference / facility.koszt_pobytu!) * 100}%` }} />
+                                  </div>
+                                  <div className="flex justify-between text-[10px] mt-1 text-slate-400 font-medium">
+                                    <span className="flex items-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Senior</span>
+                                    <span className="flex items-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-300 inline-block" /> Gmina / Rodzina</span>
                                   </div>
                                 </div>
                               )
@@ -693,8 +712,8 @@ export default function KalkulatorPage() {
                                   <span className="font-medium">Brak oficjalnej ceny</span>
                                 </div>
                                 <div className="text-xs text-neutral-600">
-                                  {facility.typ_placowki === 'ŚDS' 
-                                    ? 'Opieka dzienna - często bezpłatna'
+                                  {facility.typ_placowki === 'ŚDS'
+                                    ? 'Opieka dzienna — często bezpłatna'
                                     : 'Skontaktuj się z placówką'
                                   }
                                 </div>
@@ -748,19 +767,25 @@ export default function KalkulatorPage() {
             </div>
 
             {/* Legal Disclaimer */}
-            <div className="bg-warning-50 border border-warning-200 rounded-lg p-6">
-              <p className="text-sm text-warning-900">
-                ℹ️ <strong>Ważne:</strong> To szacunkowa kalkulacja możliwości finansowych. 
-                Ostateczną i aktualną cenę oraz wysokość dopłaty Gminy ustala Ośrodek Pomocy Społecznej 
-                na podstawie indywidualnego wywiadu środowiskowego. 
-                Zawsze skonsultuj się z lokalnym MOPS/OPS przed podjęciem decyzji.
-              </p>
+            <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-xl shadow-sm">
+              <div className="flex items-start gap-4">
+                <ShieldAlert className="text-amber-600 flex-shrink-0 mt-0.5" size={24} />
+                <div>
+                  <h3 className="text-amber-900 font-bold text-base mb-1">To tylko symulacja — nie decyzja urzędowa!</h3>
+                  <p className="text-amber-800 text-sm leading-relaxed">
+                    Poniższe wyliczenia opierają się na ogólnych przepisach ustawy o pomocy społecznej.
+                    <strong> Każda sytuacja jest rozpatrywana indywidualnie przez pracownika socjalnego (MOPS/OPS).</strong>{' '}
+                    Urzędnik bierze pod uwagę nie tylko dochód, ale też sytuację rodzinną, majątkową i alimentacyjną.
+                    Zawsze skonsultuj się z lokalnym MOPS/OPS przed podjęciem decyzji.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Lead Magnet Placeholder */}
             <div className="bg-neutral-100 border border-dashed border-neutral-300 rounded-lg p-8 text-center">
               <p className="text-neutral-600 italic">
-                💡 Funkcja <strong>"Wyślij szczegółowy raport PDF na email"</strong> będzie dostępna wkrótce
+                💡 Funkcja <strong>&quot;Wyślij szczegółowy raport PDF na email&quot;</strong> będzie dostępna wkrótce
               </p>
             </div>
 
