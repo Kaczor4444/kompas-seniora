@@ -574,15 +574,20 @@ export default function KalkulatorPage() {
                       </div>
                     </a>
 
-                    <div className="flex items-center gap-3 bg-stone-50 border border-stone-200 rounded-xl px-4 py-3">
-                      <div className="w-8 h-8 bg-stone-200 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(result.mopsContact.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group"
+                    >
+                      <div className="w-8 h-8 bg-stone-200 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors">
                         <MapPin size={15} />
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Adres</p>
-                        <p className="text-sm text-slate-700">{result.mopsContact.address}</p>
+                        <p className="text-sm text-slate-700 group-hover:text-primary-700">{result.mopsContact.address}</p>
                       </div>
-                    </div>
+                    </a>
 
                     {result.mopsContact.email && (
                       <a
