@@ -111,9 +111,12 @@ export default function PoradnikiContent({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
             <Link
               href="/"
-              className="flex items-center gap-2 text-emerald-100 hover:text-white font-bold mb-6 md:mb-8 transition-colors"
+              className="group flex items-center gap-2 text-emerald-100 hover:text-white font-bold mb-6 md:mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-emerald-700/50 w-fit"
             >
-              <ArrowLeft size={20} /> Wróć do strony głównej
+              <div className="w-8 h-8 rounded-full bg-emerald-700/50 border border-emerald-500 flex items-center justify-center group-hover:border-white/50 transition-colors">
+                <ArrowLeft size={16} />
+              </div>
+              Wróć do strony głównej
             </Link>
 
             <h1 className="text-3xl md:text-5xl font-serif font-bold mb-4 md:mb-6 text-center md:text-left">

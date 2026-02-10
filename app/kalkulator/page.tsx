@@ -282,14 +282,19 @@ export default function KalkulatorPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
 
+        {/* Back link */}
+        <Link
+          href="/"
+          className="group flex items-center gap-2 text-slate-600 hover:text-primary-600 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-white/50 w-fit"
+        >
+          <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center group-hover:border-primary-300 transition-colors shadow-sm">
+            <ArrowLeft size={16} />
+          </div>
+          Wróć do strony głównej
+        </Link>
+
         {/* Header */}
         <div className="text-center mb-10">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 font-bold mb-6 transition-colors"
-          >
-            <ArrowLeft size={16} /> Wróć do strony głównej
-          </Link>
 
           <div className="w-16 h-16 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary-900/10">
             <Calculator size={32} />
