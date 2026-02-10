@@ -2,8 +2,7 @@
 
 import { useState, useEffect, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { PencilIcon } from '@heroicons/react/24/solid';
+import { X, PenLine, Lock, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import StarRating from './StarRating';
 import { saveFacilityNote, getFacilityNote, deleteFacilityNote } from '@/src/utils/facilityNotes';
@@ -25,7 +24,6 @@ export default function FacilityNotesModal({
   const [rating, setRating] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load existing note when modal opens
   useEffect(() => {
     if (isOpen) {
       const existingNote = getFacilityNote(facilityId);
@@ -41,26 +39,19 @@ export default function FacilityNotesModal({
 
   const handleSave = () => {
     setIsSaving(true);
-
     const result = saveFacilityNote(facilityId, notes, rating);
-
     if (result.success) {
-      toast.success('Notatka zapisana! 📝', { duration: 2000 });
+      toast.success('Notatka zapisana!', { duration: 2000 });
       onClose();
     } else {
       toast.error(result.message);
     }
-
     setIsSaving(false);
   };
 
   const handleDelete = () => {
-    if (!confirm('Czy na pewno chcesz usunąć notatkę i ocenę?')) {
-      return;
-    }
-
+    if (!confirm('Czy na pewno chcesz usunąć notatkę i ocenę?')) return;
     const result = deleteFacilityNote(facilityId);
-
     if (result.success) {
       toast.success('Notatka usunięta', { duration: 2000 });
       setNotes('');
@@ -77,123 +68,116 @@ export default function FacilityNotesModal({
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
+        {/* Backdrop */}
         <Transition.Child
           as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+          enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100"
+          leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
+              enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <Dialog.Title className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                      <PencilIcon className="w-6 h-6 text-accent-600" />
-                      Notatki i ocena
-                    </Dialog.Title>
-                    <p className="text-sm text-gray-600 mt-1">{facilityName}</p>
+              <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all">
+
+                {/* Colored header */}
+                <div className="bg-primary-600 px-6 py-5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                      <PenLine className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <Dialog.Title className="text-white font-serif font-bold text-lg leading-tight">
+                        Notatki i ocena
+                      </Dialog.Title>
+                      <p className="text-primary-100 text-xs mt-0.5 truncate max-w-[280px]">{facilityName}</p>
+                    </div>
                   </div>
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-colors"
                   >
-                    <XMarkIcon className="w-6 h-6 text-gray-500" />
+                    <X size={16} />
                   </button>
                 </div>
 
-                {/* Rating */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Twoja ocena
-                  </label>
-                  <StarRating
-                    rating={rating}
-                    onChange={setRating}
-                    size="lg"
-                    showLabel
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    💡 Ocena jest prywatna - tylko Ty ją widzisz
-                  </p>
-                </div>
+                <div className="p-6 space-y-6">
 
-                {/* Notes */}
-                <div className="mb-6">
-                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-                    Twoje notatki
-                  </label>
-                  <textarea
-                    id="notes"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Np. Dzwoniliśmy 15.11 - bardzo mili. Pani Kowalska nas przyjęła. Lista oczekujących: 2 miesiące..."
-                    rows={6}
-                    maxLength={2000}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
-                  />
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-xs text-gray-500">
-                      💡 Notatki są zapisane tylko na tym urządzeniu
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {notes.length} / 2000
-                    </p>
-                  </div>
-                </div>
-
-                {/* Info Box */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    🔒 <strong>Prywatność:</strong> Twoje notatki i oceny są przechowywane tylko na tym urządzeniu.
-                    Nie wysyłamy ich na serwer i nie mamy do nich dostępu. Możesz usunąć je w każdej chwili.
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between gap-3">
+                  {/* Rating */}
                   <div>
-                    {hasExistingNote && (
-                      <button
-                        onClick={handleDelete}
-                        className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
-                      >
-                        Usuń notatkę
-                      </button>
-                    )}
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">
+                      Twoja ocena
+                    </label>
+                    <StarRating rating={rating} onChange={setRating} size="lg" showLabel />
+                    <p className="text-xs text-slate-400 mt-2">Ocena jest prywatna — tylko Ty ją widzisz</p>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={onClose}
-                      className="px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
-                    >
-                      Anuluj
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      disabled={isSaving || !hasChanges}
-                      className="px-6 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSaving ? 'Zapisywanie...' : 'Zapisz'}
-                    </button>
+                  {/* Notes textarea */}
+                  <div>
+                    <label htmlFor="notes" className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">
+                      Twoje notatki
+                    </label>
+                    <textarea
+                      id="notes"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Np. Dzwoniliśmy 15.11 — bardzo mili. Pani Kowalska nas przyjęła. Lista oczekujących: 2 miesiące..."
+                      rows={5}
+                      maxLength={2000}
+                      className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-slate-800 placeholder:text-slate-300 focus:ring-2 focus:ring-primary-400 focus:border-primary-300 outline-none resize-none transition-all text-sm"
+                    />
+                    <div className="flex justify-between mt-1.5">
+                      <p className="text-xs text-slate-400">Zapisane tylko na tym urządzeniu</p>
+                      <p className={`text-xs font-medium ${notes.length > 1800 ? 'text-amber-500' : 'text-slate-400'}`}>
+                        {notes.length} / 2000
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Privacy info */}
+                  <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 flex items-start gap-3">
+                    <Lock size={15} className="text-slate-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      <strong className="text-slate-700">Prywatność:</strong> Twoje notatki i oceny są przechowywane
+                      wyłącznie na tym urządzeniu. Nie wysyłamy ich na serwer i nie mamy do nich dostępu.
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between gap-3 pt-2 border-t border-stone-100">
+                    <div>
+                      {hasExistingNote && (
+                        <button
+                          onClick={handleDelete}
+                          className="flex items-center gap-2 px-4 py-2 text-slate-500 hover:text-slate-800 hover:bg-stone-100 rounded-xl transition-colors font-bold text-sm"
+                        >
+                          <Trash2 size={15} /> Usuń notatkę
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={onClose}
+                        className="px-5 py-2.5 text-slate-600 hover:bg-stone-100 rounded-xl transition-colors font-bold text-sm"
+                      >
+                        Anuluj
+                      </button>
+                      <button
+                        onClick={handleSave}
+                        disabled={isSaving || !hasChanges}
+                        className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-primary-600/20"
+                      >
+                        {isSaving ? 'Zapisuję...' : 'Zapisz'}
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
               </Dialog.Panel>
             </Transition.Child>
