@@ -330,7 +330,8 @@ export default function Navbar() {
                     {guideCategories.map((cat, idx) => (
                       <Link
                         key={idx}
-                        href={`/poradniki?category=${encodeURIComponent(cat)}`}
+                        href={`/poradniki?category=${encodeURIComponent(cat)}#filtry`}
+                        onClick={() => setIsGuidesHovered(false)}
                         className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-between group
                           ${isHighContrast
                             ? 'text-white hover:bg-yellow-400 hover:text-black'
@@ -430,7 +431,7 @@ export default function Navbar() {
                     {guideCategories.map((cat, idx) => (
                       <Link
                         key={idx}
-                        href={`/poradniki?category=${encodeURIComponent(cat)}`}
+                        href={`/poradniki?category=${encodeURIComponent(cat)}#filtry`}
                         onClick={() => setIsOpen(false)}
                         className={`w-full text-left py-2.5 px-3 text-sm font-bold rounded-xl block ${isHighContrast ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:bg-white hover:shadow-sm'}`}
                       >
