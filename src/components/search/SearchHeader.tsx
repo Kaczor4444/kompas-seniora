@@ -62,11 +62,11 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
             </div>
           </div>
 
-          {/* Filters Button */}
+          {/* Filters Button — hidden on mobile (handled by MobileBottomBar) */}
           <button
             onClick={onToggleFilters}
             className={`
-              relative p-3 rounded-xl border transition-all
+              hidden md:block relative p-3 rounded-xl border transition-all
               ${showFilters
                 ? 'bg-gray-900 text-white border-gray-900'
                 : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
