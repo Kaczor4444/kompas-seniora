@@ -5,7 +5,7 @@ import {
   ArrowRight, Sparkles, MapPin,
   Search, Navigation, AlertCircle,
   Check, ShieldCheck, Building2, ChevronRight,
-  Calculator
+  Calculator, RefreshCw
 } from 'lucide-react';
 
 // Type dla suggestion z API
@@ -22,7 +22,7 @@ interface SuggestResponse {
   showAll: boolean;
 }
 
-const Hero = () => {
+const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unknown; selectedProfiles?: unknown; activeTab?: unknown }) => {
   const [activeTab, setActiveTab] = useState<'search' | 'calculator' | 'assistant'>('search');
   const [cityInput, setCityInput] = useState("");
   const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>('Wszystkie');
@@ -606,8 +606,8 @@ const Hero = () => {
         {/* TRUST BAR */}
         <div className="mt-4 md:mt-6 flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
            <TrustItem icon={<ShieldCheck size={18}/>} text="Oficjalne dane BIP" />
-           <TrustItem icon={<Building2 size={18}/>} text="36 Placówek Małopolski" />
-           <TrustItem icon={<Check size={18}/>} text="Brak opłat i reklam" />
+           <TrustItem icon={<Building2 size={18}/>} text={`${totalFacilities ?? 36} Placówek Małopolski`} />
+           <TrustItem icon={<RefreshCw size={18}/>} text="Stale aktualizowane" />
         </div>
 
       </div>

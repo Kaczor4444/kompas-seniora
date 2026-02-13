@@ -35,6 +35,7 @@ export default function HomeClient({ totalFacilities }: HomeClientProps) {
         onTabChange={setActiveTab}
         selectedProfiles={selectedProfiles}
         activeTab={activeTab}
+        totalFacilities={totalFacilities}
       />
 
       {/* Regional Map */}

@@ -62,7 +62,7 @@ export default function MobileBottomBar({
         <div className="
           bg-gray-900/95 backdrop-blur-lg
           rounded-full
-          px-1 py-1
+          px-1 py-1.5
           shadow-2xl
           border border-gray-700
           flex items-center justify-between
@@ -71,7 +71,7 @@ export default function MobileBottomBar({
           <button
             onClick={() => onToggleMap(false)}
             className={`
-              flex items-center gap-1 px-3 py-2 rounded-full text-xs font-semibold transition-all
+              flex items-center gap-1 px-3 py-2.5 rounded-full text-xs font-semibold transition-all
               ${!showMap ? 'bg-white text-gray-900' : 'text-gray-300 hover:text-white'}
             `}
           >
@@ -82,7 +82,7 @@ export default function MobileBottomBar({
           <button
             onClick={() => onToggleMap(true)}
             className={`
-              flex items-center gap-1 px-3 py-2 rounded-full text-xs font-semibold transition-all
+              flex items-center gap-1 px-3 py-2.5 rounded-full text-xs font-semibold transition-all
               ${showMap ? 'bg-white text-gray-900' : 'text-gray-300 hover:text-white'}
             `}
           >
@@ -91,35 +91,38 @@ export default function MobileBottomBar({
           </button>
 
           {/* Divider */}
-          <div className="w-px h-4 bg-gray-600 mx-0.5 flex-shrink-0" />
+          <div className="w-px h-4 bg-gray-600 mx-1 flex-shrink-0" />
 
-          {/* Filtry */}
-          <button
-            onClick={onOpenFilters}
-            className="relative flex items-center gap-1 px-3 py-2 rounded-full text-xs font-semibold text-gray-300 hover:text-white transition-all"
-          >
-            <SlidersHorizontal size={15} />
-            <span>Filtry</span>
-            {activeFiltersCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-0.5 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                {activeFiltersCount}
-              </span>
-            )}
-          </button>
+          {/* Filtry + Sortuj zgrupowane razem */}
+          <div className="flex items-center gap-0.5">
+            {/* Filtry */}
+            <button
+              onClick={onOpenFilters}
+              className="relative flex items-center gap-1 px-3 py-2.5 rounded-full text-xs font-semibold text-gray-300 hover:text-white transition-all"
+            >
+              <SlidersHorizontal size={15} />
+              <span>Filtry</span>
+              {activeFiltersCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-0.5 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
 
-          {/* Sortuj */}
-          <button
-            onClick={() => setShowSortModal(true)}
-            className="flex items-center gap-1 px-3 py-2 rounded-full text-xs font-semibold text-gray-300 hover:text-white transition-all"
-          >
-            <ArrowUpDown size={15} />
-            <span>Sortuj</span>
-          </button>
+            {/* Sortuj */}
+            <button
+              onClick={() => setShowSortModal(true)}
+              className="flex items-center gap-1 px-3 py-2.5 rounded-full text-xs font-semibold text-gray-300 hover:text-white transition-all"
+            >
+              <ArrowUpDown size={15} />
+              <span>Sortuj</span>
+            </button>
+          </div>
 
           {/* Ulubione (only if any) */}
           {favoritesCount > 0 && (
             <>
-              <div className="w-px h-4 bg-gray-600 mx-0.5 flex-shrink-0" />
+              <div className="w-px h-4 bg-gray-600 mx-1 flex-shrink-0" />
               <Link
                 href="/ulubione"
                 onClick={() => {
@@ -127,9 +130,9 @@ export default function MobileBottomBar({
                     sessionStorage.setItem('returnUrl', window.location.pathname + window.location.search);
                   }
                 }}
-                className="flex items-center gap-1 px-3 py-2 rounded-full text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-all"
+                className="flex items-center gap-1 pl-2.5 pr-3.5 py-2.5 rounded-full text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-all"
               >
-                <Heart size={15} className="fill-current" />
+                <Heart size={15} className="fill-current flex-shrink-0" />
                 <span>{favoritesCount}</span>
               </Link>
             </>
