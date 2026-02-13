@@ -303,10 +303,11 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
   };
 
   return (
-    <div className="bg-white pt-6 pb-4 md:pt-8 md:pb-8 relative overflow-hidden">
+    <div className="bg-gradient-to-b from-emerald-50/70 via-stone-50/30 to-white pt-6 pb-4 md:pt-8 md:pb-8 relative overflow-hidden">
       {/* Background Decor - Subtle Grid */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:32px_32px] opacity-20 pointer-events-none" />
-      <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#d1fae5_1px,transparent_1px)] [background-size:32px_32px] opacity-30 pointer-events-none" />
+      {/* Soft radial glow top-center */}
+      <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-emerald-100/40 rounded-full blur-[80px] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
 
