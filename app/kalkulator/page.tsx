@@ -107,6 +107,19 @@ export default function KalkulatorPage() {
     return () => window.removeEventListener('favoritesChanged', sync);
   }, []);
 
+  // Auto-trigger kalkulacji gdy przekierowano z hero kalkulatora (oba params obecne)
+  useEffect(() => {
+    const incomeParam = searchParams.get('income');
+    const cityParam = searchParams.get('city');
+    if (incomeParam && cityParam && parseFloat(incomeParam) > 0) {
+      const timer = setTimeout(() => {
+        handleCalculate();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // celowo uruchamiane raz po mount
+
   const toggleFavorite = (facility: Facility) => {
     if (isFavorite(facility.id)) {
       removeFavorite(facility.id);
@@ -367,7 +380,7 @@ export default function KalkulatorPage() {
         </Link>
 
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
 
           <div className="w-16 h-16 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary-900/10">
             <Calculator size={32} />
@@ -378,8 +391,21 @@ export default function KalkulatorPage() {
           </h1>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto">
             Sprawdź orientacyjny podział kosztów (zasada 70/30) dla oficjalnych placówek w Twoim regionie.
-            Ostateczną decyzję zawsze wydaje gmina po wywiadzie środowiskowym.
           </p>
+        </div>
+
+        {/* DISCLAIMER — zawsze widoczny, nad formularzem */}
+        <div className="mb-6 flex items-start gap-4 bg-amber-50 border-2 border-amber-300 rounded-2xl px-5 py-4 shadow-sm">
+          <ShieldAlert className="text-amber-500 flex-shrink-0 mt-0.5" size={22} />
+          <div>
+            <p className="text-amber-900 font-black text-sm uppercase tracking-wide mb-0.5">
+              To tylko symulacja — nie decyzja urzędowa
+            </p>
+            <p className="text-amber-800 text-sm leading-relaxed">
+              Wynik opiera się na ogólnych przepisach ustawy o pomocy społecznej.{' '}
+              <strong>Każdą sprawę MOPS rozpatruje indywidualnie</strong> — bierze pod uwagę dochód, sytuację rodzinną, majątkową i alimentacyjną.
+            </p>
+          </div>
         </div>
 
         {/* Input Section */}
@@ -473,17 +499,21 @@ export default function KalkulatorPage() {
         {result && (
           <div id="results-section" className="space-y-8">
 
-            {/* Disclaimer */}
-            <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-xl shadow-sm">
+            {/* Disclaimer w wynikach — powtórzony, nie do przeoczenia */}
+            <div className="bg-amber-100 border-2 border-amber-400 rounded-2xl p-6 shadow-md">
               <div className="flex items-start gap-4">
-                <ShieldAlert className="text-amber-600 flex-shrink-0" size={28} />
+                <div className="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <ShieldAlert className="text-white" size={24} />
+                </div>
                 <div>
-                  <h3 className="text-amber-900 font-bold text-lg mb-1">To tylko symulacja – nie decyzja urzędowa!</h3>
-                  <p className="text-amber-800 text-sm leading-relaxed">
+                  <h3 className="text-amber-900 font-black text-base uppercase tracking-wide mb-2">
+                    ⚠ Pamiętaj — to tylko orientacyjna symulacja!
+                  </h3>
+                  <p className="text-amber-900 text-sm leading-relaxed">
                     Poniższe wyliczenia opierają się na ogólnych przepisach ustawy o pomocy społecznej.
                     <strong> Każda sytuacja jest rozpatrywana indywidualnie przez pracownika socjalnego (MOPS/OPS).</strong>{' '}
                     Urzędnik bierze pod uwagę nie tylko dochód, ale też sytuację rodzinną, majątkową i alimentacyjną.
-                    Nie traktuj tego wyniku jako ostatecznego wymiaru opłat.
+                    <strong className="block mt-1.5 text-amber-950"> Nie traktuj tego wyniku jako ostatecznego wymiaru opłat.</strong>
                   </p>
                 </div>
               </div>
