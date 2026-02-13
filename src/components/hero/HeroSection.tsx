@@ -303,11 +303,12 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
   };
 
   return (
-    <div className="bg-gradient-to-br from-emerald-50/80 via-stone-50/20 to-white pt-6 pb-4 md:pt-8 md:pb-8 relative overflow-hidden">
-      {/* Background Decor - Subtle Grid */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#d1fae5_1px,transparent_1px)] [background-size:32px_32px] opacity-30 pointer-events-none" />
-      {/* Soft radial glow top-left corner */}
-      <div className="absolute -top-20 -left-20 w-[500px] h-[400px] bg-emerald-100/50 rounded-full blur-[100px] pointer-events-none" />
+    <div className="bg-gradient-to-br from-emerald-50/80 via-stone-50/20 to-white pt-6 pb-4 md:pt-8 md:pb-8 relative">
+      {/* Dekoracje tła - osobny overflow-hidden żeby nie przycinać dropdowna */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#d1fae5_1px,transparent_1px)] [background-size:32px_32px] opacity-30" />
+        <div className="absolute -top-20 -left-20 w-[500px] h-[400px] bg-emerald-100/50 rounded-full blur-[100px]" />
+      </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
 

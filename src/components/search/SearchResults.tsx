@@ -104,13 +104,15 @@ export default function SearchResults({
   const [favoritesState, setFavoritesState] = useState<number[]>([]);
 
   // ===== COMPUTED =====
-  const availablePowiats = useMemo(() => {
-    const powiats = new Set<string>();
-    results.forEach(f => {
-      if (f.powiat) powiats.add(f.powiat);
-    });
-    return ["Wszystkie", ...Array.from(powiats).sort()];
-  }, [results]);
+  // Stała lista wszystkich powiatów Małopolski — nie zależy od aktualnych wyników
+  const availablePowiats = [
+    "Wszystkie",
+    "bocheński", "brzeski", "chrzanowski", "dąbrowski", "gorlicki",
+    "krakowski", "limanowski", "miechowski", "myślenicki", "nowosądecki",
+    "nowotarski", "olkuski", "oświęcimski", "proszowicki", "suski",
+    "tarnowski", "tatrzański", "wadowicki", "wielicki",
+    "Kraków", "Nowy Sącz", "Tarnów",
+  ];
 
   const activeChips = useMemo(() => {
     const chips = [];
