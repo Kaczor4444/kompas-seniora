@@ -258,7 +258,7 @@ export default function FacilityMap({
                     </p>
                     <div className="flex gap-2">
                       <a href={`/placowka/${facility.id}`}
-                        className="text-xs bg-accent-600 text-white px-3 py-1 rounded hover:bg-accent-700"
+                        className="text-xs bg-emerald-600 text-white px-3 py-1 rounded hover:bg-emerald-700"
                       >
                         Zobacz szczegóły
                       </a>
@@ -282,7 +282,7 @@ export default function FacilityMap({
         <a href={`https://www.google.com/maps/dir/?api=1&destination=${facilitiesWithCoords[0].latitude},${facilitiesWithCoords[0].longitude}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 inline-block bg-accent-600 text-white px-4 py-2 rounded hover:bg-accent-700"
+          className="mt-3 inline-flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-700 transition-colors"
         >
           Otwórz w Google Maps
         </a>

@@ -102,8 +102,8 @@ interface Placowka {
   koszt_pobytu: number | null;
   data_aktualizacji: Date;
   zrodlo: string | null;
-  geo_lat: number | null;
-  geo_lng: number | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
@@ -193,7 +193,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             <button
               onClick={handleToggleCompare}
               className={`px-4 py-2.5 rounded-xl transition-all border flex items-center gap-2 font-black text-[10px] uppercase tracking-widest
-              ${isInComparison ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-stone-200 text-slate-500 hover:bg-stone-50'}`}
+              ${isInComparison ? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-stone-200 text-slate-500 hover:bg-stone-50'}`}
             >
               <ArrowLeftRight size={16} />
               <span className="hidden sm:inline">{isInComparison ? 'W zestawieniu' : 'Porównaj'}</span>
@@ -389,9 +389,9 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm overflow-hidden">
               <h3 className="font-serif font-bold text-2xl text-slate-900 mb-6 flex items-center justify-between">
                 Lokalizacja na mapie
-                {placowka.geo_lat && placowka.geo_lng && (
+                {placowka.latitude && placowka.longitude && (
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${placowka.geo_lat},${placowka.geo_lng}`}
+                    href={`https://www.google.com/maps/search/?api=1&query=${placowka.latitude},${placowka.longitude}`}
                     target="_blank"
                     rel="noreferrer"
                     className="text-sm font-sans font-bold text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1"
@@ -401,11 +401,13 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                   </a>
                 )}
               </h3>
-              <FacilityMap
-                facilities={[placowka]}
-                mode="single"
-                showDirections={true}
-              />
+              <div className="h-[400px]">
+                <FacilityMap
+                  facilities={[placowka]}
+                  mode="single"
+                  showDirections={true}
+                />
+              </div>
             </section>
 
           </div>
