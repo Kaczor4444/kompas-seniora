@@ -193,11 +193,12 @@ export default function SearchResults({
       );
     }
 
-    // Powiat filter
+    // Powiat filter (normalizacja: trim, lowercase, polskie znaki → ASCII)
     if (selectedPowiat !== "Wszystkie") {
-      filtered = filtered.filter(f =>
-        f.powiat === selectedPowiat
-      );
+      const normPowiat = (s: string) =>
+        s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'l');
+      const targetPowiat = normPowiat(selectedPowiat);
+      filtered = filtered.filter(f => normPowiat(f.powiat ?? '') === targetPowiat);
     }
 
     // Profile filter - selectedProfile is a code letter (e.g. "E", "A")

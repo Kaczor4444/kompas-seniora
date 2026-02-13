@@ -65,6 +65,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     });
     message = '';
   }
+  // TRYB 5: POWIAT ONLY (klik z mapy Małopolski)
+  else if (!query && powiatParam && wojewodztwo === 'all') {
+    const allFacilities = await prisma.placowka.findMany({
+      orderBy: { nazwa: 'asc' },
+    });
+    const normalizedTarget = normalizePolish(powiatParam);
+    results = allFacilities.filter(facility => {
+      const normalizedFacilityPowiat = normalizePolish(facility.powiat);
+      return normalizedFacilityPowiat.includes(normalizedTarget) || normalizedTarget.includes(normalizedFacilityPowiat);
+    });
+    message = '';
+  }
   // TRYB 4: WOJEWÓDZTWO ONLY (RegionModal)
   else if (!query && wojewodztwo !== 'all') {
     const allFacilities = await prisma.placowka.findMany({
