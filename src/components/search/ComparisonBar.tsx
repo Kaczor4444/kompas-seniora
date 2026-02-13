@@ -27,8 +27,29 @@ export const ComparisonBar: React.FC<ComparisonBarProps> = ({
       alert('Wybierz przynajmniej 2 placówki aby porównać');
       return;
     }
-    
-    // Navigate to compare page with selected IDs
+
+    // Zapisz wybrane placówki do tymczasowego localStorage
+    // (strona porównania normalnie czyta z ulubionych — to umożliwia porównanie bez dodawania do ulubionych)
+    const selectedFacilities = facilities
+      .filter((f: any) => selectedIds.includes(f.id))
+      .map((f: any) => ({
+        id: f.id,
+        nazwa: f.nazwa,
+        miejscowosc: f.miejscowosc,
+        powiat: f.powiat,
+        typ_placowki: f.typ_placowki,
+        koszt_pobytu: f.koszt_pobytu,
+        telefon: f.telefon,
+        ulica: f.ulica,
+        kod_pocztowy: f.kod_pocztowy,
+        email: f.email,
+        www: f.www,
+        liczba_miejsc: f.liczba_miejsc,
+        profil_opieki: f.profil_opieki,
+        addedAt: new Date().toISOString(),
+      }));
+    localStorage.setItem('kompas-seniora-compare-temp', JSON.stringify(selectedFacilities));
+
     router.push(`/ulubione/porownaj?ids=${selectedIds.join(',')}`);
   };
 

@@ -24,11 +24,25 @@ function ComparePageContent() {
   useEffect(() => {
     const favs = getFavorites();
     setFacilities(favs);
-    
+
     const idsParam = searchParams.get("ids");
     if (idsParam) {
       const parsedIds = idsParam.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-      const selected = favs.filter(f => parsedIds.includes(f.id));
+
+      // Szukaj najpierw w ulubionych
+      let selected = favs.filter(f => parsedIds.includes(f.id));
+
+      // Jeśli nie znaleziono w ulubionych, sprawdź tymczasowy zapis (z wyników wyszukiwania)
+      if (selected.length === 0) {
+        try {
+          const tempData = localStorage.getItem('kompas-seniora-compare-temp');
+          if (tempData) {
+            const tempFacilities: FavoriteFacility[] = JSON.parse(tempData);
+            selected = tempFacilities.filter(f => parsedIds.includes(f.id));
+          }
+        } catch {}
+      }
+
       setSelectedFacilities(selected.length > 0 ? selected : favs);
     } else {
       setSelectedFacilities(favs);

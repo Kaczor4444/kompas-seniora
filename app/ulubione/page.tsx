@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart, Trash2, ArrowLeft, Share2, Printer, ArrowLeftRight,
-  MapPin, Phone, CheckCircle2, Plus, X, Building2, Wallet,
+  MapPin, Phone, Building2, Wallet,
   ExternalLink, ChevronRight
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -239,14 +239,14 @@ export default function FavoritesPage() {
                         <button
                           onClick={(e) => toggleCompare(facility.id, e)}
                           disabled={!isSelected && selectedForCompare.length >= 3}
-                          className={`absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all no-print ${
+                          title={isSelected ? 'Usuń z porównania' : 'Dodaj do porównania'}
+                          className={`absolute top-4 left-4 p-2 rounded-full transition-all no-print disabled:opacity-40 disabled:cursor-not-allowed ${
                             isSelected
                               ? 'bg-white text-slate-900'
-                              : 'bg-white/20 text-white hover:bg-white/30 disabled:opacity-40 disabled:cursor-not-allowed'
+                              : 'bg-white/20 text-white hover:bg-white/30'
                           }`}
                         >
-                          {isSelected ? <CheckCircle2 size={14} /> : <Plus size={14} />}
-                          {isSelected ? 'DO PORÓWNANIA' : 'PORÓWNAJ'}
+                          <ArrowLeftRight size={16} />
                         </button>
 
                         {/* Price & type */}

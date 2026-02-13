@@ -445,11 +445,6 @@ export default function SearchResults({
       <ComparisonBar
         selectedIds={selectedForCompare}
         facilities={facilities}
-        onCompare={() => {
-          // Navigate to comparison page
-          const ids = selectedForCompare.join(',');
-          window.location.href = `/ulubione/porownaj?ids=${ids}`;
-        }}
         onRemove={(id) => setSelectedForCompare(prev => prev.filter(fid => fid !== id))}
         onClear={() => setSelectedForCompare([])}
       />
