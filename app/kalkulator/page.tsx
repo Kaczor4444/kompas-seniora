@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, Info, ShieldAlert, Pill, ShoppingBag, CheckCircle2, Wallet, Scale, Building2, Search, Heart, ArrowLeftRight, ChevronRight, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -80,7 +80,7 @@ interface MopsContact {
   verified: boolean;
 }
 
-export default function KalkulatorPage() {
+function KalkulatorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -925,5 +925,13 @@ export default function KalkulatorPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function KalkulatorPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-stone-50" />}>
+      <KalkulatorContent />
+    </Suspense>
   );
 }
