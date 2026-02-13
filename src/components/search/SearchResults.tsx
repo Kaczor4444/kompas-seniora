@@ -438,6 +438,7 @@ export default function SearchResults({
           showMap={showMapMobile}
           onToggleMap={setShowMapMobile}
           activeFiltersCount={activeChips.length + (quickFilterNFZ ? 1 : 0)}
+          onOpenFilters={() => setShowFilters(true)}
           hasUserLocation={false}
         />
       )}

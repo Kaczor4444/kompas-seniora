@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma';
 import SearchResults from '@/components/SearchResults';
-import MobileFilterDrawer from '@/src/components/filters/MobileFilterDrawer';
 import { calculateDistance } from '@/src/utils/distance';
 
 interface SearchPageProps {
@@ -318,14 +317,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {/* Main Content */}
       <main className="w-full h-screen flex flex-col">
         <div className="flex-1 overflow-hidden">
-          {/* Mobile: Filter drawer */}
-            <div className="lg:hidden">
-              <MobileFilterDrawer
-                totalResults={sortedResults.length}
-                careProfileCounts={careProfileCounts}
-                hasUserLocation={!!(userLat && userLng)}
-              />
-            </div>
 
             {/* Search Results */}
             <SearchResults

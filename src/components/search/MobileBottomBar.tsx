@@ -11,6 +11,7 @@ interface MobileBottomBarProps {
   showMap: boolean;
   onToggleMap: (show: boolean) => void;
   activeFiltersCount: number;
+  onOpenFilters: () => void;
   hasUserLocation?: boolean;
 }
 
@@ -18,6 +19,7 @@ export default function MobileBottomBar({
   showMap,
   onToggleMap,
   activeFiltersCount,
+  onOpenFilters,
   hasUserLocation = false,
 }: MobileBottomBarProps) {
   const router = useRouter();
@@ -35,11 +37,6 @@ export default function MobileBottomBar({
     return () => window.removeEventListener('favoritesChanged', update);
   }, []);
 
-  // Open filter drawer via data attribute trigger
-  const handleOpenFilters = () => {
-    const btn = document.querySelector('[data-mobile-filter-trigger]') as HTMLButtonElement;
-    if (btn) btn.click();
-  };
 
   const sortOptions = [
     { value: 'name_asc', label: 'A–Z' },
@@ -98,7 +95,7 @@ export default function MobileBottomBar({
 
           {/* Filtry */}
           <button
-            onClick={handleOpenFilters}
+            onClick={onOpenFilters}
             className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-semibold text-gray-300 hover:text-white transition-all"
           >
             <SlidersHorizontal size={16} />

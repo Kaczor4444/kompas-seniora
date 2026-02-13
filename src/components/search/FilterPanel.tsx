@@ -1,6 +1,6 @@
 // src/components/search/FilterPanel.tsx
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 
 interface FilterPanelProps {
   show: boolean;
@@ -54,79 +54,112 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 }) => {
   if (!show) return null;
 
+  const filterContent = (
+    <>
+      {/* Filter Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <FilterSelect
+          label="Typ placówki"
+          value={selectedType}
+          onChange={onTypeChange}
+          options={[
+            { value: "all", label: "Wszystkie" },
+            { value: "DPS", label: "DPS (Całodobowe)" },
+            { value: "ŚDS", label: "ŚDS (Dzienne)" }
+          ]}
+        />
+        <FilterSelect
+          label="Województwo"
+          value={selectedVoivodeship}
+          onChange={onVoivodeshipChange}
+          options={VOIVODESHIPS.map(v => ({ value: v, label: v }))}
+        />
+        <FilterSelect
+          label="Powiat"
+          value={selectedPowiat}
+          onChange={onPowiatChange}
+          options={availablePowiats.map(p => ({ value: p, label: p }))}
+        />
+        <FilterSelect
+          label="Profil podopiecznego"
+          value={selectedProfile}
+          onChange={onProfileChange}
+          options={CARE_PROFILES}
+        />
+      </div>
+
+      {/* Price Range */}
+      <div className="mb-6 pb-6 border-b border-gray-200">
+        <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
+          Cena miesięczna: <span className="text-gray-900 font-semibold">{priceLimit} zł</span>
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="10000"
+          step="500"
+          value={priceLimit}
+          onChange={(e) => onPriceLimitChange(Number(e.target.value))}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+        />
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onReset}
+          className="text-sm font-medium text-gray-500 hover:text-red-500 transition-colors"
+        >
+          Wyczyść filtry
+        </button>
+        <button
+          onClick={onClose}
+          className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+        >
+          Zastosuj
+        </button>
+      </div>
+    </>
+  );
+
   return (
-    <div className="bg-gray-50 border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
-        
-        {/* Filter Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          
-          <FilterSelect
-            label="Typ placówki"
-            value={selectedType}
-            onChange={onTypeChange}
-            options={[
-              { value: "all", label: "Wszystkie" },
-              { value: "DPS", label: "DPS (Całodobowe)" },
-              { value: "ŚDS", label: "ŚDS (Dzienne)" }
-            ]}
-          />
-
-          <FilterSelect
-            label="Województwo"
-            value={selectedVoivodeship}
-            onChange={onVoivodeshipChange}
-            options={VOIVODESHIPS.map(v => ({ value: v, label: v }))}
-          />
-
-          <FilterSelect
-            label="Powiat"
-            value={selectedPowiat}
-            onChange={onPowiatChange}
-            options={availablePowiats.map(p => ({ value: p, label: p }))}
-          />
-
-          <FilterSelect
-            label="Profil podopiecznego"
-            value={selectedProfile}
-            onChange={onProfileChange}
-            options={CARE_PROFILES}
-          />
-        </div>
-
-        {/* Price Range */}
-        <div className="mb-6 pb-6 border-b border-gray-200">
-          <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
-            Cena miesięczna: <span className="text-gray-900 font-semibold">{priceLimit} zł</span>
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="10000"
-            step="500"
-            value={priceLimit}
-            onChange={(e) => onPriceLimitChange(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-          />
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={onReset}
-            className="text-sm font-medium text-gray-500 hover:text-red-500 transition-colors"
-          >
-            Wyczyść filtry
-          </button>
+    <>
+      {/* Mobile: full-screen overlay */}
+      <div className="md:hidden fixed inset-0 z-[9999] bg-white flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 bg-white flex-shrink-0">
+          <h2 className="text-lg font-semibold text-gray-900">Filtry</h2>
           <button
             onClick={onClose}
-            className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            Zastosuj
+            <X size={22} className="text-gray-600" />
+          </button>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-4 py-6">
+          {filterContent}
+        </div>
+
+        {/* Footer apply button */}
+        <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <button
+            onClick={onClose}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl transition-colors"
+          >
+            Zastosuj filtry
           </button>
         </div>
       </div>
-    </div>
+
+      {/* Desktop: inline dropdown */}
+      <div className="hidden md:block bg-gray-50 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-8 py-6">
+          {filterContent}
+        </div>
+      </div>
+    </>
   );
 };
 
