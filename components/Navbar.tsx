@@ -285,6 +285,14 @@ export default function Navbar() {
                 <NavLink isHighContrast={isHighContrast} icon={<Search size={18} />} text="Wyszukiwarka" isActive={isActive('/search')} />
               </Link>
 
+              <Link href="/kalkulator">
+                <NavLink isHighContrast={isHighContrast} icon={<Calculator size={18} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
+              </Link>
+
+              <Link href="/asystent">
+                <NavLink isHighContrast={isHighContrast} icon={<Sparkles size={18} />} text="Asystent" isActive={isActive('/asystent')} />
+              </Link>
+
               <Link
                 href="/ulubione"
                 onClick={() => {
@@ -294,14 +302,6 @@ export default function Navbar() {
                 }}
               >
                 <NavLink isHighContrast={isHighContrast} icon={<Heart size={18} />} text="Ulubione" badge={favoritesCount > 0 ? favoritesCount.toString() : undefined} isActive={isActive('/ulubione')} />
-              </Link>
-
-              <Link href="/asystent">
-                <NavLink isHighContrast={isHighContrast} icon={<Sparkles size={18} />} text="Asystent" isActive={isActive('/asystent')} />
-              </Link>
-
-              <Link href="/kalkulator">
-                <NavLink isHighContrast={isHighContrast} icon={<Calculator size={18} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
               </Link>
 
               <div
@@ -388,6 +388,14 @@ export default function Navbar() {
                 <MobileNavLink isHighContrast={isHighContrast} icon={<Search size={20} />} text="Wyszukiwarka" isActive={isActive('/search')} />
               </Link>
 
+              <Link href="/kalkulator" onClick={() => setIsOpen(false)} className="w-full block">
+                <MobileNavLink isHighContrast={isHighContrast} icon={<Calculator size={20} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
+              </Link>
+
+              <Link href="/asystent" onClick={() => setIsOpen(false)} className="w-full block">
+                <MobileNavLink isHighContrast={isHighContrast} icon={<Sparkles size={20} />} text="Asystent" isActive={isActive('/asystent')} />
+              </Link>
+
               <Link
                 href="/ulubione"
                 onClick={() => {
@@ -399,14 +407,6 @@ export default function Navbar() {
                 className="w-full block"
               >
                 <MobileNavLink isHighContrast={isHighContrast} icon={<Heart size={20} />} text="Ulubione" badge={favoritesCount > 0 ? favoritesCount.toString() : undefined} isActive={isActive('/ulubione')} />
-              </Link>
-
-              <Link href="/asystent" onClick={() => setIsOpen(false)} className="w-full block">
-                <MobileNavLink isHighContrast={isHighContrast} icon={<Sparkles size={20} />} text="Asystent" isActive={isActive('/asystent')} />
-              </Link>
-
-              <Link href="/kalkulator" onClick={() => setIsOpen(false)} className="w-full block">
-                <MobileNavLink isHighContrast={isHighContrast} icon={<Calculator size={20} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
               </Link>
 
               <div className={`rounded-xl overflow-hidden transition-all border ${isMobileGuidesExpanded ? 'bg-stone-50 border-stone-200' : 'border-transparent'}`}>
