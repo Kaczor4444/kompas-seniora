@@ -55,7 +55,7 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
                   w-full pl-10 pr-4 py-3
                   bg-gray-50 border border-gray-200 rounded-xl
                   text-sm
-                  focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100
+                  focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100
                   outline-none transition-all
                 "
               />
@@ -80,7 +80,7 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
               <span className="
                 absolute -top-1 -right-1 
                 w-5 h-5 
-                bg-blue-500 text-white 
+                bg-emerald-600 text-white
                 text-[10px] font-bold 
                 rounded-full 
                 flex items-center justify-center

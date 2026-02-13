@@ -105,7 +105,7 @@ export default function MobileStickyBar({
             </svg>
             <span className="font-medium text-xs hidden xs:inline">Filtry</span>
             {activeFiltersCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-accent-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-emerald-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                 {activeFiltersCount}
               </span>
             )}
@@ -123,29 +123,8 @@ export default function MobileStickyBar({
           </button>
 
           {/* Widok (Mapa) */}
-          <button 
-            id="map-toggle-btn"
-            onClick={() => {
-              const mapView = document.getElementById('mobile-map-view');
-              const listView = document.getElementById('mobile-list-view');
-              const btn = document.getElementById('map-toggle-btn');
-              
-              if (mapView && listView && btn) {
-                const isShowingMap = !mapView.classList.contains('hidden');
-                
-                if (isShowingMap) {
-                  // Pokaż listę
-                  mapView.classList.add('hidden');
-                  listView.classList.remove('hidden');
-                  btn.innerHTML = '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span class="font-medium text-xs hidden xs:inline">Mapa</span>';
-                } else {
-                  // Pokaż mapę
-                  mapView.classList.remove('hidden');
-                  listView.classList.add('hidden');
-                  btn.innerHTML = '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg><span class="font-medium text-xs hidden xs:inline">Lista</span>';
-                }
-              }
-            }}
+          <button
+            onClick={() => window.dispatchEvent(new Event('toggleMobileMap'))}
             className="flex items-center justify-center gap-1 px-2 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition min-h-[44px] active:scale-95 flex-1"
           >
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,16 +144,16 @@ export default function MobileStickyBar({
                   sessionStorage.setItem('returnUrl', window.location.pathname + window.location.search);
                 }
               }}
-              className="flex items-center justify-center gap-1 px-2 py-2.5 bg-accent-50 border-2 border-accent-600 rounded-lg hover:bg-accent-100 transition min-h-[44px] active:scale-95 flex-1"
+              className="flex items-center justify-center gap-1 px-2 py-2.5 bg-emerald-50 border-2 border-emerald-600 rounded-lg hover:bg-emerald-100 transition min-h-[44px] active:scale-95 flex-1"
             >
-              <svg className="w-4 h-4 flex-shrink-0 text-accent-600" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 flex-shrink-0 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
               </svg>
-              <span className="font-medium text-xs text-accent-700 hidden xs:inline">
+              <span className="font-medium text-xs text-emerald-700 hidden xs:inline">
                 ({favoritesCount})
               </span>
               {/* Na małych ekranach tylko liczba bez nawiasów */}
-              <span className="font-bold text-xs text-accent-700 xs:hidden">
+              <span className="font-bold text-xs text-emerald-700 xs:hidden">
                 {favoritesCount}
               </span>
             </Link>
@@ -196,10 +175,10 @@ export default function MobileStickyBar({
             </div>
             <div className="px-6 py-4 space-y-2 h-full overflow-y-auto">
               {sortOptions.map((opt) => (
-                <button key={opt.value} onClick={() => handleSortChange(opt.value)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-left min-h-[56px] ${currentSort === opt.value ? 'bg-accent-50 border-2 border-accent-600' : 'bg-white border-2 border-gray-200 hover:border-gray-300'}`}>
-                  <span className={`font-medium flex-1 ${currentSort === opt.value ? 'text-accent-700' : 'text-gray-900'}`}>{opt.label}</span>
+                <button key={opt.value} onClick={() => handleSortChange(opt.value)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-left min-h-[56px] ${currentSort === opt.value ? 'bg-emerald-50 border-2 border-emerald-600' : 'bg-white border-2 border-gray-200 hover:border-gray-300'}`}>
+                  <span className={`font-medium flex-1 ${currentSort === opt.value ? 'text-emerald-700' : 'text-gray-900'}`}>{opt.label}</span>
                   {currentSort === opt.value && (
-                    <svg className="w-5 h-5 text-accent-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   )}

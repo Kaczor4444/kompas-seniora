@@ -1,8 +1,7 @@
 // src/components/search/FacilityCard.tsx
 // ✅ FULLY RESPONSIVE - Mobile/Tablet/Desktop
 import React from 'react';
-import { MapPin, Star, Heart, ArrowLeftRight } from 'lucide-react';
-import { Facility } from '../../types';
+import { MapPin, Heart, ArrowLeftRight } from 'lucide-react';
 
 interface FacilityCardProps {
   facility: {
@@ -158,7 +157,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               className={`
                 p-2 sm:p-2.5 rounded-full transition-all
                 ${isSaved
-                  ? 'bg-red-500 text-white'
+                  ? 'bg-slate-800 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }
               `}

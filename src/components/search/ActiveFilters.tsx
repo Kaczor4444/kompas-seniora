@@ -98,7 +98,7 @@ const QuickChip = ({ active, onClick, icon, label }: any) => (
       }
     `}
   >
-    <span className={active ? 'text-white' : 'text-blue-500'}>{icon}</span>
+    <span className={active ? 'text-white' : 'text-emerald-600'}>{icon}</span>
     {label}
   </button>
 );

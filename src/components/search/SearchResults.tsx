@@ -62,19 +62,6 @@ interface SearchResultsProps {
   userLocation?: { lat: number; lng: number };
 }
 
-// ===== CONSTANTS =====
-const VOIVODESHIPS = [
-  "Wszystkie", "Dolnośląskie", "Kujawsko-pomorskie", "Lubelskie", "Lubuskie",
-  "Łódzkie", "Małopolskie", "Mazowieckie", "Opolskie",
-  "Podkarpackie", "Podlaskie", "Pomorskie", "Śląskie",
-  "Świętokrzyskie", "Warmińsko-mazurskie", "Wielkopolskie", "Zachodniopomorskie"
-];
-
-const CARE_PROFILES = [
-  "Wszystkie", "Osoby starsze", "Somatycznie chorzy", "Psychicznie chorzy",
-  "Niepełnosprawni intelektualnie", "Niepełnosprawni fizycznie",
-  "Dzieci i młodzież", "Uzależnieni"
-];
 
 // ===== MAIN COMPONENT =====
 export default function SearchResults({
@@ -88,7 +75,9 @@ export default function SearchResults({
 
   // ===== STATE =====
   const [cityInput, setCityInput] = useState(query || "");
-  const [selectedType, setSelectedType] = useState(type || 'all');
+  const [selectedType, setSelectedType] = useState(
+    () => type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : (type || 'all')
+  );
   const [selectedVoivodeship, setSelectedVoivodeship] = useState(
     activeFilters?.wojewodztwo || "Wszystkie"
   );
@@ -160,6 +149,13 @@ export default function SearchResults({
   }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfile, priceLimit]);
 
 
+  // Mobile map toggle via custom event from MobileStickyBar
+  useEffect(() => {
+    const handleToggleMap = () => setShowMapMobile(prev => !prev);
+    window.addEventListener('toggleMobileMap', handleToggleMap);
+    return () => window.removeEventListener('toggleMobileMap', handleToggleMap);
+  }, []);
+
   // Load favorites on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -208,11 +204,13 @@ export default function SearchResults({
       );
     }
 
-    // Profile filter
+    // Profile filter - selectedProfile is a code letter (e.g. "E", "A")
     if (selectedProfile !== "Wszystkie") {
-      filtered = filtered.filter(f =>
-        f.profil_opieki?.toLowerCase().includes(selectedProfile.toLowerCase())
-      );
+      filtered = filtered.filter(f => {
+        if (!f.profil_opieki) return false;
+        const codes = f.profil_opieki.split(',').map((c: string) => c.trim());
+        return codes.includes(selectedProfile);
+      });
     }
 
     // Price filter
@@ -225,11 +223,6 @@ export default function SearchResults({
       filtered = filtered.filter(f =>
         f.koszt_pobytu === 0 || f.koszt_pobytu === null
       );
-    }
-
-    if (quickFilterBest) {
-      // Assuming you have rating field - adjust as needed
-      // filtered = filtered.filter(f => f.rating >= 4.7);
     }
 
     setFacilities(filtered);

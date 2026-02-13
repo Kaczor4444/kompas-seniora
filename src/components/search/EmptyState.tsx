@@ -23,7 +23,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ onResetFilters }) => {
       
       <button
         onClick={onResetFilters}
-        className="px-6 py-2.5 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition-colors"
+        className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition-colors"
       >
         Wyczyść filtry
       </button>

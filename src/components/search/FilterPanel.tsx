@@ -27,8 +27,13 @@ const VOIVODESHIPS = [
 ];
 
 const CARE_PROFILES = [
-  "Wszystkie", "Osoby starsze", "Somatycznie chorzy", "Psychicznie chorzy",
-  "Niepełnosprawni intelektualnie", "Niepełnosprawni fizycznie", "Dzieci i młodzież", "Uzależnieni"
+  { value: "Wszystkie", label: "Wszystkie" },
+  { value: "E", label: "Osoby starsze" },
+  { value: "C", label: "Psychicznie chorzy" },
+  { value: "F", label: "Somatycznie chorzy" },
+  { value: "A", label: "Niepełnosprawni intelektualnie" },
+  { value: "I", label: "Niepełnosprawni fizycznie" },
+  { value: "G", label: "Dzieci i młodzież" },
 ];
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({
@@ -85,7 +90,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             label="Profil podopiecznego"
             value={selectedProfile}
             onChange={onProfileChange}
-            options={CARE_PROFILES.map(p => ({ value: p, label: p }))}
+            options={CARE_PROFILES}
           />
         </div>
 
@@ -101,7 +106,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             step="500"
             value={priceLimit}
             onChange={(e) => onPriceLimitChange(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
           />
         </div>
 
@@ -142,7 +147,7 @@ const FilterSelect = ({ label, value, onChange, options }: any) => (
           text-sm font-medium
           appearance-none
           hover:border-gray-300
-          focus:border-blue-500 focus:ring-2 focus:ring-blue-100
+          focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100
           outline-none
           cursor-pointer
           transition-all
