@@ -53,14 +53,15 @@ export default function BackToTop() {
         transition-all duration-300
         focus:outline-none focus:ring-4 focus:ring-emerald-300
         flex items-center gap-2
-        pl-4 pr-5 py-3.5
-        md:pl-5 md:pr-5 md:py-3.5
+        pl-3 pr-3 py-2.5
+        md:pl-5 md:pr-6 md:py-3.5
       `}
       aria-label="Przewiń do góry"
       title="Przewiń do góry"
     >
-      <ArrowUp size={22} strokeWidth={2.5} className="flex-shrink-0" />
-      <span className="text-sm font-semibold whitespace-nowrap hidden sm:inline">
+      <ArrowUp size={18} strokeWidth={2.5} className="flex-shrink-0 md:hidden" />
+      <ArrowUp size={22} strokeWidth={2.5} className="flex-shrink-0 hidden md:block" />
+      <span className="text-sm font-semibold whitespace-nowrap hidden md:inline">
         Do góry
       </span>
     </button>
