@@ -181,8 +181,9 @@ export default function SearchResults({
       });
     }
 
-    // City search
-    if (cityInput) {
+    // City search — tylko gdy user zmienił input po załadowaniu
+    // (gdy cityInput === query, serwer już przefiltrował przez TERYT → powiat)
+    if (cityInput && cityInput !== query) {
       filtered = filtered.filter(f =>
         f.miejscowosc?.toLowerCase().includes(cityInput.toLowerCase()) ||
         f.powiat?.toLowerCase().includes(cityInput.toLowerCase())
