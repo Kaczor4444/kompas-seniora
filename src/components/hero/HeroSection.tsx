@@ -22,6 +22,69 @@ interface SuggestResponse {
   showAll: boolean;
 }
 
+// ===== AUTOCOMPLETE DROPDOWN =====
+// Defined outside Hero so React never remounts it on re-render (scroll position is preserved)
+interface AutocompleteDropdownProps {
+  dropdownRef: React.RefObject<HTMLDivElement | null>;
+  suggestions: Suggestion[];
+  totalCount: number;
+  highlightedIndex: number;
+  onSuggestionClick: (suggestion: Suggestion) => void;
+  onShowAllClick: () => void;
+  onMouseEnter: (index: number) => void;
+}
+
+const AutocompleteDropdown: React.FC<AutocompleteDropdownProps> = ({
+  dropdownRef,
+  suggestions,
+  totalCount,
+  highlightedIndex,
+  onSuggestionClick,
+  onShowAllClick,
+  onMouseEnter,
+}) => {
+  if (suggestions.length === 0) return null;
+
+  return (
+    <div
+      ref={dropdownRef}
+      className="absolute top-[100%] -translate-y-3 left-0 right-0 bg-white rounded-b-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border-2 border-primary-200 border-t-0 z-[100] overflow-visible"
+    >
+      <ul className="divide-y divide-stone-50 bg-white pt-3 max-h-[320px] overflow-y-auto">
+        {suggestions.map((suggestion, index) => (
+          <li
+            key={`sugg-${suggestion.nazwa}-${suggestion.powiat}-${index}`}
+            onMouseDown={() => onSuggestionClick(suggestion)}
+            onMouseEnter={() => onMouseEnter(index)}
+            className={`px-6 py-4 cursor-pointer transition-colors ${
+              highlightedIndex === index ? "bg-stone-50" : "bg-white"
+            }`}
+          >
+            <div className="flex justify-between items-center">
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-slate-900 text-base truncate">{suggestion.nazwa}</p>
+                <p className="text-xs text-slate-400 truncate">Powiat {suggestion.powiat}</p>
+              </div>
+            </div>
+          </li>
+        ))}
+
+        {suggestions.length < totalCount && (
+          <li
+            onMouseDown={onShowAllClick}
+            className="px-6 py-4 bg-primary-50/30 hover:bg-primary-50 cursor-pointer border-t border-primary-100 transition-colors group"
+          >
+            <div className="flex items-center justify-between text-primary-600">
+              <span className="font-bold text-sm">Zobacz wszystkie wyniki ({totalCount})</span>
+              <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </li>
+        )}
+      </ul>
+    </div>
+  );
+};
+
 const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unknown; selectedProfiles?: unknown; activeTab?: unknown }) => {
   const [activeTab, setActiveTab] = useState<'search' | 'calculator' | 'assistant'>('search');
   const [cityInput, setCityInput] = useState("");
@@ -250,57 +313,6 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
     assistant: 'calc(66.667% - 2px)',
   };
 
-  // Autocomplete Dropdown Component - Seamless Design (Fixed clipping)
-  const AutocompleteDropdown = () => {
-    if (!showDropdown || suggestions.length === 0) return null;
-
-    console.log('🎨 RENDERING DROPDOWN:', {
-      suggestionsLength: suggestions.length,
-      totalCount,
-      showDropdown,
-      suggestions: suggestions.map(s => `${s.nazwa} (${s.powiat}) - ${s.facilitiesCount}`)
-    });
-
-    return (
-      <div
-        ref={dropdownRef}
-        className="absolute top-[100%] -translate-y-3 left-0 right-0 bg-white rounded-b-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border-2 border-primary-200 border-t-0 z-[100] overflow-visible"
-      >
-        {/* Lista - BEZ max-height aby pokazać wszystkie 5 sugestii */}
-        <ul className="divide-y divide-stone-50 bg-white pt-3">
-          {suggestions.map((suggestion, index) => (
-            <li
-              key={`sugg-${suggestion.nazwa}-${suggestion.powiat}-${index}`}
-              onMouseDown={() => handleSuggestionClick(suggestion)}
-              onMouseEnter={() => setHighlightedIndex(index)}
-              className={`px-6 py-4 cursor-pointer transition-colors ${
-                highlightedIndex === index ? "bg-stone-50" : "bg-white"
-              }`}
-            >
-              <div className="flex justify-between items-center">
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold text-slate-900 text-base truncate">{suggestion.nazwa}</p>
-                  <p className="text-xs text-slate-400 truncate">Powiat {suggestion.powiat}</p>
-                </div>
-              </div>
-            </li>
-          ))}
-
-          {suggestions.length < totalCount && (
-            <li
-              onMouseDown={handleShowAllClick}
-              className="px-6 py-4 bg-primary-50/30 hover:bg-primary-50 cursor-pointer border-t border-primary-100 transition-colors group"
-            >
-              <div className="flex items-center justify-between text-primary-600">
-                <span className="font-bold text-sm">Zobacz wszystkie wyniki ({totalCount})</span>
-                <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </li>
-          )}
-        </ul>
-      </div>
-    );
-  };
 
   return (
     <div className="bg-gradient-to-br from-emerald-50/80 via-stone-50/20 to-white pt-6 pb-4 md:pt-8 md:pb-8 relative">
@@ -310,7 +322,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
         <div className="absolute -top-20 -left-20 w-[500px] h-[400px] bg-emerald-100/50 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-[30]">
 
         {/* HEADER */}
         <div className="text-center mb-4 md:mb-6">
@@ -329,7 +341,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
         </div>
 
         {/* COMMAND CENTER HUB */}
-        <div className="bg-white rounded-2xl p-2.5 md:p-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[20]">
+        <div className="bg-white rounded-2xl p-2.5 md:p-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-stone-200 relative z-[2]">
 
           {/* TAB SWITCHER — 3 zakładki */}
           <div className="flex p-1 bg-stone-100/80 rounded-xl mb-2 relative">
@@ -416,7 +428,17 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
                             </div>
                           )}
 
-                          <AutocompleteDropdown />
+                          {showDropdown && (
+                            <AutocompleteDropdown
+                              dropdownRef={dropdownRef}
+                              suggestions={suggestions}
+                              totalCount={totalCount}
+                              highlightedIndex={highlightedIndex}
+                              onSuggestionClick={handleSuggestionClick}
+                              onShowAllClick={handleShowAllClick}
+                              onMouseEnter={setHighlightedIndex}
+                            />
+                          )}
                        </div>
 
                        <div className="md:col-span-4">
@@ -606,7 +628,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
         </div>
 
         {/* TRUST BAR */}
-        <div className="mt-4 md:mt-6 flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+        <div className="relative z-[1] mt-4 md:mt-6 flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
            <TrustItem icon={<ShieldCheck size={18}/>} text="Oficjalne dane BIP" />
            <TrustItem icon={<Building2 size={18}/>} text={`${totalFacilities ?? 36} Placówek Małopolski`} />
            <TrustItem icon={<RefreshCw size={18}/>} text="Stale aktualizowane" />

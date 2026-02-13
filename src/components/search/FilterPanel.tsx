@@ -15,6 +15,7 @@ interface FilterPanelProps {
   availablePowiats: string[];
   onReset: () => void;
   onClose: () => void;
+  onApply?: () => void;
 }
 
 const CARE_PROFILES = [
@@ -39,8 +40,13 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   onPriceLimitChange,
   availablePowiats,
   onReset,
-  onClose
+  onClose,
+  onApply,
 }) => {
+  const handleApply = () => {
+    onApply?.();
+    onClose();
+  };
   if (!show) return null;
 
   const filterContent = (
@@ -96,7 +102,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           Wyczyść filtry
         </button>
         <button
-          onClick={onClose}
+          onClick={handleApply}
           className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
         >
           Zastosuj
@@ -128,7 +134,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         {/* Footer apply button */}
         <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
           <button
-            onClick={onClose}
+            onClick={handleApply}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl transition-colors"
           >
             Zastosuj filtry

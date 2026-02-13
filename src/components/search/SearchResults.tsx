@@ -150,6 +150,11 @@ export default function SearchResults({
   }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfile, priceLimit]);
 
 
+  // Sync filter state when activeFilters prop changes (e.g. after router.push navigation)
+  useEffect(() => {
+    setSelectedPowiat(activeFilters?.powiat || "Wszystkie");
+  }, [activeFilters?.powiat]);
+
   // Mobile map toggle via custom event from MobileStickyBar
   useEffect(() => {
     const handleToggleMap = () => setShowMapMobile(prev => !prev);
@@ -201,10 +206,10 @@ export default function SearchResults({
 
     // Powiat filter (normalizacja: trim, lowercase, polskie znaki → ASCII)
     if (selectedPowiat !== "Wszystkie") {
-      const normPowiat = (s: string) =>
+      const norm = (s: string) =>
         s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'l');
-      const targetPowiat = normPowiat(selectedPowiat);
-      filtered = filtered.filter(f => normPowiat(f.powiat ?? '') === targetPowiat);
+      const targetPowiat = norm(selectedPowiat);
+      filtered = filtered.filter(f => norm(f.powiat ?? '') === targetPowiat);
     }
 
     // Profile filter - selectedProfile is a code letter (e.g. "E", "A")
@@ -235,6 +240,32 @@ export default function SearchResults({
     setSelectedPowiat("Wszystkie");
     setSelectedProfile("Wszystkie");
     setPriceLimit(10000);
+  };
+
+  const normPowiat = (s: string) =>
+    s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'l');
+
+  const handlePowiatChange = (powiat: string) => {
+    if (powiat !== "Wszystkie") {
+      const targetPowiat = normPowiat(powiat);
+      const hasResults = results.some(f => normPowiat(f.powiat ?? '') === targetPowiat);
+      if (!hasResults) {
+        // Powiat not in current server results — navigate immediately
+        const params = new URLSearchParams();
+        if (query) {
+          params.set('q', query);
+          params.set('partial', 'true');
+        }
+        params.set('powiat', powiat);
+        router.push(`/search?${params.toString()}`);
+        return;
+      }
+    }
+    setSelectedPowiat(powiat);
+  };
+
+  const handleApplyFilters = () => {
+    // No-op — powiat navigation is handled live in handlePowiatChange
   };
 
   const toggleCompare = (id: number, e: React.MouseEvent) => {
@@ -280,7 +311,7 @@ export default function SearchResults({
         selectedType={selectedType}
         onTypeChange={setSelectedType}
         selectedPowiat={selectedPowiat}
-        onPowiatChange={setSelectedPowiat}
+        onPowiatChange={handlePowiatChange}
         selectedProfile={selectedProfile}
         onProfileChange={setSelectedProfile}
         priceLimit={priceLimit}
@@ -288,6 +319,7 @@ export default function SearchResults({
         availablePowiats={availablePowiats}
         onReset={resetFilters}
         onClose={() => setShowFilters(false)}
+        onApply={handleApplyFilters}
       />
 
       {/* Content Area */}
