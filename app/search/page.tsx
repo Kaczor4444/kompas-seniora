@@ -127,7 +127,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         },
       });
 
-      let uniquePowiaty = [...new Set(terytMatches.map(t => normalizePolish(t.powiat)))];
+      // Sortuj powiaty po liczbie dopasowań (najczęściej = najbardziej trafne)
+      // i ogranicz do max 3, żeby nie zwracać wyników z całej Małopolski
+      const powiatFrequency: Record<string, number> = {};
+      for (const t of terytMatches) {
+        const p = normalizePolish(t.powiat);
+        powiatFrequency[p] = (powiatFrequency[p] || 0) + 1;
+      }
+      let uniquePowiaty = Object.entries(powiatFrequency)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([p]) => p);
 
       const powiatMapping: Record<string, string[]> = {
         'm. krakow': ['m. krakow', 'krakow'],
