@@ -124,8 +124,11 @@ function AutoFitBounds({ facilities }: { facilities: Facility[] }) {
       return;
     }
 
+    let mounted = true;
+
     // Fix map size with error handling
-    setTimeout(() => {
+    const t = setTimeout(() => {
+      if (!mounted) return;
       try {
         if (map && typeof map.invalidateSize === 'function') {
           map.invalidateSize();
@@ -175,7 +178,11 @@ function AutoFitBounds({ facilities }: { facilities: Facility[] }) {
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      mounted = false;
+      clearTimeout(t);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [facilities, map]);
 
   return null;
