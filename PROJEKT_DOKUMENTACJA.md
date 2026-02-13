@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-02-13
+> Ostatnia aktualizacja: 2026-02-13 (sesja #2)
 
 ---
 
@@ -176,7 +176,7 @@ POST /api/wspolpraca          → formularz współpracy (Resend email)
 
 ---
 
-## 6. AKTUALNA STRONA GŁÓWNA
+## 6. AKTUALNA STRONA GŁÓWNA — COMMAND CENTER HUB
 
 ### Struktura `app/page.tsx`
 Server Component - pobiera `totalFacilities` z Prisma (revalidacja co godzinę), renderuje `<HomeClient>`.
@@ -194,16 +194,25 @@ Server Component - pobiera `totalFacilities` z Prisma (revalidacja co godzinę),
 ### HeroSection (`src/components/hero/HeroSection.tsx`)
 **Layout:** białe tło, radial gradient siatka + emerald gradient, max-w-4xl wyśrodkowany.
 
-**Nagłówek:** H1 "Szukasz opieki / dla seniora?" (Playfair Display, 4xl/6xl), podtytuł dynamiczny.
+**Nagłówek:** H1 "Szukasz opieki / dla seniora?" (Playfair Display, 4xl/6xl), podtytuł dynamiczny per zakładka.
 
-**Command Center Hub** - dwie zakładki z animowanym sliderem:
-- **"Szybka wyszukiwarka"** (domyślna):
+**Command Center Hub** - **3 zakładki** z animowanym sliderem (bg-slate-900, płynne CSS transition):
+
+- **"Wyszukiwarka"** (domyślna):
   - TypeChip selektor: Wszystkie | DPS Całodobowe | ŚDS Dzienne
   - Input z autocomplete TERYT (debounce 300ms, min 2 znaki, max 5 sugestii, keyboard nav)
   - Walidacja: idle | valid (zielony check) | invalid (amber alert)
   - Przycisk "Szukaj" + link "Namierz moją lokalizację" (Geolocation API)
   - Szybkie skróty: Kraków, Tarnów, Nowy Sącz
-- **"Inteligentny doradca"**: CTA → `/asystent?start=true`
+
+- **"Kalkulator"** (nowa zakładka, środkowa):
+  - Dwa pola: dochód seniora (PLN) + miejscowość (opcjonalne)
+  - Wynik 70/30 pojawia się **natychmiast** bez API — czysta matematyka
+  - Wizualizacja: pasek emerald (70% senior) + amber (30% na rękę) + kwoty
+  - CTA: "Sprawdź DPS w [miasto] →" lub "Pełna analiza z listą placówek →"
+  - Przekierowuje do `/kalkulator?income=X&city=Y`
+
+- **"Doradca"**: CTA → `/asystent?start=true`
 
 **Trust Bar:** "Oficjalne dane BIP" | "36 Placówek Małopolski" | "Brak opłat i reklam" (grayscale → kolor na hover)
 
@@ -220,6 +229,15 @@ Symulator reguły 70/30:
 - Automatyczny kontakt MOPS dla wybranego miasta (`/api/mops`)
 - Integracja z ulubionymi i porównaniem
 - CTA → `/search?q=...&maxPrice=...`
+
+**Pre-fill z hero kalkulatora:**
+- Odczytuje URL params `?income=` i `?city=` przez `useSearchParams()`
+- Gdy oba params obecne → auto-trigger `handleCalculate()` po 500ms (user ląduje i widzi wyniki od razu)
+- Strona opakowana w `<Suspense>` (wymóg Next.js dla `useSearchParams` przy SSG)
+
+**Disclaimer (double-visible):**
+- Stały baner `border-2 border-amber-300` **nad formularzem** — zawsze widoczny
+- Wzmocniony baner w wynikach — amber-100 bg, ikona w żółtym kwadracie, uppercase bold
 
 ---
 
@@ -361,6 +379,34 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 - Bez rejestracji - prywatność użytkownika
 
 **Monetyzacja:** Na razie brak (non-profit w założeniu). Potencjalnie: współpraca z MOPS/gminami, dotacje NGO.
+
+---
+
+## 16. HISTORIA ZMIAN (changelog sesji)
+
+### Sesja #2 — 2026-02-13
+
+**Decyzja strategiczna:** Kalkulator 70/30 jako "lead magnet" zamiast zastępowania wyszukiwarki. Wyszukiwarka zostaje, kalkulator dołącza jako 3. zakładka w Command Center Hub.
+
+**Zmiany:**
+
+1. **`src/components/hero/HeroSection.tsx`** — 3 zakładki w Command Center Hub:
+   - `activeTab` type: `'search' | 'calculator' | 'assistant'`
+   - Nowa zakładka **"Kalkulator"** (inline, bez API, instant 70/30)
+   - Animowany slider tabs przeliczony na 3 pozycje
+   - Placeholder text `slate-300 → slate-400 + font-medium` (lepiej widoczny)
+   - Ikony w polach kalkulatora `slate-300 → slate-400`
+
+2. **`app/kalkulator/page.tsx`** — integracja z hero:
+   - `useSearchParams()` odczytuje `?income=` i `?city=` z URL
+   - `useEffect` auto-trigger `handleCalculate()` po 500ms gdy oba params obecne
+   - Opakowanie w `<Suspense>` (wymóg Next.js)
+   - Stały disclaimer `border-2 border-amber-300` nad formularzem
+   - Wzmocniony disclaimer w wynikach (amber-100, ikona w kwadracie)
+
+3. **`package.json`** — `next-mdx-remote` v5.0.0 → v6.0.0 (Vercel blokował CVE)
+
+4. **`PROJEKT_DOKUMENTACJA.md`** — ten plik (dokumentacja referencyjna)
 
 ---
 
