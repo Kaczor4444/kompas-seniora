@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SparklesIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import MiniFAQSection from './faq/MiniFAQSection';
@@ -13,20 +12,15 @@ import PopularLocationsSection from './home/PopularLocationsSection';
 
 interface HomeClientProps {
   totalFacilities: number;
+  powiatCounts: Record<string, number>;
 }
 
-export default function HomeClient({ totalFacilities }: HomeClientProps) {
-  const router = useRouter();
+export default function HomeClient({ totalFacilities, powiatCounts }: HomeClientProps) {
   // ✅ State management for active tab
   const [activeTab, setActiveTab] = useState<'DPS' | 'SDS' | 'Wszystkie'>('Wszystkie');
 
   // ✅ State management for selected care profiles
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
-
-  // ✅ Handler for regional map selection
-  const handleRegionSelect = (regionName: string) => {
-    router.push(`/search?q=${encodeURIComponent(regionName)}`);
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -40,7 +34,7 @@ export default function HomeClient({ totalFacilities }: HomeClientProps) {
 
       {/* Regional Map */}
       <RegionalMap
-        onRegionSelect={handleRegionSelect}
+        powiatCounts={powiatCounts}
         totalFacilities={totalFacilities}
       />
 
