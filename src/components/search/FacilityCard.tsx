@@ -146,7 +146,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }
               `}
-              title="Porównaj"
+              aria-label={isCompared ? "Usuń z porównania" : "Dodaj do porównania"}
             >
               <ArrowLeftRight size={18} className="sm:w-5 sm:h-5" />
             </button>
@@ -161,7 +161,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }
               `}
-              title="Zapisz"
+              aria-label={isSaved ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
             >
               <Heart size={18} className={`sm:w-5 sm:h-5 ${isSaved ? 'fill-current' : ''}`} />
             </button>

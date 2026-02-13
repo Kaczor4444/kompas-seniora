@@ -134,7 +134,7 @@ export default function PoradnikiContent({
                 placeholder="Wpisz temat (np. wniosek do dps, koszty, demencja)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-14 pr-6 py-4 rounded-xl bg-white text-slate-900 placeholder:text-slate-400 border border-emerald-200 focus:outline-none focus:ring-4 focus:ring-emerald-400 shadow-xl"
+                className="w-full pl-14 pr-6 py-4 rounded-xl bg-white text-slate-900 placeholder:text-slate-500 border border-emerald-200 focus:outline-none focus:ring-4 focus:ring-emerald-400 shadow-xl"
               />
             </div>
 
