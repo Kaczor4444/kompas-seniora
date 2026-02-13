@@ -23,6 +23,7 @@ interface SearchPageProps {
 // Normalizacja polskich znaków
 function normalizePolish(str: string): string {
   return str
+    .trim()
     .toLowerCase()
     .replace(/ł/g, 'l')
     .replace(/Ł/g, 'l')
@@ -73,7 +74,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const normalizedTarget = normalizePolish(powiatParam);
     results = allFacilities.filter(facility => {
       const normalizedFacilityPowiat = normalizePolish(facility.powiat);
-      return normalizedFacilityPowiat.includes(normalizedTarget) || normalizedTarget.includes(normalizedFacilityPowiat);
+      return normalizedFacilityPowiat === normalizedTarget || normalizedFacilityPowiat.includes(normalizedTarget);
     });
     message = '';
   }

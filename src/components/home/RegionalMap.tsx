@@ -34,7 +34,7 @@ export default function RegionalMap({ powiatCounts, totalFacilities }: RegionalM
     for (const [dbName, count] of Object.entries(powiatCounts)) {
       const normalized = normalizePowiatName(dbName);
       const id = DB_NAME_TO_ID[normalized] ?? DB_NAME_TO_ID[dbName];
-      if (id) result[id] = count;
+      if (id) result[id] = (result[id] || 0) + count;
     }
     return result;
   }, [powiatCounts]);
