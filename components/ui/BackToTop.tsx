@@ -48,7 +48,7 @@ export default function BackToTop() {
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
       className={`
-        fixed bottom-24 md:bottom-6 left-0 z-50
+        fixed bottom-28 md:bottom-6 left-0 z-50
         bg-gradient-to-r from-emerald-500 to-emerald-600
         hover:from-emerald-600 hover:to-emerald-700
         text-white
