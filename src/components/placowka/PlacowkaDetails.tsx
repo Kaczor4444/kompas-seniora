@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getProfileOpiekiNazwy } from '@/src/data/profileopieki';
 import { useAnalytics } from '@/src/hooks/useAnalytics';
+import { isFavorite, addFavorite, removeFavorite } from '@/src/utils/favorites';
 import {
   MapPin,
   Banknote,
@@ -110,12 +111,20 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
   const router = useRouter();
   const { trackView, trackPhoneClick, trackEmailClick, trackWebsiteClick } = useAnalytics();
   const [activeTab, setActiveTab] = useState<'info' | 'pricing'>('info');
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(() => isFavorite(placowka.id));
   const [isInComparison, setIsInComparison] = useState(false);
 
   useEffect(() => {
     trackView(placowka.id);
   }, [placowka.id, trackView]);
+
+  // Sync saved state from localStorage after hydration
+  useEffect(() => {
+    setIsSaved(isFavorite(placowka.id));
+    const onFavChange = () => setIsSaved(isFavorite(placowka.id));
+    window.addEventListener('favoritesChanged', onFavChange);
+    return () => window.removeEventListener('favoritesChanged', onFavChange);
+  }, [placowka.id]);
 
   const profiles = getProfileOpiekiNazwy(placowka.profil_opieki);
 
@@ -132,8 +141,29 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
   };
 
   const handleToggleSave = () => {
-    setIsSaved(!isSaved);
-    // TODO: Implement favorites functionality
+    if (isFavorite(placowka.id)) {
+      removeFavorite(placowka.id);
+      setIsSaved(false);
+    } else {
+      addFavorite({
+        id: placowka.id,
+        nazwa: placowka.nazwa,
+        miejscowosc: placowka.miejscowosc,
+        powiat: placowka.powiat,
+        typ_placowki: placowka.typ_placowki,
+        koszt_pobytu: placowka.koszt_pobytu,
+        telefon: placowka.telefon,
+        ulica: placowka.ulica,
+        kod_pocztowy: placowka.kod_pocztowy,
+        email: placowka.email,
+        www: placowka.www,
+        liczba_miejsc: placowka.liczba_miejsc || null,
+        profil_opieki: placowka.profil_opieki,
+        addedAt: new Date().toISOString(),
+      });
+      setIsSaved(true);
+    }
+    window.dispatchEvent(new Event('favoritesChanged'));
   };
 
   const handleToggleCompare = () => {
@@ -202,9 +232,9 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             <button
               onClick={handleToggleSave}
               className={`p-2.5 rounded-xl transition-all border
-              ${isSaved ? 'bg-red-50 border-red-100 text-red-600' : 'bg-white border-stone-200 text-slate-400 hover:bg-stone-50'}`}
+              ${isSaved ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-white border-stone-200 text-slate-400 hover:bg-stone-50'}`}
             >
-              <Heart size={20} className={isSaved ? 'fill-red-600' : ''} />
+              <Heart size={20} className={isSaved ? 'fill-emerald-600' : ''} />
             </button>
 
             <div className="h-6 w-px bg-stone-200 mx-1 hidden sm:block"></div>
@@ -405,7 +435,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                 <FacilityMap
                   facilities={[placowka]}
                   mode="single"
-                  showDirections={true}
+                  showDirections={false}
                 />
               </div>
             </section>

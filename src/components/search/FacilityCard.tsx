@@ -157,7 +157,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               className={`
                 p-2 sm:p-2.5 rounded-full transition-all
                 ${isSaved
-                  ? 'bg-slate-800 text-white'
+                  ? 'bg-emerald-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }
               `}
