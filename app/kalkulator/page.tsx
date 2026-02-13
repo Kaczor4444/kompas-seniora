@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, Info, ShieldAlert, Pill, ShoppingBag, CheckCircle2, Wallet, Scale, Building2, Search, Heart, ArrowLeftRight, ChevronRight, X } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
 import { addFavorite, removeFavorite, isFavorite, getFavorites } from '@/src/utils/favorites';
 
@@ -82,11 +82,12 @@ interface MopsContact {
 
 export default function KalkulatorPage() {
   const router = useRouter();
-  
-  // Form state
-  const [income, setIncome] = useState<string>('3500');
+  const searchParams = useSearchParams();
+
+  // Form state — pre-fill z URL params (przekierowanie z hero kalkulatora)
+  const [income, setIncome] = useState<string>(() => searchParams.get('income') || '3500');
   const [wojewodztwo, setWojewodztwo] = useState<string>('małopolskie');
-  const [city, setCity] = useState<string>('');
+  const [city, setCity] = useState<string>(() => searchParams.get('city') || '');
   
   // Result state
   const [result, setResult] = useState<CalculationResult | null>(null);
