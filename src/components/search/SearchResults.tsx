@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { isFavorite, addFavorite, removeFavorite } from '@/src/utils/favorites';
 import { getShortProfileLabels } from '@/src/lib/profileLabels';
 
@@ -72,6 +73,8 @@ export default function SearchResults({
   activeFilters,
   userLocation
 }: SearchResultsProps) {
+
+  const router = useRouter();
 
   // ===== STATE =====
   const [cityInput, setCityInput] = useState(query || "");
@@ -253,6 +256,9 @@ export default function SearchResults({
       <SearchHeader
         cityInput={cityInput}
         onCityChange={setCityInput}
+        onSearch={(val) => {
+          if (val.trim()) router.push(`/search?q=${encodeURIComponent(val.trim())}&partial=true`);
+        }}
         showFilters={showFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
         activeFiltersCount={activeChips.length}

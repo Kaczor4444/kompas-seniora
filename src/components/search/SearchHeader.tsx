@@ -5,6 +5,7 @@ import { Search, SlidersHorizontal, ChevronLeft } from 'lucide-react';
 interface SearchHeaderProps {
   cityInput: string;
   onCityChange: (value: string) => void;
+  onSearch: (value: string) => void;
   showFilters: boolean;
   onToggleFilters: () => void;
   activeFiltersCount: number;
@@ -15,6 +16,7 @@ interface SearchHeaderProps {
 export const SearchHeader: React.FC<SearchHeaderProps> = ({
   cityInput,
   onCityChange,
+  onSearch,
   showFilters,
   onToggleFilters,
   activeFiltersCount,
@@ -25,9 +27,9 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
     <div className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
         <div className="flex items-center gap-4">
-          
+
           {/* Back Button */}
-          <button 
+          <button
             onClick={onBack}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Wróć"
@@ -43,23 +45,30 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
           {/* Search Input */}
           <div className="flex-1 max-w-md">
             <div className="relative">
-              <Search 
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" 
-                size={18} 
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
               />
               <input
                 type="text"
                 value={cityInput}
                 onChange={(e) => onCityChange(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') onSearch(cityInput); }}
                 placeholder="Wyszukaj miasto..."
                 className="
-                  w-full pl-10 pr-4 py-3
+                  w-full pl-10 pr-24 py-3
                   bg-gray-50 border border-gray-200 rounded-xl
                   text-sm
                   focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100
                   outline-none transition-all
                 "
               />
+              <button
+                onClick={() => onSearch(cityInput)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Szukaj
+              </button>
             </div>
           </div>
 
