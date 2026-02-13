@@ -170,22 +170,16 @@ export default function FloatingCookieButton() {
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => setIsExpanded(false)}
         className={`
-          fixed bottom-6 right-0 z-50
+          fixed bottom-[calc(7rem+env(safe-area-inset-bottom,0px))] md:bottom-6 right-0 z-50
           bg-white text-slate-600
           border border-stone-200
           hover:bg-stone-50 hover:text-primary-600 hover:border-primary-200
           rounded-l-full
-          shadow-lg
-          hover:shadow-xl
+          shadow-lg hover:shadow-xl
           transition-all duration-500 ease-out
           focus:outline-none focus:ring-4 focus:ring-primary-300
           flex items-center gap-2
-
-          ${isExpanded
-            ? 'pr-4 pl-4 py-3'
-            : 'pr-4 pl-4 py-3 md:pr-4 md:pl-4 translate-x-[calc(100%-2.5rem)]'
-          }
-
+          pl-3.5 pr-3.5 py-3.5
           md:translate-x-0 md:right-6 md:rounded-full
         `}
         aria-label="Ustawienia cookies"
@@ -213,14 +207,15 @@ export default function FloatingCookieButton() {
 
       {/* Modal with smooth animations */}
       {showModal && (
-        <div 
-          className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm ${isClosing ? 'animate-fadeOut' : 'animate-fadeIn'}`}
+        <div
+          className={`fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4 bg-black/30 backdrop-blur-sm ${isClosing ? 'animate-fadeOut' : 'animate-fadeIn'}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="cookie-settings-title"
+          onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
         >
-          <div className={`bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden ${isClosing ? 'animate-scaleOut' : 'animate-scaleIn'}`}>
-            <div className="max-h-[90vh] overflow-y-auto">
+          <div className={`bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl overflow-hidden ${isClosing ? 'animate-scaleOut' : 'animate-scaleIn'}`}>
+            <div className="max-h-[85vh] overflow-y-auto">
               {/* Header */}
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
                 <h2 id="cookie-settings-title" className="text-2xl font-bold text-gray-900">

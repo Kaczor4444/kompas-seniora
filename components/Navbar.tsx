@@ -364,15 +364,14 @@ export default function Navbar() {
 
               <Link
                 href="/kontakt"
-                className={`flex items-center gap-2 transition-all rounded-xl
-                  px-2.5 py-2.5 md:px-4 md:py-2.5
+                className={`hidden md:flex items-center gap-2 transition-all rounded-xl
+                  px-4 py-2.5
                   ${isHighContrast
                     ? (isActive('/kontakt') ? 'bg-yellow-400 text-black' : 'text-yellow-400 hover:underline')
                     : (isActive('/kontakt') ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:text-primary-600 hover:bg-stone-50')
                   }`}
               >
-                <Mail size={20} className="md:hidden" />
-                <span className="hidden md:flex items-center gap-2 font-black uppercase tracking-widest text-[11px]">
+                <span className="flex items-center gap-2 font-black uppercase tracking-widest text-[11px]">
                   <Mail size={16} />
                   Kontakt
                 </span>
