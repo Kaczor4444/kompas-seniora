@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  ArrowLeft, MapPin, CheckCircle2, Phone, 
-  Info, Banknote, CalendarCheck, Building2, 
-  Plus, ArrowRight, Sparkles, Minus, 
-  ArrowLeftRight, Mail, Globe
+import {
+  ArrowLeft, MapPin, CheckCircle2, Phone,
+  Info, Banknote, CalendarCheck, Building2,
+  Plus, ArrowRight, Sparkles, Minus,
+  ArrowLeftRight, Mail, Globe, Heart, X
 } from 'lucide-react';
-import { getFavorites, type FavoriteFacility } from '@/src/utils/favorites';
+import { getFavorites, isFavorite, addFavorite, removeFavorite, type FavoriteFacility } from '@/src/utils/favorites';
 import { getFacilityNote } from '@/src/utils/facilityNotes';
 import StarRating from '@/src/components/StarRating';
 
@@ -19,6 +19,7 @@ function ComparePageContent() {
   const [selectedFacilities, setSelectedFacilities] = useState<FavoriteFacility[]>([]);
   const [showOnlyDiffs, setShowOnlyDiffs] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [favoritesState, setFavoritesState] = useState<number[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,6 +50,31 @@ function ComparePageContent() {
     }
     window.scrollTo(0, 0);
   }, [searchParams]);
+
+  // Ładuj stan ulubionych
+  useEffect(() => {
+    const updateFavs = () => {
+      const favs = JSON.parse(localStorage.getItem('kompas-seniora-favorites') || '[]');
+      setFavoritesState(favs.map((f: FavoriteFacility) => f.id));
+    };
+    updateFavs();
+    window.addEventListener('favoritesChanged', updateFavs);
+    return () => window.removeEventListener('favoritesChanged', updateFavs);
+  }, []);
+
+  const handleToggleFavorite = (facility: FavoriteFacility) => {
+    if (isFavorite(facility.id)) {
+      removeFavorite(facility.id);
+    } else {
+      addFavorite({ ...facility, addedAt: facility.addedAt || new Date().toISOString() });
+    }
+    window.dispatchEvent(new Event('favoritesChanged'));
+  };
+
+  const handleRemoveFromComparison = (id: number) => {
+    setSelectedFacilities(prev => prev.filter(f => f.id !== id));
+    setActiveIndex(0);
+  };
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
@@ -83,23 +109,33 @@ function ComparePageContent() {
 
   const emptySlotsCount = Math.max(0, 3 - selectedFacilities.length);
 
-  if (selectedFacilities.length === 0) {
+  if (selectedFacilities.length < 2) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 max-w-md text-center">
           <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-            Brak placówek do porównania
+            {selectedFacilities.length === 0 ? 'Brak placówek do porównania' : 'Za mało placówek'}
           </h3>
           <p className="text-gray-600 mb-6">
-            Dodaj najpierw placówki do ulubionych
+            {selectedFacilities.length === 0
+              ? 'Dodaj najpierw placówki do ulubionych lub wybierz je z wyników wyszukiwania'
+              : 'Do porównania potrzebne są przynajmniej 2 placówki'}
           </p>
-          <Link
-            href="/search"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Wróć do wyszukiwania
-          </Link>
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/search"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Wróć do wyszukiwania
+            </Link>
+            <Link
+              href="/ulubione"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            >
+              Przejdź do ulubionych
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -205,8 +241,34 @@ function ComparePageContent() {
                 {selectedFacilities.map((item, idx) => (
                   <div key={item.id} className={`px-2 py-1 md:px-6 md:py-2 border-r border-stone-100 last:border-r-0 snap-center transition-opacity duration-300 ${activeIndex === idx ? 'opacity-100' : 'opacity-30 md:opacity-100'}`}>
                     <div className="relative">
-                      <div className="text-[10px] md:text-xs font-black uppercase text-primary-600 mb-1">{item.typ_placowki}</div>
-                      <h4 className="font-bold text-sm md:text-lg text-slate-900 font-bold leading-tight break-words">{item.nazwa}</h4>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <div className="text-[10px] md:text-xs font-black uppercase text-primary-600">{item.typ_placowki}</div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {/* Dodaj / usuń z ulubionych */}
+                          <button
+                            onClick={() => handleToggleFavorite(item)}
+                            title={favoritesState.includes(item.id) ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+                            className={`p-1.5 rounded-full transition-all ${
+                              favoritesState.includes(item.id)
+                                ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200'
+                                : 'bg-stone-100 text-slate-400 hover:bg-stone-200 hover:text-slate-600'
+                            }`}
+                          >
+                            <Heart size={13} className={favoritesState.includes(item.id) ? 'fill-current' : ''} />
+                          </button>
+                          {/* Usuń z porównania (tylko gdy > 2 placówek) */}
+                          {selectedFacilities.length > 2 && (
+                            <button
+                              onClick={() => handleRemoveFromComparison(item.id)}
+                              title="Usuń z porównania"
+                              className="p-1.5 rounded-full bg-stone-100 text-slate-400 hover:bg-red-100 hover:text-red-500 transition-all"
+                            >
+                              <X size={13} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <h4 className="font-bold text-sm md:text-lg text-slate-900 leading-tight break-words">{item.nazwa}</h4>
                     </div>
                   </div>
                 ))}
