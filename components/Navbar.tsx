@@ -351,7 +351,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
-                className={`hidden md:flex w-11 h-11 rounded-full items-center justify-center transition-all border group
+                className={`flex w-10 h-10 md:w-11 md:h-11 rounded-full items-center justify-center transition-all border group
                   ${isHighContrast
                     ? 'bg-yellow-400 text-black border-yellow-400'
                     : 'bg-white text-primary-600 border-stone-200 hover:border-primary-500 hover:bg-primary-50 shadow-sm'
@@ -359,7 +359,7 @@ export default function Navbar() {
                 title="Dostępność"
                 aria-label="Otwórz panel dostępności"
               >
-                <AccessibilityIcon className="w-7 h-7 group-hover:scale-110 transition-transform" />
+                <AccessibilityIcon className="w-6 h-6 md:w-7 md:h-7 group-hover:scale-110 transition-transform" />
               </button>
 
               <Link
