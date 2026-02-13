@@ -1,41 +1,40 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ArrowUp } from 'lucide-react'
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const scrollTargetRef = useRef<Element | null>(null)
 
-  // Show button after scrolling 500px
   useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.scrollY > 500) {
-        setIsVisible(true)
+    const handleScroll = (e: Event) => {
+      const target = e.target as Element | Document
+
+      // Inner scrollable div (e.g. search results list)
+      if (
+        target instanceof Element &&
+        target !== document.documentElement &&
+        target !== document.body
+      ) {
+        scrollTargetRef.current = target
+        setIsVisible(target.scrollTop > 300)
       } else {
-        setIsVisible(false)
-        setIsExpanded(false)
+        // Regular window scroll
+        scrollTargetRef.current = null
+        setIsVisible(window.scrollY > 300)
       }
     }
 
-    window.addEventListener('scroll', toggleVisibility)
-
-    return () => window.removeEventListener('scroll', toggleVisibility)
+    document.addEventListener('scroll', handleScroll, { capture: true, passive: true })
+    return () => document.removeEventListener('scroll', handleScroll, { capture: true })
   }, [])
 
-  // Scroll to top smoothly
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    })
-  }
-
-  // Handle keyboard support
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      scrollToTop()
+    if (scrollTargetRef.current) {
+      scrollTargetRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -44,40 +43,24 @@ export default function BackToTop() {
   return (
     <button
       onClick={scrollToTop}
-      onKeyDown={handleKeyDown}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
       className={`
-        fixed bottom-28 md:bottom-6 left-0 z-50
+        fixed bottom-28 md:bottom-8 left-0 z-50
         bg-gradient-to-r from-emerald-500 to-emerald-600
         hover:from-emerald-600 hover:to-emerald-700
         text-white
         rounded-r-full
-        shadow-lg
-        hover:shadow-xl
-        transition-all duration-500 ease-out
+        shadow-lg hover:shadow-xl
+        transition-all duration-300
         focus:outline-none focus:ring-4 focus:ring-emerald-300
         flex items-center gap-2
-
-        ${isExpanded
-          ? 'pl-4 pr-4 py-3'
-          : 'pl-4 pr-4 py-3 md:pl-4 md:pr-4 -translate-x-[calc(100%-2.5rem)]'
-        }
-
-        md:translate-x-0 md:left-6 md:rounded-full
+        pl-4 pr-5 py-3.5
+        md:pl-5 md:pr-5 md:py-3.5
       `}
       aria-label="Przewiń do góry"
       title="Przewiń do góry"
     >
-      {/* ArrowUp Icon */}
-      <ArrowUp size={20} strokeWidth={2.5} className="flex-shrink-0" />
-
-      {/* Text - smooth fade */}
-      <span className={`
-        text-sm font-medium whitespace-nowrap
-        transition-all duration-500
-        ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 md:opacity-100 md:w-auto'}
-      `}>
+      <ArrowUp size={22} strokeWidth={2.5} className="flex-shrink-0" />
+      <span className="text-sm font-semibold whitespace-nowrap hidden sm:inline">
         Do góry
       </span>
     </button>

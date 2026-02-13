@@ -226,19 +226,19 @@ export default function CookieBanner() {
                     <div className="flex gap-2">
                       <button
                         onClick={handleAcceptAll}
-                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition"
+                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-base font-semibold px-4 py-3.5 rounded-xl transition min-h-[48px]"
                       >
                         Akceptuj
                       </button>
                       <button
                         onClick={() => setShowDetails(true)}
-                        className="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition"
+                        className="flex-1 bg-slate-600 hover:bg-slate-700 text-white text-base font-semibold px-4 py-3.5 rounded-xl transition min-h-[48px]"
                       >
                         Zmień
                       </button>
                       <button
                         onClick={handleRejectAll}
-                        className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg transition"
+                        className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-base font-semibold px-4 py-3.5 rounded-xl transition min-h-[48px]"
                       >
                         Odrzuć
                       </button>
@@ -247,13 +247,13 @@ export default function CookieBanner() {
                     <div className="flex gap-2">
                       <button
                         onClick={handleSavePreferences}
-                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition"
+                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-base font-semibold px-4 py-3.5 rounded-xl transition min-h-[48px]"
                       >
                         Zapisz wybór
                       </button>
                       <button
                         onClick={() => setShowDetails(false)}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg transition"
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-base font-semibold px-4 py-3.5 rounded-xl transition min-h-[48px]"
                       >
                         Anuluj
                       </button>
