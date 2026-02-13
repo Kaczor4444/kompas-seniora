@@ -287,8 +287,6 @@ export default function SearchResults({
         show={showFilters}
         selectedType={selectedType}
         onTypeChange={setSelectedType}
-        selectedVoivodeship={selectedVoivodeship}
-        onVoivodeshipChange={setSelectedVoivodeship}
         selectedPowiat={selectedPowiat}
         onPowiatChange={setSelectedPowiat}
         selectedProfile={selectedProfile}

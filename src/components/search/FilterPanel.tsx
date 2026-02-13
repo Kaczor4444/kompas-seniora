@@ -6,8 +6,6 @@ interface FilterPanelProps {
   show: boolean;
   selectedType: string;
   onTypeChange: (value: string) => void;
-  selectedVoivodeship: string;
-  onVoivodeshipChange: (value: string) => void;
   selectedPowiat: string;
   onPowiatChange: (value: string) => void;
   selectedProfile: string;
@@ -18,13 +16,6 @@ interface FilterPanelProps {
   onReset: () => void;
   onClose: () => void;
 }
-
-const VOIVODESHIPS = [
-  "Wszystkie", "Dolnośląskie", "Kujawsko-pomorskie", "Lubelskie", "Lubuskie",
-  "Łódzkie", "Małopolskie", "Mazowieckie", "Opolskie",
-  "Podkarpackie", "Podlaskie", "Pomorskie", "Śląskie",
-  "Świętokrzyskie", "Warmińsko-mazurskie", "Wielkopolskie", "Zachodniopomorskie"
-];
 
 const CARE_PROFILES = [
   { value: "Wszystkie", label: "Wszystkie" },
@@ -40,8 +31,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   show,
   selectedType,
   onTypeChange,
-  selectedVoivodeship,
-  onVoivodeshipChange,
   selectedPowiat,
   onPowiatChange,
   selectedProfile,
@@ -57,7 +46,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const filterContent = (
     <>
       {/* Filter Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <FilterSelect
           label="Typ placówki"
           value={selectedType}
@@ -69,13 +58,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           ]}
         />
         <FilterSelect
-          label="Województwo"
-          value={selectedVoivodeship}
-          onChange={onVoivodeshipChange}
-          options={VOIVODESHIPS.map(v => ({ value: v, label: v }))}
-        />
-        <FilterSelect
-          label="Powiat"
+          label="Powiat (Małopolska)"
           value={selectedPowiat}
           onChange={onPowiatChange}
           options={availablePowiats.map(p => ({ value: p, label: p }))}
