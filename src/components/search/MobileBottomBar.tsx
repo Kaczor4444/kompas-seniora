@@ -58,7 +58,7 @@ export default function MobileBottomBar({
   return (
     <>
       {/* Bottom pill bar */}
-      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-4 w-full max-w-sm">
+      <div className="md:hidden fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-40 px-4 w-full max-w-sm">
         <div className="
           bg-gray-900/95 backdrop-blur-lg
           rounded-full

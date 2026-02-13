@@ -309,7 +309,7 @@ export default function SearchResults({
                       type: fac.typ_placowki as 'DPS' | 'ŚDS',
                       city: fac.miejscowosc || '',
                       powiat: fac.powiat || '',
-                      category: fac.profil_opieki || 'Różne profile',
+                      category: fac.typ_placowki === 'DPS' ? 'Dom Pomocy Społecznej' : 'Środowiskowy Dom Samopomocy',
                       price: fac.koszt_pobytu || 0,
                       street: fac.ulica,
                       image: '/images/placeholder-facility.jpg', // Add your image logic

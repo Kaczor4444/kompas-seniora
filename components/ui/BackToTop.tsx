@@ -44,7 +44,7 @@ export default function BackToTop() {
     <button
       onClick={scrollToTop}
       className={`
-        fixed bottom-28 md:bottom-8 left-0 z-50
+        fixed bottom-[calc(7rem+env(safe-area-inset-bottom,0px))] md:bottom-8 left-0 z-50
         bg-gradient-to-r from-emerald-500 to-emerald-600
         hover:from-emerald-600 hover:to-emerald-700
         text-white

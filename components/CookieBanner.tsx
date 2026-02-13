@@ -117,7 +117,7 @@ export default function CookieBanner() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 50, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-[10000] max-h-[calc(100vh-7rem)] sm:max-h-[calc(100vh-8rem)]"
+            className="fixed bottom-24 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-[10000] max-h-[calc(100vh-7rem)] sm:max-h-[calc(100vh-8rem)]"
           >
             <div className="bg-white rounded-2xl shadow-xl border border-gray-200 max-h-full overflow-y-auto">
               
