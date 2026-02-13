@@ -404,7 +404,7 @@ const Hero = () => {
                              enterKeyHint="search"
                              autoComplete="off"
                              spellCheck="false"
-                             className={`w-full bg-stone-50 border-2 py-5 pl-14 pr-6 rounded-2xl text-lg font-bold text-slate-900 focus:bg-white outline-none transition-all placeholder:text-slate-300 shadow-inner
+                             className={`w-full bg-stone-50 border-2 py-5 pl-14 pr-6 rounded-2xl text-lg font-bold text-slate-900 focus:bg-white outline-none transition-all placeholder:text-slate-400 placeholder:font-medium shadow-inner
                                ${validationState === 'invalid' ? 'border-amber-200' : 'border-transparent focus:border-primary-200'}`}
                           />
 
@@ -485,7 +485,7 @@ const Hero = () => {
 
                   {/* Dochód */}
                   <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary-500 transition-colors pointer-events-none">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors pointer-events-none">
                       <Calculator size={20} />
                     </div>
                     <input
@@ -494,14 +494,14 @@ const Hero = () => {
                       onChange={(e) => setCalcIncome(e.target.value)}
                       placeholder="Dochód seniora (zł/mc)"
                       min="0" max="50000" step="100"
-                      className="w-full bg-stone-50 border-2 border-transparent focus:border-primary-200 py-5 pl-14 pr-16 rounded-2xl text-lg font-bold text-slate-900 focus:bg-white outline-none transition-all placeholder:text-slate-300 shadow-inner"
+                      className="w-full bg-stone-50 border-2 border-transparent focus:border-primary-200 py-5 pl-14 pr-16 rounded-2xl text-lg font-bold text-slate-900 focus:bg-white outline-none transition-all placeholder:text-slate-400 placeholder:font-medium shadow-inner"
                     />
                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-widest pointer-events-none">PLN</span>
                   </div>
 
                   {/* Miejscowość */}
                   <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary-500 transition-colors pointer-events-none">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors pointer-events-none">
                       <MapPin size={20} />
                     </div>
                     <input
@@ -509,7 +509,7 @@ const Hero = () => {
                       value={calcCity}
                       onChange={(e) => setCalcCity(e.target.value)}
                       placeholder="Miejscowość (opcjonalnie)"
-                      className="w-full bg-stone-50 border-2 border-transparent focus:border-primary-200 py-5 pl-14 pr-6 rounded-2xl text-lg font-bold text-slate-900 focus:bg-white outline-none transition-all placeholder:text-slate-300 shadow-inner"
+                      className="w-full bg-stone-50 border-2 border-transparent focus:border-primary-200 py-5 pl-14 pr-6 rounded-2xl text-lg font-bold text-slate-900 focus:bg-white outline-none transition-all placeholder:text-slate-400 placeholder:font-medium shadow-inner"
                     />
                   </div>
                 </div>
