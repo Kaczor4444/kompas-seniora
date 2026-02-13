@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import SearchResults from '@/components/SearchResults';
 import MobileFilterDrawer from '@/src/components/filters/MobileFilterDrawer';
-import MobileStickyBar from '@/src/components/mobile/MobileStickyBar';
 import { calculateDistance } from '@/src/utils/distance';
 
 interface SearchPageProps {
@@ -321,26 +320,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <div className="flex-1 overflow-hidden">
           {/* Mobile: Filter drawer */}
             <div className="lg:hidden">
-              <MobileStickyBar
-                totalResults={sortedResults.length}
-                activeFiltersCount={
-                  (type !== 'all' ? 1 : 0) +
-                  (selectedCareTypes.length || 0) +
-                  (minPrice ? 1 : 0) +
-                  (maxPrice ? 1 : 0) +
-                  (showFree ? 1 : 0)
-                }
-                hasUserLocation={!!(userLat && userLng)}
-              />
               <MobileFilterDrawer
                 totalResults={sortedResults.length}
                 careProfileCounts={careProfileCounts}
                 hasUserLocation={!!(userLat && userLng)}
               />
             </div>
-
-            {/* Padding dla fixed sticky bar na mobile */}
-            <div className="lg:hidden h-[110px]"></div>
 
             {/* Search Results */}
             <SearchResults

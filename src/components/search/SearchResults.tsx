@@ -14,7 +14,7 @@ import { FacilityCard } from './FacilityCard';
 import { SkeletonCard } from './SkeletonCard';
 import { EmptyState } from './EmptyState';
 import { ComparisonBar } from './ComparisonBar';
-import { MobileMapToggle } from './MobileMapToggle';
+import MobileBottomBar from './MobileBottomBar';
 
 // ✅ Use your existing FacilityMap with dynamic import
 const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
@@ -432,11 +432,13 @@ export default function SearchResults({
         onClear={() => setSelectedForCompare([])}
       />
 
-      {/* Mobile Map Toggle */}
+      {/* Mobile Bottom Bar (hidden when comparison bar is active) */}
       {!selectedForCompare.length && (
-        <MobileMapToggle
+        <MobileBottomBar
           showMap={showMapMobile}
-          onToggle={setShowMapMobile}
+          onToggleMap={setShowMapMobile}
+          activeFiltersCount={activeChips.length + (quickFilterNFZ ? 1 : 0)}
+          hasUserLocation={false}
         />
       )}
     </div>

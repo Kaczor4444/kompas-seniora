@@ -72,7 +72,7 @@ export default function MobileFilterDrawer({
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold">Filtry</h2>
             {activeFiltersCount > 0 && (
-              <span className="min-w-[20px] h-5 px-1.5 bg-accent-100 text-accent-700 text-xs font-semibold rounded-full flex items-center justify-center">
+              <span className="min-w-[20px] h-5 px-1.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full flex items-center justify-center">
                 {activeFiltersCount}
               </span>
             )}
@@ -94,7 +94,7 @@ export default function MobileFilterDrawer({
         </div>
 
         <div className="bg-white border-t px-6 py-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-          <button onClick={() => setIsOpen(false)} className="w-full bg-accent-600 hover:bg-accent-700 text-white font-medium py-3 rounded-lg">
+          <button onClick={() => setIsOpen(false)} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg">
             {activeFiltersCount > 0 ? `Zastosuj (${activeFiltersCount}) • ${totalResults} wyników` : `Pokaż ${totalResults} wyników`}
           </button>
         </div>
