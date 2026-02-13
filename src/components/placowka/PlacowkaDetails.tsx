@@ -386,7 +386,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             )}
 
             {/* MAP SECTION */}
-            <section className="bg-white p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm overflow-hidden">
+            <section className="bg-white p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm">
               <h3 className="font-serif font-bold text-2xl text-slate-900 mb-6 flex items-center justify-between">
                 Lokalizacja na mapie
                 {placowka.latitude && placowka.longitude && (
@@ -500,6 +500,15 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
               </h4>
 
               <div className="space-y-5 mb-6">
+                {/* Address - always shown */}
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Adres</div>
+                  <p className="font-bold text-slate-900 text-sm leading-snug">
+                    {placowka.ulica && <>{placowka.ulica}<br /></>}
+                    {placowka.kod_pocztowy && `${placowka.kod_pocztowy} `}{placowka.miejscowosc}
+                  </p>
+                </div>
+
                 {/* Phone */}
                 {placowka.telefon && (
                   <div>
@@ -539,10 +548,6 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       <ArrowLeft size={14} className="rotate-180" />
                     </a>
                   </div>
-                )}
-
-                {!placowka.telefon && !placowka.email && !placowka.www && !placowka.facebook && (
-                  <div className="text-sm text-slate-500 italic">Brak danych kontaktowych</div>
                 )}
               </div>
 
