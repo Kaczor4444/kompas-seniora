@@ -88,10 +88,6 @@ export default function SearchResults({
   const [priceLimit, setPriceLimit] = useState(
     activeFilters?.maxPrice || 10000
   );
-  const [quickFilterNFZ, setQuickFilterNFZ] = useState(
-    activeFilters?.showFree || false
-  );
-  const [quickFilterBest, setQuickFilterBest] = useState(false);
 
   const [showFilters, setShowFilters] = useState(false);
   const [showMapMobile, setShowMapMobile] = useState(false);
@@ -218,17 +214,10 @@ export default function SearchResults({
       (f.koszt_pobytu || 0) <= priceLimit
     );
 
-    // Quick filters
-    if (quickFilterNFZ) {
-      filtered = filtered.filter(f =>
-        f.koszt_pobytu === 0 || f.koszt_pobytu === null
-      );
-    }
-
     setFacilities(filtered);
   }, [
     results, selectedType, cityInput, selectedVoivodeship, selectedPowiat,
-    selectedProfile, priceLimit, quickFilterNFZ, quickFilterBest
+    selectedProfile, priceLimit
   ]);
 
   // ===== HANDLERS =====
@@ -239,8 +228,6 @@ export default function SearchResults({
     setSelectedPowiat("Wszystkie");
     setSelectedProfile("Wszystkie");
     setPriceLimit(10000);
-    setQuickFilterNFZ(false);
-    setQuickFilterBest(false);
   };
 
   const toggleCompare = (id: number, e: React.MouseEvent) => {
@@ -275,11 +262,6 @@ export default function SearchResults({
       {/* Active Filters */}
       <ActiveFilters
         chips={activeChips}
-        quickFilterNFZ={quickFilterNFZ}
-        quickFilterBest={quickFilterBest}
-        onToggleNFZ={() => setQuickFilterNFZ(!quickFilterNFZ)}
-        onToggleBest={() => setQuickFilterBest(!quickFilterBest)}
-        isFavoritesView={false}
       />
 
       {/* Filter Panel */}
@@ -435,7 +417,7 @@ export default function SearchResults({
         <MobileBottomBar
           showMap={showMapMobile}
           onToggleMap={setShowMapMobile}
-          activeFiltersCount={activeChips.length + (quickFilterNFZ ? 1 : 0)}
+          activeFiltersCount={activeChips.length}
           onOpenFilters={() => setShowFilters(true)}
           hasUserLocation={false}
         />
