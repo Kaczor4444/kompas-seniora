@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import "./leaflet-overrides.css";
@@ -19,6 +19,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["700", "900"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -51,8 +58,6 @@ export default function RootLayout({
     <html lang="pl">
       <head>
         {/* Preconnect dla lepszej wydajności */}
-        <link rel="preconnect" href="https://unpkg.com" />
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
         <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
         
         {/* Viewport dla mobile */}
@@ -62,7 +67,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#10b981" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased flex flex-col min-h-screen`}
       >
         {/* Analytics (top - ładuje się jako pierwszy) */}
         <GoogleAnalytics />
