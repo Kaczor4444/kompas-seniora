@@ -1,6 +1,17 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+
+async function trackAdvisorEvent(eventType: string, metadata: Record<string, unknown>) {
+  try {
+    const language = typeof navigator !== 'undefined' ? navigator.language : undefined;
+    await fetch('/api/analytics/app-track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventType, metadata, language }),
+    });
+  } catch { /* silent fail */ }
+}
 import {
   ChevronRight, ArrowLeft, Heart, Sun, Moon,
   MapPin, ClipboardList, CheckCircle2,
@@ -37,6 +48,21 @@ const DIAGNOSIS_OPTIONS = [
 export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityClick, onSearchRedirect, prefilledLocation }) => {
   const [currentStep, setCurrentStep] = useState<Step>('start');
   const [isGenerating, setIsGenerating] = useState(false);
+  const startTrackedRef = useRef(false);
+  const abandonedRef = useRef<Step>('start');
+
+  // Track start (once) and abandoned on unmount
+  useEffect(() => {
+    if (!startTrackedRef.current) {
+      startTrackedRef.current = true;
+      trackAdvisorEvent('advisor_start', {});
+    }
+    return () => {
+      if (abandonedRef.current !== 'results' && abandonedRef.current !== 'start') {
+        trackAdvisorEvent('advisor_abandoned', { last_step: abandonedRef.current });
+      }
+    };
+  }, []);
   const [isSharing, setIsSharing] = useState(false);
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
   const [isQuestionsExpanded, setIsQuestionsExpanded] = useState(false);
@@ -106,6 +132,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
   };
 
   const handleNext = (step: Step) => {
+    abandonedRef.current = step;
+
     if (step === 'results') {
       setCurrentStep('analyzing');
       const interval = setInterval(() => {
@@ -115,8 +143,23 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
       setTimeout(() => {
         clearInterval(interval);
         setCurrentStep('results');
+        abandonedRef.current = 'results';
+        trackAdvisorEvent('advisor_completed', {
+          who: answers.who,
+          independence: answers.independence,
+          diagnosis: answers.diagnosis || null,
+          mode: answers.mode || null,
+          recommendation: answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'demencja'
+            ? 'DPS'
+            : answers.mode === 'day' || (answers.independence === 'green' && answers.mode !== 'full')
+              ? 'ŚDS'
+              : 'DPS',
+        });
       }, 2400);
     } else {
+      if (step !== 'start' && step !== 'analyzing') {
+        trackAdvisorEvent('advisor_step', { step, from: currentStep });
+      }
       setCurrentStep(step);
     }
   };

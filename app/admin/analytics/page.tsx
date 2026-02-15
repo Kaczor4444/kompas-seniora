@@ -15,6 +15,8 @@ import {
 import ConversionFunnel from './_components/ConversionFunnel';
 import GeographicInsights from './_components/GeographicInsights';
 import TimePatterns from './_components/TimePatterns';
+import LanguageStats from './_components/LanguageStats';
+import LocalInsights from './_components/LocalInsights';
 
 interface AnalyticsData {
   overview: {
@@ -122,6 +124,19 @@ interface AnalyticsData {
     views: number;
     contacts: number;
   }>;
+  languageStats: Array<{
+    language: string;
+    count: number;
+    percent: number;
+  }>;
+  localInsights: {
+    emptyResults: { topCombos: Array<{ combo: string; count: number }>; total: number };
+    filterCombos: { topCombos: Array<{ combo: string; count: number }> };
+    scrollDepth: Array<{ depth: number; percent: number; count: number }>;
+    returnVisitors: { count: number; avgDaysBetween: number };
+    crossPowiat: { topPaths: Array<{ path: string; count: number }>; rate: number; total: number };
+    pathToContact: { avgViews: number; distribution: Array<{ views: string; count: number }>; totalContacts: number };
+  } | null;
   dateRange: {
     from: string;
     to: string;
@@ -288,6 +303,12 @@ export default function AnalyticsDashboardPage() {
         <TimePatterns data={data.timePatterns} />
       )}
 
+      {/* 🌍 LANGUAGE STATS */}
+      <LanguageStats data={data.languageStats || []} />
+
+      {/* 📍 LOCAL INSIGHTS */}
+      <LocalInsights data={data.localInsights || null} />
+
       {/* Daily Activity Chart - Enhanced */}
       <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -295,10 +316,10 @@ export default function AnalyticsDashboardPage() {
           Aktywność dzienna
         </h2>
         <div className="space-y-2">
-          {data.dailyActivity.length === 0 ? (
+          {(data.dailyActivity ?? []).length === 0 ? (
             <p className="text-gray-500 text-sm py-4 text-center">Brak aktywności w tym okresie</p>
           ) : (
-            data.dailyActivity.map((day) => (
+            (data.dailyActivity ?? []).map((day) => (
               <div key={day.date} className="flex items-center gap-4">
                 <span className="text-sm text-gray-600 w-24 font-medium">
                   {new Date(day.date).toLocaleDateString('pl-PL', { 

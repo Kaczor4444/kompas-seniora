@@ -107,15 +107,31 @@ interface Placowka {
   longitude: number | null;
 }
 
+const SESSION_VIEWS_KEY = 'kompas-session-views';
+
+function getSessionViewCount(): number {
+  if (typeof sessionStorage === 'undefined') return 0;
+  return parseInt(sessionStorage.getItem(SESSION_VIEWS_KEY) || '0');
+}
+
+function incrementSessionViews(): number {
+  const count = getSessionViewCount() + 1;
+  sessionStorage.setItem(SESSION_VIEWS_KEY, String(count));
+  return count;
+}
+
 export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
   const router = useRouter();
-  const { trackView, trackPhoneClick, trackEmailClick, trackWebsiteClick } = useAnalytics();
+  const { trackView, trackEvent } = useAnalytics();
   const [activeTab, setActiveTab] = useState<'info' | 'pricing'>('info');
   const [isSaved, setIsSaved] = useState(() => isFavorite(placowka.id));
   const [isInComparison, setIsInComparison] = useState(false);
 
   useEffect(() => {
+    const viewCount = incrementSessionViews();
     trackView(placowka.id);
+    // Store view count in session so contact events can read it
+    sessionStorage.setItem(`kompas-views-before-contact-${placowka.id}`, String(viewCount));
   }, [placowka.id, trackView]);
 
   // Sync saved state from localStorage after hydration
@@ -129,15 +145,27 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
   const profiles = getProfileOpiekiNazwy(placowka.profil_opieki);
 
   const handlePhoneClick = () => {
-    trackPhoneClick(placowka.id, placowka.telefon || undefined);
+    trackEvent({
+      placowkaId: placowka.id,
+      eventType: 'phone_click',
+      metadata: { phoneNumber: placowka.telefon, viewsInSession: getSessionViewCount() },
+    });
   };
 
   const handleEmailClick = () => {
-    trackEmailClick(placowka.id, placowka.email || undefined);
+    trackEvent({
+      placowkaId: placowka.id,
+      eventType: 'email_click',
+      metadata: { email: placowka.email, viewsInSession: getSessionViewCount() },
+    });
   };
 
   const handleWebsiteClick = () => {
-    trackWebsiteClick(placowka.id, placowka.www || undefined);
+    trackEvent({
+      placowkaId: placowka.id,
+      eventType: 'website_click',
+      metadata: { url: placowka.www, viewsInSession: getSessionViewCount() },
+    });
   };
 
   const handleToggleSave = () => {

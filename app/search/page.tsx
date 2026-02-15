@@ -106,54 +106,88 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const hasTerytData = wojewodztwo === 'all' || wojewodztwaWithTeryt.includes(wojewodztwoDbName.toLowerCase());
 
     if (hasTerytData) {
-      const terytWhere: any = isPartialSearch
-        ? { nazwa_normalized: { contains: normalizedQuery } }
-        : { nazwa_normalized: normalizedQuery };
+      const baseWhere: any = {};
+      if (wojewodztwo !== 'all') baseWhere.wojewodztwo = wojewodztwoDbName;
+      if (powiatParam) baseWhere.powiat = powiatParam;
 
-      if (wojewodztwo !== 'all') {
-        terytWhere.wojewodztwo = wojewodztwoDbName;
-      }
-
-      if (powiatParam) {
-        terytWhere.powiat = powiatParam;
-      }
-
+      // Zawsze próbuj najpierw exact match — unika "Krakowska" w nowosądeckim
+      // gdy user wpisał "Kraków"
       terytMatches = await prisma.terytLocation.findMany({
-        where: terytWhere,
-        select: {
-          powiat: true,
-          gmina: true,
-          nazwa: true,
-          wojewodztwo: true,
-        },
+        where: { ...baseWhere, nazwa_normalized: normalizedQuery },
+        select: { powiat: true, gmina: true, nazwa: true, wojewodztwo: true },
       });
 
-      // Sortuj powiaty po liczbie dopasowań (najczęściej = najbardziej trafne)
-      // i ogranicz do max 3, żeby nie zwracać wyników z całej Małopolski
+      // Fallback na partial tylko gdy brak exact matchy
+      if (terytMatches.length === 0) {
+        terytMatches = await prisma.terytLocation.findMany({
+          where: { ...baseWhere, nazwa_normalized: { contains: normalizedQuery } },
+          select: { powiat: true, gmina: true, nazwa: true, wojewodztwo: true },
+        });
+      }
+
+      // Sortuj powiaty po liczbie dopasowań
       const powiatFrequency: Record<string, number> = {};
       for (const t of terytMatches) {
         const p = normalizePolish(t.powiat);
         powiatFrequency[p] = (powiatFrequency[p] || 0) + 1;
       }
-      let uniquePowiaty = Object.entries(powiatFrequency)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([p]) => p);
 
-      const powiatMapping: Record<string, string[]> = {
-        'm. krakow': ['m. krakow', 'krakow'],
-        'krakowski': ['krakowski'],
-      };
+      // Jeśli jest powiat "m. {query}" (miasto wyodrębnione), użyj TYLKO jego —
+      // ignoruje wioski o tej samej nazwie w innych powiatach (np. wioska "Kraków" w tarnowskim)
+      const cityPowiat = `m. ${normalizedQuery}`;
+      let uniquePowiaty: string[];
+      if (powiatFrequency[cityPowiat]) {
+        uniquePowiaty = [cityPowiat];
+      } else {
+        uniquePowiaty = Object.entries(powiatFrequency)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 2)
+          .map(([p]) => p);
+      }
 
-      uniquePowiaty = [...new Set(uniquePowiaty.flatMap(p =>
-        powiatMapping[p] || [p]
-      ))];
+      // Wstępne załadowanie placówek potrzebne do weryfikacji
+      const allFacilities = await prisma.placowka.findMany({
+        orderBy: { nazwa: 'asc' },
+      });
+
+      // Sprawdź czy uniquePowiaty (exact match) dały jakiekolwiek wyniki
+      // Jeśli nie (np. "m. tarnow" nie ma odpowiednika w DB, bo DB ma "tarnowski"),
+      // wróć do partial search i znajdź powiat który faktycznie ma placówki
+      const checkResults = allFacilities.filter(facility => {
+        const norm = normalizePolish(facility.powiat);
+        return uniquePowiaty.some(p => norm.includes(p) || p.includes(norm));
+      });
+
+      if (checkResults.length === 0 && uniquePowiaty.length === 1 && uniquePowiaty[0] === cityPowiat) {
+        // Brak placówek dla "m. {city}" → partial fallback, wyklucz "m." powiaty
+        const partialTeryt = await prisma.terytLocation.findMany({
+          where: { ...baseWhere, nazwa_normalized: { contains: normalizedQuery } },
+          select: { powiat: true },
+        });
+        const partialFreq: Record<string, number> = {};
+        for (const t of partialTeryt) {
+          const p = normalizePolish(t.powiat);
+          partialFreq[p] = (partialFreq[p] || 0) + 1;
+        }
+        // Wyklucz powiaty "m." i weź top-1 który MA placówki w DB
+        const candidatePowiaty = Object.entries(partialFreq)
+          .filter(([p]) => !p.startsWith('m. '))
+          .sort((a, b) => b[1] - a[1])
+          .map(([p]) => p);
+
+        for (const candidate of candidatePowiaty) {
+          const has = allFacilities.some(f => {
+            const norm = normalizePolish(f.powiat);
+            return norm.includes(candidate) || candidate.includes(norm);
+          });
+          if (has) {
+            uniquePowiaty = [candidate];
+            break;
+          }
+        }
+      }
 
       if (uniquePowiaty.length > 0) {
-        const allFacilities = await prisma.placowka.findMany({
-          orderBy: { nazwa: 'asc' },
-        });
-
         results = allFacilities.filter(facility => {
           const normalizedFacilityPowiat = normalizePolish(facility.powiat);
           return uniquePowiaty.some(powiat => {

@@ -1,11 +1,13 @@
 // src/components/search/SearchResults.tsx
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { isFavorite, addFavorite, removeFavorite } from '@/src/utils/favorites';
 import { getShortProfileLabels } from '@/src/lib/profileLabels';
+import { useAppAnalytics } from '@/src/hooks/useAppAnalytics';
+import { useScrollTracking } from '@/src/hooks/useScrollTracking';
 
 // Import modular components
 import { SearchHeader } from './SearchHeader';
@@ -75,6 +77,8 @@ export default function SearchResults({
 }: SearchResultsProps) {
 
   const router = useRouter();
+  const { trackEmptyResults, trackFilterApplied, trackCrossPowiatView } = useAppAnalytics();
+  const filterTrackedRef = useRef<string>('');
 
   // ===== STATE =====
   const [cityInput, setCityInput] = useState(query || "");
@@ -227,10 +231,36 @@ export default function SearchResults({
     );
 
     setFacilities(filtered);
+
+    // Track empty results
+    if (filtered.length === 0 && results.length > 0) {
+      trackEmptyResults({
+        powiat: selectedPowiat,
+        type: selectedType,
+        priceLimit,
+        profile: selectedProfile,
+        totalServerResults: results.length,
+      });
+    }
+
+    // Track filter combinations (debounced by combo key)
+    const combo = [selectedPowiat, selectedType, selectedProfile, priceLimit].join('|');
+    if (combo !== filterTrackedRef.current) {
+      filterTrackedRef.current = combo;
+      trackFilterApplied({
+        powiat: selectedPowiat,
+        type: selectedType,
+        priceLimit,
+        profile: selectedProfile,
+      });
+    }
   }, [
     results, selectedType, cityInput, selectedVoivodeship, selectedPowiat,
-    selectedProfile, priceLimit
+    selectedProfile, priceLimit, trackEmptyResults, trackFilterApplied
   ]);
+
+  // Scroll depth tracking
+  useScrollTracking(facilities.length);
 
   // ===== HANDLERS =====
   const resetFilters = () => {
@@ -277,8 +307,15 @@ export default function SearchResults({
     });
   };
 
-  const handleFacilityClick = (id: number) => {
-    // Navigate to facility detail page
+  const handleFacilityClick = (id: number, facilityPowiat?: string) => {
+    // Track cross-powiat views
+    if (
+      facilityPowiat &&
+      selectedPowiat !== 'Wszystkie' &&
+      selectedPowiat.toLowerCase() !== facilityPowiat.toLowerCase()
+    ) {
+      trackCrossPowiatView(id, facilityPowiat, selectedPowiat);
+    }
     window.location.href = `/placowka/${id}`;
   };
 
@@ -362,7 +399,7 @@ export default function SearchResults({
                     isSaved={favoritesState.includes(fac.id)}
                     isCompared={selectedForCompare.includes(fac.id)}
                     onHover={setHoveredId}
-                    onClick={() => handleFacilityClick(fac.id)}
+                    onClick={() => handleFacilityClick(fac.id, fac.powiat)}
                     onToggleSave={(e) => {
                       e.stopPropagation();
                       

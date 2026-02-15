@@ -9,6 +9,8 @@ import CookieBanner from "@/components/CookieBanner";
 import FloatingCookieButton from "@/components/FloatingCookieButton";
 import BackToTop from "@/components/ui/BackToTop";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { Analytics } from "@vercel/analytics/next";
+import ReturnVisitorTracker from "@/components/ReturnVisitorTracker";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -71,6 +73,8 @@ export default function RootLayout({
       >
         {/* Analytics (top - ładuje się jako pierwszy) */}
         <GoogleAnalytics />
+        <Analytics />
+        <ReturnVisitorTracker />
         
         {/* Toast notifications */}
         <Toaster 

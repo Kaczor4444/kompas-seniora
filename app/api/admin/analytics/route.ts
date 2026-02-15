@@ -389,6 +389,117 @@ export async function GET(request: NextRequest) {
       })),
       dailyActivity: dailyActivityFormatted,
       statsByWojewodztwo: statsByWojewodztwoFormatted,
+      languageStats: await prisma.placowkaEvent.groupBy({
+        by: ['language'],
+        where: { timestamp: { gte: startDate } },
+        _count: { language: true },
+        orderBy: { _count: { language: 'desc' } },
+      }).then(raw => {
+        const total = raw.reduce((sum, r) => sum + r._count.language, 0);
+        return raw.map(r => ({
+          language: r.language || 'unknown',
+          count: r._count.language,
+          percent: total > 0 ? Math.round((r._count.language / total) * 100) : 0,
+        }));
+      }).catch(() => []),
+      localInsights: await (async () => {
+        const appEvents = await prisma.appEvent.findMany({
+          where: { timestamp: { gte: startDate } },
+          orderBy: { timestamp: 'desc' },
+        });
+
+        // 1. Empty results — top powiats with no results
+        const emptyResults = appEvents
+          .filter(e => e.eventType === 'empty_results')
+          .reduce((acc: Record<string, number>, e) => {
+            const m = e.metadata as any;
+            const key = `${m?.powiat || '?'} / ${m?.type || 'all'}`;
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+          }, {});
+        const topEmptyResults = Object.entries(emptyResults)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 10)
+          .map(([combo, count]) => ({ combo, count }));
+
+        // 2. Filter combinations
+        const filterCombos = appEvents
+          .filter(e => e.eventType === 'filter_applied')
+          .reduce((acc: Record<string, number>, e) => {
+            const m = e.metadata as any;
+            const key = m?.combo || 'unknown';
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+          }, {});
+        const topFilterCombos = Object.entries(filterCombos)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 10)
+          .map(([combo, count]) => ({ combo, count }));
+
+        // 3. Scroll depth distribution
+        const scrollEvents = appEvents.filter(e => e.eventType === 'scroll_depth');
+        const scrollDepth = [25, 50, 75, 100].map(depth => ({
+          depth,
+          count: scrollEvents.filter(e => (e.metadata as any)?.depth === depth).length,
+        }));
+        const totalScrollSessions = scrollDepth[0].count || 0;
+        const scrollWithPercent = scrollDepth.map(d => ({
+          ...d,
+          percent: totalScrollSessions > 0 ? Math.round((d.count / totalScrollSessions) * 100) : 0,
+        }));
+
+        // 4. Return visitors
+        const returnEvents = appEvents.filter(e => e.eventType === 'return_visit');
+        const returnVisitorCount = returnEvents.length;
+        const avgDaysBetweenVisits = returnVisitorCount > 0
+          ? Math.round(returnEvents.reduce((sum, e) => sum + ((e.metadata as any)?.daysSince || 0), 0) / returnVisitorCount)
+          : 0;
+
+        // 5. Cross-powiat views
+        const crossPowiatEvents = appEvents.filter(e => e.eventType === 'cross_powiat_view');
+        const crossPowiatPaths = crossPowiatEvents
+          .reduce((acc: Record<string, number>, e) => {
+            const m = e.metadata as any;
+            const key = `${m?.searchedPowiat} → ${m?.facilityPowiat}`;
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+          }, {});
+        const topCrossPowiatPaths = Object.entries(crossPowiatPaths)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 10)
+          .map(([path, count]) => ({ path, count }));
+        const crossPowiatRate = appEvents.filter(e => e.eventType === 'filter_applied').length > 0
+          ? Math.round((crossPowiatEvents.length / appEvents.filter(e => e.eventType === 'filter_applied').length) * 100)
+          : 0;
+
+        // 6. Path to contact (viewsInSession from PlacowkaEvent metadata)
+        const contactEvents = await prisma.placowkaEvent.findMany({
+          where: {
+            eventType: { in: ['phone_click', 'email_click', 'website_click'] },
+            timestamp: { gte: startDate },
+          },
+          select: { metadata: true },
+        });
+        const viewsBeforeContact = contactEvents
+          .map(e => (e.metadata as any)?.viewsInSession)
+          .filter((v): v is number => typeof v === 'number');
+        const avgViewsBeforeContact = viewsBeforeContact.length > 0
+          ? Math.round(viewsBeforeContact.reduce((a, b) => a + b, 0) / viewsBeforeContact.length * 10) / 10
+          : 0;
+        const pathDistribution = [1, 2, 3, 4, 5].map(n => ({
+          views: n === 5 ? '5+' : String(n),
+          count: viewsBeforeContact.filter(v => n === 5 ? v >= 5 : v === n).length,
+        }));
+
+        return {
+          emptyResults: { topCombos: topEmptyResults, total: scrollEvents.length > 0 ? appEvents.filter(e => e.eventType === 'empty_results').length : 0 },
+          filterCombos: { topCombos: topFilterCombos },
+          scrollDepth: scrollWithPercent,
+          returnVisitors: { count: returnVisitorCount, avgDaysBetween: avgDaysBetweenVisits },
+          crossPowiat: { topPaths: topCrossPowiatPaths, rate: crossPowiatRate, total: crossPowiatEvents.length },
+          pathToContact: { avgViews: avgViewsBeforeContact, distribution: pathDistribution, totalContacts: viewsBeforeContact.length },
+        };
+      })().catch(() => null),
       dateRange: {
         from: startDate.toISOString(),
         to: new Date().toISOString(),

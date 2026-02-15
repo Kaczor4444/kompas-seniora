@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-02-13 (sesja #2)
+> Ostatnia aktualizacja: 2026-02-15 (sesja #3)
 
 ---
 
@@ -75,7 +75,7 @@
 │   │   ├── mobile/         # MobileStickyBar
 │   │   └── compare/        # NoteModal
 │   ├── data/               # Dane statyczne (profileopieki, miejscowosci, poland-regions)
-│   ├── hooks/              # useAnalytics
+│   ├── hooks/              # useAnalytics, useAppAnalytics, useReturnVisitor, useScrollTracking
 │   ├── lib/                # profileLabels
 │   └── utils/              # favorites, facilityNotes, generatePDF, distance
 ├── lib/                    # Utilities serwerowe
@@ -88,7 +88,7 @@
 │   └── powiat-to-city.ts   # Mapowanie powiat → miasto powiatowe (dla MOPS)
 ├── content/articles/       # Artykuły MDX (5 kategorii)
 ├── prisma/schema.prisma    # Schemat bazy danych
-├── components/             # Re-eksporty z src/ (Navbar, Footer, AccessibilityPanel, FacilityMap)
+├── components/             # Re-eksporty z src/ (Navbar, Footer, AccessibilityPanel, FacilityMap, ReturnVisitorTracker)
 ├── data/                   # Pliki CSV/TERYT
 ├── scripts/                # Skrypty importu
 ├── middleware.ts            # Ochrona /admin
@@ -124,6 +124,11 @@
 
 **`PlacowkaEvent`** - surowe zdarzenia analityczne
 - `eventType`: view | phone_click | email_click | website_click | ...
+- `language String?` — `navigator.language` usera (np. "pl-PL", "en-US")
+
+**`AppEvent`** - zdarzenia na poziomie aplikacji (nie powiązane z konkretną placówką)
+- `eventType`: empty_results | filter_applied | scroll_depth | return_visit | cross_powiat_view | calculator_start | calculator_result | calculator_no_results | advisor_start | advisor_step | advisor_completed | advisor_abandoned
+- `language String?`, `metadata Json?`
 
 **`MopsContact`** - dane kontaktowe MOPS/OPS per miasto
 - `city` (unique), `name`, `phone`, `email`, `address`, `website`
@@ -169,7 +174,9 @@ GET  /api/mops                → kontakt MOPS dla miasta
 GET  /api/recommendations     → rekomendacje
 POST /api/share               → tworzenie shared link
 GET  /api/share/[token]       → odczyt shared list
-POST /api/analytics/track     → śledzenie zdarzeń
+POST /api/analytics/track     → śledzenie zdarzeń (PlacowkaEvent, per placówka)
+POST /api/analytics/app-track → śledzenie zdarzeń aplikacji (AppEvent, allowlist)
+GET  /api/admin/analytics     → dane do dashboardu (languageStats + localInsights)
 GET  /api/geocode             → geokodowanie
 POST /api/wspolpraca          → formularz współpracy (Resend email)
 ```
@@ -250,6 +257,9 @@ Symulator reguły 70/30:
 1. **Geoloc** (`near=true`) - pobiera wszystkie, sortuje haversine
 2. **Województwo** (`woj=...` bez `q`) - filtruje po województwie
 3. **TERYT** - szuka w `TerytLocation.nazwa_normalized` → pobiera powiaty → filtruje `Placowka.powiat`
+   - **Priorytet exact match** — najpierw szuka dokładnej nazwy, partial tylko gdy 0 wyników
+   - **Priorytet "m. {miasto}"** — jeśli jest powiat "m. kraków", używa TYLKO jego (ignoruje wioski "Kraków" w innych powiatach)
+   - **Fallback dla powiatu bez danych w DB** — jeśli "m. tarnów" → 0 wyników → partial search → bierze top county który ma placówki
 4. **Fallback** - dla województw bez TERYT, filtruje po `miejscowosc`
 
 ### Sortowanie
@@ -318,7 +328,29 @@ Chroniony przez:
 1. `middleware.ts`: `ADMIN_ENABLED=true` w env, inaczej 404
 2. Cookie `admin-auth=true`
 
-**Sekcje:** Dashboard, Lista placówek (CRUD), Ceny (import CSV, eksport Excel), Analytics (funnel, geograficzne, temporalne), Security log.
+**Sekcje:** Dashboard, Lista placówek (CRUD), Ceny (import CSV, eksport Excel), Analytics (funnel, geograficzne, temporalne, język, lokalne insighty), Security log.
+
+### Analytics Dashboard — komponenty
+- **`LanguageStats`** (`app/admin/analytics/_components/LanguageStats.tsx`) — wykres słupkowy rozkładu języków przeglądarki; wyróżnia języki niepolskie jako "sygnał diasporyczny"
+- **`LocalInsights`** (`app/admin/analytics/_components/LocalInsights.tsx`) — 6 paneli lokalnych insightów:
+  1. **Cross-powiat** — kiedy kliknięta placówka jest z innego powiatu niż wybrany filtr
+  2. **Puste wyniki** — kombinacje filtrów które nie dały wyników ("białe plamy")
+  3. **Ścieżka do kontaktu** — ile placówek user obejrzał zanim zadzwonił/napisał
+  4. **Scroll depth** — jak głęboko użytkownicy scrollują listę wyników (25/50/75/100%)
+  5. **Powracający użytkownicy** — via localStorage (bez cookies), dni między wizytami
+  6. **Popularne kombinacje filtrów** — co najczęściej łączone (powiat+profil)
+
+### Śledzenie zdarzeń (GDPR-safe)
+- Nie przechowujemy IP dla userów (tylko dla logów /admin)
+- `navigator.language` — GDPR-safe, bez consent
+- Identyfikacja powracających przez `localStorage` — nie wymaga cookies
+- Śledzenie sesji przez `sessionStorage` — nie persystuje
+
+### Hooki analityczne
+- **`useAnalytics`** — zdarzenia per placówka (view, phone/email/website click, z `language`)
+- **`useAppAnalytics`** — 5 metod: `trackEmptyResults`, `trackFilterApplied`, `trackScrollDepth`, `trackReturnVisit`, `trackCrossPowiatView`
+- **`useReturnVisitor`** — localStorage key `kompas-seniora-last-visit`, auto-fire `return_visit`
+- **`useScrollTracking`** — milestones 25/50/75/100%, Set do deduplikacji
 
 ---
 
@@ -330,12 +362,15 @@ Chroniony przez:
 - Wyszukiwarka (4 tryby, filtry, sortowanie, mapa Leaflet)
 - Strony placówek
 - Ulubione + notatki + oceny + porównanie + sharing
-- Kalkulator 70/30 z MOPS contact
-- Asystent 4-krokowy
+- Kalkulator 70/30 z MOPS contact + tracking zdarzeń
+- Asystent (Doradca) 4-krokowy + tracking zdarzeń
 - Panel dostępności (12 opcji)
 - Artykuły MDX (5 kategorii)
-- Panel administracyjny
+- Panel administracyjny + rozszerzony analytics dashboard
 - Cookie banner, strony prawne
+- Analytics: język usera, 6 lokalnych insightów (cross-powiat, puste wyniki, ścieżka do kontaktu, scroll depth, powracający, kombinacje filtrów)
+- Vercel Analytics (`@vercel/analytics`) w layout
+- Mapa: custom SVG piny (DPS=zielony, ŚDS=ciemnoniebieski), uproszczony popup z profilem opieki i ceną
 
 ### Placeholdery / w przygotowaniu
 - `/narzedzia/checklista-dokumentow` - "wkrótce"
@@ -383,6 +418,51 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 ---
 
 ## 16. HISTORIA ZMIAN (changelog sesji)
+
+### Sesja #3 — 2026-02-15
+
+**Temat:** Analytics (język + lokalne insighty), tracking Kalkulatora i Doradcy, redesign mapy, naprawa wyszukiwarki.
+
+**Krytyczny bugfix:**
+- `POST /api/analytics/track` — brak handlera POST (był tylko GET), żadne zdarzenia nie były zapisywane do DB. Naprawione.
+
+**Nowe modele Prisma:**
+- `PlacowkaEvent.language String?` — język przeglądarki usera
+- `AppEvent` — zdarzenia aplikacyjne (nie per placówka), z allowlistą typów
+
+**Nowe pliki:**
+- `app/api/analytics/app-track/route.ts` — endpoint AppEvent z allowlistą
+- `app/admin/analytics/_components/LanguageStats.tsx` — rozkład języków w panelu
+- `app/admin/analytics/_components/LocalInsights.tsx` — 6 lokalnych insightów
+- `components/ReturnVisitorTracker.tsx` — null-render client component w layout
+- `src/hooks/useAppAnalytics.ts` — 5 metod trackowania app-level
+- `src/hooks/useReturnVisitor.ts` — localStorage, auto-fire po powrocie
+- `src/hooks/useScrollTracking.ts` — milestones 25/50/75/100%
+
+**Zmienione pliki:**
+1. `app/api/analytics/track/route.ts` — dodano POST handler
+2. `src/hooks/useAnalytics.ts` — `navigator.language` w każdym evencie
+3. `app/api/admin/analytics/route.ts` — `languageStats` + `localInsights` (6 query)
+4. `app/admin/analytics/page.tsx` — `LanguageStats` + `LocalInsights` w UI
+5. `app/layout.tsx` — `<Analytics />` (Vercel) + `<ReturnVisitorTracker />`
+6. `src/components/search/SearchResults.tsx` — empty results tracking, filter combos, scroll depth, cross-powiat click
+7. `src/components/placowka/PlacowkaDetails.tsx` — `sessionStorage` counter `kompas-session-views`, `viewsInSession` w eventach kontaktowych
+8. `app/kalkulator/page.tsx` — `calculator_start/result/no_results` events, `getIncomeBracket()` helper
+9. `src/components/asystent/SupportAssistant.tsx` — `advisor_start/step/completed/abandoned` events
+10. `components/FacilityMap.tsx`:
+    - Custom SVG pin icons przez `L.divIcon` (DPS `#10b981` zielony, ŚDS `#1e3a8a` ciemnoniebieski)
+    - Klastry: gradient zielony↔ciemnoniebieski (zamiast czerwony↔niebieski)
+    - Popup uproszczony: typ + nazwa + profile opieki (kolorowe pills) + cena (DPS only) + przycisk
+    - `profil_opieki` dodane do interface Facility
+11. `app/search/page.tsx` — naprawa TERYT: exact match first → priorytet "m. {miasto}" → fallback partial gdy 0 wyników w DB
+
+**Kontekst decyzji:**
+- Język usera (GDPR-safe) jako sygnał diasporyczny (Polacy za granicą szukający opieki)
+- `AppEvent` oddzielony od `PlacowkaEvent` żeby nie robić `placowkaId` nullable
+- `localStorage` dla powracających (bez cookies, bez consent)
+- Mapa: DPS zielony / ŚDS granatowy — spójność z design systemem strony
+
+---
 
 ### Sesja #2 — 2026-02-13
 

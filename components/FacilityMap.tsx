@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { getShortProfileLabels } from '@/src/lib/profileLabels';
 
 // Fix dla ikon Leaflet w Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -14,53 +15,50 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom ikony
-const dpsIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+// Custom SVG pin icons
+function createPinIcon(color: string, pinClass: string) {
+  return L.divIcon({
+    html: `
+      <svg width="28" height="40" viewBox="0 0 28 40" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35))">
+        <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 26 14 26S28 23.333 28 14C28 6.268 21.732 0 14 0z"
+              fill="${color}" stroke="white" stroke-width="1.5"/>
+        <circle cx="14" cy="14" r="5.5" fill="white" opacity="0.92"/>
+      </svg>
+    `,
+    className: pinClass,
+    iconSize: [28, 40],
+    iconAnchor: [14, 40],
+    popupAnchor: [0, -42],
+  });
+}
 
-const sdsIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+const dpsIcon = createPinIcon('#10b981', 'map-pin-dps');   // emerald green
+const sdsIcon = createPinIcon('#1e3a8a', 'map-pin-sds');   // dark blue
 
-// Custom cluster icon - dual color (DPS red + ŚDS blue)
+// Custom cluster icon - dual color (DPS green + ŚDS dark blue)
 const createClusterCustomIcon = function (cluster: any) {
   const markers = cluster.getAllChildMarkers();
   const count = markers.length;
-  
+
   // Policz DPS vs ŚDS
-  const dpsCount = markers.filter((m: any) => 
-    m.options.icon.options.iconUrl?.includes('red')
+  const dpsCount = markers.filter((m: any) =>
+    m.options.icon.options.className?.includes('map-pin-dps')
   ).length;
-  const sdsCount = count - dpsCount;
-  
+
   // Proporcje dla gradient
   const dpsPercent = Math.round((dpsCount / count) * 100);
-  
-  let sizeClass = 'small';
+
   let size = 45;
   let fontSize = 16;
-  
+
   if (count >= 10) {
-    sizeClass = 'large';
     size = 60;
     fontSize = 20;
   } else if (count >= 5) {
-    sizeClass = 'medium';
     size = 50;
     fontSize = 18;
   }
-  
+
   return L.divIcon({
     html: `
       <div style="
@@ -70,7 +68,7 @@ const createClusterCustomIcon = function (cluster: any) {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(90deg, #ef4444 ${dpsPercent}%, #3b82f6 ${dpsPercent}%);
+        background: linear-gradient(90deg, #10b981 ${dpsPercent}%, #1e3a8a ${dpsPercent}%);
         border: 3px solid white;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       ">
@@ -98,6 +96,7 @@ interface Facility {
   telefon: string | null;
   latitude: number | null;
   longitude: number | null;
+  profil_opieki?: string | null;
 }
 
 interface FacilityMapProps {
@@ -252,31 +251,61 @@ export default function FacilityMap({
                 icon={facility.typ_placowki === 'DPS' ? dpsIcon : sdsIcon}
               >
                 <Popup>
-                  <div className="p-2 min-w-[200px]">
-                    <h3 className="font-semibold text-sm mb-1">{facility.nazwa}</h3>
-                    <p className="text-xs text-gray-600 mb-2">
-                      {facility.typ_placowki} • {facility.powiat}
+                  <div style={{ minWidth: '170px', maxWidth: '220px', padding: '6px 8px' }}>
+                    <p style={{
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                      color: facility.typ_placowki === 'DPS' ? '#059669' : '#1e3a8a',
+                      margin: '0 0 2px',
+                    }}>
+                      {facility.typ_placowki}
                     </p>
-                    <p className={`text-sm font-medium mb-2 ${facility.koszt_pobytu ? 'text-gray-900' : 'text-green-600'}`}>
-                      {facility.koszt_pobytu 
-                        ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
-                        : 'Bezpłatne'
-                      }
-                    </p>
-                    <div className="flex gap-2">
-                      <a href={`/placowka/${facility.id}`}
-                        className="text-xs bg-emerald-600 text-white px-3 py-1 rounded hover:bg-emerald-700"
-                      >
-                        Zobacz szczegóły
-                      </a>
-                      {facility.telefon && (
-                        <a href={`tel:${facility.telefon.replace(/\s/g, '')}`}
-                          className="text-xs bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 md:hidden"
-                        >
-                          Zadzwoń
-                        </a>
-                      )}
-                    </div>
+                    <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#111827', margin: '0 0 5px', lineHeight: '1.25' }}>
+                      {facility.nazwa}
+                    </h3>
+                    {(() => {
+                      const profiles = getShortProfileLabels(facility.profil_opieki ?? null, facility.typ_placowki);
+                      return profiles.length > 0 ? (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginBottom: '5px' }}>
+                          {profiles.map(p => (
+                            <span key={p} style={{
+                              fontSize: '10px',
+                              padding: '1px 5px',
+                              borderRadius: '999px',
+                              background: facility.typ_placowki === 'DPS' ? '#d1fae5' : '#dbeafe',
+                              color: facility.typ_placowki === 'DPS' ? '#065f46' : '#1e3a8a',
+                              fontWeight: 500,
+                            }}>
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null;
+                    })()}
+                    {facility.typ_placowki === 'DPS' && (
+                      <p style={{ fontSize: '12px', fontWeight: 700, margin: '0 0 6px', color: facility.koszt_pobytu ? '#111827' : '#059669' }}>
+                        {facility.koszt_pobytu
+                          ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
+                          : 'Bezpłatne'}
+                      </p>
+                    )}
+                    <a
+                      href={`/placowka/${facility.id}`}
+                      style={{
+                        display: 'inline-block',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        padding: '4px 10px',
+                        borderRadius: '5px',
+                        background: facility.typ_placowki === 'DPS' ? '#10b981' : '#1e3a8a',
+                        color: 'white',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Zobacz szczegóły →
+                    </a>
                   </div>
                 </Popup>
               </Marker>

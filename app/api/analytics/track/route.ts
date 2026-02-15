@@ -336,3 +336,36 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { placowkaId, eventType, metadata, language } = body;
+
+    if (!placowkaId || !eventType) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const userAgent = request.headers.get('user-agent') || undefined;
+    const referer = request.headers.get('referer') || undefined;
+
+    const event = await prisma.placowkaEvent.create({
+      data: {
+        placowkaId: Number(placowkaId),
+        eventType,
+        userAgent,
+        referer,
+        language: language || null,
+        metadata: metadata || undefined,
+      },
+    });
+
+    return NextResponse.json({ success: true, eventId: event.id });
+  } catch (error) {
+    console.error('Analytics track error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

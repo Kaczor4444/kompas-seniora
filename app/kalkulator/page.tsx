@@ -80,9 +80,36 @@ interface MopsContact {
   verified: boolean;
 }
 
+function getIncomeBracket(income: number): string {
+  if (income <= 1500) return 'do 1500';
+  if (income <= 2500) return '1500-2500';
+  if (income <= 3500) return '2500-3500';
+  if (income <= 5000) return '3500-5000';
+  return 'powyżej 5000';
+}
+
+async function trackAppEvent(eventType: string, metadata: Record<string, unknown>) {
+  try {
+    const language = typeof navigator !== 'undefined' ? navigator.language : undefined;
+    await fetch('/api/analytics/app-track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventType, metadata, language }),
+    });
+  } catch { /* silent fail */ }
+}
+
 function KalkulatorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Track calculator start once per session
+  useEffect(() => {
+    if (typeof sessionStorage !== 'undefined' && !sessionStorage.getItem('kalkulator-started')) {
+      sessionStorage.setItem('kalkulator-started', '1');
+      trackAppEvent('calculator_start', {});
+    }
+  }, []);
 
   // Form state — pre-fill z URL params (przekierowanie z hero kalkulatora)
   const [income, setIncome] = useState<string>(() => searchParams.get('income') || '3500');
@@ -279,6 +306,7 @@ function KalkulatorContent() {
       const facilities: Facility[] = data.results || [];
       
       if (facilities.length === 0) {
+        trackAppEvent('calculator_no_results', { city, wojewodztwo });
         setError(`Nie znaleźliśmy placówek dla miejscowości "${city}". Spróbuj wpisać inną miejscowość z województwa ${wojewodztwo}.`);
         setLoading(false);
         return;
@@ -329,7 +357,15 @@ function KalkulatorContent() {
       };
 
       setResult(calculationResult);
-      
+
+      trackAppEvent('calculator_result', {
+        income_bracket: getIncomeBracket(incomeNum),
+        powiat: dpsFacilities[0]?.powiat || city,
+        facilities_found: dpsFacilities.length,
+        affordable_found: affordableFacilities.length,
+        has_affordable: affordableFacilities.length > 0,
+      });
+
       // Scroll to results
       setTimeout(() => {
         document.getElementById('results-section')?.scrollIntoView({ 

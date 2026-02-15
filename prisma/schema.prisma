@@ -102,6 +102,7 @@ model PlacowkaEvent {
   userAgent  String?
   ipAddress  String?
   referer    String?
+  language   String?
   metadata   Json?
   timestamp  DateTime @default(now())
   placowka   Placowka @relation(fields: [placowkaId], references: [id], onDelete: Cascade)
@@ -109,8 +110,22 @@ model PlacowkaEvent {
   @@index([placowkaId])
   @@index([eventType])
   @@index([timestamp])
+  @@index([language])
   @@index([placowkaId, eventType])
   @@index([placowkaId, timestamp])
+}
+
+// App-level events (not tied to a specific facility)
+model AppEvent {
+  id        Int      @id @default(autoincrement())
+  eventType String
+  language  String?
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([eventType, timestamp])
 }
 
 model MopsContact {

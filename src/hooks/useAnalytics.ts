@@ -23,12 +23,14 @@ export function useAnalytics() {
     try {
       console.log('📊 Tracking event:', options.eventType, 'for placowka:', options.placowkaId);
 
+      const language = typeof navigator !== 'undefined' ? navigator.language : undefined;
+
       const response = await fetch('/api/analytics/track', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(options)
+        body: JSON.stringify({ ...options, language })
       });
 
       if (!response.ok) {
