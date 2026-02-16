@@ -744,7 +744,7 @@ function KalkulatorContent() {
                   {result.ambiguousPowiaty.map(p => (
                     <button
                       key={p}
-                      onClick={() => setSelectedPowiat(selectedPowiat === p ? null : p)}
+                      onClick={() => setSelectedPowiat(p)}
                       className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                         selectedPowiat === p
                           ? 'bg-amber-600 text-white border-amber-600'
@@ -754,18 +754,12 @@ function KalkulatorContent() {
                       powiat {p}
                     </button>
                   ))}
-                  {selectedPowiat && (
-                    <button onClick={() => setSelectedPowiat(null)}
-                      className="px-3 py-1.5 rounded-full text-xs text-amber-600 hover:text-amber-800 underline">
-                      pokaż wszystkie
-                    </button>
-                  )}
                 </div>
               </div>
             )}
 
-            {/* MOPS contact */}
-            {activeMops ? (
+            {/* MOPS contact — ukryty przy wieloznaczności dopóki nie wybrano powiatu */}
+            {(!result.ambiguousPowiaty || selectedPowiat) && (activeMops ? (
               <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
                 {/* Header */}
                 <div className="bg-primary-600 px-6 py-4 flex items-center justify-between">
@@ -898,7 +892,7 @@ function KalkulatorContent() {
                   </p>
                 </div>
               </div>
-            )}
+            ))}
 
             {/* Facility cards */}
             <div>
