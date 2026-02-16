@@ -263,7 +263,6 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
       },
       (error) => {
         setIsGeoLoading(false);
-        console.error("Geolocation error:", error);
 
         let message = "Nie udało się pobrać lokalizacji.";
         if (error.code === error.PERMISSION_DENIED) {
