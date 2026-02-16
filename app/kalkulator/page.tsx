@@ -36,6 +36,68 @@ const toCityLocative = (city: string): string => {
   return cityLocative[key] ?? city.charAt(0).toUpperCase() + city.slice(1);
 };
 
+// Dopełniacz powiatu: "z powiatu krakowskiego", "olkuskiego" itp.
+const powiatGenitiveMap: Record<string, string> = {
+  // Małopolskie
+  'krakowski':    'krakowskiego',
+  'bocheński':    'bocheńskiego',
+  'brzeski':      'brzeskiego',
+  'chrzanowski':  'chrzanowskiego',
+  'dąbrowski':    'dąbrowskiego',
+  'gorlicki':     'gorlickiego',
+  'limanowski':   'limanowskiego',
+  'miechowski':   'miechowskiego',
+  'myślenicki':   'myślenickiego',
+  'nowosądecki':  'nowosądeckiego',
+  'nowotarski':   'nowotarskiego',
+  'olkuski':      'olkuskiego',
+  'oświęcimski':  'oświęcimskiego',
+  'proszowicki':  'proszowickiego',
+  'suski':        'suskiego',
+  'tarnowski':    'tarnowskiego',
+  'tatrzański':   'tatrzańskiego',
+  'wadowicki':    'wadowickiego',
+  'wielicki':     'wielickiego',
+  // Miasta na prawach powiatu
+  'm. kraków':    'Krakowa',
+  'm. tarnów':    'Tarnowa',
+  'm. nowy sącz': 'Nowego Sącza',
+  // Śląskie
+  'bielski':      'bielskiego',
+  'cieszyński':   'cieszyńskiego',
+  'pszczyński':   'pszczyńskiego',
+  'żywiecki':     'żywieckiego',
+  'będziński':    'będzińskiego',
+  'bieruńsko-lędziński': 'bieruńsko-lędzińskiego',
+  'gliwicki':     'gliwickiego',
+  'kłobucki':     'kłobuckiego',
+  'lubliniecki':  'lublinieckiego',
+  'mikołowski':   'mikołowskiego',
+  'myszkowski':   'myszkowskiego',
+  'raciborski':   'raciborskiego',
+  'rybnicki':     'rybnickiego',
+  'tarnogórski':  'tarnogórskiego',
+  'wodzisławski': 'wodzisławskiego',
+  'zawierciański':'zawierciańskiego',
+  'częstochowski':'częstochowskiego',
+  // Inne
+  'lubelski':     'lubelskiego',
+  'łódzki':       'łódzkiego',
+  'warszawski':   'warszawskiego',
+  'poznański':    'poznańskiego',
+  'wrocławski':   'wrocławskiego',
+};
+
+const toPowiatGenitive = (powiat: string): string => {
+  const key = powiat.toLowerCase().trim();
+  if (powiatGenitiveMap[key]) return powiatGenitiveMap[key];
+  // Reguła automatyczna: przymiotniki na -ki/-cki/-ski/-ński → zamień końcowe "i" na "iego"
+  if (/[kszcń]ki$/.test(key)) {
+    return key.slice(0, -1) + 'iego';
+  }
+  return powiat;
+};
+
 // Types
 interface Facility {
   id: number;
@@ -804,8 +866,8 @@ function KalkulatorContent() {
                 <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-sm text-blue-800 flex items-start gap-2">
                   <Info size={16} className="flex-shrink-0 mt-0.5 text-blue-500" />
                   <p>
-                    Miejscowość <strong>{result.city}</strong> nie ma własnego DPS.
-                    Poniżej pokazujemy domy pomocy społecznej z powiatu <strong>{result.powiatFallbackName}</strong> — to do nich możesz złożyć wniosek.
+                    Miejscowość <strong>{result.city}</strong> nie ma własnego Domu Pomocy Społecznej.
+                    Poniżej pokazujemy Domy Pomocy Społecznej z powiatu <strong>{toPowiatGenitive(result.powiatFallbackName)}</strong> — to do nich możesz złożyć wniosek.
                   </p>
                 </div>
               )}
