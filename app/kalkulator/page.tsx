@@ -731,6 +731,39 @@ function KalkulatorContent() {
               </div>
             </div>
 
+            {/* Selektor powiatu przy wieloznaczności — nad MOPS */}
+            {result.ambiguousPowiaty && (
+              <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 text-sm text-amber-900">
+                <div className="flex items-start gap-2 mb-3">
+                  <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-500" />
+                  <p>
+                    Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach — wybierz właściwy, żeby zobaczyć odpowiednie DPS i MOPS:
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2 pl-6">
+                  {result.ambiguousPowiaty.map(p => (
+                    <button
+                      key={p}
+                      onClick={() => setSelectedPowiat(selectedPowiat === p ? null : p)}
+                      className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                        selectedPowiat === p
+                          ? 'bg-amber-600 text-white border-amber-600'
+                          : 'bg-white text-amber-800 border-amber-400 hover:bg-amber-100'
+                      }`}
+                    >
+                      powiat {p}
+                    </button>
+                  ))}
+                  {selectedPowiat && (
+                    <button onClick={() => setSelectedPowiat(null)}
+                      className="px-3 py-1.5 rounded-full text-xs text-amber-600 hover:text-amber-800 underline">
+                      pokaż wszystkie
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* MOPS contact */}
             {activeMops ? (
               <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
@@ -883,38 +916,6 @@ function KalkulatorContent() {
                   </p>
                 </div>
               </div>
-
-              {result.ambiguousPowiaty && (
-                <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 mb-4 text-sm text-amber-900">
-                  <div className="flex items-start gap-2 mb-3">
-                    <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-500" />
-                    <p>
-                      Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach — wybierz właściwy, żeby zobaczyć odpowiednie DPS i MOPS:
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2 pl-6">
-                    {result.ambiguousPowiaty.map(p => (
-                      <button
-                        key={p}
-                        onClick={() => setSelectedPowiat(selectedPowiat === p ? null : p)}
-                        className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
-                          selectedPowiat === p
-                            ? 'bg-amber-600 text-white border-amber-600'
-                            : 'bg-white text-amber-800 border-amber-400 hover:bg-amber-100'
-                        }`}
-                      >
-                        powiat {p}
-                      </button>
-                    ))}
-                    {selectedPowiat && (
-                      <button onClick={() => setSelectedPowiat(null)}
-                        className="px-3 py-1.5 rounded-full text-xs text-amber-600 hover:text-amber-800 underline">
-                        pokaż wszystkie
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
 
               {result.powiatFallbackUsed && result.powiatFallbackName && !result.ambiguousPowiaty && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-sm text-blue-800 flex items-start gap-2">
