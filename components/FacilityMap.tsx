@@ -103,10 +103,67 @@ interface FacilityMapProps {
   facilities: Facility[];
   mode?: 'single' | 'multiple';
   showDirections?: boolean;
+  userLocation?: { lat: number; lng: number };
+  searchCenter?: { lat: number; lng: number; name: string };
+}
+
+// Ikona "tu szukasz" — pulsujący marker z etykietą nazwy miasta
+function createSearchCenterIcon(cityName: string) {
+  return L.divIcon({
+    html: `
+      <style>
+        @keyframes sc-pulse {
+          0%   { transform:scale(0.5); opacity:0.8; }
+          70%  { transform:scale(1.6); opacity:0; }
+          100% { transform:scale(1.6); opacity:0; }
+        }
+      </style>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;width:56px;height:56px">
+        <div style="
+          position:absolute;inset:0;border-radius:50%;
+          background:rgba(249,115,22,0.25);
+          animation:sc-pulse 2s ease-out infinite;
+        "></div>
+        <div style="
+          position:absolute;inset:8px;border-radius:50%;
+          background:rgba(249,115,22,0.3);
+          animation:sc-pulse 2s ease-out infinite 0.5s;
+        "></div>
+        <div style="
+          position:relative;z-index:2;
+          display:flex;flex-direction:column;align-items:center;gap:3px;
+          margin-top:10px;
+        ">
+          <div style="
+            width:12px;height:12px;border-radius:50%;
+            background:#f97316;
+            border:2px solid white;
+            box-shadow:0 1px 4px rgba(249,115,22,0.8);
+          "></div>
+          <div style="
+            background:white;
+            border:1.5px solid #f97316;
+            border-radius:5px;
+            padding:1px 5px;
+            font-size:10px;
+            font-weight:700;
+            color:#c2410c;
+            white-space:nowrap;
+            box-shadow:0 1px 4px rgba(0,0,0,0.2);
+            line-height:1.3;
+          ">${cityName}</div>
+        </div>
+      </div>
+    `,
+    className: 'search-center-icon',
+    iconSize: [56, 56],
+    iconAnchor: [28, 28],
+    popupAnchor: [0, -30],
+  });
 }
 
 // Component do auto-fit bounds z resize handling
-function AutoFitBounds({ facilities }: { facilities: Facility[] }) {
+function AutoFitBounds({ facilities, searchCenter }: { facilities: Facility[]; searchCenter?: { lat: number; lng: number } }) {
   const map = useMap();
 
   useEffect(() => {
@@ -137,14 +194,16 @@ function AutoFitBounds({ facilities }: { facilities: Facility[] }) {
       }
     }, 100);
 
-    // Fit bounds with error handling
+    // Fit bounds with error handling — uwzględnij searchCenter w bounds
     try {
-      if (facilities.length === 1 && map.setView) {
-        map.setView([facilities[0].latitude!, facilities[0].longitude!], 13);
-      } else if (facilities.length > 1 && map.fitBounds) {
-        const bounds = L.latLngBounds(
-          facilities.map(f => [f.latitude!, f.longitude!] as [number, number])
-        );
+      const allPoints: [number, number][] = [
+        ...facilities.map(f => [f.latitude!, f.longitude!] as [number, number]),
+        ...(searchCenter ? [[searchCenter.lat, searchCenter.lng] as [number, number]] : []),
+      ];
+      if (allPoints.length === 1 && map.setView) {
+        map.setView(allPoints[0], 13);
+      } else if (allPoints.length > 1 && map.fitBounds) {
+        const bounds = L.latLngBounds(allPoints);
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
       }
     } catch (error) {
@@ -187,10 +246,11 @@ function AutoFitBounds({ facilities }: { facilities: Facility[] }) {
   return null;
 }
 
-export default function FacilityMap({ 
-  facilities, 
+export default function FacilityMap({
+  facilities,
   mode = 'multiple',
-  showDirections = false 
+  showDirections = false,
+  searchCenter,
 }: FacilityMapProps) {
   const facilitiesWithCoords = facilities.filter(
     f => f.latitude && f.longitude
@@ -234,8 +294,18 @@ export default function FacilityMap({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          <AutoFitBounds facilities={facilitiesWithCoords} />
-          
+          <AutoFitBounds facilities={facilitiesWithCoords} searchCenter={searchCenter} />
+
+          {/* Marker centrum szukanego miasta — nieinteraktywny, nie blokuje kliknięć */}
+          {searchCenter && (
+            <Marker
+              position={[searchCenter.lat, searchCenter.lng]}
+              icon={createSearchCenterIcon(searchCenter.name)}
+              zIndexOffset={-100}
+              interactive={false}
+            />
+          )}
+
           <MarkerClusterGroup
             chunkedLoading
             maxClusterRadius={60}

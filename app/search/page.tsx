@@ -2,6 +2,22 @@ import { prisma } from '@/lib/prisma';
 import SearchResults from '@/components/SearchResults';
 import { calculateDistance } from '@/src/utils/distance';
 
+async function geocodeCity(cityName: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const encoded = encodeURIComponent(`${cityName}, Polska`);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encoded}&countrycodes=pl&limit=1&format=json`,
+      { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 } }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data.length) return null;
+    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+  } catch {
+    return null;
+  }
+}
+
 interface SearchPageProps {
   searchParams: Promise<{
     q?: string;
@@ -369,6 +385,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       break;
   }
 
+  // Geokoduj szukane miasto żeby pokazać pin "tu szukasz" na mapie
+  // Tylko gdy jest query tekstowy (nie geoloc, nie województwo)
+  const searchCenter = query ? await geocodeCity(query) : null;
+
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Main Content */}
@@ -381,6 +401,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               type={type}
               results={sortedResults}
               message={message}
+              searchCenter={searchCenter ? { ...searchCenter, name: query } : undefined}
               userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined}
               activeFilters={{
                 wojewodztwo: wojewodztwo !== 'all' ? wojewodztwo : undefined,

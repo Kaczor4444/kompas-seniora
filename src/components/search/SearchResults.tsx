@@ -63,6 +63,7 @@ interface SearchResultsProps {
   message: string;
   activeFilters?: ActiveFilters;
   userLocation?: { lat: number; lng: number };
+  searchCenter?: { lat: number; lng: number; name: string };
 }
 
 
@@ -73,7 +74,8 @@ export default function SearchResults({
   results,
   message,
   activeFilters,
-  userLocation
+  userLocation,
+  searchCenter,
 }: SearchResultsProps) {
 
   const router = useRouter();
@@ -474,6 +476,7 @@ export default function SearchResults({
           <FacilityMap
             facilities={facilities}
             userLocation={userLocation}
+            searchCenter={searchCenter}
           />
         </div>
       </div>
