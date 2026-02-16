@@ -461,7 +461,7 @@ function KalkulatorContent() {
   // Navigate to search with budget filter
   const navigateToSearch = () => {
     if (!result) return;
-    router.push(`/search?q=${encodeURIComponent(result.city)}&woj=${encodeURIComponent(result.wojewodztwo)}&maxPrice=${Math.round(result.maxContribution)}`);
+    router.push(`/search?q=${encodeURIComponent(result.city)}&woj=${encodeURIComponent(result.wojewodztwo)}&maxPrice=${Math.round(result.maxContribution)}&type=dps`);
   };
 
   return (
@@ -850,7 +850,7 @@ function KalkulatorContent() {
                 <div>
                   <h3 className="font-serif font-bold text-2xl text-slate-900">
                     {result.powiatFallbackUsed
-                      ? <>Najbliższe DPS w okolicy: <span className="text-primary-600">{result.city}</span></>
+                      ? <>Najbliższe DPS w okolicy miejscowości: <span className="text-primary-600">{result.city}</span></>
                       : <>DPS w: <span className="text-primary-600">{result.city}</span></>
                     }
                   </h3>
@@ -928,7 +928,7 @@ function KalkulatorContent() {
                               title={savedIds.includes(facility.id) ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
                               className={`p-2 rounded-full transition-all ${
                                 savedIds.includes(facility.id)
-                                  ? 'bg-red-500 text-white'
+                                  ? 'bg-emerald-500 text-white'
                                   : 'bg-stone-100 text-slate-500 hover:bg-stone-200'
                               }`}
                             >
