@@ -900,7 +900,7 @@ function KalkulatorContent() {
                 <div>
                   <h3 className="font-serif font-bold text-2xl text-slate-900">
                     {result.powiatFallbackUsed
-                      ? <>Najbliższe DPS w okolicy miejscowości: <span className="text-primary-600">{result.city}</span></>
+                      ? <>Najbliższe DPS w okolicy miejscowości: <span className="text-primary-600">{result.city}</span>{selectedPowiat && <span className="text-slate-400 font-normal text-lg"> (powiat {selectedPowiat})</span>}</>
                       : <>DPS w: <span className="text-primary-600">{result.city}</span></>
                     }
                   </h3>
