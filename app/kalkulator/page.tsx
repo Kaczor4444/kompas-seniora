@@ -129,6 +129,7 @@ interface CalculationResult {
   mopsFallbackCity?: string;
   powiatFallbackUsed: boolean;   // DPS z powiatu, nie z miasta
   powiatFallbackName?: string;   // nazwa powiatu gdy fallback
+  ambiguousPowiaty?: string[];   // wiele powiatów dla tej samej nazwy miasta
 }
 
 interface MopsContact {
@@ -374,6 +375,10 @@ function KalkulatorContent() {
         ? (dpsFacilities[0]?.powiat || undefined)
         : undefined;
 
+      // Wykryj wieloznaczność: ta sama nazwa miasta w kilku powiatach
+      const uniquePowiaty = [...new Set(dpsFacilities.map(f => f.powiat))];
+      const ambiguousPowiaty = uniquePowiaty.length > 1 ? uniquePowiaty : undefined;
+
       if (dpsFacilities.length === 0) {
         trackAppEvent('calculator_no_results', { city, wojewodztwo });
         setError(`Nie znaleźliśmy domów pomocy społecznej (DPS) w okolicy "${city}". Spróbuj wpisać inne miasto lub powiat.`);
@@ -421,6 +426,7 @@ function KalkulatorContent() {
         mopsFallbackCity: fallbackCity,
         powiatFallbackUsed,
         powiatFallbackName,
+        ambiguousPowiaty,
       };
 
       setResult(calculationResult);
@@ -858,7 +864,17 @@ function KalkulatorContent() {
                 </div>
               </div>
 
-              {result.powiatFallbackUsed && result.powiatFallbackName && (
+              {result.ambiguousPowiaty && (
+                <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 mb-4 text-sm text-amber-900 flex items-start gap-2">
+                  <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-500" />
+                  <p>
+                    Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach ({result.ambiguousPowiaty.join(', ')}).
+                    Wyniki zawierają DPS ze wszystkich. Jeśli chcesz zawęzić do konkretnego powiatu, wpisz miasto powiatowe (np. <em>Olkusz</em> lub <em>Wadowice</em>).
+                  </p>
+                </div>
+              )}
+
+              {result.powiatFallbackUsed && result.powiatFallbackName && !result.ambiguousPowiaty && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-sm text-blue-800 flex items-start gap-2">
                   <Info size={16} className="flex-shrink-0 mt-0.5 text-blue-500" />
                   <p>
