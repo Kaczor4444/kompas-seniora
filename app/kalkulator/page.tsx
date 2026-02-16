@@ -731,9 +731,6 @@ function KalkulatorContent() {
                   )}
 
                   {/* Name */}
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">
-                    {result.mopsFallbackUsed ? 'Urząd dla Twojego powiatu' : `Urząd dla ${result.city}`}
-                  </p>
                   <p className="text-lg font-bold text-slate-900 mb-5">{result.mopsContact.name}</p>
 
                   {/* Contact grid */}
