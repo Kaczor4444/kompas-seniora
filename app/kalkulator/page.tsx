@@ -129,7 +129,8 @@ interface CalculationResult {
   mopsFallbackCity?: string;
   powiatFallbackUsed: boolean;   // DPS z powiatu, nie z miasta
   powiatFallbackName?: string;   // nazwa powiatu gdy fallback
-  ambiguousPowiaty?: string[];   // wiele powiatów dla tej samej nazwy miasta
+  ambiguousPowiaty?: string[];          // wiele powiatów dla tej samej nazwy miasta
+  mopsPerPowiat?: Record<string, MopsContact | null>; // MOPS dla każdego powiatu przy wieloznaczności
 }
 
 interface MopsContact {
@@ -185,6 +186,7 @@ function KalkulatorContent() {
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [selectedPowiat, setSelectedPowiat] = useState<string | null>(null);
   const [showAllFacilities, setShowAllFacilities] = useState(false);
 
   // Favorites & comparison state
@@ -343,6 +345,7 @@ function KalkulatorContent() {
     setError('');
     setResult(null);
     setShowAllFacilities(false);
+    setSelectedPowiat(null);
     
     // Validate
     const validationError = validateInputs();
@@ -400,12 +403,18 @@ function KalkulatorContent() {
         city,
         powiatName
       );
-      
-      console.log('✅ FINAL MOPS RESULT:', {
-        found: !!fetchedMopsContact,
-        usedFallback,
-        fallbackCity
-      });
+
+      // Przy wieloznaczności: pobierz MOPS dla każdego powiatu z osobna
+      let mopsPerPowiat: Record<string, MopsContact | null> | undefined;
+      if (ambiguousPowiaty) {
+        const entries = await Promise.all(
+          ambiguousPowiaty.map(async (p) => {
+            const { mops } = await fetchMopsWithFallback(city, p);
+            return [p, mops] as [string, MopsContact | null];
+          })
+        );
+        mopsPerPowiat = Object.fromEntries(entries);
+      }
       
       const calculationResult: CalculationResult = {
         income: incomeNum,
@@ -427,6 +436,7 @@ function KalkulatorContent() {
         powiatFallbackUsed,
         powiatFallbackName,
         ambiguousPowiaty,
+        mopsPerPowiat,
       };
 
       setResult(calculationResult);
@@ -605,7 +615,17 @@ function KalkulatorContent() {
         </div>
 
         {/* Results */}
-        {result && (
+        {result && (() => {
+          // Widok zależny od wybranego powiatu (gdy wieloznaczność)
+          const activeFacilities = selectedPowiat
+            ? result.facilities.filter(f => f.powiat === selectedPowiat)
+            : result.facilities;
+          const activeMops = selectedPowiat && result.mopsPerPowiat
+            ? result.mopsPerPowiat[selectedPowiat]
+            : result.mopsContact;
+          const activeMopsFallbackUsed = selectedPowiat ? false : result.mopsFallbackUsed;
+          const activeMopsFallbackCity = selectedPowiat ? undefined : result.mopsFallbackCity;
+          return (
           <div id="results-section" className="space-y-8">
 
             {/* Disclaimer w wynikach — powtórzony, nie do przeoczenia */}
@@ -712,7 +732,7 @@ function KalkulatorContent() {
             </div>
 
             {/* MOPS contact */}
-            {result.mopsContact ? (
+            {activeMops ? (
               <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
                 {/* Header */}
                 <div className="bg-primary-600 px-6 py-4 flex items-center justify-between">
@@ -728,21 +748,21 @@ function KalkulatorContent() {
                 </div>
 
                 <div className="p-6">
-                  {result.mopsFallbackUsed && result.mopsFallbackCity && (
+                  {activeMopsFallbackUsed && activeMopsFallbackCity && (
                     <div className="bg-amber-50 border-l-4 border-amber-400 p-3 mb-5 rounded-r-xl text-sm">
                       <p className="text-amber-900">
-                        Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest MOPS w <strong>{toCityLocative(result.mopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
+                        Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest MOPS w <strong>{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
                       </p>
                     </div>
                   )}
 
                   {/* Name */}
-                  <p className="text-lg font-bold text-slate-900 mb-5">{result.mopsContact.name}</p>
+                  <p className="text-lg font-bold text-slate-900 mb-5">{activeMops.name}</p>
 
                   {/* Contact grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                     <a
-                      href={`tel:${result.mopsContact.phone.replace(/\s/g, '')}`}
+                      href={`tel:${activeMops.phone.replace(/\s/g, '')}`}
                       className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group"
                     >
                       <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
@@ -750,12 +770,12 @@ function KalkulatorContent() {
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Telefon</p>
-                        <p className="text-sm font-bold text-slate-800">{result.mopsContact.phone}</p>
+                        <p className="text-sm font-bold text-slate-800">{activeMops.phone}</p>
                       </div>
                     </a>
 
                     <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(result.mopsContact.address)}`}
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMops.address)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group"
@@ -765,13 +785,13 @@ function KalkulatorContent() {
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Adres</p>
-                        <p className="text-sm text-slate-700 group-hover:text-primary-700">{result.mopsContact.address}</p>
+                        <p className="text-sm text-slate-700 group-hover:text-primary-700">{activeMops.address}</p>
                       </div>
                     </a>
 
-                    {result.mopsContact.email && (
+                    {activeMops.email && (
                       <a
-                        href={`mailto:${result.mopsContact.email}`}
+                        href={`mailto:${activeMops.email}`}
                         className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group"
                       >
                         <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
@@ -779,14 +799,14 @@ function KalkulatorContent() {
                         </div>
                         <div className="min-w-0">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Email</p>
-                          <p className="text-sm text-slate-800 truncate">{result.mopsContact.email}</p>
+                          <p className="text-sm text-slate-800 truncate">{activeMops.email}</p>
                         </div>
                       </a>
                     )}
 
-                    {result.mopsContact.website && (
+                    {activeMops.website && (
                       <a
-                        href={result.mopsContact.website}
+                        href={activeMops.website}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-3 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-xl px-4 py-3 transition-colors group"
@@ -796,7 +816,7 @@ function KalkulatorContent() {
                         </div>
                         <div className="min-w-0">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Strona www</p>
-                          <p className="text-sm text-primary-600 truncate">{result.mopsContact.website.replace(/^https?:\/\//, '')}</p>
+                          <p className="text-sm text-primary-600 truncate">{activeMops.website.replace(/^https?:\/\//, '')}</p>
                         </div>
                       </a>
                     )}
@@ -823,7 +843,7 @@ function KalkulatorContent() {
                 </div>
                 <div className="p-6">
                   <p className="text-sm text-slate-600 mb-5">
-                    Nie mamy jeszcze danych kontaktowych dla powiatu <strong>{result.facilities[0]?.powiat || result.city}</strong> w naszej bazie.
+                    Nie mamy jeszcze danych kontaktowych dla powiatu <strong>{activeFacilities[0]?.powiat || result.city}</strong> w naszej bazie.
                     Skontaktuj się bezpośrednio — to pierwszy krok do złożenia wniosku o dopłatę gminy.
                   </p>
                   <a
@@ -858,19 +878,41 @@ function KalkulatorContent() {
                     }
                   </h3>
                   <p className="text-sm text-slate-500 mt-1">
-                    Znaleziono {result.facilities.length}{' '}
-                    {result.facilities.length === 1 ? 'placówkę' : result.facilities.length < 5 ? 'placówki' : 'placówek'}
+                    Znaleziono {activeFacilities.length}{' '}
+                    {activeFacilities.length === 1 ? 'placówkę' : activeFacilities.length < 5 ? 'placówki' : 'placówek'}
                   </p>
                 </div>
               </div>
 
               {result.ambiguousPowiaty && (
-                <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 mb-4 text-sm text-amber-900 flex items-start gap-2">
-                  <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-500" />
-                  <p>
-                    Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach ({result.ambiguousPowiaty.join(', ')}).
-                    Wyniki zawierają DPS ze wszystkich. Jeśli chcesz zawęzić do konkretnego powiatu, wpisz miasto powiatowe (np. <em>Olkusz</em> lub <em>Wadowice</em>).
-                  </p>
+                <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 mb-4 text-sm text-amber-900">
+                  <div className="flex items-start gap-2 mb-3">
+                    <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-500" />
+                    <p>
+                      Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach — wybierz właściwy, żeby zobaczyć odpowiednie DPS i MOPS:
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pl-6">
+                    {result.ambiguousPowiaty.map(p => (
+                      <button
+                        key={p}
+                        onClick={() => setSelectedPowiat(selectedPowiat === p ? null : p)}
+                        className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                          selectedPowiat === p
+                            ? 'bg-amber-600 text-white border-amber-600'
+                            : 'bg-white text-amber-800 border-amber-400 hover:bg-amber-100'
+                        }`}
+                      >
+                        powiat {p}
+                      </button>
+                    ))}
+                    {selectedPowiat && (
+                      <button onClick={() => setSelectedPowiat(null)}
+                        className="px-3 py-1.5 rounded-full text-xs text-amber-600 hover:text-amber-800 underline">
+                        pokaż wszystkie
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -885,7 +927,7 @@ function KalkulatorContent() {
               )}
 
               <div className="space-y-4">
-                {(showAllFacilities ? result.facilities : result.facilities.slice(0, 5)).map((facility) => {
+                {(showAllFacilities ? activeFacilities : activeFacilities.slice(0, 5)).map((facility) => {
                   const hasPrice = facility.koszt_pobytu && facility.koszt_pobytu > 0;
                   const gap = hasPrice ? facility.koszt_pobytu! - result.maxContribution : 0;
                   const isCovered = hasPrice && gap <= 0;
@@ -995,13 +1037,13 @@ function KalkulatorContent() {
             </div>
 
             {/* Show more */}
-            {!showAllFacilities && result.facilities.length > 5 && (
+            {!showAllFacilities && activeFacilities.length > 5 && (
               <div className="text-center">
                 <button
                   onClick={() => setShowAllFacilities(true)}
                   className="bg-white border-2 border-stone-200 text-slate-700 font-bold py-3 px-8 rounded-xl hover:border-primary-400 hover:text-primary-700 transition-all"
                 >
-                  Pokaż więcej ({result.facilities.length - 5} kolejnych placówek)
+                  Pokaż więcej ({activeFacilities.length - 5} kolejnych placówek)
                 </button>
               </div>
             )}
@@ -1044,12 +1086,13 @@ function KalkulatorContent() {
                 onClick={navigateToSearch}
                 className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 px-6 rounded-xl transition-all active:scale-95 shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2"
               >
-                <MapPin size={18} /> Zobacz {result.facilities.length === 1 ? '1 placówkę' : `${result.facilities.length} placówki`} w wyszukiwarce
+                <MapPin size={18} /> Zobacz {activeFacilities.length === 1 ? '1 placówkę' : `${activeFacilities.length} placówki`} w wyszukiwarce
               </button>
             </div>
 
           </div>
-        )}
+          );
+        })()}
 
       </div>
     </div>
