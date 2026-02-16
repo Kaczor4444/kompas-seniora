@@ -63,8 +63,10 @@ interface CalculationResult {
   hasAffordable: boolean;
   allNeedSubsidy: boolean;
   mopsContact: MopsContact | null;
-  mopsFallbackUsed: boolean; // ✅ NOWE - czy użyto fallbacku
-  mopsFallbackCity?: string; // ✅ NOWE - z jakiego miasta jest MOPS
+  mopsFallbackUsed: boolean;
+  mopsFallbackCity?: string;
+  powiatFallbackUsed: boolean;   // DPS z powiatu, nie z miasta
+  powiatFallbackName?: string;   // nazwa powiatu gdy fallback
 }
 
 interface MopsContact {
@@ -293,39 +295,40 @@ function KalkulatorContent() {
       const maxContribution = incomeNum * 0.7;
       const remainingFunds = incomeNum * 0.3;
       
-      // Fetch facilities from existing API
+      // Fetch DPS facilities only (typ=DPS ensures TERYT fallback fires when city has no DPS)
       const response = await fetch(
-        `/api/search?q=${encodeURIComponent(city)}&woj=${encodeURIComponent(wojewodztwo)}`
+        `/api/search?q=${encodeURIComponent(city)}&woj=${encodeURIComponent(wojewodztwo)}&typ=DPS`
       );
-      
+
       if (!response.ok) {
         throw new Error('Nie udało się pobrać danych placówek');
       }
-      
+
       const data = await response.json();
-      const facilities: Facility[] = data.results || [];
-      
-      if (facilities.length === 0) {
+      const dpsFacilities: Facility[] = data.results || [];
+      // powiatFallbackUsed: TERYT rozszerzył zapytanie na powiat (brak DPS w mieście)
+      const powiatFallbackUsed = !!(data.terytSuggestion?.found && dpsFacilities.length > 0);
+      const powiatFallbackName: string | undefined = powiatFallbackUsed
+        ? (dpsFacilities[0]?.powiat || undefined)
+        : undefined;
+
+      if (dpsFacilities.length === 0) {
         trackAppEvent('calculator_no_results', { city, wojewodztwo });
-        setError(`Nie znaleźliśmy placówek dla miejscowości "${city}". Spróbuj wpisać inną miejscowość z województwa ${wojewodztwo}.`);
+        setError(`Nie znaleźliśmy domów pomocy społecznej (DPS) w okolicy "${city}". Spróbuj wpisać inne miasto lub powiat.`);
         setLoading(false);
         return;
       }
-      
-      // Show only DPS (exclude ŚDS)
-      const dpsFacilities = facilities.filter(f => f.typ_placowki === 'DPS');
 
       // Separate facilities with and without prices
       const facilitiesWithPrices = dpsFacilities.filter(f => f.koszt_pobytu && f.koszt_pobytu > 0);
       const facilitiesWithoutPrices = dpsFacilities.filter(f => !f.koszt_pobytu || f.koszt_pobytu === 0);
-      
+
       // Categorize facilities with prices
       const affordableFacilities = facilitiesWithPrices.filter(f => f.koszt_pobytu! <= maxContribution);
       const needsSubsidy = facilitiesWithPrices.filter(f => f.koszt_pobytu! > maxContribution);
 
-      // ✅ Fetch MOPS contact z fallbackiem
-      // Używamy powiatu z pierwszej placówki (wszystkie powinny być z tego samego)
-      const powiatName = facilities[0]?.powiat || '';
+      // Fetch MOPS contact z fallbackiem na powiat
+      const powiatName = dpsFacilities[0]?.powiat || '';
       const { mops: fetchedMopsContact, usedFallback, fallbackCity } = await fetchMopsWithFallback(
         city,
         powiatName
@@ -353,7 +356,9 @@ function KalkulatorContent() {
         allNeedSubsidy: facilitiesWithPrices.length > 0 && affordableFacilities.length === 0,
         mopsContact: fetchedMopsContact,
         mopsFallbackUsed: usedFallback,
-        mopsFallbackCity: fallbackCity
+        mopsFallbackCity: fallbackCity,
+        powiatFallbackUsed,
+        powiatFallbackName,
       };
 
       setResult(calculationResult);
@@ -779,10 +784,13 @@ function KalkulatorContent() {
 
             {/* Facility cards */}
             <div>
-              <div className="flex items-end justify-between mb-6">
+              <div className="flex items-end justify-between mb-4">
                 <div>
                   <h3 className="font-serif font-bold text-2xl text-slate-900">
-                    Placówki w: <span className="text-primary-600">{result.city}</span>
+                    {result.powiatFallbackUsed
+                      ? <>Najbliższe DPS w okolicy: <span className="text-primary-600">{result.city}</span></>
+                      : <>DPS w: <span className="text-primary-600">{result.city}</span></>
+                    }
                   </h3>
                   <p className="text-sm text-slate-500 mt-1">
                     Znaleziono {result.facilities.length}{' '}
@@ -791,6 +799,16 @@ function KalkulatorContent() {
                   </p>
                 </div>
               </div>
+
+              {result.powiatFallbackUsed && result.powiatFallbackName && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-sm text-blue-800 flex items-start gap-2">
+                  <Info size={16} className="flex-shrink-0 mt-0.5 text-blue-500" />
+                  <p>
+                    Miejscowość <strong>{result.city}</strong> nie ma własnego DPS.
+                    Poniżej pokazujemy domy pomocy społecznej z powiatu <strong>{result.powiatFallbackName}</strong> — to do nich możesz złożyć wniosek.
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-4">
                 {(showAllFacilities ? result.facilities : result.facilities.slice(0, 5)).map((facility) => {
