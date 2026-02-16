@@ -42,6 +42,12 @@ export default async function AdminLayout({
                       Zarządzanie cenami
                     </Link>
                     <Link
+                      href="/admin/mops"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      MOPS/GOPS
+                    </Link>
+                    <Link
                       href="/admin/security-log"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
