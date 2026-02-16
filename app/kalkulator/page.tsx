@@ -866,8 +866,8 @@ function KalkulatorContent() {
                 <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-sm text-blue-800 flex items-start gap-2">
                   <Info size={16} className="flex-shrink-0 mt-0.5 text-blue-500" />
                   <p>
-                    Miejscowość <strong>{result.city}</strong> nie ma własnego Domu Pomocy Społecznej.
-                    Poniżej pokazujemy Domy Pomocy Społecznej z powiatu <strong>{toPowiatGenitive(result.powiatFallbackName)}</strong> — to do nich możesz złożyć wniosek.
+                    Miejscowość <strong>{result.city}</strong> nie ma własnego DPS.
+                    Poniżej pokazujemy Domy Pomocy Społecznej z powiatu <strong>{toPowiatGenitive(result.powiatFallbackName)}</strong>.
                   </p>
                 </div>
               )}
