@@ -152,19 +152,34 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // ignoruje wioski o tej samej nazwie w innych powiatach (np. wioska "Kraków" w tarnowskim)
       const cityPowiat = `m. ${normalizedQuery}`;
       let uniquePowiaty: string[];
+      // Wstępne załadowanie placówek potrzebne do weryfikacji i tie-breakingu
+      const allFacilities = await prisma.placowka.findMany({
+        orderBy: { nazwa: 'asc' },
+      });
+
       if (powiatFrequency[cityPowiat]) {
         uniquePowiaty = [cityPowiat];
       } else {
         uniquePowiaty = Object.entries(powiatFrequency)
-          .sort((a, b) => b[1] - a[1])
+          .sort((a, b) => {
+            const diff = b[1] - a[1];
+            if (diff !== 0) return diff;
+            // Remis: preferuj powiat gdzie faktycznie jest placówka w szukanym mieście
+            const aHasCity = allFacilities.some(f =>
+              normalizePolish(f.miejscowosc) === normalizedQuery &&
+              (normalizePolish(f.powiat).includes(a[0]) || a[0].includes(normalizePolish(f.powiat)))
+            );
+            const bHasCity = allFacilities.some(f =>
+              normalizePolish(f.miejscowosc) === normalizedQuery &&
+              (normalizePolish(f.powiat).includes(b[0]) || b[0].includes(normalizePolish(f.powiat)))
+            );
+            if (aHasCity && !bHasCity) return -1;
+            if (!aHasCity && bHasCity) return 1;
+            return 0;
+          })
           .slice(0, 2)
           .map(([p]) => p);
       }
-
-      // Wstępne załadowanie placówek potrzebne do weryfikacji
-      const allFacilities = await prisma.placowka.findMany({
-        orderBy: { nazwa: 'asc' },
-      });
 
       // Sprawdź czy uniquePowiaty (exact match) dały jakiekolwiek wyniki
       // Jeśli nie (np. "m. tarnow" nie ma odpowiednika w DB, bo DB ma "tarnowski"),
@@ -262,6 +277,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         message = `Nie znaleźliśmy ${facilityWord} w okolicy "${query}" ${wojewodztwoInfo}. Spróbuj wpisać inną nazwę miejscowości.`;
       }
     }
+  }
+
+  // FILTROWANIE PO TYPIE (DPS / SDS)
+  if (type === 'dps') {
+    results = results.filter(f => f.typ_placowki && f.typ_placowki.toUpperCase().includes('DPS'));
+  } else if (type === 'sds') {
+    results = results.filter(f => f.typ_placowki && f.typ_placowki.toUpperCase().includes('SDS'));
   }
 
   // FILTROWANIE PO CENIE
