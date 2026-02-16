@@ -441,6 +441,14 @@ function KalkulatorContent() {
 
       setResult(calculationResult);
 
+      // Auto-preselektuj powiat z TERYT topMatch gdy wieloznaczność
+      if (ambiguousPowiaty) {
+        const terytTopPowiat = data.terytSuggestion?.powiat;
+        if (terytTopPowiat && ambiguousPowiaty.includes(terytTopPowiat)) {
+          setSelectedPowiat(terytTopPowiat);
+        }
+      }
+
       trackAppEvent('calculator_result', {
         income_bracket: getIncomeBracket(incomeNum),
         powiat: dpsFacilities[0]?.powiat || city,
