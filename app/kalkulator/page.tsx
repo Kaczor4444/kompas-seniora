@@ -854,7 +854,6 @@ function KalkulatorContent() {
                   <p className="text-sm text-slate-500 mt-1">
                     Znaleziono {result.facilities.length}{' '}
                     {result.facilities.length === 1 ? 'placówkę' : result.facilities.length < 5 ? 'placówki' : 'placówek'}
-                    {result.facilitiesWithPrices.length > 0 && ` (${result.facilitiesWithPrices.length} z oficjalną ceną)`}
                   </p>
                 </div>
               </div>
@@ -1029,7 +1028,7 @@ function KalkulatorContent() {
                 onClick={navigateToSearch}
                 className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 px-6 rounded-xl transition-all active:scale-95 shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2"
               >
-                <MapPin size={18} /> Zobacz placówki w wyszukiwarce
+                <MapPin size={18} /> Zobacz {result.facilities.length === 1 ? '1 placówkę' : `${result.facilities.length} placówki`} w wyszukiwarce
               </button>
             </div>
 
