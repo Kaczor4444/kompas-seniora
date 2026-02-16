@@ -733,9 +733,9 @@ function KalkulatorContent() {
 
             {/* Selektor powiatu przy wieloznaczności — nad MOPS */}
             {result.ambiguousPowiaty && (
-              <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 text-sm text-amber-900">
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-900">
                 <div className="flex items-start gap-2 mb-3">
-                  <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-500" />
+                  <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-emerald-600" />
                   <p>
                     Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach — wybierz właściwy, żeby zobaczyć odpowiednie DPS i MOPS:
                   </p>
@@ -745,10 +745,10 @@ function KalkulatorContent() {
                     <button
                       key={p}
                       onClick={() => setSelectedPowiat(p)}
-                      className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                      className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
                         selectedPowiat === p
-                          ? 'bg-amber-600 text-white border-amber-600'
-                          : 'bg-white text-amber-800 border-amber-400 hover:bg-amber-100'
+                          ? 'bg-emerald-600 text-white border-emerald-600'
+                          : 'bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400'
                       }`}
                     >
                       powiat {p}
