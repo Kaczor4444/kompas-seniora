@@ -486,7 +486,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
         </div>
 
         {/* === TRUST BAR === */}
-        <div className="mt-12 pt-8 border-t border-slate-100 flex flex-wrap gap-10 lg:gap-20">
+        <div className="mt-12 pt-8 border-t border-slate-100 flex flex-wrap justify-center gap-10 lg:gap-20">
           <TrustItem icon={<ShieldCheck size={16} />} label="Dane" value="Oficjalne BIP" />
           <TrustItem icon={<Building2 size={16} />} label="Placówki" value={`${totalFacilities ?? 36} w Małopolsce`} />
           <TrustItem icon={<RefreshCw size={16} />} label="Aktualizacja" value="Stale aktualizowane" />
