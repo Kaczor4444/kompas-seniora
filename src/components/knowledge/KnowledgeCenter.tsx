@@ -174,15 +174,6 @@ export default function KnowledgeCenter() {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-6xl mx-auto px-6">
-        {/* Updated Heading */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tighter">
-            Nie wiesz od czego zacząć?
-          </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            Przygotowaliśmy serię artykułów, które przeprowadzą Cię przez zawiłości systemu opieki senioralnej w Polsce.
-          </p>
-        </div>
 
         {/* Kategorie/Tagi - V2 with Icons */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
