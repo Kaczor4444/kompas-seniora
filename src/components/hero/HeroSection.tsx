@@ -402,18 +402,18 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
             </p>
 
             {/* Calculator card */}
-            <div className="bg-slate-900 rounded-xl p-6 transition-all">
+            <div className="bg-white border border-slate-300 rounded-xl p-6 transition-all">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-slate-800 text-emerald-400 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                     <Calculator size={20} strokeWidth={2.5} />
                   </div>
-                  <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Finanse</span>
+                  <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Finanse</span>
                 </div>
               </div>
 
-              <h3 className="text-xl font-black text-white mb-1">Kalkulator Opłat</h3>
-              <p className="text-sm text-slate-400 font-medium mb-4 leading-relaxed">
+              <h3 className="text-xl font-black text-slate-900 mb-1">Kalkulator Opłat</h3>
+              <p className="text-sm text-slate-500 font-medium mb-4 leading-relaxed">
                 Sprawdź koszt pobytu i wysokość dopłat z budżetu gminy.
               </p>
 
@@ -426,20 +426,20 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
                     onChange={(e) => setCalcIncome(e.target.value)}
                     placeholder="Dochód seniora (zł/mc)"
                     min="0" max="50000" step="100"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500 transition-colors placeholder:text-slate-500 placeholder:font-medium"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-emerald-500 transition-colors placeholder:text-slate-400 placeholder:font-medium"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 uppercase tracking-widest pointer-events-none">PLN</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-widest pointer-events-none">PLN</span>
                 </div>
 
                 {showCalcResult && (
-                  <div className="bg-slate-800 rounded-lg p-3 grid grid-cols-2 gap-2 text-center border border-slate-700">
+                  <div className="bg-slate-50 rounded-lg p-3 grid grid-cols-2 gap-2 text-center border border-slate-200">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-0.5">Wkład (70%)</p>
-                      <p className="text-xl font-black text-white">{formatPLN(calcContribution)}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-0.5">Wkład (70%)</p>
+                      <p className="text-xl font-black text-slate-900">{formatPLN(calcContribution)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-0.5">Zostaje (30%)</p>
-                      <p className="text-xl font-black text-white">{formatPLN(calcRemaining)}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-0.5">Zostaje (30%)</p>
+                      <p className="text-xl font-black text-slate-900">{formatPLN(calcRemaining)}</p>
                     </div>
                   </div>
                 )}
@@ -448,8 +448,8 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
                   onClick={handleCalcGoFull}
                   className={`w-full py-3 rounded-lg font-black text-[11px] uppercase tracking-[0.15em] transition-all active:scale-95 flex items-center justify-center gap-2
                     ${showCalcResult
-                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                      : 'bg-slate-800 text-slate-600 cursor-not-allowed'}`}
+                      ? 'bg-slate-900 hover:bg-emerald-600 text-white'
+                      : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
                   disabled={!showCalcResult}
                 >
                   <Calculator size={14} />
