@@ -64,6 +64,7 @@ interface SearchResultsProps {
   activeFilters?: ActiveFilters;
   userLocation?: { lat: number; lng: number };
   searchCenter?: { lat: number; lng: number; name: string };
+  terytPowiats?: string[];
 }
 
 
@@ -76,6 +77,7 @@ export default function SearchResults({
   activeFilters,
   userLocation,
   searchCenter,
+  terytPowiats,
 }: SearchResultsProps) {
 
   const router = useRouter();
@@ -110,15 +112,29 @@ export default function SearchResults({
   const [favoritesState, setFavoritesState] = useState<number[]>([]);
 
   // ===== COMPUTED =====
-  // Stała lista wszystkich powiatów Małopolski — nie zależy od aktualnych wyników
-  const availablePowiats = [
-    "Wszystkie",
+  // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
+  // lub pełna lista Małopolski gdy brak danych TERYT (np. wyszukiwanie woj./geoloc)
+  const ALL_MALOPOLSKA_POWIATS = [
     "bocheński", "brzeski", "chrzanowski", "dąbrowski", "gorlicki",
     "krakowski", "limanowski", "miechowski", "myślenicki", "nowosądecki",
     "nowotarski", "olkuski", "oświęcimski", "proszowicki", "suski",
     "tarnowski", "tatrzański", "wadowicki", "wielicki",
     "Kraków", "Nowy Sącz", "Tarnów",
   ];
+  const availablePowiats = terytPowiats && terytPowiats.length > 0
+    ? ["Wszystkie", ...terytPowiats]
+    : ["Wszystkie", ...ALL_MALOPOLSKA_POWIATS];
+
+  // Dynamiczne profile — tylko te kody które faktycznie występują w wynikach
+  const availableProfiles = useMemo(() => {
+    const codes = new Set<string>();
+    for (const f of results) {
+      if (f.profil_opieki) {
+        f.profil_opieki.split(',').forEach((c: string) => codes.add(c.trim()));
+      }
+    }
+    return [...codes];
+  }, [results]);
 
   const activeChips = useMemo(() => {
     const chips = [];
@@ -282,12 +298,9 @@ export default function SearchResults({
       const targetPowiat = normPowiat(powiat);
       const hasResults = results.some(f => normPowiat(f.powiat ?? '') === targetPowiat);
       if (!hasResults) {
-        // Powiat not in current server results — navigate immediately
+        // Powiat not in current server results — navigate to powiat-only search
+        // Nie przekazujemy q — user wybrał konkretny powiat, nie szuka już po mieście
         const params = new URLSearchParams();
-        if (query) {
-          params.set('q', query);
-          params.set('partial', 'true');
-        }
         params.set('powiat', powiat);
         router.push(`/search?${params.toString()}`);
         return;
@@ -356,6 +369,7 @@ export default function SearchResults({
         priceLimit={priceLimit}
         onPriceLimitChange={setPriceLimit}
         availablePowiats={availablePowiats}
+        availableProfiles={availableProfiles}
         onReset={resetFilters}
         onClose={() => setShowFilters(false)}
         onApply={handleApplyFilters}
@@ -375,8 +389,19 @@ export default function SearchResults({
             {isLoading ? (
               // Loading
               [1, 2, 3, 4].map(i => <SkeletonCard key={i} />)
+            ) : facilities.length === 0 && message ? (
+              // Komunikat z serwera (np. miejscowość poza Małopolską)
+              <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </div>
+                <p className="text-slate-700 font-semibold text-base mb-1">{message}</p>
+                <p className="text-slate-400 text-sm">Przykłady: Kraków, Tarnów, Nowy Sącz, Zakopane</p>
+              </div>
             ) : facilities.length === 0 ? (
-              // Empty State
+              // Empty State (po filtrowaniu po stronie klienta)
               <EmptyState onResetFilters={resetFilters} />
             ) : (
               <>

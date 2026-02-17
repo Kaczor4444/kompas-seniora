@@ -132,12 +132,16 @@ model MopsContact {
   id           Int       @id @default(autoincrement())
   city         String    @unique
   cityDisplay  String
+  typ          String    @default("MOPS")
+  gmina        String?
   name         String
   phone        String
   email        String?
   address      String
   website      String?
   wojewodztwo  String
+  latitude     Float?
+  longitude    Float?
   verified     Boolean   @default(false)
   lastVerified DateTime?
   notes        String?

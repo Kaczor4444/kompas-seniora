@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { formatPhoneNumber } from '@/lib/phone-utils';
 
 const WOJEWODZTWA = [
   'małopolskie', 'śląskie', 'mazowieckie', 'dolnośląskie',
@@ -18,13 +19,16 @@ const WOJEWODZTWA = [
 const mopsSchema = z.object({
   city:        z.string().min(1, 'Wymagane'),
   cityDisplay: z.string().min(1, 'Wymagane'),
+  typ:         z.enum(['MOPS', 'GOPS', 'OPS', 'MOPR', 'CUS']),
+  gmina:       z.string().optional().or(z.literal('')),
   name:        z.string().min(1, 'Wymagane'),
   phone:       z.string().min(1, 'Wymagane'),
   email:       z.string().email('Nieprawidłowy email').optional().or(z.literal('')),
   address:     z.string().min(1, 'Wymagane'),
   website:     z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
   wojewodztwo: z.string().min(1, 'Wymagane'),
-  typ:         z.enum(['MOPS', 'GOPS', 'OPS', 'MOPR']),
+  latitude:    z.number().nullable().optional(),
+  longitude:   z.number().nullable().optional(),
   verified:    z.boolean(),
   notes:       z.string().optional().or(z.literal('')),
 });
@@ -45,13 +49,22 @@ export default function DodajMopsPage() {
   } = useForm<MopsFormData>({
     resolver: zodResolver(mopsSchema),
     defaultValues: {
-      typ:        'MOPS',
-      verified:   false,
+      typ:         'MOPS',
+      verified:    false,
       wojewodztwo: 'małopolskie',
     },
   });
 
   const cityDisplay = watch('cityDisplay');
+  const phone = watch('phone');
+
+  // Auto-formatowanie telefonu
+  useEffect(() => {
+    if (phone && phone.length >= 9) {
+      const formatted = formatPhoneNumber(phone);
+      if (formatted !== phone) setValue('phone', formatted);
+    }
+  }, [phone, setValue]);
 
   // Auto-fill city key from cityDisplay
   const handleCityDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,11 +81,37 @@ export default function DodajMopsPage() {
   const onSubmit = async (data: MopsFormData) => {
     setIsSubmitting(true);
     setError(null);
+
+    // Formatuj telefon przed zapisem
+    if (data.phone) data.phone = formatPhoneNumber(data.phone);
+
+    // Auto-geocoding jeśli brak ręcznych współrzędnych
+    let latitude = data.latitude || null;
+    let longitude = data.longitude || null;
+
+    if (data.cityDisplay && !latitude && !longitude) {
+      try {
+        const geoParams = new URLSearchParams({
+          miejscowosc: data.cityDisplay,
+          ulica: data.address,
+          wojewodztwo: data.wojewodztwo,
+        });
+        const geoRes = await fetch(`/api/geocode?${geoParams}`);
+        const geoData = await geoRes.json();
+        if (geoData.success) {
+          latitude = geoData.latitude;
+          longitude = geoData.longitude;
+        }
+      } catch {
+        // Nie blokujemy zapisu jeśli geocoding nie działa
+      }
+    }
+
     try {
       const res = await fetch('/api/admin/mops', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, latitude, longitude }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -121,6 +160,7 @@ export default function DodajMopsPage() {
                   <option value="GOPS">GOPS</option>
                   <option value="OPS">OPS</option>
                   <option value="MOPR">MOPR</option>
+                  <option value="CUS">CUS</option>
                 </select>
               </div>
               <div>
@@ -150,6 +190,19 @@ export default function DodajMopsPage() {
               <p className="mt-1 text-xs text-gray-400">
                 Klucz (city): <code className="bg-gray-100 px-1 rounded">{watch('city') || '—'}</code>
               </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Gmina (opcjonalnie)
+              </label>
+              <input
+                type="text"
+                {...register('gmina')}
+                placeholder="np. Klucze (dla wiejskich ośrodków obsługujących gminę)"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+              <p className="mt-1 text-xs text-gray-400">Wypełnij jeśli ośrodek obsługuje gminę inną niż miasto (np. CUS Klucze obsługuje gminę Klucze)</p>
             </div>
 
             <div>
@@ -225,6 +278,34 @@ export default function DodajMopsPage() {
               {errors.website && <p className="mt-1 text-xs text-red-600">{errors.website.message}</p>}
             </div>
 
+          </div>
+        </div>
+
+        {/* Geolokalizacja */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-1">Geolokalizacja</h2>
+          <p className="text-xs text-gray-400 mb-4">Opcjonalnie — wypełniane automatycznie po zapisaniu. Możesz podać ręcznie jeśli auto-geocoding zwróci błędne wyniki.</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Szerokość (lat)</label>
+              <input
+                type="number"
+                step="any"
+                {...register('latitude', { valueAsNumber: true })}
+                placeholder="np. 50.0614"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Długość (lng)</label>
+              <input
+                type="number"
+                step="any"
+                {...register('longitude', { valueAsNumber: true })}
+                placeholder="np. 19.9383"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+            </div>
           </div>
         </div>
 

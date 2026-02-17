@@ -2,9 +2,15 @@ import { prisma } from '@/lib/prisma';
 import SearchResults from '@/components/SearchResults';
 import { calculateDistance } from '@/src/utils/distance';
 
-async function geocodeCity(cityName: string): Promise<{ lat: number; lng: number } | null> {
+async function geocodeCity(cityName: string, powiat?: string, woj?: string): Promise<{ lat: number; lng: number } | null> {
   try {
-    const encoded = encodeURIComponent(`${cityName}, Polska`);
+    // Buduj zapytanie z kontekstem powiatu/województwa żeby Nominatim znalazł właściwą miejscowość
+    let queryParts = [cityName];
+    if (powiat) queryParts.push(powiat);
+    if (woj) queryParts.push(woj);
+    queryParts.push('Polska');
+
+    const encoded = encodeURIComponent(queryParts.join(', '));
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encoded}&countrycodes=pl&limit=1&format=json`,
       { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 } }
@@ -74,6 +80,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   let results: any[] = [];
   let terytMatches: any[] = [];
   let message = '';
+  let terytPowiats: string[] = [];
 
   // TRYB 3: GEOLOCATION SEARCH
   if (isNearSearch && userLat && userLng && !query) {
@@ -139,6 +146,33 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           where: { ...baseWhere, nazwa_normalized: { contains: normalizedQuery } },
           select: { powiat: true, gmina: true, nazwa: true, wojewodztwo: true },
         });
+      }
+
+      // Sprawdź czy którakolwiek znaleziona miejscowość DOKŁADNIE pasuje do zapytania
+      // Jeśli nie (tylko partial: np. "opole" matchuje "Nowopole", "Wielopole") →
+      // miejscowość o tej nazwie nie istnieje w Małopolsce
+      const hasExactNameMatch = terytMatches.some(
+        (t: any) => normalizePolish(t.nazwa) === normalizedQuery
+      );
+
+      if (terytMatches.length === 0 || !hasExactNameMatch) {
+        results = [];
+        const displayQuery = query.charAt(0).toUpperCase() + query.slice(1);
+        message = `Miejscowość „${displayQuery}" nie istnieje w Małopolsce. Wpisz nazwę miejscowości z terenu Małopolski.`;
+      } else {
+
+      // Pobierz WSZYSTKIE powiaty gdzie szukana miejscowość istnieje (do filtra — bez constraintu powiatu)
+      if (powiatParam) {
+        const baseWhereNoPowiat: any = {};
+        if (wojewodztwo !== 'all') baseWhereNoPowiat.wojewodztwo = wojewodztwoDbName;
+        const terytForFilter = await prisma.terytLocation.findMany({
+          where: { ...baseWhereNoPowiat, nazwa_normalized: normalizedQuery },
+          select: { powiat: true },
+          distinct: ['powiat'],
+        });
+        terytPowiats = terytForFilter.map((t: any) => t.powiat).sort();
+      } else {
+        terytPowiats = [...new Set(terytMatches.map((t: any) => t.powiat))].sort();
       }
 
       // Sortuj powiaty po liczbie dopasowań
@@ -249,6 +283,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         const wojewodztwoInfo = wojewodztwo === 'all' ? 'w naszej bazie' : `w ${wojewodztwoName}`;
         message = `Nie znaleźliśmy miejscowości ${searchType} "${query}" ${wojewodztwoInfo}. Spróbuj wpisać inną nazwę.`;
       }
+
+      } // koniec else (hasExactNameMatch)
     }
     // BEZ TERYT (fallback dla województw bez danych TERYT)
     else {
@@ -409,7 +445,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   // Geokoduj szukane miasto żeby pokazać pin "tu szukasz" na mapie
   // Tylko gdy jest query tekstowy (nie geoloc, nie województwo)
-  const searchCenter = query ? await geocodeCity(query) : null;
+  const searchCenter = query ? await geocodeCity(
+    query,
+    powiatParam || undefined,
+    wojewodztwo !== 'all' ? wojewodztwo : undefined
+  ) : null;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -423,6 +463,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               type={type}
               results={sortedResults}
               message={message}
+              terytPowiats={terytPowiats.length > 0 ? terytPowiats : undefined}
               searchCenter={searchCenter ? { ...searchCenter, name: query } : undefined}
               userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined}
               activeFilters={{

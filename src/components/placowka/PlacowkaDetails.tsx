@@ -124,7 +124,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
   const router = useRouter();
   const { trackView, trackEvent } = useAnalytics();
   const [activeTab, setActiveTab] = useState<'info' | 'pricing'>('info');
-  const [isSaved, setIsSaved] = useState(() => isFavorite(placowka.id));
+  const [isSaved, setIsSaved] = useState(false); // localStorage czytany w useEffect po hydratacji
   const [isInComparison, setIsInComparison] = useState(false);
 
   useEffect(() => {
@@ -537,14 +537,16 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                   )}
                 </div>
 
-                {/* INFO NOTE */}
-                <div className="flex items-start gap-3 text-slate-300 text-xs leading-relaxed bg-white/5 p-4 rounded-xl">
-                  <Info size={16} className="shrink-0 mt-0.5 text-primary-400" />
-                  <p>
-                    W placówkach publicznych senior pokrywa <strong>70% swojego dochodu</strong>.
-                    Powyższa kwota to pełna stawka, której różnica jest pokrywana przez rodzinę lub gminę.
-                  </p>
-                </div>
+                {/* INFO NOTE — tylko DPS */}
+                {placowka.typ_placowki === 'DPS' && (
+                  <div className="flex items-start gap-3 text-slate-300 text-xs leading-relaxed bg-white/5 p-4 rounded-xl">
+                    <Info size={16} className="shrink-0 mt-0.5 text-primary-400" />
+                    <p>
+                      W placówkach publicznych senior pokrywa <strong>70% swojego dochodu</strong>.
+                      Powyższa kwota to pełna stawka, której różnica jest pokrywana przez rodzinę lub gminę.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -587,24 +589,34 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                   </div>
                 )}
 
-                {/* Website */}
-                {placowka.www && (
-                  <div>
-                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Strona www</div>
-                    <a href={placowka.www} onClick={handleWebsiteClick} target="_blank" rel="noreferrer" className="font-bold text-slate-900 hover:text-primary-600 transition-colors text-sm truncate block">
-                      {placowka.www.replace(/^https?:\/\//, '')}
-                    </a>
-                  </div>
-                )}
-
-                {/* Facebook */}
-                {placowka.facebook && (
-                  <div>
-                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Facebook</div>
-                    <a href={placowka.facebook.startsWith('http') ? placowka.facebook : `https://${placowka.facebook}`} target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 hover:text-blue-700 transition-colors text-sm truncate block flex items-center gap-2">
-                      {placowka.facebook.replace(/^https?:\/\/(www\.)?/, '')}
-                      <ArrowLeft size={14} className="rotate-180" />
-                    </a>
+                {/* Website & Facebook — ikony */}
+                {(placowka.www || placowka.facebook) && (
+                  <div className="flex items-center gap-3">
+                    {placowka.www && (
+                      <a
+                        href={placowka.www}
+                        onClick={handleWebsiteClick}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Strona internetowa"
+                        className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 hover:bg-primary-50 border border-stone-200 hover:border-primary-300 text-slate-500 hover:text-primary-600 transition-all"
+                      >
+                        <Globe size={18} />
+                      </a>
+                    )}
+                    {placowka.facebook && (
+                      <a
+                        href={placowka.facebook.startsWith('http') ? placowka.facebook : `https://${placowka.facebook}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Facebook"
+                        className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 hover:bg-blue-50 border border-stone-200 hover:border-blue-300 text-slate-500 hover:text-blue-600 transition-all"
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 )}
               </div>

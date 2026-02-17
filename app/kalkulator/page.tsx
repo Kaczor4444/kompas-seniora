@@ -5,6 +5,7 @@ import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, Info, ShieldAlert, P
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
+import { getGminaForCity } from '@/lib/city-to-gmina';
 import { addFavorite, removeFavorite, isFavorite, getFavorites } from '@/src/utils/favorites';
 
 // Locative case (miejscownik) for Polish city names
@@ -29,6 +30,11 @@ const cityLocative: Record<string, string> = {
   'wadowice': 'Wadowicach',
   'wieliczka': 'Wieliczce',
   'bielsko-biała': 'Bielsku-Białej',
+  'klucze': 'Kluczach',
+  'bukowno': 'Bukownie',
+  'wolbrom': 'Wolbromiu',
+  'bolesław': 'Bolesławiu',
+  'trzyciąż': 'Trzyciążu',
 };
 
 const toCityLocative = (city: string): string => {
@@ -137,6 +143,7 @@ interface MopsContact {
   id: number;
   city: string;
   cityDisplay: string;
+  typ: string;
   name: string;
   phone: string;
   email?: string;
@@ -318,8 +325,24 @@ function KalkulatorContent() {
       return { mops, usedFallback: false };
     }
     
-    // KROK 2: Fallback - mapuj powiat → miasto powiatowe
-    console.log('⚠️ No MOPS for city, trying fallback to powiat...');
+    // KROK 2: Fallback - sprawdź gminę miejscowości
+    const normalizedCityName = cityName.toLowerCase().trim()
+      .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e')
+      .replace(/ł/g,'l').replace(/ń/g,'n').replace(/ó/g,'o')
+      .replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z')
+      .replace(/\s+/g,'-');
+    const gminaCity = getGminaForCity(normalizedCityName);
+    if (gminaCity && gminaCity !== normalizedCityName) {
+      console.log('🔄 Trying gmina fallback:', gminaCity);
+      mops = await fetchMopsContact(gminaCity);
+      if (mops) {
+        console.log('✅ Found MOPS via gmina:', gminaCity);
+        return { mops, usedFallback: true, fallbackCity: gminaCity };
+      }
+    }
+
+    // KROK 3: Fallback - mapuj powiat → miasto powiatowe
+    console.log('⚠️ No MOPS for city or gmina, trying fallback to powiat...');
     const fallbackCity = mapPowiatToCity(powiatName);
     
     if (!fallbackCity) {
@@ -485,7 +508,13 @@ function KalkulatorContent() {
   // Navigate to search with budget filter
   const navigateToSearch = () => {
     if (!result) return;
-    router.push(`/search?q=${encodeURIComponent(result.city)}&woj=${encodeURIComponent(result.wojewodztwo)}&maxPrice=${Math.round(result.maxContribution)}&type=dps`);
+    const params = new URLSearchParams({
+      q:    result.city,
+      woj:  result.wojewodztwo,
+      type: 'dps',
+    });
+    if (selectedPowiat) params.set('powiat', selectedPowiat);
+    router.push(`/search?${params.toString()}`);
   };
 
   return (
@@ -584,7 +613,6 @@ function KalkulatorContent() {
                   className="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-sm text-slate-700 focus:ring-2 focus:ring-primary-500 outline-none"
                 >
                   <option value="małopolskie">Województwo: Małopolskie</option>
-                  <option value="śląskie">Województwo: Śląskie</option>
                 </select>
               </div>
             </div>
@@ -786,7 +814,7 @@ function KalkulatorContent() {
                   {activeMopsFallbackUsed && activeMopsFallbackCity && (
                     <div className="bg-amber-50 border-l-4 border-amber-400 p-3 mb-5 rounded-r-xl text-sm">
                       <p className="text-amber-900">
-                        Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest MOPS w <strong>{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
+                        Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest {activeMops.typ} w <strong>{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
                       </p>
                     </div>
                   )}

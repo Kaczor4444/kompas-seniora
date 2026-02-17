@@ -13,12 +13,13 @@ interface FilterPanelProps {
   priceLimit: number;
   onPriceLimitChange: (value: number) => void;
   availablePowiats: string[];
+  availableProfiles?: string[];
   onReset: () => void;
   onClose: () => void;
   onApply?: () => void;
 }
 
-const CARE_PROFILES = [
+const ALL_CARE_PROFILES = [
   { value: "Wszystkie", label: "Wszystkie" },
   { value: "E", label: "Osoby starsze" },
   { value: "C", label: "Psychicznie chorzy" },
@@ -39,10 +40,14 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   priceLimit,
   onPriceLimitChange,
   availablePowiats,
+  availableProfiles,
   onReset,
   onClose,
   onApply,
 }) => {
+  const careProfiles = availableProfiles && availableProfiles.length > 0
+    ? ALL_CARE_PROFILES.filter(p => p.value === "Wszystkie" || availableProfiles.includes(p.value))
+    : ALL_CARE_PROFILES;
   const handleApply = () => {
     onApply?.();
     onClose();
@@ -73,7 +78,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           label="Profil podopiecznego"
           value={selectedProfile}
           onChange={onProfileChange}
-          options={CARE_PROFILES}
+          options={careProfiles}
         />
       </div>
 

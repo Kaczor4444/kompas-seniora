@@ -108,26 +108,18 @@ interface FacilityMapProps {
 }
 
 // Ikona "tu szukasz" — pulsujący marker z etykietą nazwy miasta
+// Animacja sc-pulse jest zdefiniowana w globalnych stylach komponentu (nie w divIcon)
 function createSearchCenterIcon(cityName: string) {
   return L.divIcon({
     html: `
-      <style>
-        @keyframes sc-pulse {
-          0%   { transform:scale(0.5); opacity:0.8; }
-          70%  { transform:scale(1.6); opacity:0; }
-          100% { transform:scale(1.6); opacity:0; }
-        }
-      </style>
       <div style="position:relative;display:flex;align-items:center;justify-content:center;width:56px;height:56px">
-        <div style="
+        <div class="sc-pulse-ring" style="
           position:absolute;inset:0;border-radius:50%;
           background:rgba(249,115,22,0.25);
-          animation:sc-pulse 2s ease-out infinite;
         "></div>
-        <div style="
+        <div class="sc-pulse-ring sc-pulse-ring-delay" style="
           position:absolute;inset:8px;border-radius:50%;
           background:rgba(249,115,22,0.3);
-          animation:sc-pulse 2s ease-out infinite 0.5s;
         "></div>
         <div style="
           position:relative;z-index:2;
@@ -169,70 +161,51 @@ function AutoFitBounds({ facilities, searchCenter }: { facilities: Facility[]; s
   useEffect(() => {
     if (!map) return;
 
-    // Check if map is properly initialized
-    const isMapReady = map &&
-                       typeof map.invalidateSize === 'function' &&
-                       map.getContainer &&
-                       map.getContainer();
-
-    if (!isMapReady) {
-      console.warn('Map not ready for invalidateSize');
-      return;
-    }
-
     let mounted = true;
 
-    // Fix map size with error handling
-    const t = setTimeout(() => {
+    const fitBounds = () => {
       if (!mounted) return;
       try {
-        if (map && typeof map.invalidateSize === 'function') {
-          map.invalidateSize();
+        const container = map.getContainer?.();
+        if (!container || !container.isConnected) return;
+
+        map.invalidateSize();
+
+        const allPoints: [number, number][] = [
+          ...facilities.map(f => [f.latitude!, f.longitude!] as [number, number]),
+          ...(searchCenter ? [[searchCenter.lat, searchCenter.lng] as [number, number]] : []),
+        ];
+
+        if (allPoints.length === 1) {
+          map.setView(allPoints[0], 13);
+        } else if (allPoints.length > 1) {
+          map.fitBounds(L.latLngBounds(allPoints), { padding: [50, 50], maxZoom: 13 });
         }
-      } catch (error) {
-        console.error('Map invalidateSize error:', error);
+      } catch {
+        // Mapa może być w trakcie demontażu — ignoruj
       }
-    }, 100);
+    };
 
-    // Fit bounds with error handling — uwzględnij searchCenter w bounds
-    try {
-      const allPoints: [number, number][] = [
-        ...facilities.map(f => [f.latitude!, f.longitude!] as [number, number]),
-        ...(searchCenter ? [[searchCenter.lat, searchCenter.lng] as [number, number]] : []),
-      ];
-      if (allPoints.length === 1 && map.setView) {
-        map.setView(allPoints[0], 13);
-      } else if (allPoints.length > 1 && map.fitBounds) {
-        const bounds = L.latLngBounds(allPoints);
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
-      }
-    } catch (error) {
-      console.error('Map bounds error:', error);
-    }
+    // Odczekaj aż markery zostaną zamontowane przez Leaflet
+    const t = setTimeout(fitBounds, 150);
 
-    // Resize listener with error handling
     const handleResize = () => {
       setTimeout(() => {
+        if (!mounted) return;
         try {
-          if (map && typeof map.invalidateSize === 'function') {
-            map.invalidateSize();
+          const container = map.getContainer?.();
+          if (!container || !container.isConnected) return;
+          map.invalidateSize();
+          if (facilities.length > 1) {
+            map.fitBounds(
+              L.latLngBounds(facilities.map(f => [f.latitude!, f.longitude!] as [number, number])),
+              { padding: [50, 50], maxZoom: 13 }
+            );
           }
-        } catch (error) {
-          console.error('Map resize invalidateSize error:', error);
+        } catch {
+          // ignoruj
         }
       }, 100);
-
-      // Re-fit bounds on resize
-      try {
-        if (facilities.length > 1 && map.fitBounds) {
-          const bounds = L.latLngBounds(
-            facilities.map(f => [f.latitude!, f.longitude!] as [number, number])
-          );
-          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
-        }
-      } catch (error) {
-        console.error('Map resize bounds error:', error);
-      }
     };
 
     window.addEventListener('resize', handleResize);
@@ -241,7 +214,7 @@ function AutoFitBounds({ facilities, searchCenter }: { facilities: Facility[]; s
       clearTimeout(t);
       window.removeEventListener('resize', handleResize);
     };
-  }, [facilities, map]);
+  }, [facilities, searchCenter, map]);
 
   return null;
 }
@@ -269,6 +242,17 @@ export default function FacilityMap({
   return (
     <div className="w-full h-full">
       <style jsx global>{`
+        @keyframes sc-pulse {
+          0%   { transform: scale(0.5); opacity: 0.8; }
+          70%  { transform: scale(1.6); opacity: 0; }
+          100% { transform: scale(1.6); opacity: 0; }
+        }
+        .sc-pulse-ring {
+          animation: sc-pulse 2s ease-out infinite;
+        }
+        .sc-pulse-ring-delay {
+          animation-delay: 0.5s;
+        }
         .custom-dual-cluster {
           background: transparent !important;
           border: none !important;
