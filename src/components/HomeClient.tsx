@@ -116,7 +116,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
           </div>
 
           {/* 1/3 + 2/3 layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
 
             {/* Left 1/3 — Asystent */}
             <div className="bg-slate-900 rounded-2xl p-8 flex flex-col justify-between group lg:col-span-1">
