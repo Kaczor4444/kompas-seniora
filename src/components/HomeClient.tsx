@@ -74,7 +74,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
               </div>
               <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight">Porównaj koszty</h3>
               <p className="text-slate-500 leading-relaxed text-base">
-                Zobacz ile wynoszą opłaty za pobyt w DPS i sprawdź jak wygląda podział kosztów w Twojej sytuacji.
+                Zobacz ile wynoszą opłaty za pobyt w DPS i sprawdź jak wygląda podział kosztów między rodzinę a gminę.
               </p>
             </div>
 
@@ -90,7 +90,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
               </div>
               <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight">Skontaktuj się</h3>
               <p className="text-slate-500 leading-relaxed text-base">
-                Bezpośredni numer do placówki. Zapytaj o wolne miejsca bez pośredników.
+                Bezpośredni numer do placówki. Zapytaj o wolne miejsca i umów się na wizytę.
               </p>
             </div>
 
