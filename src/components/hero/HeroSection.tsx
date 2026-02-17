@@ -287,7 +287,12 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
             {/* Headline */}
             <h1 className="text-[52px] md:text-[80px] lg:text-[96px] font-black text-slate-900 leading-[0.9] tracking-tighter">
               Szukasz opieki<br />
-              <span className="text-slate-300">dla seniora?</span>
+              <span className="text-emerald-600 relative inline-block">
+                dla seniora?
+                <svg className="absolute -bottom-3 left-0 w-full overflow-visible" viewBox="0 0 400 16" fill="none" preserveAspectRatio="none">
+                  <path d="M0 12 Q100 2 200 10 Q300 18 400 6" stroke="#bbf7d0" strokeWidth="5" strokeLinecap="round"/>
+                </svg>
+              </span>
             </h1>
 
             {/* Subtitle */}
