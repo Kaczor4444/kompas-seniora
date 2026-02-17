@@ -553,7 +553,7 @@ function KalkulatorContent() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white border-2 border-slate-100 rounded-2xl p-8 lg:p-12 mb-16 shadow-sm">
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-8 lg:p-12 mb-16 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
             {/* Income */}
@@ -568,7 +568,7 @@ function KalkulatorContent() {
                   onChange={(e) => setIncome(e.target.value)}
                   placeholder="np. 3500"
                   min="0" max="50000" step="100"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-600 focus:bg-white transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-600 focus:bg-white transition-all"
                 />
                 <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[11px] font-black text-slate-300 uppercase pointer-events-none">PLN</span>
               </div>
@@ -586,7 +586,7 @@ function KalkulatorContent() {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="np. Kraków, Wieliczka..."
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-600 focus:bg-white transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-600 focus:bg-white transition-all"
                 />
                 <MapPin className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" size={20} />
               </div>
@@ -594,7 +594,7 @@ function KalkulatorContent() {
                 <select
                   value={wojewodztwo}
                   onChange={(e) => setWojewodztwo(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-500 outline-none ml-1"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-sm text-slate-500 outline-none ml-1"
                 >
                   <option value="małopolskie">Województwo: Małopolskie</option>
                 </select>
@@ -744,9 +744,9 @@ function KalkulatorContent() {
                   </div>
 
                   {activeMops ? (
-                    <div className="bg-white border-2 border-slate-100 rounded-2xl p-8 hover:border-emerald-600 transition-all">
+                    <div className="bg-white border-2 border-slate-300 rounded-2xl p-8 hover:border-emerald-600 transition-all">
                       {activeMopsFallbackUsed && activeMopsFallbackCity && (
-                        <p className="text-sm text-slate-500 mb-5 pb-5 border-b border-slate-100">
+                        <p className="text-sm text-slate-500 mb-5 pb-5 border-b border-slate-300">
                           Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest {activeMops.typ} w <strong>{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
                         </p>
                       )}
@@ -754,21 +754,21 @@ function KalkulatorContent() {
                       <div className="flex flex-wrap gap-3 mb-6">
                         <a
                           href={`tel:${activeMops.phone.replace(/\s/g, '')}`}
-                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all"
+                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all"
                         >
                           <Phone size={15} /> {activeMops.phone}
                         </a>
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMops.address)}`}
                           target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm text-slate-500 hover:border-slate-300 transition-all"
+                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm text-slate-500 hover:border-slate-500 transition-all"
                         >
                           <MapPin size={15} /> {activeMops.address}
                         </a>
                         {activeMops.email && (
                           <a
                             href={`mailto:${activeMops.email}`}
-                            className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm text-slate-500 hover:border-slate-300 transition-all"
+                            className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm text-slate-500 hover:border-slate-500 transition-all"
                           >
                             {activeMops.email}
                           </a>
@@ -777,7 +777,7 @@ function KalkulatorContent() {
                           <a
                             href={activeMops.website}
                             target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm text-slate-500 hover:border-slate-300 transition-all"
+                            className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm text-slate-500 hover:border-slate-500 transition-all"
                           >
                             {activeMops.website.replace(/^https?:\/\//, '')}
                           </a>
@@ -788,7 +788,7 @@ function KalkulatorContent() {
                       </p>
                     </div>
                   ) : (
-                    <div className="bg-white border-2 border-slate-100 rounded-2xl p-8">
+                    <div className="bg-white border-2 border-slate-300 rounded-2xl p-8">
                       <p className="text-sm text-slate-500 mb-5">
                         Nie mamy jeszcze danych kontaktowych dla powiatu <strong>{activeFacilities[0]?.powiat || result.city}</strong> w naszej bazie.
                         Skontaktuj się bezpośrednio — to pierwszy krok do złożenia wniosku o dopłatę gminy.
@@ -796,7 +796,7 @@ function KalkulatorContent() {
                       <a
                         href={`https://www.google.com/search?q=MOPS+${encodeURIComponent(result.city)}`}
                         target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all"
+                        className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all"
                       >
                         <Search size={15} /> Szukaj MOPS {result.city} w Google
                       </a>
@@ -850,7 +850,7 @@ function KalkulatorContent() {
                     const isCovered = hasPrice && gap <= 0;
 
                     return (
-                      <div key={facility.id} className="bg-white border-2 border-slate-100 rounded-xl p-6 lg:p-8 hover:border-emerald-600 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                      <div key={facility.id} className="bg-white border-2 border-slate-300 rounded-xl p-6 lg:p-8 hover:border-emerald-600 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-2 flex-wrap">
                             <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg ${
@@ -897,7 +897,7 @@ function KalkulatorContent() {
                               className={`p-2 rounded-lg border-2 transition-all ${
                                 compareIds.includes(facility.id)
                                   ? 'bg-slate-900 text-white border-slate-900'
-                                  : 'border-slate-100 text-slate-400 hover:border-slate-300'
+                                  : 'border-slate-300 text-slate-400 hover:border-slate-500'
                               }`}
                             >
                               <ArrowLeftRight size={14} />
@@ -908,7 +908,7 @@ function KalkulatorContent() {
                               className={`p-2 rounded-lg border-2 transition-all ${
                                 savedIds.includes(facility.id)
                                   ? 'text-emerald-600 border-emerald-200'
-                                  : 'border-slate-100 text-slate-400 hover:border-slate-300'
+                                  : 'border-slate-300 text-slate-400 hover:border-slate-500'
                               }`}
                             >
                               <Heart size={14} className={savedIds.includes(facility.id) ? 'fill-current' : ''} />
@@ -943,7 +943,7 @@ function KalkulatorContent() {
                 {!showAllFacilities && activeFacilities.length > 5 && (
                   <button
                     onClick={() => setShowAllFacilities(true)}
-                    className="mt-6 w-full py-4 border-2 border-slate-100 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:border-emerald-600 hover:text-emerald-700 transition-all"
+                    className="mt-6 w-full py-4 border-2 border-slate-300 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:border-emerald-600 hover:text-emerald-700 transition-all"
                   >
                     Pokaż więcej ({activeFacilities.length - 5} kolejnych placówek)
                   </button>
