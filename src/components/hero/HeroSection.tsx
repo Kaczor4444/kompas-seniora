@@ -267,7 +267,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
     new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(amount);
 
   return (
-    <div className="bg-white pt-12 pb-10 md:pt-16 md:pb-14">
+    <div className="bg-white pt-11 pb-10 md:pt-14 md:pb-14">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-20">
 
         {/* === 2-COLUMN GRID === */}
