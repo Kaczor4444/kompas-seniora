@@ -553,7 +553,7 @@ function KalkulatorContent() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-slate-900 rounded-2xl p-8 lg:p-12 mb-16">
+        <div className="bg-white border border-slate-300 rounded-2xl p-8 lg:p-12 mb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
             {/* Income */}
@@ -568,11 +568,11 @@ function KalkulatorContent() {
                   onChange={(e) => setIncome(e.target.value)}
                   placeholder="np. 3500"
                   min="0" max="50000" step="100"
-                  className="w-full bg-slate-800 border-2 border-slate-700 rounded-xl px-6 py-4 text-2xl font-black text-white outline-none focus:border-emerald-500 transition-all placeholder:text-slate-600"
+                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-400"
                 />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[11px] font-black text-slate-500 uppercase pointer-events-none">PLN</span>
+                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[11px] font-black text-slate-400 uppercase pointer-events-none">PLN</span>
               </div>
-              <p className="text-xs text-slate-500 ml-1">Emerytura, renta + zasiłek pielęgnacyjny</p>
+              <p className="text-xs text-slate-400 ml-1">Emerytura, renta + zasiłek pielęgnacyjny</p>
             </div>
 
             {/* City */}
@@ -586,15 +586,15 @@ function KalkulatorContent() {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="np. Kraków, Wieliczka..."
-                  className="w-full bg-slate-800 border-2 border-slate-700 rounded-xl px-6 py-4 text-2xl font-black text-white outline-none focus:border-emerald-500 transition-all placeholder:text-slate-600"
+                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-400"
                 />
-                <MapPin className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" size={20} />
+                <MapPin className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={20} />
               </div>
               <div>
                 <select
                   value={wojewodztwo}
                   onChange={(e) => setWojewodztwo(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-slate-400 outline-none ml-1"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-sm text-slate-500 outline-none ml-1"
                 >
                   <option value="małopolskie">Województwo: Małopolskie</option>
                 </select>
@@ -603,7 +603,7 @@ function KalkulatorContent() {
           </div>
 
           {error && (
-            <div className="p-4 bg-rose-900/40 text-rose-300 text-sm font-bold rounded-xl mb-6 flex items-center gap-3 border border-rose-800/50">
+            <div className="p-4 bg-rose-50 text-rose-600 text-sm font-bold rounded-xl mb-6 flex items-center gap-3 border border-rose-200">
               <AlertCircle size={16} /> {error}
             </div>
           )}
@@ -613,8 +613,8 @@ function KalkulatorContent() {
             disabled={loading || !income || !city}
             className={`w-full font-black text-[12px] uppercase tracking-[0.3em] py-5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-3
               ${!loading && income && city
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                : 'bg-slate-800 text-slate-600 cursor-not-allowed'}`}
+                ? 'bg-slate-900 hover:bg-emerald-600 text-white'
+                : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
