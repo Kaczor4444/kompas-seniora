@@ -96,12 +96,12 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
       </section>
 
       {/* CTA - Doradca + Poradniki */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Heading */}
-          <div className="mb-10 md:mb-14">
-            <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter leading-[1.0] mb-4">
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter leading-[1.0] mb-3">
               Nie musisz wiedzieć<br />
               <span className="text-emerald-600 relative inline-block">
                 wszystkiego od razu.
@@ -110,7 +110,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
                 </svg>
               </span>
             </h2>
-            <p className="text-slate-500 text-lg max-w-2xl leading-relaxed border-l-4 border-emerald-100 pl-5 mt-6">
+            <p className="text-slate-500 text-base max-w-2xl leading-relaxed border-l-4 border-emerald-100 pl-4 mt-4">
               Skorzystaj z doradcy, który podpowie co będzie lepszym wyborem dla seniora — DPS czy ŚDS — lub przeczytaj nasze poradniki, które pomogą Ci podjąć decyzję.
             </p>
           </div>
@@ -119,7 +119,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
 
             {/* Left 1/3 — Asystent */}
-            <div className="bg-slate-900 rounded-2xl p-8 flex flex-col justify-between group lg:col-span-1">
+            <div className="bg-slate-900 rounded-2xl p-6 flex flex-col justify-between group lg:col-span-1">
               <div>
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">

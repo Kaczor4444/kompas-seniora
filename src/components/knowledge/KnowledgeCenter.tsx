@@ -176,7 +176,7 @@ export default function KnowledgeCenter() {
       <div className="max-w-6xl mx-auto px-3">
 
         {/* Kategorie/Tagi - V2 with Icons */}
-        <div className="lg:hidden flex flex-nowrap overflow-x-auto scrollbar-hide gap-3 mb-6 px-1 pb-1">
+        <div className="lg:hidden flex flex-nowrap overflow-x-auto scrollbar-hide gap-3 mb-4 px-1 pb-1">
           <button
             onClick={() => setActiveFilter('Wszystkie')}
             className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
@@ -316,7 +316,7 @@ export default function KnowledgeCenter() {
 
                   {/* Image or Placeholder */}
                   {article.isPlaceholder ? (
-                    <div className="relative h-48 bg-slate-200 flex items-center justify-center">
+                    <div className="relative h-36 bg-slate-200 flex items-center justify-center">
                       <h3 className="text-2xl font-serif font-bold text-slate-600">Poradnik Seniora</h3>
 
                       {/* Category badge ON image - bottom left */}
@@ -338,7 +338,7 @@ export default function KnowledgeCenter() {
                       </div>
                     </div>
                   ) : (
-                    <div className="relative h-48 overflow-hidden">
+                    <div className="relative h-36 overflow-hidden">
                       <img
                         src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
                         alt={article.title}
@@ -366,11 +366,11 @@ export default function KnowledgeCenter() {
                   )}
 
                   {/* Content - NO category tag here */}
-                  <div className="p-6">
-                    <h3 className="text-xl font-serif font-semibold text-slate-900 mb-3">
+                  <div className="p-4">
+                    <h3 className="text-base font-serif font-semibold text-slate-900 mb-2">
                       {article.title}
                     </h3>
-                    <p className="text-neutral-700 mb-3">
+                    <p className="text-neutral-700 text-sm mb-2">
                       {article.excerpt}
                     </p>
                     <span className={`text-sm font-medium inline-flex items-center gap-1 ${
