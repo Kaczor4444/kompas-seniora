@@ -48,7 +48,14 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
 
             {/* Step 1 */}
             <div className="px-0 md:px-10 pb-10 md:pb-0 border-b md:border-b-0 border-slate-100">
-              <p className="text-[80px] md:text-[96px] font-black text-emerald-600 leading-none tracking-tighter mb-4 select-none">01</p>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-600">Krok 01</span>
+              </div>
               <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight">Wyszukaj placówkę</h3>
               <p className="text-slate-500 leading-relaxed text-base">
                 Wpisz miasto i wybierz typ placówki — DPS lub ŚDS. Pokażemy tylko to, co faktycznie pasuje.
@@ -57,7 +64,14 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
 
             {/* Step 2 */}
             <div className="px-0 md:px-10 py-10 md:py-0 border-b md:border-b-0 border-slate-100">
-              <p className="text-[80px] md:text-[96px] font-black text-emerald-600 leading-none tracking-tighter mb-4 select-none">02</p>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-600">Krok 02</span>
+              </div>
               <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight">Porównaj koszty</h3>
               <p className="text-slate-500 leading-relaxed text-base">
                 Zobacz ile wynoszą opłaty za pobyt w DPS i sprawdź jak wygląda podział kosztów w Twojej sytuacji.
@@ -66,7 +80,14 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
 
             {/* Step 3 */}
             <div className="px-0 md:px-10 pt-10 md:pt-0">
-              <p className="text-[80px] md:text-[96px] font-black text-emerald-600 leading-none tracking-tighter mb-4 select-none">03</p>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-600">Krok 03</span>
+              </div>
               <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight">Skontaktuj się</h3>
               <p className="text-slate-500 leading-relaxed text-base">
                 Bezpośredni numer do placówki. Zapytaj o wolne miejsca bez pośredników.
