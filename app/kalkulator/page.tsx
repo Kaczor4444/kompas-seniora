@@ -553,7 +553,7 @@ function KalkulatorContent() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white border-2 border-slate-300 rounded-2xl p-8 lg:p-12 mb-16 shadow-sm">
+        <div className="bg-white border-2 border-emerald-500 rounded-2xl p-8 lg:p-12 mb-16 shadow-sm shadow-emerald-100">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
             {/* Income */}
@@ -744,31 +744,31 @@ function KalkulatorContent() {
                   </div>
 
                   {activeMops ? (
-                    <div className="bg-white border-2 border-slate-300 rounded-2xl p-8 hover:border-emerald-600 transition-all">
+                    <div className="bg-slate-900 rounded-2xl p-8">
                       {activeMopsFallbackUsed && activeMopsFallbackCity && (
-                        <p className="text-sm text-slate-500 mb-5 pb-5 border-b border-slate-300">
-                          Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest {activeMops.typ} w <strong>{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
+                        <p className="text-sm text-slate-400 mb-5 pb-5 border-b border-white/10">
+                          Dla miejscowości <strong className="text-white">{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest {activeMops.typ} w <strong className="text-white">{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
                         </p>
                       )}
-                      <h4 className="text-xl font-black text-slate-900 mb-6">{activeMops.name}</h4>
+                      <h4 className="text-xl font-black text-white mb-6">{activeMops.name}</h4>
                       <div className="flex flex-wrap gap-3 mb-6">
                         <a
                           href={`tel:${activeMops.phone.replace(/\s/g, '')}`}
-                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all"
+                          className="inline-flex items-center gap-2 px-5 py-3 border border-white/20 rounded-xl text-sm font-bold text-white hover:border-emerald-400 hover:text-emerald-400 transition-all"
                         >
                           <Phone size={15} /> {activeMops.phone}
                         </a>
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMops.address)}`}
                           target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm text-slate-500 hover:border-slate-500 transition-all"
+                          className="inline-flex items-center gap-2 px-5 py-3 border border-white/20 rounded-xl text-sm text-slate-400 hover:border-white/40 hover:text-slate-300 transition-all"
                         >
                           <MapPin size={15} /> {activeMops.address}
                         </a>
                         {activeMops.email && (
                           <a
                             href={`mailto:${activeMops.email}`}
-                            className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm text-slate-500 hover:border-slate-500 transition-all"
+                            className="inline-flex items-center gap-2 px-5 py-3 border border-white/20 rounded-xl text-sm text-slate-400 hover:border-white/40 hover:text-slate-300 transition-all"
                           >
                             {activeMops.email}
                           </a>
@@ -777,13 +777,13 @@ function KalkulatorContent() {
                           <a
                             href={activeMops.website}
                             target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm text-slate-500 hover:border-slate-500 transition-all"
+                            className="inline-flex items-center gap-2 px-5 py-3 border border-white/20 rounded-xl text-sm text-slate-400 hover:border-white/40 hover:text-slate-300 transition-all"
                           >
                             {activeMops.website.replace(/^https?:\/\//, '')}
                           </a>
                         )}
                       </div>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-500">
                         Zadzwoń i umów się na rozmowę z pracownikiem socjalnym — to pierwszy krok do uzyskania dopłaty gminy do kosztów DPS.
                       </p>
                     </div>
