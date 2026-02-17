@@ -101,9 +101,6 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
 
           {/* Heading */}
           <div className="mb-10 md:mb-14">
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-bold uppercase tracking-[0.25em] mb-6">
-              <SparklesIcon className="w-4 h-4 text-emerald-700" /> Nie wiesz od czego zacząć?
-            </div>
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter leading-[1.0] mb-4">
               Nie musisz wiedzieć<br />
               <span className="text-emerald-600 relative inline-block">
