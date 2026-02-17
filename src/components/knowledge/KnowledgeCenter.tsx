@@ -172,7 +172,7 @@ export default function KnowledgeCenter() {
     : false
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-6 bg-white">
       <div className="max-w-6xl mx-auto px-6">
 
         {/* Kategorie/Tagi - V2 with Icons */}
@@ -404,10 +404,10 @@ export default function KnowledgeCenter() {
         </div>
 
         {/* CTA dla więcej artykułów */}
-        <div className="text-center mt-12">
-          <Link href="/poradniki" className="bg-white hover:bg-neutral-50 text-neutral-900 px-8 py-3 rounded-lg font-medium border-2 border-neutral-300 transition-colors inline-flex items-center gap-2">
+        <div className="text-center mt-6">
+          <Link href="/poradniki" className="bg-white hover:bg-neutral-50 text-neutral-900 px-5 py-2 rounded-lg text-sm font-medium border border-neutral-300 transition-colors inline-flex items-center gap-2">
             Zobacz wszystkie poradniki ({articles.length})
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
