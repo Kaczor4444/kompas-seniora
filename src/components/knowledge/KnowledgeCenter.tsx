@@ -176,7 +176,7 @@ export default function KnowledgeCenter() {
       <div className="max-w-6xl mx-auto px-6">
 
         {/* Kategorie/Tagi - V2 with Icons */}
-        <div className="flex flex-wrap justify-center gap-3 mb-10">
+        <div className="lg:hidden flex flex-wrap justify-center gap-3 mb-10">
           <button
             onClick={() => setActiveFilter('Wszystkie')}
             className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
