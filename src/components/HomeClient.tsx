@@ -32,17 +32,11 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
         totalFacilities={totalFacilities}
       />
 
-      {/* Regional Map */}
-      <RegionalMap
-        powiatCounts={powiatCounts}
-        totalFacilities={totalFacilities}
-      />
-
       {/* How It Works - 3 Steps */}
       <section className="bg-white py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tighter">
               Jak znaleźć opiekę?
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
@@ -126,6 +120,12 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
         </div>
       </section>
 
+      {/* Regional Map */}
+      <RegionalMap
+        powiatCounts={powiatCounts}
+        totalFacilities={totalFacilities}
+      />
+
       {/* CTA - Asystent Wyboru */}
       <section className="py-16 bg-gradient-to-br from-primary-50 to-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -134,7 +134,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
               <SparklesIcon className="w-4 h-4" /> Potrzebujesz pomocy?
             </div>
 
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-slate-900 mb-4">
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tighter">
               Nie wiesz, od czego zacząć?
             </h3>
 
