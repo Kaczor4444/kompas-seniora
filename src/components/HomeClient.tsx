@@ -98,31 +98,31 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
         </div>
       </section>
 
-      {/* Regional Map */}
-      <RegionalMap
-        powiatCounts={powiatCounts}
-        totalFacilities={totalFacilities}
-      />
-
       {/* CTA - Asystent Wyboru */}
-      <section className="py-16 bg-gradient-to-br from-primary-50 to-white">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-3xl p-8 md:p-16 shadow-xl border border-stone-100 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-full text-xs font-bold uppercase mb-6 border border-primary-200">
-              <SparklesIcon className="w-4 h-4" /> Potrzebujesz pomocy?
+          <div className="bg-white rounded-3xl p-8 md:p-16 border border-slate-100 text-center">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-bold uppercase tracking-[0.25em] mb-8">
+              <SparklesIcon className="w-4 h-4 text-emerald-700" /> Potrzebujesz pomocy?
             </div>
 
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tighter">
-              Nie wiesz, od czego zacząć?
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-6 tracking-tighter leading-[1.0]">
+              Nie wiesz,<br />
+              <span className="text-emerald-600 relative inline-block">
+                od czego zacząć?
+                <svg className="absolute -bottom-2 left-0 w-full overflow-visible" viewBox="0 0 400 16" fill="none" preserveAspectRatio="none">
+                  <path d="M0 12 Q100 2 200 10 Q300 18 400 6" stroke="#bbf7d0" strokeWidth="5" strokeLinecap="round"/>
+                </svg>
+              </span>
             </h3>
 
-            <p className="text-slate-600 text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-              Wypełnij 4 proste pytania, a pomożemy Ci wybrać odpowiednią formę opieki dla Twojego bliskiego.
+            <p className="text-slate-500 text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed border-l-4 border-emerald-100 pl-5 text-left">
+              Wypełnij 4 proste pytania, a pomożemy wybrać odpowiednią formę opieki — DPS lub ŚDS — i przygotujemy konkretny plan działania.
             </p>
 
             <Link
               href="/asystent?start=true"
-              className="inline-flex items-center gap-3 bg-slate-900 hover:bg-primary-600 text-white px-8 md:px-10 py-4 md:py-5 rounded-2xl font-bold text-base md:text-lg transition-all shadow-xl hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-3 bg-slate-900 hover:bg-emerald-600 text-white px-8 md:px-10 py-4 md:py-5 rounded-2xl font-black text-sm uppercase tracking-[0.15em] transition-all active:scale-95"
             >
               Rozpocznij analizę <ChevronRightIcon className="w-5 h-5" />
             </Link>
@@ -150,6 +150,12 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
           </div>
         </div>
       </section>
+
+      {/* Regional Map */}
+      <RegionalMap
+        powiatCounts={powiatCounts}
+        totalFacilities={totalFacilities}
+      />
 
       {/* Knowledge Center */}
       <KnowledgeCenter />
