@@ -181,8 +181,8 @@ export default function KnowledgeCenter() {
             onClick={() => setActiveFilter('Wszystkie')}
             className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Wszystkie'
-                ? 'bg-slate-800 text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm'
             }`}
           >
             Wszystkie
@@ -191,8 +191,8 @@ export default function KnowledgeCenter() {
             onClick={() => setActiveFilter('Wybór opieki')}
             className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Wybór opieki'
-                ? 'bg-slate-800 text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm'
             }`}
           >
             <Building2 size={16} />
@@ -202,8 +202,8 @@ export default function KnowledgeCenter() {
             onClick={() => setActiveFilter('Dla opiekuna')}
             className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Dla opiekuna'
-                ? 'bg-slate-800 text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm'
             }`}
           >
             <UserCheck size={16} />
@@ -213,8 +213,8 @@ export default function KnowledgeCenter() {
             onClick={() => setActiveFilter('Dla seniora')}
             className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Dla seniora'
-                ? 'bg-slate-800 text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm'
             }`}
           >
             <User size={16} />
@@ -224,8 +224,8 @@ export default function KnowledgeCenter() {
             onClick={() => setActiveFilter('Finanse')}
             className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Finanse'
-                ? 'bg-slate-800 text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm'
             }`}
           >
             <TrendingUp size={16} />
@@ -235,8 +235,8 @@ export default function KnowledgeCenter() {
             onClick={() => setActiveFilter('Prawne')}
             className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Prawne'
-                ? 'bg-slate-800 text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm'
             }`}
           >
             <Scale size={16} />
@@ -247,7 +247,7 @@ export default function KnowledgeCenter() {
             className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Zakładki'
                 ? 'bg-emerald-600 text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-emerald-300 hover:shadow-sm'
             }`}
           >
             <Bookmark size={16} className={activeFilter === 'Zakładki' ? 'fill-white' : ''} />
