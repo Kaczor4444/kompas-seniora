@@ -640,32 +640,40 @@ function KalkulatorContent() {
 
               {/* ── 70/30 split ── */}
               <section>
-                <div className="flex items-center gap-4 mb-8">
-                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Podział kosztów (70/30)</span>
+                <div className="flex items-center gap-4 mb-10">
+                  <span className="px-4 py-1.5 bg-emerald-100 rounded-full text-[11px] font-black text-emerald-700 uppercase tracking-widest">Szczegóły symulacji</span>
                   <div className="h-px flex-1 bg-slate-100" />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-emerald-600" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
+                        <CheckCircle2 size={20} />
+                      </div>
                       <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Wkład Seniora (70%)</span>
                     </div>
-                    <div className="text-5xl lg:text-7xl font-black text-slate-900 leading-none tracking-tight">
+                    <div className="text-5xl lg:text-7xl font-black text-emerald-600 leading-none tracking-tight">
                       {formatCurrency(result.maxContribution)}
                     </div>
-                    <p className="text-slate-400 text-sm font-medium">Kwota przekazywana bezpośrednio do placówki DPS.</p>
+                    <p className="text-slate-500 text-sm font-medium leading-relaxed border-l-4 border-emerald-200 pl-5">
+                      Kwota automatycznie potrącana z dochodu seniora na poczet kosztów utrzymania w DPS.
+                    </p>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-amber-400" />
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-400 text-white flex items-center justify-center flex-shrink-0">
+                        <Heart size={20} />
+                      </div>
                       <span className="text-[11px] font-black text-amber-600 uppercase tracking-widest">Zostaje &quot;Na rękę&quot; (30%)</span>
                     </div>
                     <div className="text-5xl lg:text-7xl font-black text-slate-900 leading-none tracking-tight">
                       {formatCurrency(result.remainingFunds)}
                     </div>
-                    <p className="text-slate-400 text-sm font-medium">Fundusze na leki, higienę i drobne wydatki własne.</p>
+                    <p className="text-slate-500 text-sm font-medium leading-relaxed border-l-4 border-amber-200 pl-5">
+                      Pieniądze pozostające do dyspozycji seniora na leki, higienę i własne potrzeby.
+                    </p>
                     {result.remainingFunds < 300 && (
                       <p className="text-sm text-amber-600 font-bold flex items-center gap-1.5">
                         <AlertCircle size={14} /> Kwota może nie wystarczyć na leki nierefundowane
@@ -674,9 +682,13 @@ function KalkulatorContent() {
                   </div>
                 </div>
 
-                <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex">
-                  <div className="h-full bg-emerald-600" style={{ width: '70%' }} />
-                  <div className="h-full bg-amber-400" style={{ width: '30%' }} />
+                <div className="w-full h-14 bg-slate-100 rounded-xl overflow-hidden flex">
+                  <div className="h-full bg-emerald-600 flex items-center justify-center" style={{ width: '70%' }}>
+                    <span className="text-white text-[11px] font-black uppercase tracking-widest">Koszt pobytu</span>
+                  </div>
+                  <div className="h-full flex-1 flex items-center justify-center">
+                    <span className="text-slate-400 text-[11px] font-black uppercase tracking-widest">Kwota wolna</span>
+                  </div>
                 </div>
                 <p className="text-xs text-slate-400 mt-4 italic">
                   Symulacja wg ustawy o pomocy społecznej. MOPS rozpatruje każdą sprawę indywidualnie — nie jest to decyzja administracyjna.
