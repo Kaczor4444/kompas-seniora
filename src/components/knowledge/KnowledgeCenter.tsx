@@ -176,10 +176,10 @@ export default function KnowledgeCenter() {
       <div className="max-w-6xl mx-auto px-3">
 
         {/* Kategorie/Tagi - V2 with Icons */}
-        <div className="lg:hidden flex flex-wrap justify-center gap-3 mb-10">
+        <div className="lg:hidden flex flex-nowrap overflow-x-auto scrollbar-hide gap-3 mb-6 px-1 pb-1">
           <button
             onClick={() => setActiveFilter('Wszystkie')}
-            className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Wszystkie'
                 ? 'bg-slate-800 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
@@ -189,7 +189,7 @@ export default function KnowledgeCenter() {
           </button>
           <button
             onClick={() => setActiveFilter('Wybór opieki')}
-            className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Wybór opieki'
                 ? 'bg-slate-800 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
@@ -200,7 +200,7 @@ export default function KnowledgeCenter() {
           </button>
           <button
             onClick={() => setActiveFilter('Dla opiekuna')}
-            className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Dla opiekuna'
                 ? 'bg-slate-800 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
@@ -211,7 +211,7 @@ export default function KnowledgeCenter() {
           </button>
           <button
             onClick={() => setActiveFilter('Dla seniora')}
-            className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Dla seniora'
                 ? 'bg-slate-800 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
@@ -222,7 +222,7 @@ export default function KnowledgeCenter() {
           </button>
           <button
             onClick={() => setActiveFilter('Finanse')}
-            className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Finanse'
                 ? 'bg-slate-800 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
@@ -233,7 +233,7 @@ export default function KnowledgeCenter() {
           </button>
           <button
             onClick={() => setActiveFilter('Prawne')}
-            className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Prawne'
                 ? 'bg-slate-800 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
@@ -244,7 +244,7 @@ export default function KnowledgeCenter() {
           </button>
           <button
             onClick={() => setActiveFilter('Zakładki')}
-            className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
+            className={`flex-shrink-0 px-4 py-2.5 rounded-lg font-medium text-sm transition-all inline-flex items-center gap-2 ${
               activeFilter === 'Zakładki'
                 ? 'bg-emerald-600 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-stone-200 hover:border-slate-300'
