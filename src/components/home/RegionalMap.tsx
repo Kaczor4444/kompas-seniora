@@ -61,12 +61,12 @@ export default function RegionalMap({ powiatCounts, totalFacilities }: RegionalM
               <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-bold uppercase tracking-[0.25em] shadow-sm">
                 <MapPin size={14} className="text-emerald-700" /> Małopolska — 22 powiaty
               </div>
-              <h2 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 leading-[1.05]">
+              <h2 className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.05] tracking-tighter">
                 Znajdź opiekę<br/>
-                <span className="text-emerald-700 relative inline-block">
+                <span className="text-emerald-600 relative inline-block">
                   w Twojej okolicy
-                  <svg className="absolute -bottom-4 left-0 w-full h-5 text-emerald-200" viewBox="0 0 100 10" preserveAspectRatio="none">
-                    <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round" />
+                  <svg className="absolute -bottom-3 left-0 w-full overflow-visible" viewBox="0 0 400 16" fill="none" preserveAspectRatio="none">
+                    <path d="M0 12 Q100 2 200 10 Q300 18 400 6" stroke="#bbf7d0" strokeWidth="5" strokeLinecap="round"/>
                   </svg>
                 </span>
               </h2>

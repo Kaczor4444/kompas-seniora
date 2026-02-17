@@ -79,8 +79,8 @@ export default function PopularLocationsSection() {
               <MapPin size={12} className="text-primary-600" aria-hidden="true" />
               Dostępność lokalna
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold font-serif text-slate-900 leading-tight">
-              Szukaj w <span className="text-primary-600">Twoim mieście</span>
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight tracking-tighter">
+              Szukaj w <span className="text-emerald-600">Twoim mieście</span>
             </h2>
             <p className="mt-4 text-slate-500 text-base md:text-lg font-medium">
               Placówki w najpopularniejszych miastach Małopolski.

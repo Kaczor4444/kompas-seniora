@@ -176,8 +176,8 @@ export default function KnowledgeCenter() {
       <div className="max-w-6xl mx-auto px-6">
         {/* Updated Heading */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">
-            🎯 Nie wiesz od czego zacząć?
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tighter">
+            Nie wiesz od czego zacząć?
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
             Przygotowaliśmy serię artykułów, które przeprowadzą Cię przez zawiłości systemu opieki senioralnej w Polsce.
