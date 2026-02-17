@@ -172,8 +172,8 @@ export default function KnowledgeCenter() {
     : false
 
   return (
-    <section className="py-6 bg-white">
-      <div className="max-w-6xl mx-auto px-6">
+    <section className="py-4 bg-white">
+      <div className="max-w-6xl mx-auto px-3">
 
         {/* Kategorie/Tagi - V2 with Icons */}
         <div className="lg:hidden flex flex-wrap justify-center gap-3 mb-10">
@@ -278,7 +278,7 @@ export default function KnowledgeCenter() {
           {/* Scroll Container */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-4 px-2"
+            className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-2 px-1"
             onScroll={handleScroll}
           >
             {filteredArticles.map((article) => (
@@ -404,11 +404,11 @@ export default function KnowledgeCenter() {
         </div>
 
         {/* CTA dla więcej artykułów */}
-        <div className="text-center mt-6">
-          <Link href="/poradniki" className="bg-white hover:bg-neutral-50 text-neutral-900 px-5 py-2 rounded-lg text-sm font-medium border border-neutral-300 transition-colors inline-flex items-center gap-2">
+        <div className="text-center mt-4">
+          <Link href="/poradniki" className="bg-slate-900 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-[0.15em] transition-all active:scale-95 inline-flex items-center gap-2">
             Zobacz wszystkie poradniki ({articles.length})
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
         </div>
