@@ -297,7 +297,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
 
             {/* Subtitle */}
             <p className="text-slate-600 text-lg md:text-xl font-medium max-w-xl leading-relaxed border-l-4 border-emerald-100 pl-6">
-              Niezależny przewodnik po domach opieki w Małopolsce. Pomagamy zrozumieć formalności, finanse i krok po kroku znaleźć najlepsze miejsce.
+              Niezależny przewodnik po domach opieki w <strong className="text-slate-900 font-black">Małopolsce</strong>. Pomagamy zrozumieć formalności, finanse i krok po kroku znaleźć najlepsze miejsce.
             </p>
 
             {/* Search block */}
