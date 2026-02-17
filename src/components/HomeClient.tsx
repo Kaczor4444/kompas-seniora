@@ -37,7 +37,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tighter">
-              Nie musisz wiedzieć wszystkiego od razu.
+              Jak to działa?
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               System opieki to labirynt przepisów. Przeprowadzimy Cię przez to krok po kroku.
@@ -98,55 +98,83 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
         </div>
       </section>
 
-      {/* CTA - Asystent Wyboru */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-3xl p-8 md:p-16 border border-slate-100 text-center">
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-bold uppercase tracking-[0.25em] mb-8">
-              <SparklesIcon className="w-4 h-4 text-emerald-700" /> Potrzebujesz pomocy?
-            </div>
+      {/* CTA - Doradca + Poradniki */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-6 tracking-tighter leading-[1.0]">
-              Nie wiesz,<br />
+          {/* Heading */}
+          <div className="mb-10 md:mb-14">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-bold uppercase tracking-[0.25em] mb-6">
+              <SparklesIcon className="w-4 h-4 text-emerald-700" /> Nie wiesz od czego zacząć?
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter leading-[1.0] mb-4">
+              Nie musisz wiedzieć<br />
               <span className="text-emerald-600 relative inline-block">
-                od czego zacząć?
+                wszystkiego od razu.
                 <svg className="absolute -bottom-2 left-0 w-full overflow-visible" viewBox="0 0 400 16" fill="none" preserveAspectRatio="none">
                   <path d="M0 12 Q100 2 200 10 Q300 18 400 6" stroke="#bbf7d0" strokeWidth="5" strokeLinecap="round"/>
                 </svg>
               </span>
-            </h3>
-
-            <p className="text-slate-500 text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed border-l-4 border-emerald-100 pl-5 text-left">
-              Wypełnij 4 proste pytania, a pomożemy wybrać odpowiednią formę opieki — DPS lub ŚDS — i przygotujemy konkretny plan działania.
+            </h2>
+            <p className="text-slate-500 text-lg max-w-2xl leading-relaxed border-l-4 border-emerald-100 pl-5 mt-6">
+              Skorzystaj z doradcy, który podpowie co będzie lepszym wyborem dla seniora — DPS czy ŚDS — lub przeczytaj nasze poradniki, które pomogą Ci podjąć decyzję.
             </p>
+          </div>
 
-            <Link
-              href="/asystent?start=true"
-              className="inline-flex items-center gap-3 bg-slate-900 hover:bg-emerald-600 text-white px-8 md:px-10 py-4 md:py-5 rounded-2xl font-black text-sm uppercase tracking-[0.15em] transition-all active:scale-95"
-            >
-              Rozpocznij analizę <ChevronRightIcon className="w-5 h-5" />
-            </Link>
+          {/* 2-column cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-            <div className="flex items-center justify-center flex-wrap gap-4 md:gap-6 mt-6 text-sm text-slate-500">
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                2 minuty
-              </span>
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Bez rejestracji
-              </span>
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Konkretny plan
-              </span>
+            {/* Left — Asystent */}
+            <div className="bg-slate-900 rounded-2xl p-8 flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                    <SparklesIcon className="w-6 h-6" />
+                  </div>
+                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.25em]">Sztuczna inteligencja</span>
+                </div>
+                <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Doradca Seniora</h3>
+                <p className="text-slate-300 leading-relaxed mb-8">
+                  Odpowiedz na 4 pytania o potrzeby seniora. System wskaże DPS lub ŚDS i przygotuje konkretny plan działania.
+                </p>
+                <div className="flex flex-wrap gap-4 text-xs text-slate-400 mb-8">
+                  <span className="flex items-center gap-1.5"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>2 minuty</span>
+                  <span className="flex items-center gap-1.5"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>Bez rejestracji</span>
+                  <span className="flex items-center gap-1.5"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Konkretny plan</span>
+                </div>
+              </div>
+              <Link
+                href="/asystent?start=true"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-xl font-black text-sm uppercase tracking-[0.15em] transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                Rozpocznij analizę <ChevronRightIcon className="w-4 h-4" />
+              </Link>
             </div>
+
+            {/* Right — Poradniki */}
+            <div className="bg-white rounded-2xl p-8 border border-slate-200 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.25em]">Samodzielna lektura</span>
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight">Poradniki</h3>
+                <p className="text-slate-500 leading-relaxed mb-8">
+                  Artykuły i przewodniki, które krok po kroku tłumaczą system opieki senioralnej — od wyboru placówki po formalności w MOPS.
+                </p>
+              </div>
+              <Link
+                href="/poradniki"
+                className="w-full bg-slate-900 hover:bg-emerald-600 text-white py-4 rounded-xl font-black text-sm uppercase tracking-[0.15em] transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                Czytaj poradniki <ChevronRightIcon className="w-4 h-4" />
+              </Link>
+            </div>
+
           </div>
         </div>
       </section>
