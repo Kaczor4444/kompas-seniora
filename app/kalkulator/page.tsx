@@ -519,7 +519,7 @@ function KalkulatorContent() {
 
   return (
     <div className="min-h-screen bg-white pb-24">
-      <div className="max-w-3xl mx-auto px-6 py-10 md:py-14">
+      <div className="max-w-[1000px] mx-auto px-6 py-12">
 
         {/* Back link */}
         <Link
@@ -530,18 +530,21 @@ function KalkulatorContent() {
         </Link>
 
         {/* Header */}
-        <div className="mb-8">
-          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-emerald-700 mb-4">Kalkulator kosztów</p>
-          <h1 className="text-4xl md:text-[56px] font-black text-slate-900 leading-tight mb-4 tracking-tight">
-            Symulator DPS
+        <div className="mb-12">
+          <div className="flex items-center gap-4 mb-6">
+            <span className="h-px w-10 bg-emerald-600" />
+            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-emerald-700">Analiza Finansowa</span>
+          </div>
+          <h1 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight mb-4">
+            Symulator Opłat DPS
           </h1>
-          <p className="text-slate-500 text-lg max-w-xl leading-relaxed">
-            Sprawdź orientacyjny podział kosztów (zasada 70/30) dla oficjalnych placówek w Twoim regionie.
+          <p className="text-slate-500 text-lg max-w-2xl leading-relaxed">
+            Sprawdź orientacyjny podział kosztów według zasady 70/30 oraz wysokość dopłaty gminy dla Twojej lokalizacji.
           </p>
         </div>
 
-        {/* Disclaimer — subtle */}
-        <div className="flex items-start gap-3 mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+        {/* Disclaimer */}
+        <div className="flex items-start gap-3 mb-10 p-4 bg-amber-50 border border-amber-200 rounded-xl">
           <AlertCircle size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-amber-800 leading-relaxed">
             <strong>Tylko orientacyjna symulacja</strong> — nie decyzja urzędowa. MOPS rozpatruje każdą sprawę
@@ -549,14 +552,14 @@ function KalkulatorContent() {
           </p>
         </div>
 
-        {/* Form */}
-        <div className="mb-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* Form Card */}
+        <div className="bg-white border-2 border-slate-100 rounded-2xl p-8 lg:p-12 mb-16 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
             {/* Income */}
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
-                Dochód miesięczny (netto)
+            <div className="space-y-3">
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 block ml-1">
+                Dochód netto (emerytura/renta)
               </label>
               <div className="relative">
                 <input
@@ -565,33 +568,33 @@ function KalkulatorContent() {
                   onChange={(e) => setIncome(e.target.value)}
                   placeholder="np. 3500"
                   min="0" max="50000" step="100"
-                  className="w-full pl-4 pr-14 py-4 border-2 border-slate-100 rounded-xl text-2xl font-black text-slate-900 bg-slate-50 focus:border-emerald-400 focus:bg-white outline-none transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-600 focus:bg-white transition-all"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-widest pointer-events-none">PLN</span>
+                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[11px] font-black text-slate-300 uppercase pointer-events-none">PLN</span>
               </div>
-              <p className="text-xs text-slate-400 mt-2">Emerytura, renta + zasiłek pielęgnacyjny</p>
+              <p className="text-xs text-slate-400 ml-1">Emerytura, renta + zasiłek pielęgnacyjny</p>
             </div>
 
             {/* City */}
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
-                Miejscowość
+            <div className="space-y-3">
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 block ml-1">
+                Twoje miasto / gmina
               </label>
               <div className="relative">
-                <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 <input
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="np. Kraków, Wieliczka..."
-                  className="w-full pl-10 pr-4 py-4 border-2 border-slate-100 rounded-xl text-lg font-semibold text-slate-900 bg-slate-50 focus:border-emerald-400 focus:bg-white outline-none transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-600 focus:bg-white transition-all"
                 />
+                <MapPin className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" size={20} />
               </div>
-              <div className="mt-2">
+              <div>
                 <select
                   value={wojewodztwo}
                   onChange={(e) => setWojewodztwo(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-500 outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-500 outline-none ml-1"
                 >
                   <option value="małopolskie">Województwo: Małopolskie</option>
                 </select>
@@ -600,24 +603,23 @@ function KalkulatorContent() {
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-100 rounded-xl mb-4">
-              <AlertCircle size={15} className="text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="p-4 bg-rose-50 text-rose-600 text-sm font-bold rounded-xl mb-6 flex items-center gap-3 border border-rose-100">
+              <AlertCircle size={16} /> {error}
             </div>
           )}
 
           <button
             onClick={handleCalculate}
             disabled={loading || !income || !city}
-            className={`w-full py-4 rounded-xl font-black text-[12px] uppercase tracking-[0.2em] transition-all active:scale-95 flex items-center justify-center gap-2
+            className={`w-full font-black text-[12px] uppercase tracking-[0.3em] py-5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-3
               ${!loading && income && city
-                ? 'bg-slate-900 hover:bg-emerald-700 text-white'
+                ? 'bg-slate-900 hover:bg-emerald-600 text-white shadow-lg'
                 : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
           >
             {loading ? (
-              <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Obliczam...</>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              <><Calculator size={15} /> Oblicz symulację</>
+              <><Calculator size={18} /> Oblicz symulację</>
             )}
           </button>
         </div>
@@ -634,121 +636,139 @@ function KalkulatorContent() {
           const activeMopsFallbackCity = selectedPowiat ? undefined : result.mopsFallbackCity;
 
           return (
-            <div id="results-section" className="space-y-0">
+            <div id="results-section" className="space-y-20">
 
-              {/* ── 70 / 30 split ── */}
-              <div className="pt-10 border-t border-slate-100">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6">Podział 70 / 30</p>
-
-                {/* Bar */}
-                <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden flex mb-8">
-                  <div className="bg-emerald-500 h-full transition-all" style={{ width: '70%' }} />
-                  <div className="bg-amber-300 h-full" style={{ width: '30%' }} />
+              {/* ── 70/30 split ── */}
+              <section>
+                <div className="flex items-center gap-4 mb-8">
+                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Podział kosztów (70/30)</span>
+                  <div className="h-px flex-1 bg-slate-100" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700 flex items-center gap-1.5 mb-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Wkład seniora (70%)
-                    </p>
-                    <p className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-1">{formatCurrency(result.maxContribution)}</p>
-                    <p className="text-xs text-slate-400">odprowadzane do DPS</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-emerald-600" />
+                      <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Wkład Seniora (70%)</span>
+                    </div>
+                    <div className="text-5xl lg:text-7xl font-black text-slate-900 leading-none tracking-tight">
+                      {formatCurrency(result.maxContribution)}
+                    </div>
+                    <p className="text-slate-400 text-sm font-medium">Kwota przekazywana bezpośrednio do placówki DPS.</p>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 flex items-center gap-1.5 mb-2">
-                      <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" /> Zostaje na rękę (30%)
-                    </p>
-                    <p className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-1">{formatCurrency(result.remainingFunds)}</p>
-                    <p className="text-xs text-slate-400">leki, higiena, telefon</p>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-amber-400" />
+                      <span className="text-[11px] font-black text-amber-600 uppercase tracking-widest">Zostaje &quot;Na rękę&quot; (30%)</span>
+                    </div>
+                    <div className="text-5xl lg:text-7xl font-black text-slate-900 leading-none tracking-tight">
+                      {formatCurrency(result.remainingFunds)}
+                    </div>
+                    <p className="text-slate-400 text-sm font-medium">Fundusze na leki, higienę i drobne wydatki własne.</p>
                     {result.remainingFunds < 300 && (
-                      <p className="text-xs text-amber-600 font-bold mt-2 flex items-center gap-1">
-                        <AlertCircle size={12} /> Kwota może nie wystarczyć na leki
+                      <p className="text-sm text-amber-600 font-bold flex items-center gap-1.5">
+                        <AlertCircle size={14} /> Kwota może nie wystarczyć na leki nierefundowane
                       </p>
                     )}
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-400 italic">
+                <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex">
+                  <div className="h-full bg-emerald-600" style={{ width: '70%' }} />
+                  <div className="h-full bg-amber-400" style={{ width: '30%' }} />
+                </div>
+                <p className="text-xs text-slate-400 mt-4 italic">
                   Symulacja wg ustawy o pomocy społecznej. MOPS rozpatruje każdą sprawę indywidualnie — nie jest to decyzja administracyjna.
                 </p>
-              </div>
+              </section>
 
               {/* ── Legal thresholds ── */}
-              <div className="pt-10 mt-10 border-t border-slate-100">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4">Ustawowe progi zwolnienia</p>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="bg-slate-50 rounded-xl p-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Osoba samotna</p>
-                    <p className="text-2xl font-black text-slate-900">~{THRESHOLD_SINGLE} zł</p>
-                    <p className="text-xs text-slate-400 mt-1">300% kryterium dochodowego</p>
+              <section className="bg-slate-50 border border-slate-200 rounded-2xl p-8 lg:p-10">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 mb-8">Ustawowe progi zwolnienia</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white p-6 rounded-xl border border-slate-200">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Osoba samotna</span>
+                    <span className="text-2xl font-black text-slate-900">~{THRESHOLD_SINGLE} zł</span>
+                    <p className="text-xs text-slate-400 mt-2 font-medium leading-relaxed">
+                      Poniżej tej kwoty dochodu, rodzina może ubiegać się o całkowite zwolnienie z dopłat.
+                    </p>
                   </div>
-                  <div className="bg-slate-50 rounded-xl p-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Osoba w rodzinie</p>
-                    <p className="text-2xl font-black text-slate-900">~{THRESHOLD_FAMILY} zł</p>
-                    <p className="text-xs text-slate-400 mt-1">na osobę, 300% kryterium</p>
+                  <div className="bg-white p-6 rounded-xl border border-slate-200">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Osoba w rodzinie</span>
+                    <span className="text-2xl font-black text-slate-900">~{THRESHOLD_FAMILY} zł</span>
+                    <p className="text-xs text-slate-400 mt-2 font-medium leading-relaxed">
+                      Próg dochodu na jedną osobę w gospodarstwie domowym bliskich.
+                    </p>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Nawet jeśli dochód przekracza próg, dopłata nie jest automatyczna — jej wysokość ustala MOPS w drodze umowy.
-                  Masz prawo do negocjacji przy wysokich kosztach życia.
+                <p className="text-xs text-slate-400 mt-6 leading-relaxed">
+                  Nawet jeśli dochód przekracza próg, dopłata nie jest automatyczna — jej wysokość ustala MOPS w drodze umowy. Masz prawo do negocjacji przy wysokich kosztach życia.
                 </p>
-              </div>
+              </section>
 
               {/* ── Powiat selector ── */}
               {result.ambiguousPowiaty && (
-                <div className="pt-10 mt-10 border-t border-slate-100">
-                  <p className="text-sm text-slate-600 mb-3">
-                    Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach — wybierz właściwy:
+                <section>
+                  <div className="flex items-center gap-4 mb-6">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Wybierz powiat</span>
+                    <div className="h-px flex-1 bg-slate-100" />
+                  </div>
+                  <p className="text-sm text-slate-600 mb-4">
+                    Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach — wybierz właściwy, żeby zobaczyć odpowiednie DPS i MOPS:
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {result.ambiguousPowiaty.map(p => (
                       <button
                         key={p}
                         onClick={() => setSelectedPowiat(p)}
-                        className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
+                        className={`px-5 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider border-2 transition-all ${
                           selectedPowiat === p
                             ? 'bg-slate-900 text-white border-slate-900'
-                            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'
+                            : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-600 hover:text-emerald-700'
                         }`}
                       >
                         powiat {p}
                       </button>
                     ))}
                   </div>
-                </div>
+                </section>
               )}
 
               {/* ── MOPS ── */}
               {(!result.ambiguousPowiaty || selectedPowiat) && (
-                <div className="pt-10 mt-10 border-t border-slate-100">
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4">Właściwy ośrodek pomocy</p>
+                <section>
+                  <div className="flex items-center gap-4 mb-8">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Właściwy ośrodek pomocy</span>
+                    <div className="h-px flex-1 bg-slate-100" />
+                  </div>
 
                   {activeMops ? (
-                    <>
+                    <div className="bg-white border-2 border-slate-100 rounded-2xl p-8 hover:border-emerald-600 transition-all">
                       {activeMopsFallbackUsed && activeMopsFallbackCity && (
-                        <p className="text-sm text-slate-500 mb-4">
-                          Dla <strong>{result.city}</strong> właściwym ośrodkiem jest {activeMops.typ} w <strong>{toCityLocative(activeMopsFallbackCity)}</strong>.
+                        <p className="text-sm text-slate-500 mb-5 pb-5 border-b border-slate-100">
+                          Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest {activeMops.typ} w <strong>{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
                         </p>
                       )}
-                      <p className="text-xl font-black text-slate-900 mb-4">{activeMops.name}</p>
-                      <div className="flex flex-wrap gap-3">
+                      <h4 className="text-xl font-black text-slate-900 mb-6">{activeMops.name}</h4>
+                      <div className="flex flex-wrap gap-3 mb-6">
                         <a
                           href={`tel:${activeMops.phone.replace(/\s/g, '')}`}
-                          className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:border-emerald-400 hover:text-emerald-700 transition-colors"
+                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all"
                         >
-                          <Phone size={14} /> {activeMops.phone}
+                          <Phone size={15} /> {activeMops.phone}
                         </a>
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMops.address)}`}
                           target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-500 hover:border-slate-400 transition-colors"
+                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm text-slate-500 hover:border-slate-300 transition-all"
                         >
-                          <MapPin size={14} /> {activeMops.address}
+                          <MapPin size={15} /> {activeMops.address}
                         </a>
                         {activeMops.email && (
                           <a
                             href={`mailto:${activeMops.email}`}
-                            className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-500 hover:border-slate-400 transition-colors"
+                            className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm text-slate-500 hover:border-slate-300 transition-all"
                           >
                             {activeMops.email}
                           </a>
@@ -757,137 +777,164 @@ function KalkulatorContent() {
                           <a
                             href={activeMops.website}
                             target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-500 hover:border-slate-400 transition-colors"
+                            className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm text-slate-500 hover:border-slate-300 transition-all"
                           >
                             {activeMops.website.replace(/^https?:\/\//, '')}
                           </a>
                         )}
                       </div>
-                      <p className="text-xs text-slate-400 mt-4">
-                        Zadzwoń i umów się na rozmowę z pracownikiem socjalnym — to pierwszy krok do uzyskania dopłaty gminy.
+                      <p className="text-xs text-slate-400">
+                        Zadzwoń i umów się na rozmowę z pracownikiem socjalnym — to pierwszy krok do uzyskania dopłaty gminy do kosztów DPS.
                       </p>
-                    </>
+                    </div>
                   ) : (
-                    <>
-                      <p className="text-sm text-slate-500 mb-4">
-                        Brak danych w bazie dla powiatu <strong>{activeFacilities[0]?.powiat || result.city}</strong>.
+                    <div className="bg-white border-2 border-slate-100 rounded-2xl p-8">
+                      <p className="text-sm text-slate-500 mb-5">
+                        Nie mamy jeszcze danych kontaktowych dla powiatu <strong>{activeFacilities[0]?.powiat || result.city}</strong> w naszej bazie.
+                        Skontaktuj się bezpośrednio — to pierwszy krok do złożenia wniosku o dopłatę gminy.
                       </p>
                       <a
                         href={`https://www.google.com/search?q=MOPS+${encodeURIComponent(result.city)}`}
                         target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:border-emerald-400 hover:text-emerald-700 transition-colors"
+                        className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-100 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all"
                       >
-                        <Search size={14} /> Szukaj MOPS {result.city} w Google
+                        <Search size={15} /> Szukaj MOPS {result.city} w Google
                       </a>
-                      <p className="text-xs text-slate-400 mt-3">
+                      <p className="text-xs text-slate-400 mt-4">
                         Możesz też zadzwonić do Urzędu Gminy lub Starostwa Powiatowego — skierują Cię do właściwego ośrodka.
                       </p>
-                    </>
+                    </div>
                   )}
-                </div>
+                </section>
               )}
 
               {/* ── Facilities ── */}
-              <div className="pt-10 mt-10 border-t border-slate-100">
-                <div className="mb-6">
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-1">Dostępne placówki</p>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                    {result.powiatFallbackUsed ? `DPS w okolicy ${result.city}` : `DPS w ${result.city}`}
-                  </h2>
-                  <p className="text-sm text-slate-400 mt-0.5">
-                    {activeFacilities.length}{' '}
-                    {activeFacilities.length === 1 ? 'placówka' : activeFacilities.length < 5 ? 'placówki' : 'placówek'}
-                  </p>
+              <section>
+                <div className="flex justify-between items-end mb-8">
+                  <div>
+                    <div className="flex items-center gap-4 mb-2">
+                      <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                        {result.powiatFallbackUsed ? 'DPS w okolicy' : 'Placówki w'}
+                      </span>
+                      <div className="h-px flex-1 bg-slate-100 w-16" />
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                      {result.powiatFallbackUsed
+                        ? `Najbliższe DPS w okolicy ${result.city}`
+                        : `DPS w ${toCityLocative(result.city)}`}
+                    </h3>
+                    <p className="text-slate-500 text-sm mt-1">
+                      {activeFacilities.length}{' '}
+                      {activeFacilities.length === 1 ? 'placówka' : activeFacilities.length < 5 ? 'placówki' : 'placówek'} — analiza pokrycia kosztów dla Twojego dochodu
+                    </p>
+                  </div>
+                  <button
+                    onClick={navigateToSearch}
+                    className="text-[11px] font-black text-emerald-700 uppercase tracking-widest flex items-center gap-2 hover:text-slate-900 transition-colors shrink-0 ml-4"
+                  >
+                    Pokaż w wyszukiwarce <ChevronRight size={14} />
+                  </button>
                 </div>
 
                 {result.powiatFallbackUsed && result.powiatFallbackName && !result.ambiguousPowiaty && (
-                  <p className="text-sm text-slate-500 mb-5">
-                    <strong>{result.city}</strong> nie ma własnego DPS — poniżej placówki z powiatu <strong>{toPowiatGenitive(result.powiatFallbackName)}</strong>.
+                  <p className="text-sm text-slate-500 mb-6">
+                    Miejscowość <strong>{result.city}</strong> nie ma własnego DPS.
+                    Poniżej pokazujemy placówki z powiatu <strong>{toPowiatGenitive(result.powiatFallbackName)}</strong>.
                   </p>
                 )}
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {(showAllFacilities ? activeFacilities : activeFacilities.slice(0, 5)).map((facility) => {
                     const hasPrice = facility.koszt_pobytu && facility.koszt_pobytu > 0;
                     const gap = hasPrice ? facility.koszt_pobytu! - result.maxContribution : 0;
                     const isCovered = hasPrice && gap <= 0;
 
                     return (
-                      <div key={facility.id} className="border border-slate-100 rounded-xl p-5 hover:border-slate-200 transition-colors">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                              <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
-                                facility.typ_placowki === 'DPS' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
-                              }`}>
-                                {facility.typ_placowki}
-                              </span>
-                              <span className="text-xs text-slate-400">{facility.miejscowosc}, pow. {facility.powiat}</span>
-                            </div>
-                            <h4 className="font-black text-slate-900 text-base leading-tight mb-1.5">{facility.nazwa}</h4>
-                            {hasPrice && (
-                              <p className="text-sm text-slate-500">
-                                Koszt: <span className="font-black text-slate-900">{formatCurrency(facility.koszt_pobytu!)}/mc</span>
-                              </p>
-                            )}
+                      <div key={facility.id} className="bg-white border-2 border-slate-100 rounded-xl p-6 lg:p-8 hover:border-emerald-600 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg ${
+                              facility.typ_placowki === 'DPS' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'
+                            }`}>
+                              {facility.typ_placowki}
+                            </span>
+                            <span className="text-[11px] font-bold text-slate-400 uppercase">{facility.miejscowosc}, pow. {facility.powiat}</span>
                           </div>
-
-                          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                            {!hasPrice ? (
-                              <span className="text-[11px] font-bold text-slate-500">Cena na zapytanie</span>
-                            ) : isCovered ? (
-                              <span className="text-[11px] font-black text-emerald-600 flex items-center gap-1">
-                                <CheckCircle2 size={13} /> W pełni pokryte
-                              </span>
-                            ) : (
-                              <span className="text-[11px] font-black text-amber-600">Brakuje {formatCurrency(gap)}</span>
-                            )}
-
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => toggleCompare(facility.id)}
-                                title="Porównaj"
-                                className={`p-1.5 rounded-lg transition-all ${compareIds.includes(facility.id) ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-700'}`}
-                              >
-                                <ArrowLeftRight size={14} />
-                              </button>
-                              <button
-                                onClick={() => toggleFavorite(facility)}
-                                title="Ulubione"
-                                className={`p-1.5 rounded-lg transition-all ${savedIds.includes(facility.id) ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-700'}`}
-                              >
-                                <Heart size={14} className={savedIds.includes(facility.id) ? 'fill-current' : ''} />
-                              </button>
-                              <Link href={`/placowka/${facility.id}`} className="p-1.5 text-slate-400 hover:text-slate-700 transition-colors">
-                                <ChevronRight size={16} />
-                              </Link>
+                          <h4 className="text-xl font-black text-slate-900 mb-2 leading-tight">{facility.nazwa}</h4>
+                          {hasPrice && (
+                            <div className="text-sm font-bold text-slate-500">
+                              Pełny koszt: <span className="text-slate-900">{formatCurrency(facility.koszt_pobytu!)}</span> / mc
                             </div>
-
-                            {facility.telefon && (
-                              <a
-                                href={`tel:${facility.telefon.replace(/\s/g, '')}`}
-                                className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1"
-                              >
-                                <Phone size={11} /> {facility.telefon}
-                              </a>
-                            )}
-                          </div>
+                          )}
+                          {facility.telefon && (
+                            <a
+                              href={`tel:${facility.telefon.replace(/\s/g, '')}`}
+                              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 mt-2 transition-colors"
+                            >
+                              <Phone size={11} /> {facility.telefon}
+                            </a>
+                          )}
                         </div>
 
-                        {/* Gap bar — only when subsidy needed */}
-                        {hasPrice && !isCovered && (
-                          <div className="mt-4 pt-4 border-t border-slate-100">
-                            <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden flex mb-1.5">
-                              <div className="bg-emerald-500 h-full" style={{ width: `${(result.maxContribution / facility.koszt_pobytu!) * 100}%` }} />
-                              <div className="bg-amber-300 h-full" style={{ width: `${(gap / facility.koszt_pobytu!) * 100}%` }} />
+                        <div className="flex flex-col items-start md:items-end gap-3 flex-shrink-0">
+                          {!hasPrice ? (
+                            <span className="text-sm font-bold text-slate-400">Cena na zapytanie</span>
+                          ) : isCovered ? (
+                            <span className="text-sm font-black text-emerald-600 flex items-center gap-2 uppercase tracking-tight">
+                              <CheckCircle2 size={16} /> W pełni pokryte
+                            </span>
+                          ) : (
+                            <div className="text-right">
+                              <div className="text-sm font-black text-rose-600 uppercase tracking-tighter">Brakuje: {formatCurrency(gap)}</div>
+                              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Dopłata gminy/rodziny</div>
                             </div>
-                            <div className="flex justify-between text-[10px] text-slate-400">
-                              <span>Senior: {formatCurrency(result.maxContribution)}</span>
-                              <span>Gmina/Rodzina: {formatCurrency(gap)} *</span>
-                            </div>
-                            <p className="text-[10px] text-slate-400 mt-0.5 italic">* O podziale decyduje MOPS</p>
+                          )}
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => toggleCompare(facility.id)}
+                              title={compareIds.includes(facility.id) ? 'Usuń z porównania' : 'Dodaj do porównania'}
+                              className={`p-2 rounded-lg border-2 transition-all ${
+                                compareIds.includes(facility.id)
+                                  ? 'bg-slate-900 text-white border-slate-900'
+                                  : 'border-slate-100 text-slate-400 hover:border-slate-300'
+                              }`}
+                            >
+                              <ArrowLeftRight size={14} />
+                            </button>
+                            <button
+                              onClick={() => toggleFavorite(facility)}
+                              title={savedIds.includes(facility.id) ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+                              className={`p-2 rounded-lg border-2 transition-all ${
+                                savedIds.includes(facility.id)
+                                  ? 'text-emerald-600 border-emerald-200'
+                                  : 'border-slate-100 text-slate-400 hover:border-slate-300'
+                              }`}
+                            >
+                              <Heart size={14} className={savedIds.includes(facility.id) ? 'fill-current' : ''} />
+                            </button>
+                            <Link
+                              href={`/placowka/${facility.id}`}
+                              className="text-[11px] font-black text-slate-900 border-b-2 border-slate-900 hover:text-emerald-600 hover:border-emerald-600 transition-all pb-0.5 uppercase tracking-wider"
+                            >
+                              Szczegóły
+                            </Link>
                           </div>
-                        )}
+
+                          {/* Gap bar */}
+                          {hasPrice && !isCovered && (
+                            <div className="w-full min-w-[180px]">
+                              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden flex">
+                                <div className="bg-emerald-600 h-full" style={{ width: `${(result.maxContribution / facility.koszt_pobytu!) * 100}%` }} />
+                                <div className="bg-amber-400 h-full" style={{ width: `${(gap / facility.koszt_pobytu!) * 100}%` }} />
+                              </div>
+                              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                                <span>Senior</span>
+                                <span>Gmina *</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -896,22 +943,31 @@ function KalkulatorContent() {
                 {!showAllFacilities && activeFacilities.length > 5 && (
                   <button
                     onClick={() => setShowAllFacilities(true)}
-                    className="mt-4 w-full py-3 border border-slate-100 rounded-xl text-sm font-black text-slate-500 uppercase tracking-widest hover:border-slate-300 transition-colors"
+                    className="mt-6 w-full py-4 border-2 border-slate-100 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:border-emerald-600 hover:text-emerald-700 transition-all"
                   >
-                    Pokaż więcej ({activeFacilities.length - 5} kolejnych)
+                    Pokaż więcej ({activeFacilities.length - 5} kolejnych placówek)
                   </button>
                 )}
-              </div>
+              </section>
 
-              {/* ── CTA ── */}
-              <div className="pt-8 mt-8 border-t border-slate-100">
-                <button
-                  onClick={navigateToSearch}
-                  className="w-full py-4 bg-slate-900 hover:bg-emerald-700 text-white font-black text-[12px] uppercase tracking-[0.15em] rounded-xl transition-colors active:scale-95 flex items-center justify-center gap-2"
+              {/* ── Expert note ── */}
+              <section className="bg-emerald-900 text-white rounded-2xl p-8 lg:p-10 flex flex-col md:flex-row gap-8 items-center">
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center shrink-0">
+                  <AlertCircle size={28} className="text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xl font-black mb-2 uppercase tracking-tight">Potrzebujesz pomocy urzędowej?</h4>
+                  <p className="text-emerald-100 text-sm leading-relaxed opacity-80">
+                    Ostateczna decyzja o odpłatności zawsze należy do MOPS / GOPS. Pracownik socjalny przeprowadzi wywiad środowiskowy i ustali dokładne kwoty dopłat na podstawie Twojej indywidualnej sytuacji majątkowej. Nie traktuj tego wyniku jako ostatecznego wymiaru opłat.
+                  </p>
+                </div>
+                <a
+                  href="/asystent?start=true"
+                  className="bg-emerald-500 hover:bg-emerald-400 text-white font-black text-[12px] uppercase tracking-widest px-8 py-4 rounded-xl transition-all shrink-0 active:scale-95"
                 >
-                  <MapPin size={15} /> Zobacz {activeFacilities.length === 1 ? '1 placówkę' : `${activeFacilities.length} placówki`} w wyszukiwarce
-                </button>
-              </div>
+                  Zapytaj AI
+                </a>
+              </section>
 
               {/* ── Comparison bar ── */}
               {compareIds.length > 0 && (
