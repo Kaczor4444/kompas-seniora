@@ -518,7 +518,7 @@ function KalkulatorContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-stone-50 pb-24">
       <div className="max-w-[1000px] mx-auto px-6 py-12">
 
         {/* Back link */}
@@ -640,54 +640,62 @@ function KalkulatorContent() {
 
               {/* ── 70/30 split ── */}
               <section>
-                <div className="flex items-center gap-4 mb-10">
+                <div className="flex items-center gap-4 mb-8">
                   <span className="px-4 py-1.5 bg-emerald-100 rounded-full text-[11px] font-black text-emerald-700 uppercase tracking-widest">Szczegóły symulacji</span>
-                  <div className="h-px flex-1 bg-slate-100" />
+                  <div className="h-px flex-1 bg-stone-200" />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-                  <div className="space-y-5">
-                    <div className="flex items-center gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                  {/* Senior contribution */}
+                  <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
+                    <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
                         <CheckCircle2 size={20} />
                       </div>
                       <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Wkład Seniora (70%)</span>
                     </div>
-                    <div className="text-5xl lg:text-7xl font-black text-emerald-600 leading-none tracking-tight">
+                    <div className="text-4xl lg:text-5xl font-black text-emerald-800 leading-none tracking-tight mb-3">
                       {formatCurrency(result.maxContribution)}
                     </div>
-                    <p className="text-slate-500 text-sm font-medium leading-relaxed border-l-4 border-emerald-200 pl-5">
-                      Kwota automatycznie potrącana z dochodu seniora na poczet kosztów utrzymania w DPS.
+                    <p className="text-emerald-700 text-sm leading-relaxed border-t border-emerald-100 pt-3">
+                      Kwota wynikająca wprost z ustawy (70% dochodu). Jest potrącana automatycznie na rzecz DPS.
                     </p>
                   </div>
 
-                  <div className="space-y-5">
-                    <div className="flex items-center gap-3">
+                  {/* Pocket money */}
+                  <div className="bg-white rounded-2xl p-6 border border-stone-200">
+                    <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 rounded-xl bg-amber-400 text-white flex items-center justify-center flex-shrink-0">
                         <Heart size={20} />
                       </div>
                       <span className="text-[11px] font-black text-amber-600 uppercase tracking-widest">Zostaje &quot;Na rękę&quot; (30%)</span>
                     </div>
-                    <div className="text-5xl lg:text-7xl font-black text-slate-900 leading-none tracking-tight">
+                    <div className="text-4xl lg:text-5xl font-black text-slate-900 leading-none tracking-tight mb-3">
                       {formatCurrency(result.remainingFunds)}
                     </div>
-                    <p className="text-slate-500 text-sm font-medium leading-relaxed border-l-4 border-amber-200 pl-5">
-                      Pieniądze pozostające do dyspozycji seniora na leki, higienę i własne potrzeby.
-                    </p>
-                    {result.remainingFunds < 300 && (
-                      <p className="text-sm text-amber-600 font-bold flex items-center gap-1.5">
-                        <AlertCircle size={14} /> Kwota może nie wystarczyć na leki nierefundowane
-                      </p>
-                    )}
+                    <div className="text-xs text-slate-500 border-t border-stone-100 pt-3">
+                      <p className="font-black uppercase tracking-widest text-[10px] mb-2">Budżet na potrzeby własne:</p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 font-bold">Leki</span>
+                        <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 font-bold">Higiena</span>
+                        <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 font-bold">Telefon</span>
+                      </div>
+                      {result.remainingFunds < 300 && (
+                        <div className="mt-3 text-amber-700 flex items-start gap-1.5 font-bold bg-amber-50 p-2 rounded-lg border border-amber-100">
+                          <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
+                          Uwaga: ta kwota może nie wystarczyć na leki nierefundowane.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div className="w-full h-14 bg-slate-100 rounded-xl overflow-hidden flex">
+                <div className="w-full h-14 bg-stone-100 rounded-xl overflow-hidden flex">
                   <div className="h-full bg-emerald-600 flex items-center justify-center" style={{ width: '70%' }}>
                     <span className="text-white text-[11px] font-black uppercase tracking-widest">Koszt pobytu</span>
                   </div>
                   <div className="h-full flex-1 flex items-center justify-center">
-                    <span className="text-slate-400 text-[11px] font-black uppercase tracking-widest">Kwota wolna</span>
+                    <span className="text-stone-400 text-[11px] font-black uppercase tracking-widest">Kwota wolna</span>
                   </div>
                 </div>
                 <p className="text-xs text-slate-400 mt-4 italic">
@@ -696,27 +704,27 @@ function KalkulatorContent() {
               </section>
 
               {/* ── Legal thresholds ── */}
-              <section className="bg-slate-50 border border-slate-200 rounded-2xl p-8 lg:p-10">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 mb-8">Ustawowe progi zwolnienia</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white p-6 rounded-xl border border-slate-200">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Osoba samotna</span>
-                    <span className="text-2xl font-black text-slate-900">~{THRESHOLD_SINGLE} zł</span>
-                    <p className="text-xs text-slate-400 mt-2 font-medium leading-relaxed">
-                      Poniżej tej kwoty dochodu, rodzina może ubiegać się o całkowite zwolnienie z dopłat.
-                    </p>
+              <section className="bg-slate-800 rounded-2xl p-8 lg:p-10 text-white">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3">Ustawowe progi dochodowe</h3>
+                <p className="text-slate-300 text-sm mb-8 max-w-2xl leading-relaxed">
+                  Ustawa o pomocy społecznej określa tzw. „bezpieczniki finansowe". Poniżej tych kwot gmina zazwyczaj <strong className="text-white">nie powinna</strong> żądać dopłaty od rodziny, ale każda sprawa jest badana indywidualnie.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="bg-white/10 rounded-xl p-5 border border-white/10">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Dla osoby samotnej</span>
+                    <span className="text-2xl font-black text-blue-300">~{THRESHOLD_SINGLE} zł <span className="text-sm font-normal text-white">netto</span></span>
+                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">Ustawowy próg zwolnienia (300% kryterium).</p>
                   </div>
-                  <div className="bg-white p-6 rounded-xl border border-slate-200">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Osoba w rodzinie</span>
-                    <span className="text-2xl font-black text-slate-900">~{THRESHOLD_FAMILY} zł</span>
-                    <p className="text-xs text-slate-400 mt-2 font-medium leading-relaxed">
-                      Próg dochodu na jedną osobę w gospodarstwie domowym bliskich.
-                    </p>
+                  <div className="bg-white/10 rounded-xl p-5 border border-white/10">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Dla osoby w rodzinie</span>
+                    <span className="text-2xl font-black text-blue-300">~{THRESHOLD_FAMILY} zł <span className="text-sm font-normal text-white">netto/os.</span></span>
+                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">Ustawowy próg zwolnienia na osobę (300% kryterium).</p>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400 mt-6 leading-relaxed">
-                  Nawet jeśli dochód przekracza próg, dopłata nie jest automatyczna — jej wysokość ustala MOPS w drodze umowy. Masz prawo do negocjacji przy wysokich kosztach życia.
-                </p>
+                <div className="p-3 bg-red-900/30 border border-red-500/30 rounded-lg text-xs text-red-200 flex items-start gap-2">
+                  <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+                  <p><strong>Ważne:</strong> Nawet jeśli Twój dochód jest wyższy, dopłata nie jest automatyczna! Jej wysokość ustala się w drodze umowy z kierownikiem ośrodka pomocy. Masz prawo do negocjacji, jeśli ponosisz inne wysokie koszty życiowe.</p>
+                </div>
               </section>
 
               {/* ── Powiat selector ── */}
@@ -756,48 +764,89 @@ function KalkulatorContent() {
                   </div>
 
                   {activeMops ? (
-                    <div className="bg-slate-900 rounded-2xl p-8">
-                      {activeMopsFallbackUsed && activeMopsFallbackCity && (
-                        <p className="text-sm text-slate-400 mb-5 pb-5 border-b border-white/10">
-                          Dla miejscowości <strong className="text-white">{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest {activeMops.typ} w <strong className="text-white">{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
-                        </p>
-                      )}
-                      <h4 className="text-xl font-black text-white mb-6">{activeMops.name}</h4>
-                      <div className="flex flex-wrap gap-3 mb-6">
-                        <a
-                          href={`tel:${activeMops.phone.replace(/\s/g, '')}`}
-                          className="inline-flex items-center gap-2 px-5 py-3 border border-white/20 rounded-xl text-sm font-bold text-white hover:border-emerald-400 hover:text-emerald-400 transition-all"
-                        >
-                          <Phone size={15} /> {activeMops.phone}
-                        </a>
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMops.address)}`}
-                          target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-3 border border-white/20 rounded-xl text-sm text-slate-400 hover:border-white/40 hover:text-slate-300 transition-all"
-                        >
-                          <MapPin size={15} /> {activeMops.address}
-                        </a>
-                        {activeMops.email && (
-                          <a
-                            href={`mailto:${activeMops.email}`}
-                            className="inline-flex items-center gap-2 px-5 py-3 border border-white/20 rounded-xl text-sm text-slate-400 hover:border-white/40 hover:text-slate-300 transition-all"
-                          >
-                            {activeMops.email}
-                          </a>
-                        )}
-                        {activeMops.website && (
-                          <a
-                            href={activeMops.website}
-                            target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-5 py-3 border border-white/20 rounded-xl text-sm text-slate-400 hover:border-white/40 hover:text-slate-300 transition-all"
-                          >
-                            {activeMops.website.replace(/^https?:\/\//, '')}
-                          </a>
-                        )}
+                    <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+                      {/* Header */}
+                      <div className="bg-emerald-600 px-6 py-4 flex items-center gap-3">
+                        <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Phone className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-emerald-100 text-[10px] font-black uppercase tracking-widest">Kluczowy kontakt</p>
+                          <h3 className="text-white font-black text-lg leading-tight">Wniosek o dopłatę gminy</h3>
+                        </div>
                       </div>
-                      <p className="text-xs text-slate-500">
-                        Zadzwoń i umów się na rozmowę z pracownikiem socjalnym — to pierwszy krok do uzyskania dopłaty gminy do kosztów DPS.
-                      </p>
+                      <div className="p-6">
+                        {activeMopsFallbackUsed && activeMopsFallbackCity && (
+                          <div className="bg-amber-50 border-l-4 border-amber-400 p-3 mb-5 rounded-r-xl text-sm">
+                            <p className="text-amber-900">
+                              Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest {activeMops.typ} w <strong>{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
+                            </p>
+                          </div>
+                        )}
+                        <p className="text-lg font-black text-slate-900 mb-5">{activeMops.name}</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                          <a
+                            href={`tel:${activeMops.phone.replace(/\s/g, '')}`}
+                            className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors group"
+                          >
+                            <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Phone size={15} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Telefon</p>
+                              <p className="text-sm font-bold text-slate-800">{activeMops.phone}</p>
+                            </div>
+                          </a>
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMops.address)}`}
+                            target="_blank" rel="noopener noreferrer"
+                            className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors group"
+                          >
+                            <div className="w-8 h-8 bg-stone-200 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
+                              <MapPin size={15} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Adres</p>
+                              <p className="text-sm text-slate-700">{activeMops.address}</p>
+                            </div>
+                          </a>
+                          {activeMops.email && (
+                            <a
+                              href={`mailto:${activeMops.email}`}
+                              className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors group"
+                            >
+                              <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Search size={15} />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email</p>
+                                <p className="text-sm text-slate-800 truncate">{activeMops.email}</p>
+                              </div>
+                            </a>
+                          )}
+                          {activeMops.website && (
+                            <a
+                              href={activeMops.website}
+                              target="_blank" rel="noopener noreferrer"
+                              className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors group"
+                            >
+                              <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <ChevronRight size={15} />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Strona www</p>
+                                <p className="text-sm text-emerald-600 truncate">{activeMops.website.replace(/^https?:\/\//, '')}</p>
+                              </div>
+                            </a>
+                          )}
+                        </div>
+                        <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-start gap-2">
+                          <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-emerald-800">
+                            Zadzwoń i umów się na rozmowę z pracownikiem socjalnym. To pierwszy krok do uzyskania dopłaty gminy do kosztów DPS.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <div className="bg-white border-2 border-slate-300 rounded-2xl p-8">
@@ -862,7 +911,7 @@ function KalkulatorContent() {
                     const isCovered = hasPrice && gap <= 0;
 
                     return (
-                      <div key={facility.id} className="bg-white border-2 border-slate-300 rounded-xl p-6 lg:p-8 hover:border-emerald-600 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                      <div key={facility.id} className="bg-white border border-stone-200 rounded-2xl p-6 lg:p-8 hover:border-emerald-400 transition-all flex flex-col md:flex-row justify-between items-start gap-6">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-2 flex-wrap">
                             <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg ${
@@ -888,21 +937,35 @@ function KalkulatorContent() {
                           )}
                         </div>
 
-                        <div className="flex flex-col items-start md:items-end gap-3 flex-shrink-0">
+                        <div className="w-full md:w-auto bg-stone-50 rounded-xl p-4 flex-shrink-0 md:min-w-[220px] border border-stone-100">
                           {!hasPrice ? (
                             <span className="text-sm font-bold text-slate-400">Cena na zapytanie</span>
                           ) : isCovered ? (
-                            <span className="text-sm font-black text-emerald-600 flex items-center gap-2 uppercase tracking-tight">
+                            <span className="text-sm font-black text-emerald-600 flex items-center gap-2 uppercase tracking-tight mb-3">
                               <CheckCircle2 size={16} /> W pełni pokryte
                             </span>
                           ) : (
-                            <div className="text-right">
+                            <div className="mb-3">
                               <div className="text-sm font-black text-rose-600 uppercase tracking-tighter">Brakuje: {formatCurrency(gap)}</div>
                               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Dopłata gminy/rodziny</div>
                             </div>
                           )}
 
-                          <div className="flex items-center gap-2">
+                          {/* Gap bar */}
+                          {hasPrice && !isCovered && (
+                            <div className="mb-3">
+                              <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden flex">
+                                <div className="bg-emerald-600 h-full" style={{ width: `${(result.maxContribution / facility.koszt_pobytu!) * 100}%` }} />
+                                <div className="bg-amber-400 h-full" style={{ width: `${(gap / facility.koszt_pobytu!) * 100}%` }} />
+                              </div>
+                              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                                <span>Senior</span>
+                                <span>Gmina *</span>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-2 mt-1">
                             <button
                               onClick={() => toggleCompare(facility.id)}
                               title={compareIds.includes(facility.id) ? 'Usuń z porównania' : 'Dodaj do porównania'}
@@ -932,20 +995,6 @@ function KalkulatorContent() {
                               Szczegóły
                             </Link>
                           </div>
-
-                          {/* Gap bar */}
-                          {hasPrice && !isCovered && (
-                            <div className="w-full min-w-[180px]">
-                              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden flex">
-                                <div className="bg-emerald-600 h-full" style={{ width: `${(result.maxContribution / facility.koszt_pobytu!) * 100}%` }} />
-                                <div className="bg-amber-400 h-full" style={{ width: `${(gap / facility.koszt_pobytu!) * 100}%` }} />
-                              </div>
-                              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                                <span>Senior</span>
-                                <span>Gmina *</span>
-                              </div>
-                            </div>
-                          )}
                         </div>
                       </div>
                     );
