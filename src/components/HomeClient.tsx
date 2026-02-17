@@ -37,10 +37,10 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tighter">
-              Jak znaleźć opiekę?
+              Nie musisz wiedzieć wszystkiego od razu.
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Uprościliśmy proces do trzech kroków, abyś mógł szybko znaleźć bezpieczne miejsce dla bliskiego.
+              System opieki to labirynt przepisów. Przeprowadzimy Cię przez to krok po kroku.
             </p>
           </div>
 
@@ -63,7 +63,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-3">Wyszukaj placówkę</h3>
               <p className="text-slate-600 leading-relaxed">
-                Wpisz miasto lub kod pocztowy. Znajdź domy pomocy w Twojej okolicy.
+                Wpisz miasto i wybierz typ placówki — DPS lub ŚDS. Pokażemy tylko to, co faktycznie pasuje.
               </p>
             </div>
 
@@ -88,7 +88,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-3">Porównaj koszty</h3>
               <p className="text-slate-600 leading-relaxed">
-                Sprawdź oficjalne ceny, standard pokoi i dostępne miejsca.
+                Zobacz ile wynoszą opłaty za pobyt w DPS i sprawdź jak wygląda podział kosztów w Twojej sytuacji.
               </p>
             </div>
 
@@ -113,7 +113,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-3">Skontaktuj się</h3>
               <p className="text-slate-600 leading-relaxed">
-                Zadzwoń bezpośrednio do dyrektora lub wyślij zapytanie online.
+                Bezpośredni numer do placówki. Zapytaj o wolne miejsca bez pośredników.
               </p>
             </div>
           </div>
