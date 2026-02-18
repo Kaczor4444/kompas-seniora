@@ -76,7 +76,10 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
   });
 
   const [checklist, setChecklist] = useState<string[]>([]);
-  
+
+  // Live facility counter
+  const [liveCount, setLiveCount] = useState<number | null>(null);
+
   // API-based validation state
   const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid'>('idle');
 
@@ -118,6 +121,29 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
 
     return () => clearTimeout(timer);
   }, [answers.location]);
+
+  // Derive early type recommendation from partial answers
+  const earlyType = useMemo(() => {
+    if (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'demencja') return 'DPS';
+    if (answers.mode === 'day') return 'ŚDS';
+    if (answers.mode === 'full') return 'DPS';
+    if (answers.independence === 'green') return 'ŚDS';
+    if (answers.independence === 'red') return 'DPS';
+    return null;
+  }, [answers.diagnosis, answers.mode, answers.independence]);
+
+  // Fetch live count when type or location changes
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (earlyType) params.set('type', earlyType);
+    // Use location only when it's been validated
+    if (answers.location && validationState === 'valid') params.set('powiat', answers.location);
+
+    fetch(`/api/advisor/count?${params}`)
+      .then(r => r.json())
+      .then(d => setLiveCount(d.count ?? null))
+      .catch(() => {/* silent */});
+  }, [earlyType, answers.location, validationState]);
 
   const toggleChecklist = (item: string) => {
     const newChecklist = checklist.includes(item) 
@@ -315,7 +341,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
       case 'who':
         return (
           <div className="animate-fade-in-up max-w-2xl mx-auto">
-             <StepHeader title="Dla kogo szukasz pomocy?" current={currentStepNum} total={totalSteps} onBack={() => handleNext('start')} />
+             <StepHeader title="Dla kogo szukasz pomocy?" current={currentStepNum} total={totalSteps} onBack={() => handleNext('start')} liveCount={liveCount} />
              <SelectionPills />
              <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 mt-4">
                 {[
@@ -340,7 +366,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
       case 'independence':
         return (
           <div className="animate-fade-in-up max-w-3xl mx-auto">
-             <StepHeader title={`Jak radzi sobie ${getProperForm(answers.who)}?`} current={currentStepNum} total={totalSteps} onBack={() => handleNext('who')} />
+             <StepHeader title={`Jak radzi sobie ${getProperForm(answers.who)}?`} current={currentStepNum} total={totalSteps} onBack={() => handleNext('who')} liveCount={liveCount} />
              <SelectionPills />
              <div className="space-y-4 mt-4">
                 <StatusTile color="green" title="W pełni samodzielna" desc="Potrzebuje głównie towarzystwa, posiłków i ciekawych zajęć w ciągu dnia." active={answers.independence === 'green'} onClick={() => {setAnswers({...answers, independence: 'green', diagnosis: '', mode: ''}); handleNext('mode');}} />
@@ -391,7 +417,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
       case 'mode':
         return (
           <div className="animate-fade-in-up max-w-2xl mx-auto">
-             <StepHeader title="Jaki tryb opieki rozważasz?" current={currentStepNum} total={totalSteps} onBack={() => handleNext('independence')} />
+             <StepHeader title="Jaki tryb opieki rozważasz?" current={currentStepNum} total={totalSteps} onBack={() => handleNext('independence')} liveCount={liveCount} />
              <SelectionPills />
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                 <Tile label="Tryb dzienny" sub="Zajęcia rano, powrót na noc" icon={<Sun size={32} className="text-amber-500" />} active={answers.mode === 'day'} onClick={() => {setAnswers({...answers, mode: 'day'}); handleNext('location');}} />
@@ -404,7 +430,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
       case 'location':
         return (
           <div className="animate-fade-in-up max-w-2xl mx-auto">
-             <StepHeader title="Gdzie szukasz pomocy?" current={currentStepNum} total={totalSteps} onBack={() => handleNext(isSkipPath ? 'independence' : 'mode')} />
+             <StepHeader title="Gdzie szukasz pomocy?" current={currentStepNum} total={totalSteps} onBack={() => handleNext(isSkipPath ? 'independence' : 'mode')} liveCount={liveCount} />
              <SelectionPills />
              
              <div className="mt-4 space-y-6">
@@ -630,11 +656,20 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
   );
 };
 
-const StepHeader = ({ title, current, total, onBack }: any) => (
+const StepHeader = ({ title, current, total, onBack, liveCount }: any) => (
   <div className="mb-10">
-     <button onClick={onBack} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-600 hover:text-slate-900 font-bold text-sm transition-all mb-8 group">
-        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Wróć
-     </button>
+     {/* Top bar: back + live counter */}
+     <div className="flex items-center justify-between mb-8">
+       <button onClick={onBack} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-600 hover:text-slate-900 font-bold text-sm transition-all group">
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Wróć
+       </button>
+       {liveCount !== null && (
+         <div className="flex items-center gap-2 text-sm font-black text-slate-700">
+           <span className="text-emerald-600 text-base font-black tabular-nums">{liveCount}</span>
+           <span className="text-slate-500 font-bold text-xs">placówek dostępnych</span>
+         </div>
+       )}
+     </div>
      <div className="flex justify-between items-end gap-8">
         <h3 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 leading-tight tracking-tight">{title}</h3>
         <div className="text-[10px] font-black text-primary-700 bg-primary-50 px-5 py-2 rounded-xl border border-primary-100 shadow-sm whitespace-nowrap uppercase tracking-widest">KROK {current} / {total}</div>
