@@ -7,7 +7,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import FloatingCookieButton from "@/components/FloatingCookieButton";
-import BackToTop from "@/components/ui/BackToTop";
 import WelcomeWidget from "@/components/WelcomeWidget";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Analytics } from "@vercel/analytics/next";
@@ -118,8 +117,7 @@ export default function RootLayout({
         {/* Cookie Banner (bottom - ładuje się ostatni) */}
         <CookieBanner />
 
-        {/* Floating Buttons (left: Back to Top, right: Cookie Settings) */}
-        <BackToTop />
+        {/* Floating Buttons */}
         <FloatingCookieButton />
 
         {/* Welcome Widget - floating bubble bottom-right */}
