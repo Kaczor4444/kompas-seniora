@@ -57,13 +57,13 @@ export default function WelcomeWidget() {
             </Link>
 
             <Link
-              href="/asystent?start=true"
+              href="/nie-wiem"
               onClick={() => setIsOpen(false)}
               className="flex items-center justify-between w-full bg-emerald-600 hover:bg-emerald-500 rounded-xl px-4 py-3.5 transition-all group"
             >
               <div className="min-w-0 mr-2">
                 <p className="text-sm font-black text-white">Nie wiem, potrzebuję pomocy</p>
-                <p className="text-xs text-emerald-100 font-medium">Asystent AI dobierze opcję</p>
+                <p className="text-xs text-emerald-100 font-medium">Wyjaśniamy różnice i doradzamy</p>
               </div>
               <Sparkles size={16} className="text-white flex-shrink-0" />
             </Link>
