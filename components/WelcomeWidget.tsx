@@ -80,16 +80,18 @@ export default function WelcomeWidget() {
       {/* Bubble button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full shadow-xl overflow-hidden hover:scale-105 transition-all active:scale-95"
+        className="w-14 h-14 rounded-full shadow-xl hover:scale-105 transition-all active:scale-95 overflow-hidden flex items-center justify-center bg-white"
         aria-label="Pomoc w wyborze placówki"
       >
         {isOpen ? (
-          <X size={20} className="text-slate-700" />
+          <div className="w-full h-full flex items-center justify-center bg-slate-100">
+            <X size={20} className="text-slate-700" />
+          </div>
         ) : (
           <img
-            src="/advisor.png"
+            src="/images/advisor.png"
             alt="Doradca"
-            className="w-full h-full object-cover rounded-full"
+            className="w-full h-full object-cover"
           />
         )}
       </button>
