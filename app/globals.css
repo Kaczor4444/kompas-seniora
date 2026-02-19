@@ -2,6 +2,7 @@
 @plugin "@tailwindcss/typography";
 @theme inline {
   --font-serif: 'Playfair Display', serif;
+  --font-quicksand: 'Quicksand', sans-serif;
   /* Emerald Green - świeży zielony (primary) */
   --color-primary-50: #ecfdf5;
   --color-primary-100: #d1fae5;

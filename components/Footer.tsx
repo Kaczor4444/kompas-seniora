@@ -8,7 +8,7 @@ const FooterLogo = () => (
     alt="Kompas Seniora Logo"
     width={200}
     height={60}
-    className="h-10 w-auto brightness-0 invert"
+    className="h-10 w-auto"
   />
 );
 
@@ -49,7 +49,7 @@ export default function Footer() {
               
               {/* O serwisie */}
               <div className="text-center md:text-left">
-                <h3 className="text-base md:text-lg font-serif font-bold mb-4 text-primary-400">
+                <h3 className="text-base md:text-lg font-quicksand font-bold mb-4 text-primary-400">
                   O serwisie
                 </h3>
                 <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
@@ -73,7 +73,7 @@ export default function Footer() {
 
               {/* Na skróty */}
               <div className="text-center md:text-left">
-                <h3 className="text-base md:text-lg font-serif font-bold mb-4 text-primary-400">
+                <h3 className="text-base md:text-lg font-quicksand font-bold mb-4 text-primary-400">
                   Na skróty
                 </h3>
                 <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
@@ -102,7 +102,7 @@ export default function Footer() {
 
               {/* Informacje */}
               <div className="text-center md:text-left">
-                <h3 className="text-base md:text-lg font-serif font-bold mb-4 text-primary-400">
+                <h3 className="text-base md:text-lg font-quicksand font-bold mb-4 text-primary-400">
                   Informacje
                 </h3>
                 <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">

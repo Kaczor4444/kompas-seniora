@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display, Quicksand } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import "./leaflet-overrides.css";
@@ -27,6 +27,13 @@ const playfairDisplay = Playfair_Display({
   variable: "--font-serif",
   subsets: ["latin"],
   weight: ["700", "900"],
+  display: "swap",
+});
+
+const quicksand = Quicksand({
+  variable: "--font-quicksand",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -69,7 +76,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#10b981" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${quicksand.variable} antialiased flex flex-col min-h-screen`}
       >
         {/* Analytics (top - ładuje się jako pierwszy) */}
         <GoogleAnalytics />
