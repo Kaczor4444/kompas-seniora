@@ -4,7 +4,7 @@ import { Mail } from 'lucide-react';
 
 const FooterLogo = () => (
   <Image
-    src="/images/logo1.png"
+    src="/images/logo1white.png"
     alt="Kompas Seniora Logo"
     width={200}
     height={60}
