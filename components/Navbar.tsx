@@ -246,28 +246,12 @@ export default function Navbar() {
               {/* Desktop logo */}
               <Link href="/" className="hidden md:flex flex-shrink-0 items-center mr-4 group">
                 <NavbarLogo />
-                <div className="flex flex-col ml-3">
-                  <div className={`font-serif text-2xl font-bold leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
-                    Kompas
-                  </div>
-                  <div className={`text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${isHighContrast ? 'text-yellow-200' : 'text-primary-700'}`}>
-                    Seniora
-                  </div>
-                </div>
               </Link>
             </div>
 
             {/* Mobile logo - absolutnie wyśrodkowane */}
             <Link href="/" className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center group">
               <NavbarLogo />
-              <div className="flex flex-col ml-3">
-                <div className={`font-serif text-2xl font-bold leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
-                  Kompas
-                </div>
-                <div className={`text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${isHighContrast ? 'text-yellow-200' : 'text-primary-700'}`}>
-                  Seniora
-                </div>
-              </div>
             </Link>
 
             {/* Desktop Menu */}

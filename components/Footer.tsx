@@ -27,12 +27,8 @@ export default function Footer() {
             
             {/* COLUMN 1: Logo + Description + Email - LEFT SIDE */}
             <div className="md:pr-8 md:border-r md:border-slate-800">
-              <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center mb-6">
                 <FooterLogo />
-                <div className="flex flex-col">
-                  <span className="font-serif text-2xl font-bold text-white leading-none">Kompas</span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-400 leading-none mt-1">Seniora</span>
-                </div>
               </div>
               
               <p className="text-slate-400 text-sm leading-relaxed mb-6">
