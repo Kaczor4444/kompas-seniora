@@ -20,9 +20,9 @@ const NavbarLogo = () => (
   <Image
     src="/images/logo1.png"
     alt="Kompas Seniora Logo"
-    width={40}
-    height={40}
-    className="w-10 h-10"
+    width={200}
+    height={60}
+    className="h-10 w-auto"
   />
 );
 
