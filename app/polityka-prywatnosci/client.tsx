@@ -65,11 +65,11 @@ export default function PolitykaPrywatnosciClient() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-white">
       {/* Reading Progress Bar */}
-      <div className="fixed top-0 left-0 w-full h-1 bg-stone-200 z-50">
+      <div className="fixed top-0 left-0 w-full h-1 bg-slate-100 z-50">
         <div
-          className="h-full bg-primary-600 transition-all duration-150 ease-out"
+          className="h-full bg-emerald-600 transition-all duration-150 ease-out"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
@@ -78,9 +78,9 @@ export default function PolitykaPrywatnosciClient() {
         {/* Back Button */}
         <Link
           href="/"
-          className="group flex items-center gap-2 text-slate-600 hover:text-primary-600 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-white/50 w-fit"
+          className="group flex items-center gap-2 text-slate-600 hover:text-emerald-700 font-bold mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-slate-50 w-fit"
         >
-          <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center group-hover:border-primary-300 transition-colors shadow-sm">
+          <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center group-hover:border-emerald-300 transition-colors shadow-sm">
             <ArrowLeft size={16} />
           </div>
           Wróć do strony głównej
@@ -90,9 +90,9 @@ export default function PolitykaPrywatnosciClient() {
 
           {/* TOC Sidebar - Desktop Only */}
           <aside className="hidden lg:block w-72 sticky top-32 shrink-0">
-            <div className="bg-white rounded-[2rem] border border-stone-200 p-6 shadow-sm">
+            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
-                <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">
@@ -109,8 +109,8 @@ export default function PolitykaPrywatnosciClient() {
                       onClick={() => scrollToSection(s.id)}
                       className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all
                         ${isActive
-                          ? 'bg-primary-600 text-white shadow-lg translate-x-1'
-                          : 'text-slate-500 hover:bg-stone-50 hover:text-slate-900'
+                          ? 'bg-slate-900 text-white shadow-sm translate-x-1'
+                          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                         }`}
                     >
                       {s.title}
@@ -120,7 +120,7 @@ export default function PolitykaPrywatnosciClient() {
                 })}
               </nav>
 
-              <div className="mt-6 pt-6 border-t border-stone-100">
+              <div className="mt-6 pt-6 border-t border-slate-100">
                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
                   Zgodne z RODO i DSA
                 </p>
@@ -130,18 +130,18 @@ export default function PolitykaPrywatnosciClient() {
 
           {/* Main Content - owinięty w flex-1 */}
           <div className="flex-1">
-            <div className="bg-white rounded-[2.5rem] border border-stone-200 shadow-xl shadow-slate-900/5 overflow-hidden">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               {/* Header Banner */}
               <div className="bg-slate-900 p-8 md:p-14 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-20 -mt-20" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-20 -mt-20" />
                 <div className="relative z-10">
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-white/10">
-                    <svg className="w-3 h-3 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                     Ochrona danych osobowych
                   </div>
-                  <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6">Polityka Prywatności</h1>
+                  <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">Polityka Prywatności</h1>
                   <p className="text-slate-400 font-medium">
                     Ostatnia aktualizacja: <span className="text-white">{new Date().toLocaleDateString('pl-PL')} r.</span>
                   </p>
@@ -151,15 +151,15 @@ export default function PolitykaPrywatnosciClient() {
               {/* Content */}
               <div className="p-8 md:p-14">
                 {/* Intro */}
-                <p className="text-lg text-slate-600 leading-relaxed italic border-l-4 border-primary-500 pl-6 mb-12">
+                <p className="text-lg text-slate-600 leading-relaxed border-l-4 border-emerald-100 pl-6 mb-12">
                   Niniejsza Polityka Prywatności określa zasady przetwarzania i ochrony danych osobowych
                   użytkowników serwisu <strong>kompaseniora.pl</strong> (zwanego dalej „Serwisem").
                 </p>
 
                 {/* Section 1 */}
                 <section id="sec-1" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     1. Postanowienia ogólne i Administrator
@@ -168,8 +168,8 @@ export default function PolitykaPrywatnosciClient() {
                     Niniejsza Polityka Prywatności określa zasady przetwarzania i ochrony danych osobowych
                     użytkowników serwisu <strong>kompaseniora.pl</strong> (zwanego dalej „Serwisem").
                   </p>
-                  <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100 mb-6">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-primary-700 mb-4">Administrator danych osobowych:</p>
+                  <div className="bg-blue-50 rounded-xl p-6 border border-blue-100 mb-6">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700 mb-4">Administrator danych osobowych:</p>
                     <div className="text-slate-800 space-y-1">
                       <p className="font-bold text-lg">[NAZWA FIRMY UK - np. Senior Compass Ltd.]</p>
                       <p className="text-sm">Company Number: <strong>[NUMER REJESTRACYJNY]</strong></p>
@@ -186,8 +186,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 2 */}
                 <section id="sec-2" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     2. Przedstawiciel RODO w Unii Europejskiej
@@ -197,7 +197,7 @@ export default function PolitykaPrywatnosciClient() {
                     z którym można kontaktować się we wszystkich sprawach związanych z przetwarzaniem
                     danych osobowych i korzystaniem z praw:
                   </p>
-                  <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
+                  <div className="bg-emerald-50 rounded-xl p-6 border border-emerald-100">
                     <ul className="space-y-3 list-none text-emerald-900 font-medium">
                       <li className="flex items-start gap-3">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0" />
@@ -209,7 +209,7 @@ export default function PolitykaPrywatnosciClient() {
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0" />
-                        <span><strong>Email:</strong> <a href="mailto:kontakt@kompaseniora.pl" className="text-primary-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
+                        <span><strong>Email:</strong> <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0" />
@@ -221,8 +221,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 3 */}
                 <section id="sec-3" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -230,24 +230,24 @@ export default function PolitykaPrywatnosciClient() {
                   </h2>
                   <p className="text-slate-600 mb-6">Serwis przetwarza następujące kategorie danych:</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="p-4 bg-stone-50 rounded-xl border border-stone-100">
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                       <span className="block font-bold text-slate-900 text-sm mb-1">Dane analityczne</span>
                       <span className="text-xs text-slate-500">Informacje o aktywności w Serwisie (szczegóły poniżej)</span>
                     </div>
-                    <div className="p-4 bg-stone-50 rounded-xl border border-stone-100">
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                       <span className="block font-bold text-slate-900 text-sm mb-1">Dane techniczne</span>
                       <span className="text-xs text-slate-500">Typ przeglądarki, system operacyjny, czas wizyty</span>
                     </div>
-                    <div className="p-4 bg-stone-50 rounded-xl border border-stone-100">
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                       <span className="block font-bold text-slate-900 text-sm mb-1">Dane bezpieczeństwa</span>
                       <span className="text-xs text-slate-500">Adres IP (tylko w logach bezpieczeństwa panelu)</span>
                     </div>
-                    <div className="p-4 bg-stone-50 rounded-xl border border-stone-100">
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                       <span className="block font-bold text-slate-900 text-sm mb-1">Dane lokalizacyjne</span>
                       <span className="text-xs text-slate-500">Opcjonalnie, za Twoją zgodą - nie przechowywane</span>
                     </div>
                   </div>
-                  <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100 flex gap-4">
+                  <div className="bg-amber-50 p-6 rounded-xl border border-amber-100 flex gap-4">
                     <svg className="w-6 h-6 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -264,8 +264,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 3.1 - Analytics */}
                 <section id="sec-4" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                     3.1. Analityka strony - szczegóły
@@ -279,19 +279,19 @@ export default function PolitykaPrywatnosciClient() {
                     </p>
                     <ul className="space-y-2 text-sm text-slate-600 mb-4">
                       <li className="flex items-start gap-2">
-                        <span className="text-primary-500 mt-1">•</span>
+                        <span className="text-emerald-500 mt-1">•</span>
                         <span>Liczba odsłon placówek</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-primary-500 mt-1">•</span>
+                        <span className="text-emerald-500 mt-1">•</span>
                         <span>Częstotliwość korzystania z funkcji kontaktu</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-primary-500 mt-1">•</span>
+                        <span className="text-emerald-500 mt-1">•</span>
                         <span>Popularne wyszukiwania i filtry</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-primary-500 mt-1">•</span>
+                        <span className="text-emerald-500 mt-1">•</span>
                         <span>Ogólne informacje techniczne (rodzaj urządzenia, przeglądarka)</span>
                       </li>
                     </ul>
@@ -310,7 +310,7 @@ export default function PolitykaPrywatnosciClient() {
                   </div>
 
                   {/* Google Analytics */}
-                  <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
+                  <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
                     <h3 className="text-lg font-bold text-slate-800 mb-4">Google Analytics (opcjonalne, wymaga zgody)</h3>
                     <p className="text-slate-600 text-sm mb-4">
                       Jeśli <strong>zaakceptujesz cookies analityczne</strong> w bannerze, dodatkowo używamy Google Analytics
@@ -367,8 +367,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 4 */}
                 <section id="sec-5" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                     </svg>
                     4. Cel i podstawa prawna przetwarzania
@@ -396,8 +396,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 5 */}
                 <section id="sec-6" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     5. Udostępnianie danych i przechowywanie
@@ -407,19 +407,19 @@ export default function PolitykaPrywatnosciClient() {
                   </p>
                   <ul className="space-y-2 text-slate-600 text-sm mb-6">
                     <li className="flex items-start gap-2">
-                      <span className="text-primary-500 mt-1">•</span>
+                      <span className="text-emerald-500 mt-1">•</span>
                       <span>Dostawcom usług hostingowych i baz danych</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-primary-500 mt-1">•</span>
+                      <span className="text-emerald-500 mt-1">•</span>
                       <span>Dostawcom usług geolokalizacji (OpenStreetMap)</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-primary-500 mt-1">•</span>
+                      <span className="text-emerald-500 mt-1">•</span>
                       <span>Google Analytics (jeśli zaakceptujesz cookies analityczne)</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-primary-500 mt-1">•</span>
+                      <span className="text-emerald-500 mt-1">•</span>
                       <span>Organom państwowym na podstawie przepisów prawa</span>
                     </li>
                   </ul>
@@ -427,8 +427,8 @@ export default function PolitykaPrywatnosciClient() {
                     <strong>Nie sprzedajemy</strong> ani nie udostępniamy danych osobowych firmom trzecim
                     w celach marketingowych.
                   </p>
-                  <div className="bg-blue-900 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500 opacity-20 rounded-full blur-2xl" />
+                  <div className="bg-blue-900 text-white p-6 rounded-xl shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500 opacity-20 rounded-full blur-2xl" />
                     <p className="text-sm leading-relaxed relative z-10">
                       <strong>Lokalizacja i bezpieczeństwo danych:</strong> Korzystamy z profesjonalnych
                       dostawców usług chmurowych i email zgodnych z RODO/GDPR. Wszyscy dostawcy posiadają
@@ -441,31 +441,31 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 6 */}
                 <section id="sec-7" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     6. Okres przechowywania danych
                   </h2>
                   <ul className="space-y-3 text-slate-600 text-sm">
                     <li className="flex items-start gap-3">
-                      <span className="text-primary-500 font-bold mt-0.5">→</span>
+                      <span className="text-emerald-500 font-bold mt-0.5">→</span>
                       <span><strong>Dane analityczne własne:</strong> 24 miesiące od zebrania</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <span className="text-primary-500 font-bold mt-0.5">→</span>
+                      <span className="text-emerald-500 font-bold mt-0.5">→</span>
                       <span><strong>Google Analytics:</strong> zgodnie z polityką Google (możesz zarządzać w ustawieniach cookies)</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <span className="text-primary-500 font-bold mt-0.5">→</span>
+                      <span className="text-emerald-500 font-bold mt-0.5">→</span>
                       <span><strong>Dane lokalizacyjne:</strong> wykorzystywane wyłącznie w danej sesji, nie są przechowywane na serwerze</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <span className="text-primary-500 font-bold mt-0.5">→</span>
+                      <span className="text-emerald-500 font-bold mt-0.5">→</span>
                       <span><strong>Logi bezpieczeństwa:</strong> 12 miesięcy (dotyczą wyłącznie panelu administracyjnego)</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <span className="text-primary-500 font-bold mt-0.5">→</span>
+                      <span className="text-emerald-500 font-bold mt-0.5">→</span>
                       <span><strong>Pliki cookies:</strong> zgodnie z Polityką Cookies (maksymalnie 12 miesięcy)</span>
                     </li>
                   </ul>
@@ -473,8 +473,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 7 - Rights */}
                 <section id="sec-8" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     7. Twoje prawa
@@ -500,15 +500,15 @@ export default function PolitykaPrywatnosciClient() {
                   <p className="text-slate-600 font-bold mb-3">Jak skorzystać z praw?</p>
                   <ul className="space-y-2 text-slate-600 text-sm mb-6">
                     <li className="flex items-center gap-2">
-                      <span className="text-primary-500">•</span>
-                      <span>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-primary-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
+                      <span className="text-emerald-500">•</span>
+                      <span>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-primary-500">•</span>
-                      <span><a href="/kontakt" className="text-primary-700 underline underline-offset-4 font-bold">Formularz kontaktowy</a></span>
+                      <span className="text-emerald-500">•</span>
+                      <span><a href="/kontakt" className="text-emerald-700 underline underline-offset-4 font-bold">Formularz kontaktowy</a></span>
                     </li>
                   </ul>
-                  <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                  <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
                     <p className="text-slate-700 text-sm leading-relaxed">
                       <strong>Prawo do skargi:</strong> Jeśli uważasz, że nieprawidłowo przetwarzamy Twoje dane,
                       możesz złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych (PUODO):
@@ -519,8 +519,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 8 */}
                 <section id="sec-9" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     8. Profilowanie
@@ -534,15 +534,15 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 9 */}
                 <section id="sec-10" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                     </svg>
                     9. Pliki cookies
                   </h2>
                   <p className="text-slate-600 leading-relaxed">
                     Szczegółowe informacje na temat wykorzystywania plików cookies znajdują się w
-                    {' '}<a href="/polityka-cookies" className="text-primary-700 underline underline-offset-4 font-bold">
+                    {' '}<a href="/polityka-cookies" className="text-emerald-700 underline underline-offset-4 font-bold">
                       Polityce Cookies
                     </a>. Możesz zarządzać ustawieniami cookies klikając przycisk
                     {' '}<strong>"Ustawienia cookies"</strong> w stopce strony.
@@ -551,8 +551,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 10 */}
                 <section id="sec-11" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     10. Źródła danych o placówkach
@@ -561,7 +561,7 @@ export default function PolitykaPrywatnosciClient() {
                     Informacje o placówkach opieki prezentowane w Serwisie pochodzą z oficjalnych źródeł publicznych
                     (MOPS, strony BIP, strony internetowe placówek).
                   </p>
-                  <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100 flex gap-4">
+                  <div className="bg-amber-50 p-6 rounded-xl border border-amber-100 flex gap-4">
                     <svg className="w-6 h-6 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
@@ -577,8 +577,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 11 */}
                 <section id="sec-12" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     11. Zmiany w Polityce Prywatności
@@ -591,8 +591,8 @@ export default function PolitykaPrywatnosciClient() {
 
                 {/* Section 12 */}
                 <section id="sec-13" className="mb-12 scroll-mt-32">
-                  <h2 className="flex items-center gap-3 text-2xl font-serif font-bold mb-6 text-slate-900">
-                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter mb-6 text-slate-900">
+                    <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     12. Punkt kontaktowy (DSA)
@@ -603,24 +603,24 @@ export default function PolitykaPrywatnosciClient() {
                   </p>
                   <ul className="space-y-2 text-slate-600 text-sm">
                     <li className="flex items-center gap-2">
-                      <span className="text-primary-500">•</span>
-                      <span>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-primary-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
+                      <span className="text-emerald-500">•</span>
+                      <span>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-primary-500">•</span>
+                      <span className="text-emerald-500">•</span>
                       <span>Języki komunikacji: polski, angielski</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-primary-500">•</span>
-                      <span><a href="/kontakt" className="text-primary-700 underline underline-offset-4 font-bold">Formularz kontaktowy</a></span>
+                      <span className="text-emerald-500">•</span>
+                      <span><a href="/kontakt" className="text-emerald-700 underline underline-offset-4 font-bold">Formularz kontaktowy</a></span>
                     </li>
                   </ul>
                 </section>
 
                 {/* Quote - Zostaje bez id, bo nie jest w TOC */}
-                <div className="bg-slate-900 text-white p-8 rounded-3xl text-center mt-12">
-                  <p className="font-serif text-xl mb-4 italic">"Z pasją dla rodzin, z szacunkiem dla prywatności."</p>
-                  <div className="w-12 h-1 bg-primary-500 mx-auto" />
+                <div className="bg-slate-900 text-white p-8 rounded-2xl text-center mt-12">
+                  <p className="font-black tracking-tighter text-xl mb-4">"Z pasją dla rodzin, z szacunkiem dla prywatności."</p>
+                  <div className="w-12 h-1 bg-emerald-500 mx-auto" />
                 </div>
               </div>
             </div>
@@ -631,7 +631,7 @@ export default function PolitykaPrywatnosciClient() {
         <div className="mt-12 text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-bold uppercase text-xs tracking-widest transition-all"
+            className="inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-800 font-black uppercase text-xs tracking-widest transition-all"
           >
             Powrót do strony głównej
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

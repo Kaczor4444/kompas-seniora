@@ -82,6 +82,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
 
   // API-based validation state
   const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid'>('idle');
+  // Resolved powiat name from TERYT (e.g. "olkuski" for city "Olkusz")
+  const [resolvedPowiat, setResolvedPowiat] = useState<string>('');
 
   useEffect(() => {
     if (prefilledLocation) {
@@ -101,10 +103,11 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     }
   }, []);
 
-  // API-based location validation
+  // API-based location validation — also resolves powiat name from TERYT
   useEffect(() => {
     if (answers.location.length < 2) {
       setValidationState('idle');
+      setResolvedPowiat('');
       return;
     }
 
@@ -112,10 +115,14 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
       try {
         const res = await fetch(`/api/teryt/suggest?q=${answers.location}`);
         const data = await res.json();
-        setValidationState(data.suggestions?.length > 0 ? 'valid' : 'invalid');
+        const found = data.suggestions?.length > 0;
+        setValidationState(found ? 'valid' : 'invalid');
+        // Store the TERYT powiat (adjective form, e.g. "olkuski") for API queries
+        setResolvedPowiat(found ? (data.suggestions[0].powiat ?? '') : '');
       } catch (error) {
         console.error('Validation error:', error);
         setValidationState('idle');
+        setResolvedPowiat('');
       }
     }, 300);
 
@@ -136,14 +143,14 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
   useEffect(() => {
     const params = new URLSearchParams();
     if (earlyType) params.set('type', earlyType);
-    // Use location only when it's been validated
-    if (answers.location && validationState === 'valid') params.set('powiat', answers.location);
+    // Use TERYT-resolved powiat (e.g. "olkuski"), not city name ("Olkusz")
+    if (resolvedPowiat && validationState === 'valid') params.set('powiat', resolvedPowiat);
 
     fetch(`/api/advisor/count?${params}`)
       .then(r => r.json())
       .then(d => setLiveCount(d.count ?? null))
       .catch(() => {/* silent */});
-  }, [earlyType, answers.location, validationState]);
+  }, [earlyType, resolvedPowiat, validationState]);
 
   const toggleChecklist = (item: string) => {
     const newChecklist = checklist.includes(item) 
@@ -198,6 +205,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
       mode: '',
       location: ''
     });
+    setResolvedPowiat('');
+    setValidationState('idle');
     setCurrentStep('who');
   };
 
@@ -555,8 +564,15 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                             Placówki w pobliżu: {answers.location}
                          </h4>
                          <div className="space-y-4 md:space-y-6">
-                            <div 
-                              onClick={() => onSearchRedirect?.(recommendation as any, answers.location)}
+                            <div
+                              onClick={() => {
+                                const p = new URLSearchParams();
+                                if (answers.location) p.set('q', answers.location);
+                                if (resolvedPowiat) p.set('powiat', resolvedPowiat);
+                                if (recommendation === 'DPS') p.set('type', 'dps');
+                                if (recommendation === 'ŚDS') p.set('type', 'śds');
+                                window.location.href = `/search?${p.toString()}`;
+                              }}
                               className="p-6 md:p-8 rounded-2xl border border-stone-200 bg-white flex items-center justify-between group cursor-pointer hover:border-primary-500 transition-all shadow-sm"
                             >
                                <div className="flex items-center gap-4 md:gap-6">
@@ -565,13 +581,20 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                   </div>
                                   <div>
                                      <h5 className="font-bold text-slate-900 group-hover:text-primary-600 transition-colors text-sm md:text-base">Wstępne wyniki dla Twojej lokalizacji</h5>
-                                     <span className="text-[10px] md:text-xs text-slate-500 font-medium">Zasięg: powiat {answers.location || 'region'}</span>
+                                     <span className="text-[10px] md:text-xs text-slate-500 font-medium">Zasięg: powiat {resolvedPowiat || answers.location || 'region'}</span>
                                   </div>
                                </div>
                                <ChevronRight size={20} className="text-slate-300 group-hover:text-primary-500 transition-all shrink-0" />
                             </div>
-                            <button 
-                              onClick={() => onSearchRedirect?.(recommendation as any, answers.location)}
+                            <button
+                              onClick={() => {
+                                const p = new URLSearchParams();
+                                if (answers.location) p.set('q', answers.location);
+                                if (resolvedPowiat) p.set('powiat', resolvedPowiat);
+                                if (recommendation === 'DPS') p.set('type', 'dps');
+                                if (recommendation === 'ŚDS') p.set('type', 'śds');
+                                window.location.href = `/search?${p.toString()}`;
+                              }}
                               className="w-full py-4 md:py-5 bg-primary-600 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-primary-700 transition-all shadow-xl flex items-center justify-center gap-3"
                             >
                                Przeglądaj wszystkie ({recommendation}) <ArrowUpRight size={16} />

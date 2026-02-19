@@ -45,6 +45,13 @@ export default function FloatingCookieButton() {
     };
   }, [showModal]);
 
+  // Open modal via custom event (e.g. from cookie policy page)
+  useEffect(() => {
+    const handler = () => setShowModal(true);
+    window.addEventListener('open-cookie-settings', handler);
+    return () => window.removeEventListener('open-cookie-settings', handler);
+  }, []);
+
   // Focus trap - keep focus inside modal
   useEffect(() => {
     if (!showModal) return;
@@ -111,7 +118,6 @@ export default function FloatingCookieButton() {
 
   const closeModal = () => {
     setIsClosing(true);
-    setIsExpanded(false);
     setTimeout(() => {
       setShowModal(false);
       setIsClosing(false);
@@ -160,23 +166,6 @@ export default function FloatingCookieButton() {
 
   return (
     <>
-      {/* Floating Cookie Bubble — styl jak avatar */}
-      <button
-        onClick={() => setShowModal(true)}
-        className="fixed bottom-6 left-5 z-40 w-14 h-14 rounded-full bg-slate-900 text-white shadow-xl border-[3px] border-emerald-400 flex items-center justify-center hover:scale-105 hover:border-emerald-500 transition-all active:scale-95 focus:outline-none"
-        aria-label="Ustawienia cookies"
-        title="Ustawienia cookies"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="w-6 h-6"
-        >
-          <path d="M21.598 11.064a1.006 1.006 0 0 0-.854-.172A2.938 2.938 0 0 1 20 11c-1.654 0-3-1.346-3-3 0-.217.031-.444.099-.716a1 1 0 0 0-1.067-1.236A9.956 9.956 0 0 0 2 12c0 5.514 4.486 10 10 10s10-4.486 10-10c0-.049-.003-.097-.007-.16a1.004 1.004 0 0 0-.395-.776zM8.5 6a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-2 8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm2.5-6.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm3.5 6.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-        </svg>
-      </button>
-
       {/* Modal with smooth animations */}
       {showModal && (
         <div
