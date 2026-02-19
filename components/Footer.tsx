@@ -8,7 +8,7 @@ const FooterLogo = () => (
     alt="Kompas Seniora Logo"
     width={200}
     height={60}
-    className="h-10 w-auto"
+    className="h-10 w-auto brightness-0 invert"
   />
 );
 
