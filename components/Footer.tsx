@@ -1,18 +1,15 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail } from 'lucide-react';
 
 const FooterLogo = () => (
-  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10">
-    <path 
-      d="M20 34C20 34 5 26 5 15C5 9 10 5 14 5C17 5 19 7 20 8C21 7 23 5 26 5C30 5 35 9 35 15C35 26 20 34 20 34Z" 
-      className="stroke-primary-500" 
-      strokeWidth="2.5" 
-      strokeLinejoin="round"
-    />
-    <path d="M20 10L23 20H17L20 10Z" className="fill-primary-500" />
-    <path d="M20 30L17 20H23L20 30Z" className="fill-slate-500" />
-    <circle cx="20" cy="20" r="1.5" className="fill-slate-900" />
-  </svg>
+  <Image
+    src="/images/logo1.png"
+    alt="Kompas Seniora Logo"
+    width={40}
+    height={40}
+    className="w-10 h-10"
+  />
 );
 
 export default function Footer() {

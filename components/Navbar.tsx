@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Search, Calculator, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Sparkles, Heart } from 'lucide-react';
 import { getFavoritesCount } from '@/src/utils/favorites';
@@ -15,24 +16,14 @@ const AccessibilityIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const NavbarLogo = ({ isHighContrast }: { isHighContrast: boolean }) => (
-  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10">
-    <path
-      d="M20 34C20 34 5 26 5 15C5 9 10 5 14 5C17 5 19 7 20 8C21 7 23 5 26 5C30 5 35 9 35 15C35 26 20 34 20 34Z"
-      stroke={isHighContrast ? "#fbbf24" : undefined}
-      strokeWidth="2.5"
-      strokeLinejoin="round"
-      className={isHighContrast ? undefined : "stroke-primary-600"}
-    />
-    <g
-      className="transition-transform duration-500 ease-in-out group-hover:rotate-[20deg]"
-      style={{ transformOrigin: '20px 20px' }}
-    >
-      <path d="M20 10L23 20H17L20 10Z" className={isHighContrast ? undefined : "fill-primary-600"} fill={isHighContrast ? "#fbbf24" : undefined} />
-      <path d="M20 30L17 20H23L20 30Z" className={isHighContrast ? undefined : "fill-slate-500"} fill={isHighContrast ? "#9ca3af" : undefined} />
-      <circle cx="20" cy="20" r="1.5" className={isHighContrast ? undefined : "fill-slate-900"} fill={isHighContrast ? "#111827" : undefined} />
-    </g>
-  </svg>
+const NavbarLogo = () => (
+  <Image
+    src="/images/logo1.png"
+    alt="Kompas Seniora Logo"
+    width={40}
+    height={40}
+    className="w-10 h-10"
+  />
 );
 
 export default function Navbar() {
@@ -254,7 +245,7 @@ export default function Navbar() {
 
               {/* Desktop logo */}
               <Link href="/" className="hidden md:flex flex-shrink-0 items-center mr-4 group">
-                <NavbarLogo isHighContrast={isHighContrast} />
+                <NavbarLogo />
                 <div className="flex flex-col ml-3">
                   <div className={`font-serif text-2xl font-bold leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
                     Kompas
@@ -268,7 +259,7 @@ export default function Navbar() {
 
             {/* Mobile logo - absolutnie wyśrodkowane */}
             <Link href="/" className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center group">
-              <NavbarLogo isHighContrast={isHighContrast} />
+              <NavbarLogo />
               <div className="flex flex-col ml-3">
                 <div className={`font-serif text-2xl font-bold leading-none ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
                   Kompas
