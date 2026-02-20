@@ -81,6 +81,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   let terytMatches: any[] = [];
   let message = '';
   let terytPowiats: string[] = [];
+  let powiatBreakdown: Record<string, number> = {};
+  let powiatSearchCenters: Record<string, { lat: number; lng: number }> = {};
 
   // TRYB 3: GEOLOCATION SEARCH
   if (isNearSearch && userLat && userLng && !query) {
@@ -161,97 +163,28 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         message = `Miejscowość „${displayQuery}" nie istnieje w Małopolsce. Wpisz nazwę miejscowości z terenu Małopolski.`;
       } else {
 
-      // Pobierz WSZYSTKIE powiaty gdzie szukana miejscowość istnieje (do filtra — bez constraintu powiatu)
-      if (powiatParam) {
-        const baseWhereNoPowiat: any = {};
-        if (wojewodztwo !== 'all') baseWhereNoPowiat.wojewodztwo = wojewodztwoDbName;
-        const terytForFilter = await prisma.terytLocation.findMany({
-          where: { ...baseWhereNoPowiat, nazwa_normalized: normalizedQuery },
-          select: { powiat: true },
-          distinct: ['powiat'],
-        });
-        terytPowiats = terytForFilter.map((t: any) => t.powiat).sort();
-      } else {
-        terytPowiats = [...new Set(terytMatches.map((t: any) => t.powiat))].sort();
-      }
+      // Pobierz UNIKALNE powiaty gdzie szukana miejscowość istnieje
+      // Używamy Set aby usunąć duplikaty z bazy TERYT
+      terytPowiats = [...new Set(terytMatches.map((t: any) => t.powiat))].sort();
 
-      // Sortuj powiaty po liczbie dopasowań
-      const powiatFrequency: Record<string, number> = {};
-      for (const t of terytMatches) {
-        const p = normalizePolish(t.powiat);
-        powiatFrequency[p] = (powiatFrequency[p] || 0) + 1;
-      }
-
-      // Jeśli jest powiat "m. {query}" (miasto wyodrębnione), użyj TYLKO jego —
-      // ignoruje wioski o tej samej nazwie w innych powiatach (np. wioska "Kraków" w tarnowskim)
-      const cityPowiat = `m. ${normalizedQuery}`;
+      // NOWA LOGIKA: Rozróżniamy czy user wybrał z dropdownu czy kliknął "Szukaj"
       let uniquePowiaty: string[];
-      // Wstępne załadowanie placówek potrzebne do weryfikacji i tie-breakingu
+
+      // Wstępne załadowanie placówek
       const allFacilities = await prisma.placowka.findMany({
         orderBy: { nazwa: 'asc' },
       });
 
-      if (powiatFrequency[cityPowiat]) {
-        uniquePowiaty = [cityPowiat];
+      if (powiatParam) {
+        // User WYBRAŁ konkretny powiat z dropdownu → użyj tylko tego
+        uniquePowiaty = [normalizePolish(powiatParam)];
       } else {
-        uniquePowiaty = Object.entries(powiatFrequency)
-          .sort((a, b) => {
-            const diff = b[1] - a[1];
-            if (diff !== 0) return diff;
-            // Remis: preferuj powiat gdzie faktycznie jest placówka w szukanym mieście
-            const aHasCity = allFacilities.some(f =>
-              normalizePolish(f.miejscowosc) === normalizedQuery &&
-              (normalizePolish(f.powiat).includes(a[0]) || a[0].includes(normalizePolish(f.powiat)))
-            );
-            const bHasCity = allFacilities.some(f =>
-              normalizePolish(f.miejscowosc) === normalizedQuery &&
-              (normalizePolish(f.powiat).includes(b[0]) || b[0].includes(normalizePolish(f.powiat)))
-            );
-            if (aHasCity && !bHasCity) return -1;
-            if (!aHasCity && bHasCity) return 1;
-            return 0;
-          })
-          .slice(0, 2)
-          .map(([p]) => p);
+        // User WPISAŁ i kliknął "Szukaj" bez wyboru → pokaż WSZYSTKIE UNIKALNE powiaty
+        // Używamy Set aby usunąć duplikaty TERYT (ta sama miejscowość może być kilka razy w bazie dla tego samego powiatu)
+        uniquePowiaty = [...new Set(terytMatches.map((t: any) => normalizePolish(t.powiat)))];
       }
 
-      // Sprawdź czy uniquePowiaty (exact match) dały jakiekolwiek wyniki
-      // Jeśli nie (np. "m. tarnow" nie ma odpowiednika w DB, bo DB ma "tarnowski"),
-      // wróć do partial search i znajdź powiat który faktycznie ma placówki
-      const checkResults = allFacilities.filter(facility => {
-        const norm = normalizePolish(facility.powiat);
-        return uniquePowiaty.some(p => norm.includes(p) || p.includes(norm));
-      });
-
-      if (checkResults.length === 0 && uniquePowiaty.length === 1 && uniquePowiaty[0] === cityPowiat) {
-        // Brak placówek dla "m. {city}" → partial fallback, wyklucz "m." powiaty
-        const partialTeryt = await prisma.terytLocation.findMany({
-          where: { ...baseWhere, nazwa_normalized: { contains: normalizedQuery } },
-          select: { powiat: true },
-        });
-        const partialFreq: Record<string, number> = {};
-        for (const t of partialTeryt) {
-          const p = normalizePolish(t.powiat);
-          partialFreq[p] = (partialFreq[p] || 0) + 1;
-        }
-        // Wyklucz powiaty "m." i weź top-1 który MA placówki w DB
-        const candidatePowiaty = Object.entries(partialFreq)
-          .filter(([p]) => !p.startsWith('m. '))
-          .sort((a, b) => b[1] - a[1])
-          .map(([p]) => p);
-
-        for (const candidate of candidatePowiaty) {
-          const has = allFacilities.some(f => {
-            const norm = normalizePolish(f.powiat);
-            return norm.includes(candidate) || candidate.includes(norm);
-          });
-          if (has) {
-            uniquePowiaty = [candidate];
-            break;
-          }
-        }
-      }
-
+      // Filtruj placówki według wybranych powiatów
       if (uniquePowiaty.length > 0) {
         results = allFacilities.filter(facility => {
           const normalizedFacilityPowiat = normalizePolish(facility.powiat);
@@ -259,6 +192,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             return normalizedFacilityPowiat.includes(powiat) || powiat.includes(normalizedFacilityPowiat);
           });
         });
+
+        // Policz rozkład placówek per powiat (dla banneru informacyjnego)
+        if (!powiatParam && uniquePowiaty.length > 1) {
+          // User kliknął "Szukaj" bez wyboru i mamy wiele powiatów
+          for (const facility of results) {
+            const powiat = facility.powiat;
+            powiatBreakdown[powiat] = (powiatBreakdown[powiat] || 0) + 1;
+          }
+
+          // Użyj współrzędnych pierwszej placówki w każdym powiecie (zamiast Nominatim)
+          for (const powiat of Object.keys(powiatBreakdown)) {
+            const firstFacilityInPowiat = results.find(f => f.powiat === powiat && f.latitude && f.longitude);
+            if (firstFacilityInPowiat) {
+              powiatSearchCenters[powiat] = {
+                lat: parseFloat(firstFacilityInPowiat.latitude),
+                lng: parseFloat(firstFacilityInPowiat.longitude)
+              };
+            }
+          }
+        }
 
         const facilityWord = type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : 'domy opieki';
 
@@ -466,6 +419,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               terytPowiats={terytPowiats.length > 0 ? terytPowiats : undefined}
               searchCenter={searchCenter ? { ...searchCenter, name: query } : undefined}
               userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined}
+              powiatBreakdown={Object.keys(powiatBreakdown).length > 0 ? powiatBreakdown : undefined}
+              powiatSearchCenters={Object.keys(powiatSearchCenters).length > 0 ? powiatSearchCenters : undefined}
               activeFilters={{
                 wojewodztwo: wojewodztwo !== 'all' ? wojewodztwo : undefined,
                 powiat: powiatParam || undefined,

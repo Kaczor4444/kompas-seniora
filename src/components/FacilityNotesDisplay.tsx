@@ -87,7 +87,7 @@ export default function FacilityNotesDisplay({
     <div className="bg-stone-50 border border-stone-200 rounded-xl p-5">
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-bold text-slate-800 mb-1 font-serif">
+          <h3 className="font-black text-slate-800 mb-1 tracking-tight">
             {hasNote ? 'Twoje notatki' : 'Dodaj prywatną notatkę'}
           </h3>
           {note?.rating > 0 && (

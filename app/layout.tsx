@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display, Quicksand } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display, Quicksand, Open_Sans, Lato, Inter } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import "./leaflet-overrides.css";
@@ -34,6 +34,26 @@ const quicksand = Quicksand({
   variable: "--font-quicksand",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const openSans = Open_Sans({
+  variable: "--font-open-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const lato = Lato({
+  variable: "--font-lato",
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  display: "swap",
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -76,7 +96,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#10b981" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${quicksand.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${quicksand.variable} ${openSans.variable} ${lato.variable} ${inter.variable} antialiased flex flex-col min-h-screen`}
       >
         {/* Analytics (top - ładuje się jako pierwszy) */}
         <GoogleAnalytics />

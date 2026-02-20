@@ -50,7 +50,7 @@ const AutocompleteDropdown: React.FC<AutocompleteDropdownProps> = ({
       ref={dropdownRef}
       className="absolute top-[100%] left-0 right-0 bg-white rounded-b-xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.2)] border border-slate-200 border-t-0 z-[100] overflow-hidden"
     >
-      <ul className="divide-y divide-slate-50 bg-white max-h-[300px] overflow-y-auto">
+      <ul className="divide-y divide-slate-50 bg-white max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
         {suggestions.map((suggestion, index) => (
           <li
             key={`sugg-${suggestion.nazwa}-${suggestion.powiat}-${index}`}
@@ -69,15 +69,10 @@ const AutocompleteDropdown: React.FC<AutocompleteDropdownProps> = ({
           </li>
         ))}
 
-        {suggestions.length < totalCount && (
-          <li
-            onMouseDown={onShowAllClick}
-            className="px-5 py-3.5 bg-emerald-50/50 hover:bg-emerald-50 cursor-pointer border-t border-emerald-100 transition-colors group"
-          >
-            <div className="flex items-center justify-between text-emerald-700">
-              <span className="font-bold text-sm">Zobacz wszystkie wyniki ({totalCount})</span>
-              <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </div>
+        {/* Info o liczbie wyników - zawsze na dole */}
+        {suggestions.length > 5 && (
+          <li className="px-5 py-2 bg-slate-50 text-slate-500 text-xs text-center sticky bottom-0">
+            Przewiń, aby zobaczyć wszystkie ({suggestions.length}) wyniki
           </li>
         )}
       </ul>
@@ -129,7 +124,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
         const data: SuggestResponse = await response.json();
 
         const sugg = data.suggestions || [];
-        setSuggestions(sugg.slice(0, 5));
+        setSuggestions(sugg); // Pokazujemy WSZYSTKIE wyniki - dropdown jest scrollowalny
         setTotalCount(data.totalCount || 0);
         setShowDropdown(sugg.length > 0);
         setValidationState(sugg.length > 0 ? 'valid' : 'invalid');

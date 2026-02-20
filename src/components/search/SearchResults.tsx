@@ -65,6 +65,8 @@ interface SearchResultsProps {
   userLocation?: { lat: number; lng: number };
   searchCenter?: { lat: number; lng: number; name: string };
   terytPowiats?: string[];
+  powiatBreakdown?: Record<string, number>;
+  powiatSearchCenters?: Record<string, { lat: number; lng: number }>;
 }
 
 
@@ -78,6 +80,8 @@ export default function SearchResults({
   userLocation,
   searchCenter,
   terytPowiats,
+  powiatBreakdown,
+  powiatSearchCenters,
 }: SearchResultsProps) {
 
   const router = useRouter();
@@ -357,6 +361,44 @@ export default function SearchResults({
         chips={activeChips}
       />
 
+      {/* Multi-Powiat Info Banner */}
+      {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && (
+        <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mx-3 sm:mx-4 md:mx-8 mb-2 rounded-r-lg">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 mt-0.5">
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-blue-900 mb-1">
+                Znaleziono "{query}" w kilku lokalizacjach:
+              </p>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {Object.entries(powiatBreakdown)
+                  .sort((a, b) => b[1] - a[1]) // Sort by count descending
+                  .map(([powiat, count]) => (
+                    <button
+                      key={powiat}
+                      onClick={() => handlePowiatChange(powiat)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-blue-800 text-xs font-medium rounded-full border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer active:scale-95"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {powiat} ({count})
+                    </button>
+                  ))}
+              </div>
+              <p className="text-xs text-blue-700">
+                Kliknij na powiat, aby zobaczyć tylko placówki z tej lokalizacji.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filter Panel */}
       <FilterPanel
         show={showFilters}
@@ -502,6 +544,10 @@ export default function SearchResults({
             facilities={facilities}
             userLocation={userLocation}
             searchCenter={searchCenter}
+            powiatBreakdown={powiatBreakdown}
+            powiatSearchCenters={powiatSearchCenters}
+            selectedPowiat={selectedPowiat}
+            onPowiatClick={handlePowiatChange}
           />
         </div>
       </div>

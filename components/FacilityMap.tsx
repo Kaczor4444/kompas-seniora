@@ -105,6 +105,10 @@ interface FacilityMapProps {
   showDirections?: boolean;
   userLocation?: { lat: number; lng: number };
   searchCenter?: { lat: number; lng: number; name: string };
+  powiatBreakdown?: Record<string, number>;
+  powiatSearchCenters?: Record<string, { lat: number; lng: number }>;
+  selectedPowiat?: string;
+  onPowiatClick?: (powiat: string) => void;
 }
 
 // Ikona "tu szukasz" — pulsujący marker z etykietą nazwy miasta
@@ -154,8 +158,47 @@ function createSearchCenterIcon(cityName: string) {
   });
 }
 
+// Ikona punktu miejscowości (gdy pokazujemy wiele powiatów)
+function createCityLocationIcon(powiat: string, count: number) {
+  return L.divIcon({
+    html: `
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <svg width="32" height="44" viewBox="0 0 32 44" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4))">
+          <path d="M16 0C7.163 0 0 7.163 0 16c0 10.667 16 28 16 28S32 26.667 32 16C32 7.163 24.837 0 16 0z"
+                fill="#3b82f6" stroke="white" stroke-width="2"/>
+          <circle cx="16" cy="16" r="7" fill="white" opacity="0.95"/>
+          <text x="16" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">${count}</text>
+        </svg>
+        <div style="
+          background:white;
+          border:2px solid #3b82f6;
+          border-radius:6px;
+          padding:2px 8px;
+          font-size:11px;
+          font-weight:700;
+          color:#1e40af;
+          white-space:nowrap;
+          box-shadow:0 2px 4px rgba(0,0,0,0.25);
+        ">${powiat}</div>
+      </div>
+    `,
+    className: 'city-location-icon',
+    iconSize: [80, 70],
+    iconAnchor: [40, 44],
+    popupAnchor: [0, -46],
+  });
+}
+
 // Component do auto-fit bounds z resize handling
-function AutoFitBounds({ facilities, searchCenter }: { facilities: Facility[]; searchCenter?: { lat: number; lng: number } }) {
+function AutoFitBounds({
+  facilities,
+  searchCenter,
+  pointsToFit
+}: {
+  facilities: Facility[];
+  searchCenter?: { lat: number; lng: number };
+  pointsToFit?: Array<{ latitude: number | null; longitude: number | null }>;
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -171,8 +214,12 @@ function AutoFitBounds({ facilities, searchCenter }: { facilities: Facility[]; s
 
         map.invalidateSize();
 
+        // Use pointsToFit if provided, otherwise use facilities
+        const pointsSource = pointsToFit || facilities;
         const allPoints: [number, number][] = [
-          ...facilities.map(f => [f.latitude!, f.longitude!] as [number, number]),
+          ...pointsSource
+            .filter(f => f.latitude && f.longitude)
+            .map(f => [f.latitude!, f.longitude!] as [number, number]),
           ...(searchCenter ? [[searchCenter.lat, searchCenter.lng] as [number, number]] : []),
         ];
 
@@ -196,9 +243,11 @@ function AutoFitBounds({ facilities, searchCenter }: { facilities: Facility[]; s
           const container = map.getContainer?.();
           if (!container || !container.isConnected) return;
           map.invalidateSize();
-          if (facilities.length > 1) {
+          const pointsSource = pointsToFit || facilities;
+          const points = pointsSource.filter(f => f.latitude && f.longitude);
+          if (points.length > 1) {
             map.fitBounds(
-              L.latLngBounds(facilities.map(f => [f.latitude!, f.longitude!] as [number, number])),
+              L.latLngBounds(points.map(f => [f.latitude!, f.longitude!] as [number, number])),
               { padding: [50, 50], maxZoom: 13 }
             );
           }
@@ -214,7 +263,7 @@ function AutoFitBounds({ facilities, searchCenter }: { facilities: Facility[]; s
       clearTimeout(t);
       window.removeEventListener('resize', handleResize);
     };
-  }, [facilities, searchCenter, map]);
+  }, [facilities, searchCenter, pointsToFit, map]);
 
   return null;
 }
@@ -224,6 +273,10 @@ export default function FacilityMap({
   mode = 'multiple',
   showDirections = false,
   searchCenter,
+  powiatBreakdown,
+  powiatSearchCenters,
+  selectedPowiat = "Wszystkie",
+  onPowiatClick,
 }: FacilityMapProps) {
   const facilitiesWithCoords = facilities.filter(
     f => f.latitude && f.longitude
@@ -236,6 +289,25 @@ export default function FacilityMap({
       </div>
     );
   }
+
+  // Tryb wielu powiatów: pokazuj tylko punkty miejscowości (jeden per powiat)
+  // ALE tylko gdy user NIE wybrał konkretnego powiatu z filtra
+  const isMultiPowiatMode = powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && selectedPowiat === "Wszystkie";
+
+  // Grupuj facilities per powiat i weź pierwszą jako reprezentanta
+  const cityLocations = isMultiPowiatMode
+    ? Object.entries(powiatBreakdown).map(([powiat, count]) => {
+        const firstInPowiat = facilitiesWithCoords.find(f => f.powiat === powiat);
+        return firstInPowiat ? { powiat, count, facility: firstInPowiat } : null;
+      }).filter(Boolean) as Array<{ powiat: string; count: number; facility: Facility }>
+    : [];
+
+  // Gdy user wybrał konkretny powiat, użyj geolokalizacji miejscowości dla tego powiatu
+  const effectiveSearchCenter = selectedPowiat !== "Wszystkie" && powiatSearchCenters && searchCenter
+    ? (powiatSearchCenters[selectedPowiat]
+        ? { ...powiatSearchCenters[selectedPowiat], name: searchCenter.name }
+        : searchCenter)
+    : searchCenter;
 
   const center: [number, number] = [50.0647, 19.9450];
 
@@ -267,104 +339,132 @@ export default function FacilityMap({
       
       <div className="h-full rounded-lg overflow-hidden border border-gray-200">
         <MapContainer
-          
+
           center={center}
           zoom={9}
           style={{ height: '100%', width: '100%' }}
           scrollWheelZoom={false}
+          zoomControl={true}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          <AutoFitBounds facilities={facilitiesWithCoords} searchCenter={searchCenter} />
+          <AutoFitBounds
+            facilities={facilitiesWithCoords}
+            searchCenter={!isMultiPowiatMode ? effectiveSearchCenter : undefined}
+            pointsToFit={isMultiPowiatMode ? cityLocations.map(c => c.facility) : undefined}
+          />
 
           {/* Marker centrum szukanego miasta — nieinteraktywny, nie blokuje kliknięć */}
-          {searchCenter && (
+          {/* Pokazuj TYLKO gdy user wybrał konkretny powiat (nie w trybie multi-powiat) */}
+          {effectiveSearchCenter && !isMultiPowiatMode && (
             <Marker
-              position={[searchCenter.lat, searchCenter.lng]}
-              icon={createSearchCenterIcon(searchCenter.name)}
+              position={[effectiveSearchCenter.lat, effectiveSearchCenter.lng]}
+              icon={createSearchCenterIcon(effectiveSearchCenter.name)}
               zIndexOffset={-100}
               interactive={false}
             />
           )}
 
-          <MarkerClusterGroup
-            chunkedLoading
-            maxClusterRadius={60}
-            spiderfyOnMaxZoom={true}
-            showCoverageOnHover={false}
-            zoomToBoundsOnClick={true}
-            iconCreateFunction={createClusterCustomIcon}
-          >
-            {facilitiesWithCoords.map((facility) => (
-              <Marker
-                key={facility.id}
-                position={[facility.latitude!, facility.longitude!]}
-                icon={facility.typ_placowki === 'DPS' ? dpsIcon : sdsIcon}
-              >
-                <Popup>
-                  <div style={{ minWidth: '170px', maxWidth: '220px', padding: '6px 8px' }}>
-                    <p style={{
-                      fontSize: '10px',
-                      fontWeight: 600,
-                      letterSpacing: '0.05em',
-                      textTransform: 'uppercase',
-                      color: facility.typ_placowki === 'DPS' ? '#059669' : '#1e3a8a',
-                      margin: '0 0 2px',
-                    }}>
-                      {facility.typ_placowki}
-                    </p>
-                    <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#111827', margin: '0 0 5px', lineHeight: '1.25' }}>
-                      {facility.nazwa}
-                    </h3>
-                    {(() => {
-                      const profiles = getShortProfileLabels(facility.profil_opieki ?? null, facility.typ_placowki);
-                      return profiles.length > 0 ? (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginBottom: '5px' }}>
-                          {profiles.map(p => (
-                            <span key={p} style={{
-                              fontSize: '10px',
-                              padding: '1px 5px',
-                              borderRadius: '999px',
-                              background: facility.typ_placowki === 'DPS' ? '#d1fae5' : '#dbeafe',
-                              color: facility.typ_placowki === 'DPS' ? '#065f46' : '#1e3a8a',
-                              fontWeight: 500,
-                            }}>
-                              {p}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null;
-                    })()}
-                    {facility.typ_placowki === 'DPS' && (
-                      <p style={{ fontSize: '12px', fontWeight: 700, margin: '0 0 6px', color: facility.koszt_pobytu ? '#111827' : '#059669' }}>
-                        {facility.koszt_pobytu
-                          ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
-                          : 'Bezpłatne'}
-                      </p>
-                    )}
-                    <a
-                      href={`/placowka/${facility.id}`}
-                      style={{
-                        display: 'inline-block',
-                        fontSize: '11px',
+          {/* Tryb wielu powiatów - pokazuj tylko punkty miejscowości */}
+          {isMultiPowiatMode ? (
+            <>
+              {cityLocations.map(({ powiat, count, facility }) => (
+                <Marker
+                  key={`city-${powiat}`}
+                  position={[facility.latitude!, facility.longitude!]}
+                  icon={createCityLocationIcon(powiat, count)}
+                  zIndexOffset={100}
+                  eventHandlers={{
+                    click: () => {
+                      if (onPowiatClick) {
+                        onPowiatClick(powiat);
+                      }
+                    }
+                  }}
+                />
+              ))}
+            </>
+          ) : (
+            // Normalny tryb - pokazuj wszystkie placówki DPS/ŚDS
+            <MarkerClusterGroup
+              chunkedLoading
+              maxClusterRadius={60}
+              spiderfyOnMaxZoom={true}
+              showCoverageOnHover={false}
+              zoomToBoundsOnClick={true}
+              iconCreateFunction={createClusterCustomIcon}
+            >
+              {facilitiesWithCoords.map((facility) => (
+                <Marker
+                  key={facility.id}
+                  position={[facility.latitude!, facility.longitude!]}
+                  icon={facility.typ_placowki === 'DPS' ? dpsIcon : sdsIcon}
+                >
+                  <Popup>
+                    <div style={{ minWidth: '170px', maxWidth: '220px', padding: '6px 8px' }}>
+                      <p style={{
+                        fontSize: '10px',
                         fontWeight: 600,
-                        padding: '4px 10px',
-                        borderRadius: '5px',
-                        background: facility.typ_placowki === 'DPS' ? '#10b981' : '#1e3a8a',
-                        color: 'white',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      Zobacz szczegóły →
-                    </a>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MarkerClusterGroup>
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        color: facility.typ_placowki === 'DPS' ? '#059669' : '#1e3a8a',
+                        margin: '0 0 2px',
+                      }}>
+                        {facility.typ_placowki}
+                      </p>
+                      <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#111827', margin: '0 0 5px', lineHeight: '1.25' }}>
+                        {facility.nazwa}
+                      </h3>
+                      {(() => {
+                        const profiles = getShortProfileLabels(facility.profil_opieki ?? null, facility.typ_placowki);
+                        return profiles.length > 0 ? (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginBottom: '5px' }}>
+                            {profiles.map(p => (
+                              <span key={p} style={{
+                                fontSize: '10px',
+                                padding: '1px 5px',
+                                borderRadius: '999px',
+                                background: facility.typ_placowki === 'DPS' ? '#d1fae5' : '#dbeafe',
+                                color: facility.typ_placowki === 'DPS' ? '#065f46' : '#1e3a8a',
+                                fontWeight: 500,
+                              }}>
+                                {p}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null;
+                      })()}
+                      {facility.typ_placowki === 'DPS' && (
+                        <p style={{ fontSize: '12px', fontWeight: 700, margin: '0 0 6px', color: facility.koszt_pobytu ? '#111827' : '#059669' }}>
+                          {facility.koszt_pobytu
+                            ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
+                            : 'Bezpłatne'}
+                        </p>
+                      )}
+                      <a
+                        href={`/placowka/${facility.id}`}
+                        style={{
+                          display: 'inline-block',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          padding: '4px 10px',
+                          borderRadius: '5px',
+                          background: facility.typ_placowki === 'DPS' ? '#10b981' : '#1e3a8a',
+                          color: 'white',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        Zobacz szczegóły →
+                      </a>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MarkerClusterGroup>
+          )}
         </MapContainer>
       </div>
       

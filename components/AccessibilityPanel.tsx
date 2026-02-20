@@ -61,7 +61,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
         {/* Header - Clean Style */}
         <div className="p-6 border-b border-stone-100 flex justify-between items-center bg-white z-10">
             <div>
-                <h2 className="text-xl font-bold font-serif text-slate-900 flex items-center gap-2">
+                <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
                 <AccessibilityIcon className="text-primary-600" size={24} />
                 Dostępność
                 </h2>

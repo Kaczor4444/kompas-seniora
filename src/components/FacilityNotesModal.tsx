@@ -93,7 +93,7 @@ export default function FacilityNotesModal({
                       <PenLine className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <Dialog.Title className="text-white font-serif font-bold text-lg leading-tight">
+                      <Dialog.Title className="text-white font-black text-lg leading-tight">
                         Notatki i ocena
                       </Dialog.Title>
                       <p className="text-primary-100 text-xs mt-0.5 truncate max-w-[280px]">{facilityName}</p>

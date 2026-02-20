@@ -41,7 +41,7 @@ export default function MisjaClient() {
                 <Heart size={10} className="text-primary-400" />
                 Historia, która stoi za tym projektem
               </div>
-              <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 tracking-tight leading-[1.1]">
+              <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-[1.1]">
                 Misja
               </h1>
               <p className="text-slate-400 text-lg md:text-xl font-medium max-w-xl leading-relaxed">
@@ -60,7 +60,7 @@ export default function MisjaClient() {
                   <Heart size={32} />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-serif font-bold text-slate-900 mb-6">
+                  <h2 className="text-3xl font-black text-slate-900 mb-6">
                     Skąd się to wzięło
                   </h2>
                   <div className="space-y-5 text-lg text-slate-600 leading-relaxed">
@@ -85,7 +85,7 @@ export default function MisjaClient() {
                   <Globe size={32} />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-serif font-bold text-slate-900 mb-6">
+                  <h2 className="text-3xl font-black text-slate-900 mb-6">
                     Dla kogo
                   </h2>
                   <p className="text-lg text-slate-600 leading-relaxed mb-6">
@@ -116,7 +116,7 @@ export default function MisjaClient() {
                 <div className="w-12 h-12 rounded-xl bg-white text-primary-600 flex items-center justify-center shadow-sm">
                   <ShieldCheck size={28} />
                 </div>
-                <h2 className="text-3xl font-serif font-bold text-slate-900">Moje zasady</h2>
+                <h2 className="text-3xl font-black text-slate-900">Moje zasady</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -150,7 +150,7 @@ export default function MisjaClient() {
                   <User size={32} />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-serif font-bold text-slate-900 mb-6">
+                  <h2 className="text-3xl font-black text-slate-900 mb-6">
                     Jeden człowiek, otwarty na więcej
                   </h2>
                   <div className="space-y-5 text-lg text-slate-600 leading-relaxed">
@@ -179,7 +179,7 @@ export default function MisjaClient() {
 
             {/* Manifesto closing */}
             <section className="border-t border-stone-100 pt-16 text-center">
-              <p className="text-2xl md:text-3xl font-serif text-slate-800 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-2xl md:text-3xl font-bold text-slate-800 leading-relaxed max-w-2xl mx-auto tracking-tight">
                 Chcę, żeby żadna rodzina w Polsce nie podejmowała tej decyzji w chaosie.
               </p>
               <div className="w-12 h-1 bg-primary-500 mx-auto mt-8" />

@@ -295,7 +295,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
-              <h1 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 leading-tight tracking-tight mb-3">
+              <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight mb-3">
                 {placowka.nazwa}
               </h1>
               <div className="flex items-center gap-2 text-slate-400 font-bold">
@@ -410,7 +410,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
 
             {/* PROFIL DZIAŁALNOŚCI */}
             <section>
-              <h3 className="text-2xl font-serif font-bold text-slate-900 mb-6">
+              <h3 className="text-2xl font-black text-slate-900 mb-6">
                 Profil działalności
               </h3>
               <p className="text-slate-600 leading-relaxed text-lg">
@@ -424,7 +424,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             {/* STANDARDY I UDOGODNIENIA */}
             {profiles.length > 0 && (
               <section>
-                <h3 className="text-2xl font-serif font-bold text-slate-900 mb-6">
+                <h3 className="text-2xl font-black text-slate-900 mb-6">
                   Standardy i udogodnienia
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -445,7 +445,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
 
             {/* MAP SECTION */}
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm">
-              <h3 className="font-serif font-bold text-2xl text-slate-900 mb-6 flex items-center justify-between">
+              <h3 className="font-black text-2xl text-slate-900 mb-6 flex items-center justify-between">
                 Lokalizacja na mapie
                 {placowka.latitude && placowka.longitude && (
                   <a
@@ -483,7 +483,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                   <div className="text-[10px] font-black uppercase tracking-widest text-primary-400 mb-2">
                     Szacunkowy koszt miesięczny
                   </div>
-                  <div className="text-5xl md:text-6xl font-serif font-bold mb-3">
+                  <div className="text-5xl md:text-6xl font-black mb-3">
                     {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł` : 'NFZ'}
                   </div>
                   {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 && (

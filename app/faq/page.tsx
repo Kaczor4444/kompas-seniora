@@ -51,7 +51,7 @@ export default function FAQPage() {
           />
           
           <div className="relative max-w-4xl mx-auto px-4 py-20 md:py-28 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tighter">
               Pytania o Kompas Seniora?
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -66,7 +66,7 @@ export default function FAQPage() {
           {Object.entries(categories).map(([categoryKey, items]) => (
             <div key={categoryKey} className="mb-20 last:mb-0">
               <div className="mb-8">
-                <h2 className="text-2xl md:text-3xl font-bold font-serif text-slate-900 mb-2">
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 tracking-tight">
                   {categoryNames[categoryKey as keyof typeof categoryNames]}
                 </h2>
                 <div className="w-20 h-1 bg-primary-500 rounded-full"></div>
@@ -80,7 +80,7 @@ export default function FAQPage() {
         {/* CTA SECTION */}
         <section className="bg-slate-900 py-16 md:py-20">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tighter">
               Nie znalazłeś odpowiedzi?
             </h2>
             <p className="text-slate-300 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">

@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-02-15 (sesja #3)
+> Ostatnia aktualizacja: 2026-02-20 (sesja #4)
 
 ---
 
@@ -293,9 +293,12 @@ Symulator reguły 70/30:
 - **Warning Amber:** `#F59E0B`
 
 ### Typografia
-- **Serif (headings, logo):** Playfair Display (700, 900)
-- **Sans (base):** Geist Sans (next/font)
-- **Mono:** Geist Mono
+- **Główna czcionka (cały projekt):** Lato (400, 700, 900)
+- **Serif (dostępna, ale nieużywana):** Playfair Display (700, 900)
+- **Mono (dostępna, ale nieużywana):** Geist Mono
+- **Dostępne alternatywy:** Quicksand (dla logo), Open Sans, Inter
+
+**Obecnie:** Cały projekt używa Lato jako domyślnej czcionki - senior-friendly, ciepła i czytelna. Zobacz sekcję "10.5 SYSTEM CZCIONEK" poniżej dla szczegółów konfiguracji.
 
 ### Konwencje UI
 - Border radius: `rounded-xl` / `rounded-2xl` / `rounded-3xl`
@@ -306,6 +309,121 @@ Symulator reguły 70/30:
 
 ### Accessibility Panel (12 opcji w localStorage)
 `isHighContrast`, `isLargeFont`, `linksUnderlined`, `reduceMotion`, `dyslexiaFriendly`, `textSpacing`, `hideImages`, `bigCursor`, `lineHeight`, `textAlignLeft`, `saturation`, `tooltips`
+
+---
+
+## 10.5. SYSTEM CZCIONEK - KONFIGURACJA I MIEJSCA UŻYCIA
+
+### Aktualny stan (2026-02-20)
+**Cały projekt używa Lato jako jedynej czcionki.** Lato wybrano po testach senior-friendly - jest ciepła, przyjazna i bardzo czytelna dla osób starszych.
+
+### Miejsca konfiguracji czcionek
+
+#### 1. `app/layout.tsx` - Ładowanie czcionek
+```typescript
+import { Quicksand, Playfair_Display, Geist, Geist_Mono } from "next/font/google";
+
+const quicksand = Quicksand({
+  variable: "--font-quicksand",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+// Body tag:
+<body className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${quicksand.variable} ...`}>
+```
+
+#### 2. `app/globals.css` - Konfiguracja Tailwind
+```css
+@theme inline {
+  --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-lato: 'Lato', sans-serif;
+  --font-quicksand: 'Quicksand', sans-serif;
+  --font-open-sans: 'Open Sans', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  ...
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-lato), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+```
+
+### Wagi czcionek w projekcie
+Używane wagi Lato:
+- `font-normal` (400) - dla body text, paragrafów
+- `font-bold` (700) - dla nagłówków średnich, wyróżnień
+- `font-black` (900) - dla głównych nagłówków H1/H2 + `tracking-tight` dla lepszego wyglądu
+
+### Dlaczego Lato?
+Po testach z seniorami wybrano Lato, ponieważ:
+- ✅ Ciepła, przyjazna atmosfera (mniej "korporacyjna" niż Open Sans)
+- ✅ Duży x-height = małe litery dobrze widoczne
+- ✅ Wyraźne różnice między literami (a, o, e rozpoznawalne)
+- ✅ Świetna czytelność w długich tekstach
+- ✅ Dostępne wagi: 400 (regular), 700 (bold), 900 (black)
+
+### Jak zmienić czcionkę w przyszłości
+
+Jeśli chcesz zmienić czcionkę na inną (np. z Quicksand na Montserrat):
+
+**Krok 1: Dodaj nową czcionkę w `app/layout.tsx`**
+```typescript
+import { Montserrat } from "next/font/google";
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "900"],
+  display: "swap",
+});
+
+// Dodaj do body className
+<body className={`... ${montserrat.variable} ...`}>
+```
+
+**Krok 2: Zmień w `app/globals.css`**
+```css
+@theme inline {
+  --font-sans: 'Montserrat', -apple-system, ...;
+  --font-montserrat: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: var(--font-montserrat), -apple-system, ...;
+}
+```
+
+**To wszystko!** Wszystkie komponenty automatycznie przełączą się na nową czcionkę.
+
+### Pliki gdzie NIGDY nie występuje `font-serif` ani inne czcionki
+
+Po czyszczeniu z 2026-02-20, **wszystkie komponenty używają domyślnej czcionki** (Quicksand przez Tailwind). Nie ma już żadnych:
+- `font-serif` (stara czcionka Playfair Display)
+- `font-mono`
+- inline `font-family`
+
+Jeśli chcesz zmienić czcionkę w konkretnych komponentach (np. nagłówki serif, body sans), musisz ręcznie dodać klasy Tailwind:
+- `className="font-serif"` dla Playfair Display
+- `className="font-mono"` dla Geist Mono
+
+### Historia zmian czcionek
+- **2026-02-20 (późniejsza aktualizacja):** Zmiana na Lato po testach senior-friendly - priorytet czytelność dla seniorów
+- **2026-02-20 (rano):** Przejście z mieszanki Playfair Display (nagłówki) + Geist Sans (body) na 100% Quicksand dla spójności z logo
+- **Przed 2026-02-20:** Playfair Display dla nagłówków (`font-serif`), Geist Sans dla body
+
+### Dostępne czcionki alternatywne
+W `layout.tsx` załadowane są również:
+- **Quicksand** - dla ewentualnego użycia w logo/nagłówkach (geometryczna, zaokrąglona)
+- **Open Sans** - bardzo czytelna, neutralna alternatywa
+- **Inter** - nowoczesna, zaprojektowana dla UI/ekranów
+- **Playfair Display** - serif dla akcentów (jeśli potrzeba)
+
+Zmiana między nimi wymaga tylko edycji `globals.css` (2 linie).
 
 ---
 
@@ -418,6 +536,45 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 ---
 
 ## 16. HISTORIA ZMIAN (changelog sesji)
+
+### Sesja #4 — 2026-02-20
+
+**Temat:** Unifikacja czcionek - przejście na czcionkę senior-friendly (Lato).
+
+**Kontekst:**
+Projekt używał wcześniej mieszanki czcionek: Playfair Display (serif) dla nagłówków i Geist Sans dla body. W pierwszej iteracji zmieniono na Quicksand (dla spójności z logo), ale po testach okazało się że Quicksand (geometric sans) jest mniej czytelna dla seniorów przy długich tekstach. Po porównaniu 3 opcji (Open Sans, Lato, Inter) wybrano **Lato** - ciepłą, przyjazną czcionkę z doskonałą czytelnością.
+
+**Zmienione pliki:**
+1. `app/globals.css` — dodano `--font-sans: 'Quicksand'` w `@theme`, zmieniono `body { font-family }` na Quicksand
+2. `src/components/knowledge/KnowledgeCenter.tsx` — usunięto `font-serif` z tytułów kafelków artykułów
+3. `components/poradniki/PoradnikiContent.tsx` — zmiana `font-serif` → `font-black` + `tracking-tight` w nagłówku "Potrzebujesz pomocy w opiece?" i tytułach artykułów
+4. `app/faq/page.tsx` — wszystkie nagłówki z `font-serif` → `font-black`
+5. `app/misja/client.tsx` — wszystkie nagłówki z `font-serif` → `font-black`
+6. `app/ulubione/porownaj/page.tsx` — usunięto `font-serif`
+7. `app/ulubione/page.tsx` — usunięto `font-serif`
+8. `components/AccessibilityPanel.tsx` — usunięto `font-serif`
+9. `src/components/FacilityNotesDisplay.tsx` — usunięto `font-serif`
+10. `src/components/asystent/SupportAssistant.tsx` — usunięto `font-serif`
+11. `src/components/FacilityNotesModal.tsx` — usunięto `font-serif`
+12. `src/components/placowka/PlacowkaDetails.tsx` — usunięto `font-serif`
+13. `app/kontakt/page.tsx` — dostosowano style do landing page (emerald zamiast primary, font-black zamiast font-serif)
+
+**Nowa dokumentacja:**
+- Dodano sekcję **10.5 SYSTEM CZCIONEK** w `PROJEKT_DOKUMENTACJA.md` z instrukcjami jak zmienić czcionkę w przyszłości
+
+**Testowane czcionki:**
+- Quicksand (geometric, zaokrąglona) - spójna z logo, ale mniej czytelna dla seniorów
+- Open Sans (neutralna, uniwersalna) - bardzo dobra, bezpieczny wybór
+- Lato (ciepła, przyjazna) - **wybrana** ✓
+- Inter (nowoczesna, UI-focused) - doskonała dla interfejsów
+
+**Wynik:**
+- Cały projekt używa teraz jednej, spójnej czcionki: **Lato** (senior-friendly, ciepła, bardzo czytelna)
+- Usuniętych ~30+ wystąpień `font-serif` z aktywnych komponentów
+- Dodane alternatywne czcionki do layout.tsx (Quicksand, Open Sans, Inter) - gotowe do szybkiej zmiany
+- Zaktualizowana dokumentacja z mapą konfiguracji czcionek i uzasadnieniem wyboru
+
+---
 
 ### Sesja #3 — 2026-02-15
 

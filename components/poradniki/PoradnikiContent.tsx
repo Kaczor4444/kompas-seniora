@@ -119,7 +119,7 @@ export default function PoradnikiContent({
               Wróć do strony głównej
             </Link>
 
-            <h1 className="text-3xl md:text-5xl font-serif font-bold mb-4 md:mb-6 text-center md:text-left">
+            <h1 className="text-3xl md:text-5xl font-black mb-4 md:mb-6 text-center md:text-left tracking-tighter">
               Potrzebujesz pomocy w opiece?
             </h1>
             <p className="text-emerald-100 text-lg mb-8 max-w-2xl text-center md:text-left">
@@ -288,7 +288,7 @@ export default function PoradnikiContent({
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-xl font-bold text-slate-900 mb-3 font-serif leading-tight group-hover:text-emerald-600 transition-colors line-clamp-2">
+                      <h3 className="text-xl font-black text-slate-900 mb-3 leading-tight tracking-tight group-hover:text-emerald-600 transition-colors line-clamp-2">
                         {article.title.replace('[Placeholder] ', '')}
                       </h3>
 
@@ -325,7 +325,7 @@ export default function PoradnikiContent({
           {isFullPage && (
             <aside className="hidden lg:block w-80 flex-shrink-0">
               <div className="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm sticky top-32">
-                <h3 className="font-bold font-serif text-xl mb-6 flex items-center gap-2">
+                <h3 className="font-black text-xl mb-6 flex items-center gap-2 tracking-tight">
                   <TrendingUp className="text-emerald-600" /> Najczęściej czytane
                 </h3>
 
@@ -336,7 +336,7 @@ export default function PoradnikiContent({
                       href={`/poradniki/${article.sectionId}/${article.slug}`}
                       className="group cursor-pointer flex items-start gap-4"
                     >
-                      <span className="text-3xl font-serif font-bold text-stone-200 group-hover:text-emerald-200 transition-colors flex-shrink-0">
+                      <span className="text-3xl font-black text-stone-200 group-hover:text-emerald-200 transition-colors flex-shrink-0 tracking-tight">
                         {index + 1}
                       </span>
                       <div>

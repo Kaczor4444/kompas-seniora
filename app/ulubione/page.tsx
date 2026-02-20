@@ -135,7 +135,7 @@ export default function FavoritesPage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-50 text-primary-700 rounded-full text-[10px] font-extrabold uppercase tracking-widest border border-primary-100">
               <Heart size={12} className="fill-current" /> Schowek ulubionych
             </div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 tracking-tight leading-none">
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-none">
               Twoje miejsca
             </h1>
             <p className="text-slate-500 text-lg">
@@ -185,7 +185,7 @@ export default function FavoritesPage() {
             <div className="w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-primary-50/50">
               <Heart size={36} className="text-primary-400" />
             </div>
-            <h2 className="text-2xl font-serif font-bold text-slate-900 mb-3">Twój schowek jest pusty</h2>
+            <h2 className="text-2xl font-black text-slate-900 mb-3">Twój schowek jest pusty</h2>
             <p className="text-slate-500 mb-8 leading-relaxed">
               Przeglądaj placówki i klikaj serce, aby zapisywać te, które Cię zainteresują.
             </p>
@@ -255,7 +255,7 @@ export default function FavoritesPage() {
                             <div className="text-[10px] font-extrabold text-white/60 uppercase tracking-widest mb-1">
                               {facility.typ_placowki}
                             </div>
-                            <div className="text-2xl font-serif font-bold text-white">
+                            <div className="text-2xl font-black text-white">
                               {facility.koszt_pobytu
                                 ? formatCurrency(facility.koszt_pobytu) + '/mc'
                                 : <span className="text-emerald-300">Bezpłatne</span>
@@ -270,7 +270,7 @@ export default function FavoritesPage() {
 
                       {/* Card body */}
                       <div className="p-5">
-                        <h3 className="font-serif text-xl font-bold text-slate-900 mb-1 leading-snug group-hover:text-primary-700 transition-colors line-clamp-2">
+                        <h3 className="text-xl font-black tracking-tight text-slate-900 mb-1 leading-snug group-hover:text-primary-700 transition-colors line-clamp-2">
                           {facility.nazwa}
                         </h3>
 

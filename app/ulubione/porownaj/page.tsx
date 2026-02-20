@@ -194,7 +194,7 @@ function ComparePageContent() {
               <Link href="/ulubione" className="p-2 -ml-2 text-slate-400 hover:text-primary-600 transition-all active:scale-75">
                 <ArrowLeft size={22} />
               </Link>
-              <h1 className="text-lg md:text-2xl font-serif font-bold text-slate-900 leading-tight">
+              <h1 className="text-lg md:text-2xl font-black text-slate-900 leading-tight">
                 Wybrane <span className="text-primary-600">placówki</span>
               </h1>
             </div>
@@ -235,7 +235,7 @@ function ComparePageContent() {
               {/* HEADERS */}
               <div className="grid grid-cols-[100px_repeat(3,calc(100vw-120px))] md:grid-cols-[200px_repeat(3,1fr)] border-b-2 border-stone-100 bg-white/95 backdrop-blur-md sticky top-0 z-40">
                 <div className="px-2 py-1 md:px-6 md:py-2 flex flex-col justify-end border-r border-stone-100 sticky left-0 z-50 bg-white">
-                   <h3 className="font-serif text-sm md:text-xl font-bold text-slate-900 leading-tight">Zestawienie<br/>szczegółów</h3>
+                   <h3 className="text-sm md:text-xl font-black tracking-tight text-slate-900 leading-tight">Zestawienie<br/>szczegółów</h3>
                 </div>
                 
                 {selectedFacilities.map((item, idx) => (
@@ -288,7 +288,7 @@ function ComparePageContent() {
                    return (
                      <DataCell key={item.id} isBest={isLowest}>
                         <div className="w-full">
-                          <div className="text-xl md:text-4xl font-serif font-bold text-slate-900">
+                          <div className="text-xl md:text-4xl font-black text-slate-900">
                             {item.koszt_pobytu && item.koszt_pobytu > 0 
                               ? `${Math.round(item.koszt_pobytu).toLocaleString('pl-PL')} zł` 
                               : <span className="text-emerald-600">Bezpłatne</span>

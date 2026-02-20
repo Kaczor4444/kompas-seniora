@@ -332,7 +332,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-[10px] font-black uppercase tracking-widest mb-10 border border-primary-100">
                <Sparkles size={14} className="text-primary-500" /> Inteligentny Asystent Wyboru
             </div>
-            <h2 className="text-4xl md:text-7xl font-serif font-bold text-slate-900 mb-8 leading-tight tracking-tight">
+            <h2 className="text-4xl md:text-7xl font-black text-slate-900 mb-8 leading-tight tracking-tight">
               Dopasuj pomoc <br/> do potrzeb bliskiej osoby.
             </h2>
             <p className="text-slate-500 text-xl max-w-2xl mx-auto mb-14 leading-relaxed">
@@ -517,7 +517,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                    <Search size={32} className="animate-pulse" />
                 </div>
              </div>
-             <h3 className="text-2xl font-serif font-bold text-slate-900 mb-2">{LOADING_MESSAGES[loadingMsgIndex]}</h3>
+             <h3 className="text-2xl font-black text-slate-900 mb-2">{LOADING_MESSAGES[loadingMsgIndex]}</h3>
              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Weryfikujemy dane w: {answers.location || 'całej Małopolsce'}</p>
           </div>
         );
@@ -542,7 +542,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                       <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-500/20 text-primary-400 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 md:mb-8 border border-primary-500/20">
                          <Sparkles size={14} /> Rekomendacja Systemu
                       </div>
-                      <h3 className="text-3xl md:text-6xl lg:text-7xl font-serif font-bold mb-4 md:mb-8 leading-tight tracking-tight">
+                      <h3 className="text-3xl md:text-6xl lg:text-7xl font-black mb-4 md:mb-8 leading-tight tracking-tight">
                          Najlepszy będzie <br className="hidden md:block" /> 
                          <span className="text-primary-400 italic">
                            {recommendation === 'ŚDS' ? 'Dom Dzienny (ŚDS)' : 'Pobyt całodobowy (DPS)'}
@@ -624,7 +624,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                            onClick={() => setIsQuestionsExpanded(!isQuestionsExpanded)}
                            className="w-full text-left flex items-center justify-between group"
                          >
-                            <h4 className="text-xl md:text-2xl font-serif font-bold text-primary-900 flex items-center gap-3">
+                            <h4 className="text-xl md:text-2xl font-black text-primary-900 flex items-center gap-3">
                                <MessageSquare size={26} className="text-primary-600" /> Pytania do urzędnika
                             </h4>
                             <ChevronDown className={`text-primary-400 transition-transform md:hidden ${isQuestionsExpanded ? 'rotate-180' : ''}`} />
@@ -694,7 +694,7 @@ const StepHeader = ({ title, current, total, onBack, liveCount }: any) => (
        )}
      </div>
      <div className="flex justify-between items-end gap-8">
-        <h3 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 leading-tight tracking-tight">{title}</h3>
+        <h3 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight tracking-tight">{title}</h3>
         <div className="text-[10px] font-black text-primary-700 bg-primary-50 px-5 py-2 rounded-xl border border-primary-100 shadow-sm whitespace-nowrap uppercase tracking-widest">KROK {current} / {total}</div>
      </div>
      <div className="w-full h-2 bg-stone-100 rounded-full mt-10 overflow-hidden shadow-inner">

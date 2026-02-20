@@ -317,7 +317,7 @@ export default function KnowledgeCenter() {
                   {/* Image or Placeholder */}
                   {article.isPlaceholder ? (
                     <div className="relative h-36 bg-slate-200 flex items-center justify-center">
-                      <h3 className="text-2xl font-serif font-bold text-slate-600">Poradnik Seniora</h3>
+                      <h3 className="text-2xl font-black text-slate-600 tracking-tight">Poradnik Seniora</h3>
 
                       {/* Category badge ON image - bottom left */}
                       <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
@@ -367,7 +367,7 @@ export default function KnowledgeCenter() {
 
                   {/* Content - NO category tag here */}
                   <div className="p-4">
-                    <h3 className="text-base font-serif font-semibold text-slate-900 mb-2">
+                    <h3 className="text-base font-bold text-slate-900 mb-2 tracking-tight">
                       {article.title}
                     </h3>
                     <p className="text-neutral-700 text-sm mb-2">
