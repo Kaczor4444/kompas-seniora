@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-02-20 (sesja #4)
+> Ostatnia aktualizacja: 2026-02-20 (sesja #5 - reimport TERYT z filtrowaniem RM)
 
 ---
 
@@ -114,6 +114,9 @@
 **`TerytLocation`** - baza miejscowości TERYT (Małopolska + Śląsk)
 - `nazwa`, `nazwa_normalized` (bez polskich znaków)
 - `gmina`, `powiat`, `wojewodztwo`
+- `rodzaj_miejscowosci` (RM): 01=wieś, 96=miasto na prawach powiatu, 98=miasto, 00=część/dzielnica
+- `teryt_sym`, `teryt_sympod` - identyfikatory TERYT
+- **Import:** Tylko główne miejscowości (RM=01,96,98) - 1,901 lokalizacji, pominięto 11,932 części (RM=00)
 
 **`SharedList`** - udostępnione listy placówek przez token URL
 - `token` (unique), `ids` (string z przecinkami), `views`
@@ -536,6 +539,57 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 ---
 
 ## 16. HISTORIA ZMIAN (changelog sesji)
+
+### Sesja #5 — 2026-02-20
+
+**Temat:** Reimport TERYT z filtrowaniem RM (rodzaj miejscowości) - usunięcie "części" miejscowości z bazy TERYT.
+
+**Problem:**
+Baza TERYT zawierała wszystkie miejscowości z GUS (~13,833), w tym:
+- **Główne miejscowości** (RM=01 wsie, RM=96 miasta PP, RM=98 miasta): 1,901 szt
+- **Części miejscowości** (RM=00 - kolonie, dzielnice, przysiółki): 11,932 szt
+
+To powodowało że wyszukiwanie pokazywało np. 12 powiatów dla "zarzecze" (gdy w rzeczywistości są tylko 2 wsie o tej nazwie). Reszta to części/dzielnice innych miejscowości.
+
+**Rozwiązanie:**
+1. Zaktualizowano schemat Prisma - dodano kolumny do `TerytLocation`:
+   - `rodzaj_miejscowosci` (String?) - kod RM z SIMC
+   - `teryt_sym` (String?) - symbol TERYT
+   - `teryt_sympod` (String?) - symbol nadrzędny TERYT
+
+2. Utworzono nowy skrypt `scripts/import-teryt-filtered.js`:
+   - Importuje tylko RM=01, 96, 98 (główne miejscowości)
+   - Pomija RM=00 (części/kolonie) - 11,932 wpisów
+   - Dodaje metadane TERYT dla przyszłej geolokalizacji
+
+3. Zreimportowano dane TERYT:
+   - **Przed:** ~13,833 lokalizacji (wszystkie)
+   - **Po:** 1,901 lokalizacji (tylko główne)
+   - Przykład "zarzecze": z 12 powiatów → **2 powiaty** (zgodnie z GUS)
+
+**Zmienione pliki:**
+- `prisma/schema.prisma` — dodano 3 kolumny do TerytLocation
+- `scripts/import-teryt-filtered.js` — nowy skrypt z filtrowaniem RM
+
+**Weryfikacja:**
+```javascript
+// Test query pokazał poprawne działanie:
+SELECT nazwa, powiat, rodzaj_miejscowosci
+FROM TerytLocation
+WHERE nazwa_normalized = 'zarzecze';
+
+// Wynik: 2 wiersze (olkuski RM=01, nowosądecki RM=01)
+```
+
+**Znane ograniczenie:**
+1 placówka (DPS w Nowym Dworze, powiat krakowski) ma miejscowość będącą "częścią" (RM=00). Autocomplete nie zasugeruje tej lokalizacji. Planowane rozwiązanie: **OPCJA 1b** - import wszystkich RM, ale priorytetyzacja głównych w UI.
+
+**Następne kroki (zaplanowane):**
+- Reimport WSZYSTKICH miejscowości (RM=00 włącznie)
+- Autocomplete: pokazuj główne na górze, części na dole
+- Multi-powiat banner: agreguj tylko po głównych miejscowościach
+
+---
 
 ### Sesja #4 — 2026-02-20
 

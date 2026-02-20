@@ -49,17 +49,21 @@ model Placowka {
 }
 
 model TerytLocation {
-  id               Int     @id @default(autoincrement())
-  nazwa            String
-  nazwa_normalized String
-  typ              String
-  gmina            String?
-  powiat           String
-  wojewodztwo      String
+  id                    Int     @id @default(autoincrement())
+  nazwa                 String
+  nazwa_normalized      String
+  typ                   String
+  gmina                 String?
+  powiat                String
+  wojewodztwo           String
+  rodzaj_miejscowosci   String? // RM: 01=wieś, 96=miasto na prawach powiatu, 98=miasto
+  teryt_sym             String? // Symbol TERYT
+  teryt_sympod          String? // Symbol nadrzędny TERYT
 
   @@index([nazwa_normalized])
   @@index([powiat])
   @@index([wojewodztwo])
+  @@index([rodzaj_miejscowosci])
 }
 
 model SharedList {
