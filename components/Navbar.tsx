@@ -10,7 +10,7 @@ import { AccessibilityPanel } from './AccessibilityPanel';
 
 const AccessibilityIcon = ({ className }: { className?: string }) => (
   <Image
-    src="/images/logo_dostepnosc.png"
+    src="/images/logo_dostepnosc.webp"
     alt="Dostępność"
     width={44}
     height={44}
