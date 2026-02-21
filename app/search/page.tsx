@@ -139,14 +139,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // gdy user wpisał "Kraków"
       terytMatches = await prisma.terytLocation.findMany({
         where: { ...baseWhere, nazwa_normalized: normalizedQuery },
-        select: { powiat: true, gmina: true, nazwa: true, wojewodztwo: true },
+        select: { powiat: true, gmina: true, nazwa: true, wojewodztwo: true, rodzaj_miejscowosci: true }, // ✅ OPCJA 1b
       });
 
       // Fallback na partial tylko gdy brak exact matchy
       if (terytMatches.length === 0) {
         terytMatches = await prisma.terytLocation.findMany({
           where: { ...baseWhere, nazwa_normalized: { contains: normalizedQuery } },
-          select: { powiat: true, gmina: true, nazwa: true, wojewodztwo: true },
+          select: { powiat: true, gmina: true, nazwa: true, wojewodztwo: true, rodzaj_miejscowosci: true }, // ✅ OPCJA 1b
         });
       }
 
@@ -179,9 +179,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         // User WYBRAŁ konkretny powiat z dropdownu → użyj tylko tego
         uniquePowiaty = [normalizePolish(powiatParam)];
       } else {
-        // User WPISAŁ i kliknął "Szukaj" bez wyboru → pokaż WSZYSTKIE UNIKALNE powiaty
-        // Używamy Set aby usunąć duplikaty TERYT (ta sama miejscowość może być kilka razy w bazie dla tego samego powiatu)
-        uniquePowiaty = [...new Set(terytMatches.map((t: any) => normalizePolish(t.powiat)))];
+        // ✅ OPCJA 1b: User WPISAŁ i kliknął "Szukaj" bez wyboru → pokaż TYLKO powiaty z GŁÓWNYCH miejscowości
+        // Filtrujemy tylko RM=01,96,98 aby banner nie pokazywał powiatów z "części"
+        const mainTerytMatches = terytMatches.filter((t: any) =>
+          ['01', '96', '98'].includes(t.rodzaj_miejscowosci || '')
+        );
+        uniquePowiaty = [...new Set(mainTerytMatches.map((t: any) => normalizePolish(t.powiat)))];
       }
 
       // Filtruj placówki według wybranych powiatów

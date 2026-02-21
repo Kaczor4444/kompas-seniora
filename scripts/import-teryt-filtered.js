@@ -77,11 +77,12 @@ async function importTeryt() {
       continue;
     }
 
-    // ✅ NOWE: Filtruj tylko główne miejscowości (RM = 01, 96, 98)
-    if (!['01', '96', '98'].includes(rm)) {
-      skippedByRM++;
-      continue;
-    }
+    // ✅ OPCJA 1b: Importuj WSZYSTKIE miejscowości (w tym RM=00 części)
+    // Zachowaj RM w bazie żeby móc priorytetyzować w UI
+    // if (!['01', '96', '98'].includes(rm)) {
+    //   skippedByRM++;
+    //   continue;
+    // }
 
     const powiatNazwa = POWIATY_MAP[pow];
 

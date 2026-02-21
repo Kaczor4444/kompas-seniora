@@ -74,9 +74,15 @@ export async function GET(request: NextRequest) {
       const terytMatches = await prisma.terytLocation.findMany({
         where: terytWhere,
         distinct: ['nazwa', 'powiat'],
-        take: 20,
+        take: 50, // Zwiększono z 20 żeby pokazać więcej opcji
         orderBy: {
           nazwa: 'asc'
+        },
+        select: {
+          nazwa: true,
+          powiat: true,
+          wojewodztwo: true,
+          rodzaj_miejscowosci: true // ✅ OPCJA 1b: pobierz RM dla priorytetyzacji
         }
       });
 
@@ -119,23 +125,32 @@ export async function GET(request: NextRequest) {
             nazwa: loc.nazwa,
             powiat: loc.powiat,
             wojewodztwo: loc.wojewodztwo,
-            facilitiesCount: matchingFacilities.length
+            facilitiesCount: matchingFacilities.length,
+            rodzaj_miejscowosci: loc.rodzaj_miejscowosci // ✅ OPCJA 1b: przekaż RM do UI
           };
         })
       );
 
       // 3. Filtruj tylko te które mają placówki + sortuj po liczbie
+      // ✅ OPCJA 1b: Priorytetyzacja głównych (RM=01,96,98) nad częściami (RM=00)
       let withFacilities = suggestionsWithCount
         .filter(s => s.facilitiesCount > 0)
         .sort((a, b) => {
-          // BOOST: Exact match goes first
+          // 1. BOOST: Exact match goes first
           const aExact = normalizePolish(a.nazwa).toLowerCase() === normalizedQuery;
           const bExact = normalizePolish(b.nazwa).toLowerCase() === normalizedQuery;
-          
+
           if (aExact && !bExact) return -1;
           if (!aExact && bExact) return 1;
-          
-          // Otherwise sort by facility count
+
+          // 2. PRIORYTET: Główne miejscowości (RM=01,96,98) przed częściami (RM=00)
+          const aIsMain = ['01', '96', '98'].includes(a.rodzaj_miejscowosci || '');
+          const bIsMain = ['01', '96', '98'].includes(b.rodzaj_miejscowosci || '');
+
+          if (aIsMain && !bIsMain) return -1;
+          if (!aIsMain && bIsMain) return 1;
+
+          // 3. Otherwise sort by facility count
           return b.facilitiesCount - a.facilitiesCount;
         });
 
@@ -144,14 +159,16 @@ export async function GET(request: NextRequest) {
       // 🐛 DEBUG: Show what we're returning
       if (withFacilities.length > 0) {
         console.log('  📋 Top suggestions (sorted):');
-        withFacilities.slice(0, 5).forEach((s, i) => {
+        withFacilities.slice(0, 10).forEach((s, i) => {
           const isExact = normalizePolish(s.nazwa).toLowerCase() === normalizedQuery;
-          console.log(`    ${i + 1}. "${s.nazwa}" (${s.facilitiesCount}) - powiat: "${s.powiat}" ${isExact ? '⭐ EXACT' : ''}`);
+          const isMain = ['01', '96', '98'].includes(s.rodzaj_miejscowosci || '');
+          const rmLabel = isMain ? '⭐' : '🟡';
+          console.log(`    ${i + 1}. "${s.nazwa}" (${s.facilitiesCount}) - ${s.powiat} ${rmLabel}${isExact ? ' EXACT' : ''} RM=${s.rodzaj_miejscowosci}`);
         });
       }
 
-      // 4. Zwróć top 5 + totalCount
-      const topSuggestions = withFacilities.slice(0, 5);
+      // 4. Zwróć top 10 + totalCount (zwiększono z 5 żeby pokazać więcej opcji)
+      const topSuggestions = withFacilities.slice(0, 10);
       const totalCount = withFacilities.length;
 
       return NextResponse.json({

@@ -14,6 +14,7 @@ interface Suggestion {
   powiat: string;
   wojewodztwo: string;
   facilitiesCount: number;
+  rodzaj_miejscowosci?: string; // ✅ OPCJA 1b: 01=wieś, 96=miasto PP, 98=miasto, 00=część
 }
 
 interface SuggestResponse {
@@ -62,7 +63,15 @@ const AutocompleteDropdown: React.FC<AutocompleteDropdownProps> = ({
           >
             <div className="flex justify-between items-center">
               <div className="min-w-0 flex-1">
-                <p className="font-bold text-slate-900 text-sm truncate">{suggestion.nazwa}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-slate-900 text-sm truncate">{suggestion.nazwa}</p>
+                  {/* ✅ OPCJA 1b: Oznaczenie czy to główna miejscowość czy część */}
+                  {suggestion.rodzaj_miejscowosci && !['01', '96', '98'].includes(suggestion.rodzaj_miejscowosci) && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700 flex-shrink-0">
+                      część
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-slate-400 truncate">Powiat {suggestion.powiat}</p>
               </div>
             </div>
