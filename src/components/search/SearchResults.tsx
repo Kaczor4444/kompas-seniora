@@ -418,12 +418,12 @@ export default function SearchResults({
       />
 
       {/* Content Area */}
-      <div className="flex flex-1 h-[calc(100vh-240px)] overflow-hidden relative">
+      <div className="flex flex-1 md:h-[calc(100vh-240px)] md:overflow-hidden relative">
 
         {/* Results List */}
         <div className={`
           flex-1 md:w-1/2
-          overflow-y-auto p-3 sm:p-4 md:p-8 relative z-10
+          md:overflow-y-auto p-3 sm:p-4 md:p-8 relative z-10
           ${showMapMobile ? 'hidden md:block' : 'block'}
         `}>
           <div className="max-w-2xl ml-auto mr-0 md:mr-4 space-y-3 sm:space-y-4">
