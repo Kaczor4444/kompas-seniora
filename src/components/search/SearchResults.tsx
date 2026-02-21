@@ -206,6 +206,23 @@ export default function SearchResults({
   useEffect(() => {
     let filtered = results;
 
+    // ✅ If cityInput is completely empty (user cleared it), show no results
+    if (!cityInput || cityInput.trim() === '') {
+      setFacilities([]);
+      return;
+    }
+
+    // ✅ If user typed completely different city (not a substring of query), show no results
+    // This prevents showing old results when user types new city before clicking "Szukaj"
+    const normalizeText = (s: string) => s.toLowerCase().trim();
+    const inputNorm = normalizeText(cityInput);
+    const queryNorm = normalizeText(query);
+
+    if (cityInput !== query && !inputNorm.includes(queryNorm) && !queryNorm.includes(inputNorm)) {
+      setFacilities([]);
+      return;
+    }
+
     // Type filter
     if (selectedType !== 'all') {
       filtered = filtered.filter(f => {
@@ -216,7 +233,7 @@ export default function SearchResults({
 
     // City search — tylko gdy user zmienił input po załadowaniu
     // (gdy cityInput === query, serwer już przefiltrował przez TERYT → powiat)
-    if (cityInput && cityInput !== query) {
+    if (cityInput !== query) {
       filtered = filtered.filter(f =>
         f.miejscowosc?.toLowerCase().includes(cityInput.toLowerCase()) ||
         f.powiat?.toLowerCase().includes(cityInput.toLowerCase())
@@ -284,10 +301,28 @@ export default function SearchResults({
   // Scroll depth tracking
   useScrollTracking(facilities.length);
 
+  // ===== AUTO-RESET FILTERS WHEN CITY INPUT IS CLEARED =====
+  const prevCityInputRef = useRef(cityInput);
+  useEffect(() => {
+    // Only reset if cityInput changed from non-empty to empty
+    if (prevCityInputRef.current && (!cityInput || cityInput.trim() === '')) {
+      setSelectedType('all');
+      setSelectedVoivodeship("Wszystkie");
+      setSelectedPowiat("Wszystkie");
+      setSelectedProfile("Wszystkie");
+      setPriceLimit(10000);
+    }
+    prevCityInputRef.current = cityInput;
+  }, [cityInput]);
+
   // ===== HANDLERS =====
   const resetFilters = () => {
-    setCityInput(query);
-    setSelectedType(type);
+    // Only restore query if cityInput is not empty
+    // If user cleared cityInput, keep it empty (don't restore old query)
+    if (cityInput && cityInput.trim() !== '') {
+      setCityInput(query);
+    }
+    setSelectedType('all');
     setSelectedVoivodeship("Wszystkie");
     setSelectedPowiat("Wszystkie");
     setSelectedProfile("Wszystkie");
@@ -362,7 +397,7 @@ export default function SearchResults({
       />
 
       {/* Multi-Powiat Info Banner */}
-      {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && (
+      {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && (
         <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mx-3 sm:mx-4 md:mx-8 mb-2 rounded-r-lg">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 mt-0.5">
@@ -444,7 +479,7 @@ export default function SearchResults({
               </div>
             ) : facilities.length === 0 ? (
               // Empty State (po filtrowaniu po stronie klienta)
-              <EmptyState onResetFilters={resetFilters} />
+              <EmptyState onResetFilters={resetFilters} cityInput={cityInput} />
             ) : (
               <>
                 {/* Facility Cards */}

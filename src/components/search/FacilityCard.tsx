@@ -1,6 +1,7 @@
 // src/components/search/FacilityCard.tsx
 // ✅ FULLY RESPONSIVE - Mobile/Tablet/Desktop
 import React from 'react';
+import Image from 'next/image';
 import { MapPin, Heart, ArrowLeftRight } from 'lucide-react';
 
 interface FacilityCardProps {
@@ -58,18 +59,37 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
 
       {/* Image - RESPONSIVE */}
       <div className="relative w-full sm:w-[245px] h-48 sm:h-[195px] flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden bg-gray-100">
-        <img 
-          src={facility.image} 
-          alt={facility.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        
+        {/* Check if placeholder - show gradient + icon, otherwise show image */}
+        {facility.image.includes('placeholder') ? (
+          <div className={`
+            w-full h-full flex items-center justify-center transition-all duration-500
+            ${facility.type === 'DPS'
+              ? 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600'
+              : 'bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600'
+            }
+          `}>
+            <Image
+              src={facility.type === 'DPS' ? '/images/ikonka_dps.png' : '/images/ikonka_sds.png'}
+              alt={facility.type}
+              width={96}
+              height={96}
+              className="w-20 h-20 sm:w-24 sm:h-24 object-contain group-hover:scale-110 transition-transform duration-500"
+            />
+          </div>
+        ) : (
+          <img
+            src={facility.image}
+            alt={facility.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        )}
+
         {/* Type Badge on Image */}
         <div className="absolute bottom-3 right-3">
           <span className={`
             px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-bold backdrop-blur-sm
-            ${facility.type === 'DPS' 
-              ? 'bg-emerald-500/90 text-white' 
+            ${facility.type === 'DPS'
+              ? 'bg-emerald-500/90 text-white'
               : 'bg-blue-500/90 text-white'
             }
           `}>
