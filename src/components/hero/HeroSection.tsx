@@ -15,6 +15,7 @@ interface Suggestion {
   wojewodztwo: string;
   facilitiesCount: number;
   rodzaj_miejscowosci?: string; // ✅ OPCJA 1b: 01=wieś, 96=miasto PP, 98=miasto, 00=część
+  parentLocationName?: string | null; // ✅ Nazwa nadrzędnej miejscowości dla części
 }
 
 interface SuggestResponse {
@@ -72,7 +73,13 @@ const AutocompleteDropdown: React.FC<AutocompleteDropdownProps> = ({
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-400 truncate">Powiat {suggestion.powiat}</p>
+                <p className="text-xs text-slate-400 truncate">
+                  Powiat {suggestion.powiat}
+                  {/* ✅ Pokaż nazwę nadrzędnej miejscowości dla części */}
+                  {suggestion.parentLocationName && (
+                    <span className="text-slate-500"> • część wsi {suggestion.parentLocationName}</span>
+                  )}
+                </p>
               </div>
             </div>
           </li>

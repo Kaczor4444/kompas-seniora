@@ -82,7 +82,9 @@ export async function GET(request: NextRequest) {
           nazwa: true,
           powiat: true,
           wojewodztwo: true,
-          rodzaj_miejscowosci: true // ✅ OPCJA 1b: pobierz RM dla priorytetyzacji
+          rodzaj_miejscowosci: true, // ✅ OPCJA 1b: pobierz RM dla priorytetyzacji
+          teryt_sym: true, // ✅ Symbol TERYT
+          teryt_sympod: true // ✅ Symbol nadrzędnej miejscowości (dla części)
         }
       });
 
@@ -109,7 +111,7 @@ export async function GET(request: NextRequest) {
           // Filtruj po powiecie (case-insensitive + contains)
           const matchingFacilities = allFacilities.filter(f => {
             const normalizedFacilityPowiat = normalizePolish(f.powiat);
-            const powiatMatch = normalizedFacilityPowiat.includes(normalizedPowiat) || 
+            const powiatMatch = normalizedFacilityPowiat.includes(normalizedPowiat) ||
                                normalizedPowiat.includes(normalizedFacilityPowiat);
 
             // Filtr typu
@@ -121,12 +123,23 @@ export async function GET(request: NextRequest) {
             return powiatMatch;
           });
 
+          // ✅ Dla części (RM=00) znajdź nazwę nadrzędnej miejscowości
+          let parentLocationName: string | null = null;
+          if (loc.rodzaj_miejscowosci === '00' && loc.teryt_sympod) {
+            const parent = await prisma.terytLocation.findFirst({
+              where: { teryt_sym: loc.teryt_sympod },
+              select: { nazwa: true }
+            });
+            parentLocationName = parent?.nazwa || null;
+          }
+
           return {
             nazwa: loc.nazwa,
             powiat: loc.powiat,
             wojewodztwo: loc.wojewodztwo,
             facilitiesCount: matchingFacilities.length,
-            rodzaj_miejscowosci: loc.rodzaj_miejscowosci // ✅ OPCJA 1b: przekaż RM do UI
+            rodzaj_miejscowosci: loc.rodzaj_miejscowosci, // ✅ OPCJA 1b: przekaż RM do UI
+            parentLocationName // ✅ Nazwa nadrzędnej miejscowości dla części
           };
         })
       );
