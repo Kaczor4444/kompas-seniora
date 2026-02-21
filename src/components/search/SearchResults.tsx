@@ -207,7 +207,8 @@ export default function SearchResults({
     let filtered = results;
 
     // ✅ If cityInput is completely empty (user cleared it), show no results
-    if (!cityInput || cityInput.trim() === '') {
+    // EXCEPT when using geolocation (userLocation is set)
+    if ((!cityInput || cityInput.trim() === '') && !userLocation) {
       setFacilities([]);
       return;
     }
@@ -397,7 +398,7 @@ export default function SearchResults({
       />
 
       {/* Multi-Powiat Info Banner */}
-      {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && (
+      {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && !userLocation && (
         <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mx-3 sm:mx-4 md:mx-8 mb-2 rounded-r-lg">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 mt-0.5">
