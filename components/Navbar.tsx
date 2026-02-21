@@ -328,10 +328,10 @@ export default function Navbar() {
             <div className="flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
-                className={`flex w-10 h-10 md:w-11 md:h-11 rounded-full items-center justify-center transition-all border group
+                className={`flex w-10 h-10 md:w-11 md:h-11 rounded-full items-center justify-center transition-all group
                   ${isHighContrast
-                    ? 'bg-yellow-400 text-black border-yellow-400'
-                    : 'bg-white text-primary-600 border-stone-200 hover:border-primary-500 hover:bg-primary-50 shadow-sm'
+                    ? 'bg-yellow-400 text-black'
+                    : 'hover:bg-primary-50/30'
                   }`}
                 title="Dostępność"
                 aria-label="Otwórz panel dostępności"
