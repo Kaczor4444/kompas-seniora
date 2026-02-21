@@ -9,11 +9,13 @@ import { getFavoritesCount } from '@/src/utils/favorites';
 import { AccessibilityPanel } from './AccessibilityPanel';
 
 const AccessibilityIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <circle cx="50" cy="50" r="44" stroke="currentColor" strokeWidth="8"/>
-    <circle cx="50" cy="30" r="7" fill="currentColor"/>
-    <path d="M50 40 L50 65 M50 42 L25 55 M50 42 L75 55 M50 65 L35 88 M50 65 L65 88" stroke="currentColor" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
+  <Image
+    src="/images/logo_dostepnosc.png"
+    alt="Dostępność"
+    width={28}
+    height={28}
+    className={className}
+  />
 );
 
 const NavbarLogo = () => (
