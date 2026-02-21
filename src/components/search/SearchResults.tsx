@@ -498,8 +498,10 @@ export default function SearchResults({
                       street: fac.ulica,
                       image: '/images/placeholder-facility.jpg', // Add your image logic
                       waitTime: 'Brak danych',
-                      profileLabels: getShortProfileLabels(fac.profil_opieki, fac.typ_placowki)
+                      profileLabels: getShortProfileLabels(fac.profil_opieki, fac.typ_placowki),
+                      distance: fac.distance
                     }}
+                    userLocation={userLocation}
                     isHovered={hoveredId === fac.id}
                     isSaved={favoritesState.includes(fac.id)}
                     isCompared={selectedForCompare.includes(fac.id)}

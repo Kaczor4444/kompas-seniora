@@ -2,7 +2,7 @@
 // ✅ FULLY RESPONSIVE - Mobile/Tablet/Desktop
 import React from 'react';
 import Image from 'next/image';
-import { MapPin, Heart, ArrowLeftRight } from 'lucide-react';
+import { MapPin, Heart, ArrowLeftRight, Navigation } from 'lucide-react';
 
 interface FacilityCardProps {
   facility: {
@@ -17,6 +17,7 @@ interface FacilityCardProps {
     image: string;
     waitTime: string;
     profileLabels?: string[];
+    distance?: number | null;
   };
   isHovered: boolean;
   isSaved: boolean;
@@ -25,6 +26,7 @@ interface FacilityCardProps {
   onClick: () => void;
   onToggleSave: (e: React.MouseEvent) => void;
   onToggleCompare: (e: React.MouseEvent) => void;
+  userLocation?: { lat: number; lng: number };
 }
 
 export const FacilityCard: React.FC<FacilityCardProps> = ({
@@ -35,7 +37,8 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
   onHover,
   onClick,
   onToggleSave,
-  onToggleCompare
+  onToggleCompare,
+  userLocation
 }) => {
   return (
     <div
@@ -120,6 +123,20 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               {facility.street ? `${facility.street}, ` : ''}{facility.city}
             </span>
           </div>
+
+          {/* Distance Badge */}
+          {facility.distance !== null && facility.distance !== undefined && (
+            <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold mb-3">
+              <Navigation size={14} className="flex-shrink-0" />
+              <span>
+                {facility.distance < 1
+                  ? `${Math.round(facility.distance * 1000)} m`
+                  : `${facility.distance.toFixed(1)} km`
+                }
+                {userLocation ? ' od Ciebie' : ''}
+              </span>
+            </div>
+          )}
 
           {/* Profile Badges */}
           {facility.profileLabels && facility.profileLabels.length > 0 && (
