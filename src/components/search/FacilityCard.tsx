@@ -126,7 +126,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
 
           {/* Distance Badge */}
           {facility.distance !== null && facility.distance !== undefined && (
-            <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold mb-3">
+            <div className="flex items-center gap-1.5 text-xs text-slate-700 font-semibold mb-3">
               <Navigation size={14} className="flex-shrink-0" />
               <span>
                 {facility.distance < 1
