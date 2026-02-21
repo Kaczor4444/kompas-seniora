@@ -64,21 +64,15 @@ const AutocompleteDropdown: React.FC<AutocompleteDropdownProps> = ({
           >
             <div className="flex justify-between items-center">
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-bold text-slate-900 text-sm truncate">{suggestion.nazwa}</p>
-                  {/* ✅ OPCJA 1b: Oznaczenie czy to główna miejscowość czy część */}
-                  {suggestion.rodzaj_miejscowosci && !['01', '96', '98'].includes(suggestion.rodzaj_miejscowosci) && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700 flex-shrink-0">
-                      część
-                    </span>
+                <p className="font-bold text-slate-900 text-sm truncate">
+                  {suggestion.nazwa}
+                  {/* ✅ Pokaż nazwę nadrzędnej miejscowości dla części w nawiasie */}
+                  {suggestion.parentLocationName && (
+                    <span className="text-slate-500 font-normal"> (część wsi {suggestion.parentLocationName})</span>
                   )}
-                </div>
+                </p>
                 <p className="text-xs text-slate-400 truncate">
                   Powiat {suggestion.powiat}
-                  {/* ✅ Pokaż nazwę nadrzędnej miejscowości dla części */}
-                  {suggestion.parentLocationName && (
-                    <span className="text-slate-500"> • część wsi {suggestion.parentLocationName}</span>
-                  )}
                 </p>
               </div>
             </div>
