@@ -24,7 +24,7 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
   isFavoritesView = false
 }) => {
   return (
-    <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <div className="sticky top-0 md:top-20 z-40 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
         <div className="flex items-center gap-4">
 

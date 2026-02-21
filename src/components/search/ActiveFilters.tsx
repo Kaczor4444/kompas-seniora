@@ -19,7 +19,7 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   if (chips.length === 0) return null;
 
   return (
-    <div className="sticky top-[72px] z-40 bg-white border-b border-gray-200 shadow-sm">
+    <div className="sticky top-[72px] md:top-[152px] z-30 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-3">
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
           {chips.map((chip, idx) => (
