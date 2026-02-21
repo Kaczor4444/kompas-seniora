@@ -328,7 +328,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
-                className={`flex w-10 h-10 md:w-11 md:h-11 rounded-full items-center justify-center transition-all group
+                className={`flex w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center transition-all group
                   ${isHighContrast
                     ? 'bg-yellow-400 text-black'
                     : 'hover:bg-primary-50/30'
@@ -336,7 +336,7 @@ export default function Navbar() {
                 title="Dostępność"
                 aria-label="Otwórz panel dostępności"
               >
-                <AccessibilityIcon className="w-9 h-9 md:w-10 md:h-10 group-hover:scale-110 transition-transform" />
+                <AccessibilityIcon className="w-7 h-7 md:w-8 md:h-8 group-hover:scale-110 transition-transform" />
               </button>
 
               <Link
@@ -438,7 +438,7 @@ export default function Navbar() {
                   onClick={() => { setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen); setIsOpen(false); }}
                   className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
                 >
-                  <AccessibilityIcon className="w-[28px] h-[28px]" /> <span>Ułatwienia dostępu</span>
+                  <AccessibilityIcon className="w-[24px] h-[24px]" /> <span>Ułatwienia dostępu</span>
                 </button>
               </div>
 
