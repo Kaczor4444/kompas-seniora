@@ -12,8 +12,8 @@ const AccessibilityIcon = ({ className }: { className?: string }) => (
   <Image
     src="/images/logo_dostepnosc.png"
     alt="Dostępność"
-    width={28}
-    height={28}
+    width={44}
+    height={44}
     className={className}
   />
 );
