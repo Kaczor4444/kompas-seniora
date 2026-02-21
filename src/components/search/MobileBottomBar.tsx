@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { List, Map, SlidersHorizontal, ArrowUpDown, Heart, X, Check } from 'lucide-react';
+import { List, Map, SlidersHorizontal, ArrowUpDown, Heart, X, Check, MapPin } from 'lucide-react';
 import { getFavorites } from '@/src/utils/favorites';
 
 interface MobileBottomBarProps {
@@ -13,6 +13,7 @@ interface MobileBottomBarProps {
   activeFiltersCount: number;
   onOpenFilters: () => void;
   hasUserLocation?: boolean;
+  onGeolocation?: () => void;
 }
 
 export default function MobileBottomBar({
@@ -21,6 +22,7 @@ export default function MobileBottomBar({
   activeFiltersCount,
   onOpenFilters,
   hasUserLocation = false,
+  onGeolocation,
 }: MobileBottomBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -92,6 +94,20 @@ export default function MobileBottomBar({
 
           {/* Divider */}
           <div className="w-px h-4 bg-gray-600 mx-1 flex-shrink-0" />
+
+          {/* Geolokalizacja (jeśli funkcja dostępna) */}
+          {onGeolocation && (
+            <button
+              onClick={onGeolocation}
+              className="flex items-center justify-center p-2.5 rounded-full text-emerald-400 hover:text-emerald-300 transition-all"
+              aria-label="Użyj geolokalizacji"
+            >
+              <MapPin size={16} />
+            </button>
+          )}
+
+          {/* Divider */}
+          {onGeolocation && <div className="w-px h-4 bg-gray-600 mx-1 flex-shrink-0" />}
 
           {/* Filtry + Sortuj zgrupowane razem */}
           <div className="flex items-center gap-0.5">
