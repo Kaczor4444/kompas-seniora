@@ -8,25 +8,33 @@ interface FilterPanelProps {
   onTypeChange: (value: string) => void;
   selectedPowiat: string;
   onPowiatChange: (value: string) => void;
-  selectedProfile: string;
-  onProfileChange: (value: string) => void;
+  selectedProfiles: string[];
+  onProfilesChange: (value: string[]) => void;
   priceLimit: number;
   onPriceLimitChange: (value: number) => void;
+  maxDistance?: number;
+  onMaxDistanceChange?: (value: number) => void;
+  maxDistanceFromCity?: number;
+  onMaxDistanceFromCityChange?: (value: number) => void;
   availablePowiats: string[];
   availableProfiles?: string[];
+  userLocation?: { lat: number; lng: number };
+  searchCenter?: { lat: number; lng: number; name: string };
   onReset: () => void;
   onClose: () => void;
   onApply?: () => void;
 }
 
 const ALL_CARE_PROFILES = [
-  { value: "Wszystkie", label: "Wszystkie" },
   { value: "E", label: "Osoby starsze" },
   { value: "C", label: "Psychicznie chorzy" },
   { value: "F", label: "Somatycznie chorzy" },
   { value: "A", label: "Niepełnosprawni intelektualnie" },
   { value: "I", label: "Niepełnosprawni fizycznie" },
-  { value: "G", label: "Dzieci i młodzież" },
+  { value: "G", label: "Dzieci niepełnosprawne" },
+  { value: "H", label: "Młodzież niepełnosprawna" },
+  { value: "B", label: "Zaburzenia psychiczne (ŚDS)" },
+  { value: "D", label: "Podeszły wiek (ŚDS)" },
 ];
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({
@@ -35,18 +43,24 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   onTypeChange,
   selectedPowiat,
   onPowiatChange,
-  selectedProfile,
-  onProfileChange,
+  selectedProfiles,
+  onProfilesChange,
   priceLimit,
   onPriceLimitChange,
+  maxDistance,
+  onMaxDistanceChange,
+  maxDistanceFromCity,
+  onMaxDistanceFromCityChange,
   availablePowiats,
   availableProfiles,
+  userLocation,
+  searchCenter,
   onReset,
   onClose,
   onApply,
 }) => {
   const careProfiles = availableProfiles && availableProfiles.length > 0
-    ? ALL_CARE_PROFILES.filter(p => p.value === "Wszystkie" || availableProfiles.includes(p.value))
+    ? ALL_CARE_PROFILES.filter(p => availableProfiles.includes(p.value))
     : ALL_CARE_PROFILES;
   const handleApply = () => {
     onApply?.();
@@ -57,7 +71,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const filterContent = (
     <>
       {/* Filter Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <FilterSelect
           label="Typ placówki"
           value={selectedType}
@@ -74,13 +88,41 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           onChange={onPowiatChange}
           options={availablePowiats.map(p => ({ value: p, label: p }))}
         />
-        <FilterSelect
-          label="Profil podopiecznego"
-          value={selectedProfile}
-          onChange={onProfileChange}
-          options={careProfiles}
-        />
       </div>
+
+      {/* Profile Checkboxes */}
+      {careProfiles.length > 0 && (
+        <div className="mb-6 pb-6 border-b border-gray-200">
+          <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
+            Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {careProfiles.map((profile) => {
+              const isSelected = selectedProfiles.includes(profile.value);
+              return (
+                <label
+                  key={profile.value}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        onProfilesChange([...selectedProfiles, profile.value]);
+                      } else {
+                        onProfilesChange(selectedProfiles.filter(c => c !== profile.value));
+                      }
+                    }}
+                    className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">{profile.label}</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Price Range */}
       <div className="mb-6 pb-6 border-b border-gray-200">
@@ -97,6 +139,50 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
         />
       </div>
+
+      {/* Distance from Geolocation Filter */}
+      {userLocation && maxDistance !== undefined && onMaxDistanceChange && (
+        <div className="mb-6 pb-6 border-b border-gray-200">
+          <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
+            Odległość: <span className="text-gray-900 font-semibold">{maxDistance === 100 ? 'Wszystkie' : `do ${maxDistance} km`}</span>
+          </label>
+          <input
+            type="range"
+            min="5"
+            max="100"
+            step="5"
+            value={maxDistance}
+            onChange={(e) => onMaxDistanceChange(Number(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+          />
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>5 km</span>
+            <span>100 km</span>
+          </div>
+        </div>
+      )}
+
+      {/* Distance from City Filter */}
+      {searchCenter && !userLocation && maxDistanceFromCity !== undefined && onMaxDistanceFromCityChange && (
+        <div className="mb-6 pb-6 border-b border-gray-200">
+          <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
+            Odległość od {searchCenter.name}: <span className="text-gray-900 font-semibold">{maxDistanceFromCity === 100 ? 'Wszystkie' : `do ${maxDistanceFromCity} km`}</span>
+          </label>
+          <input
+            type="range"
+            min="5"
+            max="100"
+            step="5"
+            value={maxDistanceFromCity}
+            onChange={(e) => onMaxDistanceFromCityChange(Number(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+          />
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>5 km</span>
+            <span>100 km</span>
+          </div>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex items-center justify-between">

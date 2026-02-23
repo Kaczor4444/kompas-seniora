@@ -8,6 +8,7 @@ import { isFavorite, addFavorite, removeFavorite } from '@/src/utils/favorites';
 import { getShortProfileLabels } from '@/src/lib/profileLabels';
 import { useAppAnalytics } from '@/src/hooks/useAppAnalytics';
 import { useScrollTracking } from '@/src/hooks/useScrollTracking';
+import { calculateDistance } from '@/src/utils/distance';
 
 // Import modular components
 import { SearchHeader } from './SearchHeader';
@@ -38,6 +39,7 @@ interface Facility {
   longitude: number | null;
   profil_opieki?: string | null;
   distance?: number | null;
+  distanceFromCity?: number | null;
   ulica?: string | null;
   kod_pocztowy?: string | null;
   prowadzacy?: string | null;
@@ -99,7 +101,7 @@ export default function SearchResults({
   const [selectedPowiat, setSelectedPowiat] = useState(
     activeFilters?.powiat || "Wszystkie"
   );
-  const [selectedProfile, setSelectedProfile] = useState("Wszystkie");
+  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
   const [priceLimit, setPriceLimit] = useState(
     activeFilters?.maxPrice || 10000
   );
@@ -114,7 +116,8 @@ export default function SearchResults({
   const [visibleCount, setVisibleCount] = useState(20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [favoritesState, setFavoritesState] = useState<number[]>([]);
-  const [maxDistance, setMaxDistance] = useState<number>(100); // km
+  const [maxDistance, setMaxDistance] = useState<number>(100); // km (from geolocation)
+  const [maxDistanceFromCity, setMaxDistanceFromCity] = useState<number>(100); // km (from searched city)
 
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
@@ -161,10 +164,10 @@ export default function SearchResults({
         clear: () => setSelectedPowiat("Wszystkie")
       });
     }
-    if (selectedProfile !== "Wszystkie") {
+    if (selectedProfiles.length > 0) {
       chips.push({
-        label: `Profil: ${selectedProfile}`,
-        clear: () => setSelectedProfile("Wszystkie")
+        label: `Profile: ${selectedProfiles.length}`,
+        clear: () => setSelectedProfiles([])
       });
     }
     if (priceLimit < 10000) {
@@ -179,8 +182,14 @@ export default function SearchResults({
         clear: () => setMaxDistance(100)
       });
     }
+    if (searchCenter && maxDistanceFromCity < 100) {
+      chips.push({
+        label: `Od ${searchCenter.name}: ${maxDistanceFromCity} km`,
+        clear: () => setMaxDistanceFromCity(100)
+      });
+    }
     return chips;
-  }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfile, priceLimit, maxDistance, userLocation]);
+  }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter]);
 
 
   // Sync filter state when activeFilters prop changes (e.g. after router.push navigation)
@@ -202,13 +211,36 @@ export default function SearchResults({
         const favorites = JSON.parse(localStorage.getItem('kompas-seniora-favorites') || '[]');
         setFavoritesState(favorites.map((f: any) => f.id));
       };
-      
+
       updateFavorites();
       window.addEventListener('favoritesChanged', updateFavorites);
-      
+
       return () => window.removeEventListener('favoritesChanged', updateFavorites);
     }
   }, []);
+
+  // Calculate distance from searched city for all facilities
+  useEffect(() => {
+    if (!searchCenter) return;
+
+    const resultsWithCityDistance = results.map(facility => {
+      if (!facility.latitude || !facility.longitude) {
+        return { ...facility, distanceFromCity: null };
+      }
+
+      const dist = calculateDistance(
+        searchCenter.lat,
+        searchCenter.lng,
+        parseFloat(facility.latitude as any),
+        parseFloat(facility.longitude as any)
+      );
+
+      return { ...facility, distanceFromCity: dist };
+    });
+
+    setFacilities(resultsWithCityDistance);
+  }, [searchCenter, results]);
+
   // ===== FILTERING LOGIC =====
   useEffect(() => {
     let filtered = results;
@@ -263,12 +295,13 @@ export default function SearchResults({
       filtered = filtered.filter(f => norm(f.powiat ?? '') === targetPowiat);
     }
 
-    // Profile filter - selectedProfile is a code letter (e.g. "E", "A")
-    if (selectedProfile !== "Wszystkie") {
+    // Profile filter - selectedProfiles is an array of code letters
+    if (selectedProfiles.length > 0) {
       filtered = filtered.filter(f => {
         if (!f.profil_opieki) return false;
         const codes = f.profil_opieki.split(',').map((c: string) => c.trim());
-        return codes.includes(selectedProfile);
+        // Check if facility has at least one of the selected profiles
+        return selectedProfiles.some(selectedCode => codes.includes(selectedCode));
       });
     }
 
@@ -285,6 +318,14 @@ export default function SearchResults({
       });
     }
 
+    // Distance from searched city filter (only when searchCenter exists)
+    if (searchCenter && maxDistanceFromCity < 100) {
+      filtered = filtered.filter(f => {
+        if (f.distanceFromCity === null || f.distanceFromCity === undefined) return false;
+        return f.distanceFromCity <= maxDistanceFromCity;
+      });
+    }
+
     setFacilities(filtered);
 
     // Track empty results
@@ -293,25 +334,25 @@ export default function SearchResults({
         powiat: selectedPowiat,
         type: selectedType,
         priceLimit,
-        profile: selectedProfile,
+        profile: selectedProfiles.join(','),
         totalServerResults: results.length,
       });
     }
 
     // Track filter combinations (debounced by combo key)
-    const combo = [selectedPowiat, selectedType, selectedProfile, priceLimit].join('|');
+    const combo = [selectedPowiat, selectedType, selectedProfiles.join(','), priceLimit].join('|');
     if (combo !== filterTrackedRef.current) {
       filterTrackedRef.current = combo;
       trackFilterApplied({
         powiat: selectedPowiat,
         type: selectedType,
         priceLimit,
-        profile: selectedProfile,
+        profile: selectedProfiles.join(','),
       });
     }
   }, [
     results, selectedType, cityInput, selectedVoivodeship, selectedPowiat,
-    selectedProfile, priceLimit, maxDistance, userLocation, trackEmptyResults, trackFilterApplied
+    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, trackEmptyResults, trackFilterApplied
   ]);
 
   // Scroll depth tracking
@@ -325,9 +366,10 @@ export default function SearchResults({
       setSelectedType('all');
       setSelectedVoivodeship("Wszystkie");
       setSelectedPowiat("Wszystkie");
-      setSelectedProfile("Wszystkie");
+      setSelectedProfiles([]);
       setPriceLimit(10000);
       setMaxDistance(100);
+      setMaxDistanceFromCity(100);
     }
     prevCityInputRef.current = cityInput;
   }, [cityInput]);
@@ -342,9 +384,10 @@ export default function SearchResults({
     setSelectedType('all');
     setSelectedVoivodeship("Wszystkie");
     setSelectedPowiat("Wszystkie");
-    setSelectedProfile("Wszystkie");
+    setSelectedProfiles([]);
     setPriceLimit(10000);
     setMaxDistance(100);
+    setMaxDistanceFromCity(100);
   };
 
   const normPowiat = (s: string) =>
@@ -464,12 +507,18 @@ export default function SearchResults({
         onTypeChange={setSelectedType}
         selectedPowiat={selectedPowiat}
         onPowiatChange={handlePowiatChange}
-        selectedProfile={selectedProfile}
-        onProfileChange={setSelectedProfile}
+        selectedProfiles={selectedProfiles}
+        onProfilesChange={setSelectedProfiles}
         priceLimit={priceLimit}
         onPriceLimitChange={setPriceLimit}
+        maxDistance={maxDistance}
+        onMaxDistanceChange={setMaxDistance}
+        maxDistanceFromCity={maxDistanceFromCity}
+        onMaxDistanceFromCityChange={setMaxDistanceFromCity}
         availablePowiats={availablePowiats}
         availableProfiles={availableProfiles}
+        userLocation={userLocation}
+        searchCenter={searchCenter}
         onReset={resetFilters}
         onClose={() => setShowFilters(false)}
         onApply={handleApplyFilters}
@@ -531,17 +580,44 @@ export default function SearchResults({
               {/* Profile Filter */}
               {availableProfiles.length > 0 && (
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">Profil opieki</label>
-                  <select
-                    value={selectedProfile}
-                    onChange={(e) => setSelectedProfile(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  >
-                    <option value="Wszystkie">Wszystkie</option>
-                    {availableProfiles.map((code) => (
-                      <option key={code} value={code}>{code}</option>
-                    ))}
-                  </select>
+                  <label className="block text-sm font-bold text-gray-700 mb-3">
+                    Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}
+                  </label>
+                  <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    {availableProfiles.map((code) => {
+                      const isSelected = selectedProfiles.includes(code);
+                      const profileName = code === 'A' ? 'Niepełnosprawnić intelektualna' :
+                                         code === 'B' ? 'Zaburzenia psychiczne' :
+                                         code === 'C' ? 'Choroby przewlekłe / Niepełnosprawnić fizyczna' :
+                                         code === 'D' ? 'Podeszły wiek' :
+                                         code === 'E' ? 'Podeszły wiek / Niewidomi' :
+                                         code === 'F' ? 'Choroby somatyczne / Niesłyszący' :
+                                         code === 'G' ? 'Dzieci niepełnosprawne' :
+                                         code === 'H' ? 'Młodzież niepełnosprawna' :
+                                         code === 'I' ? 'Niepełnosprawnić fizyczna' : code;
+
+                      return (
+                        <label
+                          key={code}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedProfiles([...selectedProfiles, code]);
+                              } else {
+                                setSelectedProfiles(selectedProfiles.filter(c => c !== code));
+                              }
+                            }}
+                            className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                          />
+                          <span className="text-sm text-gray-700">{profileName}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
@@ -578,6 +654,28 @@ export default function SearchResults({
                     step="5"
                     value={maxDistance}
                     onChange={(e) => setMaxDistance(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>5 km</span>
+                    <span>100 km</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Distance from City Filter (only when searching by city) */}
+              {searchCenter && !userLocation && (
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-3">
+                    Odległość od {searchCenter.name}: {maxDistanceFromCity === 100 ? 'Wszystkie' : `do ${maxDistanceFromCity} km`}
+                  </label>
+                  <input
+                    type="range"
+                    min="5"
+                    max="100"
+                    step="5"
+                    value={maxDistanceFromCity}
+                    onChange={(e) => setMaxDistanceFromCity(parseInt(e.target.value))}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                   />
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
