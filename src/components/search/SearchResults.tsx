@@ -551,11 +551,11 @@ export default function SearchResults({
       />
 
       {/* 2-COLUMN LAYOUT (jak Lottie) */}
-      <div className="flex-1 w-full relative">
+      <div className="flex-1 w-full relative pb-32">
         <div className="flex gap-6 lg:px-6 py-4">
 
           {/* LEFT SIDEBAR - FILTERS (Desktop only) - STICKY */}
-          <aside className="hidden lg:block w-96 shrink-0">
+          <aside className="hidden lg:block w-96 shrink-0 self-start">
             <div className="sticky top-24 bg-white border border-slate-300 rounded-xl p-6 space-y-5 shadow-sm max-h-[calc(100vh-120px)] overflow-y-auto">
 
               {/* Filters Header */}
