@@ -26,6 +26,22 @@ const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
   loading: () => <div className="h-full bg-gray-100 animate-pulse" />
 });
 
+// ===== HELPER FUNCTIONS =====
+const getProfileName = (code: string): string => {
+  const mapping: Record<string, string> = {
+    'A': 'Niepełnosprawnić intelektualna',
+    'B': 'Zaburzenia psychiczne',
+    'C': 'Choroby przewlekłe',
+    'D': 'Podeszły wiek',
+    'E': 'Osoby starsze',
+    'F': 'Choroby somatyczne',
+    'G': 'Dzieci niepełnosprawne',
+    'H': 'Młodzież niepełnosprawna',
+    'I': 'Niepełnosprawnić fizyczna',
+  };
+  return mapping[code] || code;
+};
+
 // ===== TYPES (from your existing structure) =====
 interface Facility {
   id: number;
@@ -110,6 +126,7 @@ export default function SearchResults({
   const [showMapMobile, setShowMapMobile] = useState(false);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [selectedForCompare, setSelectedForCompare] = useState<number[]>([]);
+  const [showProfilesMenu, setShowProfilesMenu] = useState(false);
 
   const [facilities, setFacilities] = useState<Facility[]>(results);
   const [isLoading, setIsLoading] = useState(false);
@@ -171,12 +188,13 @@ export default function SearchResults({
         clear: () => setSelectedPowiat("Wszystkie")
       });
     }
-    if (selectedProfiles.length > 0) {
+    // Add a chip for each selected profile
+    selectedProfiles.forEach(code => {
       chips.push({
-        label: `Profile: ${selectedProfiles.length}`,
-        clear: () => setSelectedProfiles([])
+        label: getProfileName(code),
+        clear: () => setSelectedProfiles(selectedProfiles.filter(c => c !== code))
       });
-    }
+    });
     if (priceLimit < 10000) {
       chips.push({
         label: `Do: ${priceLimit} zł`,
@@ -587,44 +605,47 @@ export default function SearchResults({
               {/* Profile Filter */}
               {availableProfiles.length > 0 && (
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">
-                    Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}
-                  </label>
-                  <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    {availableProfiles.map((code) => {
-                      const isSelected = selectedProfiles.includes(code);
-                      const profileName = code === 'A' ? 'Niepełnosprawnić intelektualna' :
-                                         code === 'B' ? 'Zaburzenia psychiczne' :
-                                         code === 'C' ? 'Choroby przewlekłe / Niepełnosprawnić fizyczna' :
-                                         code === 'D' ? 'Podeszły wiek' :
-                                         code === 'E' ? 'Podeszły wiek / Niewidomi' :
-                                         code === 'F' ? 'Choroby somatyczne / Niesłyszący' :
-                                         code === 'G' ? 'Dzieci niepełnosprawne' :
-                                         code === 'H' ? 'Młodzież niepełnosprawna' :
-                                         code === 'I' ? 'Niepełnosprawnić fizyczna' : code;
-
-                      return (
-                        <label
-                          key={code}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedProfiles([...selectedProfiles, code]);
-                              } else {
-                                setSelectedProfiles(selectedProfiles.filter(c => c !== code));
-                              }
-                            }}
-                            className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                          />
-                          <span className="text-sm text-gray-700">{profileName}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
+                  <button
+                    onClick={() => setShowProfilesMenu(!showProfilesMenu)}
+                    className="w-full flex items-center justify-between text-sm font-bold text-gray-700 mb-3 hover:text-gray-900 transition-colors"
+                  >
+                    <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
+                    <svg
+                      className={`w-5 h-5 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {showProfilesMenu && (
+                    <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                      {availableProfiles.map((code) => {
+                        const isSelected = selectedProfiles.includes(code);
+                        return (
+                          <label
+                            key={code}
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedProfiles([...selectedProfiles, code]);
+                                } else {
+                                  setSelectedProfiles(selectedProfiles.filter(c => c !== code));
+                                }
+                              }}
+                              className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                            />
+                            <span className="text-sm text-gray-700">{getProfileName(code)}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 

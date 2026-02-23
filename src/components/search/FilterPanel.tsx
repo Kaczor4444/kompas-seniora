@@ -1,6 +1,22 @@
 // src/components/search/FilterPanel.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
+
+// Helper function for profile names
+const getProfileName = (code: string): string => {
+  const mapping: Record<string, string> = {
+    'A': 'Niepełnosprawnić intelektualna',
+    'B': 'Zaburzenia psychiczne',
+    'C': 'Choroby przewlekłe',
+    'D': 'Podeszły wiek',
+    'E': 'Osoby starsze',
+    'F': 'Choroby somatyczne',
+    'G': 'Dzieci niepełnosprawne',
+    'H': 'Młodzież niepełnosprawna',
+    'I': 'Niepełnosprawnić fizyczna',
+  };
+  return mapping[code] || code;
+};
 
 interface FilterPanelProps {
   show: boolean;
@@ -62,6 +78,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const careProfiles = availableProfiles && availableProfiles.length > 0
     ? ALL_CARE_PROFILES.filter(p => availableProfiles.includes(p.value))
     : ALL_CARE_PROFILES;
+
+  const [showProfilesMenu, setShowProfilesMenu] = useState(false);
+
   const handleApply = () => {
     onApply?.();
     onClose();
@@ -93,34 +112,47 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       {/* Profile Checkboxes */}
       {careProfiles.length > 0 && (
         <div className="mb-6 pb-6 border-b border-gray-200">
-          <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
-            Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {careProfiles.map((profile) => {
-              const isSelected = selectedProfiles.includes(profile.value);
-              return (
-                <label
-                  key={profile.value}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        onProfilesChange([...selectedProfiles, profile.value]);
-                      } else {
-                        onProfilesChange(selectedProfiles.filter(c => c !== profile.value));
-                      }
-                    }}
-                    className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                  />
-                  <span className="text-sm text-gray-700">{profile.label}</span>
-                </label>
-              );
-            })}
-          </div>
+          <button
+            onClick={() => setShowProfilesMenu(!showProfilesMenu)}
+            className="w-full flex items-center justify-between text-xs font-medium text-gray-500 uppercase mb-3 hover:text-gray-700 transition-colors"
+          >
+            <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
+            <svg
+              className={`w-4 h-4 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showProfilesMenu && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {careProfiles.map((profile) => {
+                const isSelected = selectedProfiles.includes(profile.value);
+                return (
+                  <label
+                    key={profile.value}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          onProfilesChange([...selectedProfiles, profile.value]);
+                        } else {
+                          onProfilesChange(selectedProfiles.filter(c => c !== profile.value));
+                        }
+                      }}
+                      className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                    />
+                    <span className="text-sm text-gray-700">{getProfileName(profile.value)}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
