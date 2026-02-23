@@ -571,12 +571,12 @@ export default function SearchResults({
               {/* Type Filter */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-3">Typ placówki</label>
-                <div className="space-y-2">
+                <div className="flex gap-2">
                   {['all', 'DPS', 'ŚDS'].map((type) => (
                     <button
                       key={type}
                       onClick={() => setSelectedType(type)}
-                      className={`w-full text-left px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                      className={`flex-1 px-3 py-2 rounded-lg font-semibold text-xs transition-all ${
                         selectedType === type
                           ? 'bg-emerald-600 text-white'
                           : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
