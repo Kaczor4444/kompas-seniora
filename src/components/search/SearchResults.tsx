@@ -133,8 +133,8 @@ export default function SearchResults({
   const [visibleCount, setVisibleCount] = useState(20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [favoritesState, setFavoritesState] = useState<number[]>([]);
-  const [maxDistance, setMaxDistance] = useState<number>(100); // km (from geolocation)
-  const [maxDistanceFromCity, setMaxDistanceFromCity] = useState<number>(100); // km (from searched city)
+  const [maxDistance, setMaxDistance] = useState<number>(30); // km (from geolocation)
+  const [maxDistanceFromCity, setMaxDistanceFromCity] = useState<number>(30); // km (from searched city)
 
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
@@ -201,16 +201,16 @@ export default function SearchResults({
         clear: () => setPriceLimit(10000)
       });
     }
-    if (userLocation && maxDistance < 100) {
+    if (userLocation && maxDistance < 30) {
       chips.push({
         label: `Do: ${maxDistance} km`,
-        clear: () => setMaxDistance(100)
+        clear: () => setMaxDistance(30)
       });
     }
-    if (searchCenter && maxDistanceFromCity < 100) {
+    if (searchCenter && maxDistanceFromCity < 30) {
       chips.push({
         label: `Od ${searchCenter.name}: ${maxDistanceFromCity} km`,
-        clear: () => setMaxDistanceFromCity(100)
+        clear: () => setMaxDistanceFromCity(30)
       });
     }
     return chips;
@@ -336,7 +336,7 @@ export default function SearchResults({
     );
 
     // Distance filter (only when geolocation is active)
-    if (userLocation && maxDistance < 100) {
+    if (userLocation) {
       filtered = filtered.filter(f => {
         if (f.distance === null || f.distance === undefined) return false;
         return f.distance <= maxDistance;
@@ -344,7 +344,7 @@ export default function SearchResults({
     }
 
     // Distance from searched city filter (only when searchCenter exists)
-    if (searchCenter && maxDistanceFromCity < 100) {
+    if (searchCenter && !userLocation) {
       filtered = filtered.filter(f => {
         if (f.distanceFromCity === null || f.distanceFromCity === undefined) return false;
         return f.distanceFromCity <= maxDistanceFromCity;
@@ -393,8 +393,8 @@ export default function SearchResults({
       setSelectedPowiat("Wszystkie");
       setSelectedProfiles([]);
       setPriceLimit(10000);
-      setMaxDistance(100);
-      setMaxDistanceFromCity(100);
+      setMaxDistance(30);
+      setMaxDistanceFromCity(30);
     }
     prevCityInputRef.current = cityInput;
   }, [cityInput]);
@@ -411,8 +411,8 @@ export default function SearchResults({
     setSelectedPowiat("Wszystkie");
     setSelectedProfiles([]);
     setPriceLimit(10000);
-    setMaxDistance(100);
-    setMaxDistanceFromCity(100);
+    setMaxDistance(30);
+    setMaxDistanceFromCity(30);
   };
 
   const normPowiat = (s: string) =>
@@ -671,11 +671,11 @@ export default function SearchResults({
                 </div>
               )}
 
-              {/* Distance Filter (only when geolocation is active) */}
-              {userLocation && (
+              {/* Distance Filter */}
+              {userLocation ? (
                 <div>
                   <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                    Odległość: <span className="text-slate-900">{maxDistance === 100 ? 'Wszystkie' : `do ${maxDistance} km`}</span>
+                    Odległość: <span className="text-slate-900">do {maxDistance} km</span>
                   </label>
                   <input
                     type="range"
@@ -691,13 +691,10 @@ export default function SearchResults({
                     <span>100 km</span>
                   </div>
                 </div>
-              )}
-
-              {/* Distance from City Filter (only when searching by city) */}
-              {searchCenter && !userLocation && (
+              ) : searchCenter ? (
                 <div>
                   <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                    Od {searchCenter.name}: <span className="text-slate-900">{maxDistanceFromCity === 100 ? 'Wszystkie' : `do ${maxDistanceFromCity} km`}</span>
+                    Od {searchCenter.name}: <span className="text-slate-900">do {maxDistanceFromCity} km</span>
                   </label>
                   <input
                     type="range"
@@ -713,7 +710,7 @@ export default function SearchResults({
                     <span>100 km</span>
                   </div>
                 </div>
-              )}
+              ) : null}
 
             </div>
           </aside>
