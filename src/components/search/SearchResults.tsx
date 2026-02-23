@@ -482,7 +482,7 @@ export default function SearchResults({
 
   // ===== RENDER =====
   return (
-    <div className="flex flex-col bg-gray-50 min-h-screen md:-mt-20">
+    <div className="flex flex-col bg-slate-50 min-h-screen md:-mt-20">
 
       {/* Active Filters Chips */}
       <ActiveFilters chips={activeChips} />
@@ -554,15 +554,15 @@ export default function SearchResults({
         <div className="flex">
 
           {/* LEFT SIDEBAR - FILTERS (Desktop only) - FIXED */}
-          <aside className="hidden lg:block w-96 bg-white border-r border-gray-200 overflow-y-auto fixed left-0 top-20 h-[calc(100vh-80px)] z-20 shadow-sm">
-            <div className="p-6 space-y-5">
+          <aside className="hidden lg:block w-96 overflow-y-auto fixed left-6 top-24 h-[calc(100vh-120px)] z-20">
+            <div className="bg-white border border-slate-300 rounded-xl p-6 space-y-5 shadow-sm">
 
               {/* Filters Header */}
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-gray-900">Filtry</h2>
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-xl font-black text-slate-900 tracking-tight">Filtry</h2>
                 <button
                   onClick={resetFilters}
-                  className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                  className="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
                 >
                   Wyczyść
                 </button>
@@ -570,16 +570,16 @@ export default function SearchResults({
 
               {/* Type Filter */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Typ placówki</label>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Typ placówki</label>
                 <div className="flex gap-2">
                   {['all', 'DPS', 'ŚDS'].map((type) => (
                     <button
                       key={type}
                       onClick={() => setSelectedType(type)}
-                      className={`flex-1 px-3 py-2 rounded-lg font-semibold text-xs transition-all ${
+                      className={`flex-1 px-3 py-2 rounded-lg font-black text-[11px] uppercase tracking-wider transition-all ${
                         selectedType === type
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
                       }`}
                     >
                       {type === 'all' ? 'Wszystkie' : type}
@@ -590,11 +590,11 @@ export default function SearchResults({
 
               {/* Powiat Filter */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Powiat</label>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Powiat</label>
                 <select
                   value={selectedPowiat}
                   onChange={(e) => handlePowiatChange(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 transition-colors"
                 >
                   {availablePowiats.map((p) => (
                     <option key={p} value={p}>{p}</option>
@@ -607,26 +607,26 @@ export default function SearchResults({
                 <div>
                   <button
                     onClick={() => setShowProfilesMenu(!showProfilesMenu)}
-                    className="w-full flex items-center justify-between text-sm font-bold text-gray-700 mb-3 hover:text-gray-900 transition-colors"
+                    className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
                   >
                     <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
                     <svg
-                      className={`w-5 h-5 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`}
+                      className={`w-4 h-4 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
                   {showProfilesMenu && (
-                    <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <div className="space-y-1.5 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                       {availableProfiles.map((code) => {
                         const isSelected = selectedProfiles.includes(code);
                         return (
                           <label
                             key={code}
-                            className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
                           >
                             <input
                               type="checkbox"
@@ -638,9 +638,9 @@ export default function SearchResults({
                                   setSelectedProfiles(selectedProfiles.filter(c => c !== code));
                                 }
                               }}
-                              className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                              className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
                             />
-                            <span className="text-sm text-gray-700">{getProfileName(code)}</span>
+                            <span className="text-sm font-medium text-slate-700">{getProfileName(code)}</span>
                           </label>
                         );
                       })}
@@ -651,8 +651,8 @@ export default function SearchResults({
 
               {/* Price Filter */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">
-                  Cena do: {priceLimit} zł
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                  Cena do: <span className="text-slate-900">{priceLimit} zł</span>
                 </label>
                 <input
                   type="range"
@@ -661,9 +661,9 @@ export default function SearchResults({
                   step="100"
                   value={priceLimit}
                   onChange={(e) => setPriceLimit(parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
                 />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
                   <span>0 zł</span>
                   <span>10000 zł</span>
                 </div>
@@ -672,8 +672,8 @@ export default function SearchResults({
               {/* Distance Filter (only when geolocation is active) */}
               {userLocation && (
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">
-                    Odległość: {maxDistance === 100 ? 'Wszystkie' : `do ${maxDistance} km`}
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                    Odległość: <span className="text-slate-900">{maxDistance === 100 ? 'Wszystkie' : `do ${maxDistance} km`}</span>
                   </label>
                   <input
                     type="range"
@@ -682,9 +682,9 @@ export default function SearchResults({
                     step="5"
                     value={maxDistance}
                     onChange={(e) => setMaxDistance(parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
                   />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
                     <span>5 km</span>
                     <span>100 km</span>
                   </div>
@@ -694,8 +694,8 @@ export default function SearchResults({
               {/* Distance from City Filter (only when searching by city) */}
               {searchCenter && !userLocation && (
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">
-                    Odległość od {searchCenter.name}: {maxDistanceFromCity === 100 ? 'Wszystkie' : `do ${maxDistanceFromCity} km`}
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                    Od {searchCenter.name}: <span className="text-slate-900">{maxDistanceFromCity === 100 ? 'Wszystkie' : `do ${maxDistanceFromCity} km`}</span>
                   </label>
                   <input
                     type="range"
@@ -704,9 +704,9 @@ export default function SearchResults({
                     step="5"
                     value={maxDistanceFromCity}
                     onChange={(e) => setMaxDistanceFromCity(parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
                   />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
                     <span>5 km</span>
                     <span>100 km</span>
                   </div>
@@ -717,7 +717,7 @@ export default function SearchResults({
           </aside>
 
           {/* RIGHT SIDE - LIST OR MAP (toggle jak w Lottie) */}
-          <div className="flex-1 flex flex-col bg-gray-50 lg:ml-96">
+          <div className="flex-1 flex flex-col bg-slate-50 lg:ml-[420px]">
 
             {/* Desktop Search & Toggle Bar - sticky */}
             <div className="hidden md:flex items-center justify-between gap-4 px-6 py-4 bg-white border-b border-gray-200 sticky top-20 z-30 lg:left-96">
