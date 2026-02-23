@@ -649,25 +649,27 @@ export default function SearchResults({
                 </div>
               )}
 
-              {/* Price Filter */}
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                  Cena do: <span className="text-slate-900">{priceLimit} zł</span>
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="10000"
-                  step="100"
-                  value={priceLimit}
-                  onChange={(e) => setPriceLimit(parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
-                />
-                <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
-                  <span>0 zł</span>
-                  <span>10000 zł</span>
+              {/* Price Filter - tylko dla DPS (ŚDS jest bezpłatny) */}
+              {selectedType !== 'ŚDS' && (
+                <div>
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                    Cena do: <span className="text-slate-900">{priceLimit} zł</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="10000"
+                    step="100"
+                    value={priceLimit}
+                    onChange={(e) => setPriceLimit(parseInt(e.target.value))}
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+                  />
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+                    <span>0 zł</span>
+                    <span>10000 zł</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Distance Filter (only when geolocation is active) */}
               {userLocation && (
