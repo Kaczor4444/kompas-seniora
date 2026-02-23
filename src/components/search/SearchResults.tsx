@@ -552,11 +552,11 @@ export default function SearchResults({
 
       {/* 2-COLUMN LAYOUT (jak Lottie) */}
       <div className="flex-1 w-full relative pb-32">
-        <div className="flex gap-6 lg:px-6 py-4">
+        <div className="flex">
 
-          {/* LEFT SIDEBAR - FILTERS (Desktop only) - STICKY */}
-          <aside className="hidden lg:block w-96 shrink-0 self-start">
-            <div className="sticky top-24 bg-white border border-slate-300 rounded-xl p-6 space-y-5 shadow-sm max-h-[calc(100vh-120px)] overflow-y-auto">
+          {/* LEFT SIDEBAR - FILTERS (Desktop only) - FIXED */}
+          <aside className="hidden lg:block w-80 shrink-0">
+            <div className="fixed left-0 top-20 w-80 h-[calc(100vh-80px)] bg-white border-r border-slate-200 p-6 space-y-5 overflow-y-auto">
 
               {/* Filters Header */}
               <div className="flex items-center justify-between mb-1">
@@ -717,13 +717,12 @@ export default function SearchResults({
           </aside>
 
           {/* RIGHT SIDE - LIST OR MAP (toggle jak w Lottie) */}
-          <div className="flex-1 flex flex-col bg-slate-50">
+          <div className="flex-1 flex flex-col bg-slate-50 lg:ml-80">
 
-            {/* Desktop Search & Toggle Bar - sticky */}
-            <div className="hidden md:flex items-center justify-between gap-4 px-6 py-4 bg-white border-b border-gray-200 sticky top-20 z-30">
-
-              {/* Search Bar - compact version */}
-              <div className="flex-1 max-w-md">
+            {/* Desktop Header - sticky */}
+            <div className="hidden md:block sticky top-20 z-30 bg-white border-b border-gray-200">
+              {/* Row 1: Search Bar */}
+              <div className="px-6 py-3 border-b border-gray-100">
                 <SearchBar
                   initialQuery={cityInput}
                   initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
@@ -731,39 +730,55 @@ export default function SearchResults({
                 />
               </div>
 
-              {/* Results Count */}
-              <p className="text-sm font-semibold text-gray-600 whitespace-nowrap">
-                Znaleziono <span className="text-gray-900">{facilities.length}</span> {facilities.length === 1 ? 'placówkę' : 'placówek'}
-              </p>
+              {/* Row 2: Results Info + Sort + Toggle */}
+              <div className="flex items-center justify-between gap-4 px-6 py-3">
+                {/* Results Count - Lottie style */}
+                <h2 className="text-lg font-bold text-gray-900">
+                  {query ? `${query}: ` : ''}{facilities.length} {facilities.length === 1 ? 'placówka' : facilities.length < 5 ? 'placówki' : 'placówek'}
+                </h2>
 
-              {/* List/Map Toggle */}
-              <div className="flex items-center gap-2 bg-gray-900 rounded-xl p-1">
-                <button
-                  onClick={() => setShowMapMobile(false)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                    !showMapMobile
-                      ? 'bg-white text-gray-900'
-                      : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                  </svg>
-                  Lista
-                </button>
-                <button
-                  onClick={() => setShowMapMobile(true)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                    showMapMobile
-                      ? 'bg-white text-gray-900'
-                      : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
-                  Mapa
-                </button>
+                <div className="flex items-center gap-4">
+                  {/* Sort Dropdown - Lottie style */}
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-gray-600">Sortuj:</label>
+                    <select className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                      <option>Rekomendowane</option>
+                      <option>Odległość</option>
+                      <option>Cena: rosnąco</option>
+                      <option>Cena: malejąco</option>
+                    </select>
+                  </div>
+
+                  {/* List/Map Toggle */}
+                  <div className="flex items-center gap-2 bg-gray-900 rounded-xl p-1">
+                    <button
+                      onClick={() => setShowMapMobile(false)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                        !showMapMobile
+                          ? 'bg-white text-gray-900'
+                          : 'text-gray-300 hover:text-white'
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                      </svg>
+                      Lista
+                    </button>
+                    <button
+                      onClick={() => setShowMapMobile(true)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                        showMapMobile
+                          ? 'bg-white text-gray-900'
+                          : 'text-gray-300 hover:text-white'
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                      Mapa
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
