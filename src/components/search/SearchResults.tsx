@@ -136,12 +136,19 @@ export default function SearchResults({
   // Dynamiczne profile — tylko te kody które faktycznie występują w wynikach
   const availableProfiles = useMemo(() => {
     const codes = new Set<string>();
+    const validCodes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
     for (const f of results) {
       if (f.profil_opieki) {
-        f.profil_opieki.split(',').forEach((c: string) => codes.add(c.trim()));
+        f.profil_opieki.split(',').forEach((c: string) => {
+          const trimmed = c.trim();
+          // Only add valid single-letter codes
+          if (validCodes.includes(trimmed)) {
+            codes.add(trimmed);
+          }
+        });
       }
     }
-    return [...codes];
+    return [...codes].sort();
   }, [results]);
 
   const activeChips = useMemo(() => {
