@@ -267,7 +267,7 @@ export default function Navbar() {
               </Link>
 
               <Link href="/asystent">
-                <NavLink isHighContrast={isHighContrast} icon={<Sparkles size={18} />} text="Doradca" isActive={isActive('/asystent')} />
+                <NavLink isHighContrast={isHighContrast} icon={<Sparkles size={18} />} text="Asystent" isActive={isActive('/asystent')} />
               </Link>
 
               <Link
@@ -370,7 +370,7 @@ export default function Navbar() {
               </Link>
 
               <Link href="/asystent" onClick={() => setIsOpen(false)} className="w-full block">
-                <MobileNavLink isHighContrast={isHighContrast} icon={<Sparkles size={20} />} text="Doradca" isActive={isActive('/asystent')} />
+                <MobileNavLink isHighContrast={isHighContrast} icon={<Sparkles size={20} />} text="Asystent" isActive={isActive('/asystent')} />
               </Link>
 
               <Link

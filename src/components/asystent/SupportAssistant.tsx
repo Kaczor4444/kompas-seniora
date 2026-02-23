@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 async function trackAdvisorEvent(eventType: string, metadata: Record<string, unknown>) {
   try {
@@ -336,7 +337,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
               Dopasuj pomoc <br/> do potrzeb bliskiej osoby.
             </h2>
             <p className="text-slate-500 text-xl max-w-2xl mx-auto mb-14 leading-relaxed">
-              Odpowiedz na kilka prostych pytań, a we współpracy z systemem wygenerujemy dla Ciebie plan działania.
+              Odpowiedz na 4 pytania o potrzeby seniora - podpowiemy która forma opieki DPS czy ŚDS będzie właściwa i co zrobić dalej.
             </p>
             <button
               onClick={() => handleNext('who')}
@@ -540,10 +541,10 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                    <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-primary-500/10 rounded-full blur-[80px] md:blur-[120px] -mr-20 md:-mr-40 -mt-20 md:-mt-40" />
                    <div className="relative z-10 max-w-4xl">
                       <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-500/20 text-primary-400 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 md:mb-8 border border-primary-500/20">
-                         <Sparkles size={14} /> Rekomendacja Systemu
+                         <Sparkles size={14} /> Polecamy
                       </div>
                       <h3 className="text-3xl md:text-6xl lg:text-7xl font-black mb-4 md:mb-8 leading-tight tracking-tight">
-                         Najlepszy będzie <br className="hidden md:block" /> 
+                         Najlepsza opcja to <br className="hidden md:block" />
                          <span className="text-primary-400 italic">
                            {recommendation === 'ŚDS' ? 'Dom Dzienny (ŚDS)' : 'Pobyt całodobowy (DPS)'}
                          </span>
@@ -637,6 +638,51 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                <QuestionItem text="Czy senior kwalifikuje się do dodatku pielęgnacyjnego?" />
                                <QuestionItem text="Jakie konkretnie badania są wymagane w naszym powiecie?" />
                             </ul>
+                         </div>
+                      </div>
+
+                      {/* CTA - Artykuły */}
+                      <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 border border-stone-200 shadow-sm">
+                         <h4 className="text-xl md:text-2xl font-black text-slate-900 mb-3 flex items-center gap-3">
+                            <Info size={24} className="text-primary-600" /> Chcesz wiedzieć więcej?
+                         </h4>
+                         <p className="text-slate-500 text-sm md:text-base mb-6 md:mb-8 leading-relaxed">
+                            Przeczytaj nasze poradniki, które pomogą Ci lepiej zrozumieć system opieki i podjąć najlepszą decyzję.
+                         </p>
+
+                         <div className="space-y-3">
+                            <Link
+                              href="/poradniki/wybor-opieki/typy-dps"
+                              className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS w Polsce - który wybrać?</h5>
+                                  <p className="text-xs text-slate-500">Poznaj rodzaje DPS i sprawdź który pasuje</p>
+                                </div>
+                                <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/poradniki/wybor-opieki/wybor-placowki"
+                              className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">Jak wybrać odpowiednią placówkę?</h5>
+                                  <p className="text-xs text-slate-500">Kryteria wyboru domu opieki dla seniora</p>
+                                </div>
+                                <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/poradniki"
+                              className="w-full mt-4 py-3 bg-slate-900 hover:bg-primary-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                            >
+                              Zobacz wszystkie poradniki <ChevronRight size={14} />
+                            </Link>
                          </div>
                       </div>
 

@@ -114,6 +114,7 @@ export default function SearchResults({
   const [visibleCount, setVisibleCount] = useState(20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [favoritesState, setFavoritesState] = useState<number[]>([]);
+  const [maxDistance, setMaxDistance] = useState<number>(100); // km
 
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
@@ -172,8 +173,14 @@ export default function SearchResults({
         clear: () => setPriceLimit(10000)
       });
     }
+    if (userLocation && maxDistance < 100) {
+      chips.push({
+        label: `Do: ${maxDistance} km`,
+        clear: () => setMaxDistance(100)
+      });
+    }
     return chips;
-  }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfile, priceLimit]);
+  }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfile, priceLimit, maxDistance, userLocation]);
 
 
   // Sync filter state when activeFilters prop changes (e.g. after router.push navigation)
@@ -270,6 +277,14 @@ export default function SearchResults({
       (f.koszt_pobytu || 0) <= priceLimit
     );
 
+    // Distance filter (only when geolocation is active)
+    if (userLocation && maxDistance < 100) {
+      filtered = filtered.filter(f => {
+        if (f.distance === null || f.distance === undefined) return false;
+        return f.distance <= maxDistance;
+      });
+    }
+
     setFacilities(filtered);
 
     // Track empty results
@@ -296,7 +311,7 @@ export default function SearchResults({
     }
   }, [
     results, selectedType, cityInput, selectedVoivodeship, selectedPowiat,
-    selectedProfile, priceLimit, trackEmptyResults, trackFilterApplied
+    selectedProfile, priceLimit, maxDistance, userLocation, trackEmptyResults, trackFilterApplied
   ]);
 
   // Scroll depth tracking
@@ -312,6 +327,7 @@ export default function SearchResults({
       setSelectedPowiat("Wszystkie");
       setSelectedProfile("Wszystkie");
       setPriceLimit(10000);
+      setMaxDistance(100);
     }
     prevCityInputRef.current = cityInput;
   }, [cityInput]);
@@ -328,6 +344,7 @@ export default function SearchResults({
     setSelectedPowiat("Wszystkie");
     setSelectedProfile("Wszystkie");
     setPriceLimit(10000);
+    setMaxDistance(100);
   };
 
   const normPowiat = (s: string) =>
@@ -397,66 +414,7 @@ export default function SearchResults({
 
   // ===== RENDER =====
   return (
-    <div className="flex flex-col bg-gray-50 min-h-screen">
-
-      {/* TOP SEARCH BAR (like Lottie's pink bar) */}
-      <div className="sticky top-0 md:top-20 z-40 bg-emerald-600 border-b border-emerald-700 shadow-md">
-        <div className="max-w-[1800px] mx-auto px-4 md:px-6 py-4">
-          <div className="flex items-center gap-3">
-            {/* Search Input */}
-            <div className="flex-1 max-w-2xl">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={cityInput}
-                  onChange={(e) => setCityInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && cityInput.trim()) {
-                      router.push(`/search?q=${encodeURIComponent(cityInput.trim())}&partial=true`);
-                    }
-                  }}
-                  placeholder="Wpisz miejscowość..."
-                  className="w-full pl-4 pr-32 py-3 bg-white border-2 border-white rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300 transition-all"
-                />
-                <button
-                  onClick={() => {
-                    if (cityInput.trim()) {
-                      router.push(`/search?q=${encodeURIComponent(cityInput.trim())}&partial=true`);
-                    }
-                  }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors"
-                >
-                  Szukaj
-                </button>
-              </div>
-            </div>
-
-            {/* Geolocation Button */}
-            <button
-              onClick={handleGeolocation}
-              disabled={isLoadingLocation}
-              className="hidden md:flex items-center gap-2 px-4 py-3 bg-white hover:bg-gray-50 text-emerald-700 rounded-xl font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              {isLoadingLocation ? 'Wyszukiwanie...' : 'Użyj lokalizacji'}
-            </button>
-
-            {/* Back Button */}
-            <button
-              onClick={() => window.history.back()}
-              className="p-3 bg-white hover:bg-gray-50 text-emerald-700 rounded-xl transition-colors"
-              aria-label="Wróć"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="flex flex-col bg-gray-50 min-h-screen md:-mt-20">
 
       {/* Active Filters Chips */}
       <ActiveFilters chips={activeChips} />
@@ -517,13 +475,13 @@ export default function SearchResults({
         onApply={handleApplyFilters}
       />
 
-      {/* 3-COLUMN LAYOUT */}
-      <div className="flex-1 max-w-[1800px] mx-auto w-full">
-        <div className="flex h-[calc(100vh-200px)] md:h-[calc(100vh-240px)]">
+      {/* 2-COLUMN LAYOUT (jak Lottie) */}
+      <div className="flex-1 w-full relative">
+        <div className="flex">
 
-          {/* LEFT SIDEBAR - FILTERS (Desktop only) */}
-          <aside className="hidden lg:block w-80 bg-white border-r border-gray-200 overflow-y-auto">
-            <div className="p-6 space-y-6">
+          {/* LEFT SIDEBAR - FILTERS (Desktop only) - FIXED */}
+          <aside className="hidden lg:block w-96 bg-white border-r border-gray-200 overflow-y-auto fixed left-0 top-20 h-[calc(100vh-80px)] z-20 shadow-sm">
+            <div className="p-6 space-y-5">
 
               {/* Filters Header */}
               <div className="flex items-center justify-between">
@@ -607,15 +565,119 @@ export default function SearchResults({
                 </div>
               </div>
 
+              {/* Distance Filter (only when geolocation is active) */}
+              {userLocation && (
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-3">
+                    Odległość: {maxDistance === 100 ? 'Wszystkie' : `do ${maxDistance} km`}
+                  </label>
+                  <input
+                    type="range"
+                    min="5"
+                    max="100"
+                    step="5"
+                    value={maxDistance}
+                    onChange={(e) => setMaxDistance(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>5 km</span>
+                    <span>100 km</span>
+                  </div>
+                </div>
+              )}
+
             </div>
           </aside>
 
-          {/* MIDDLE - RESULTS LIST */}
-          <div className={`
-            flex-1 overflow-y-auto bg-gray-50
-            ${showMapMobile ? 'hidden md:block' : 'block'}
-          `}>
-            <div className="p-4 md:p-6 space-y-4 max-w-3xl mx-auto">
+          {/* RIGHT SIDE - LIST OR MAP (toggle jak w Lottie) */}
+          <div className="flex-1 flex flex-col bg-gray-50 lg:ml-96">
+
+            {/* Desktop Search & Toggle Bar - sticky */}
+            <div className="hidden md:flex items-center justify-between gap-4 px-6 py-4 bg-white border-b border-gray-200 sticky top-20 z-30 lg:left-96">
+
+              {/* Search Input */}
+              <div className="flex-1 max-w-md">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={cityInput}
+                    onChange={(e) => setCityInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && cityInput.trim()) {
+                        router.push(`/search?q=${encodeURIComponent(cityInput.trim())}&partial=true`);
+                      }
+                    }}
+                    placeholder="Wpisz miejscowość..."
+                    className="w-full pl-4 pr-24 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                  />
+                  <button
+                    onClick={() => {
+                      if (cityInput.trim()) {
+                        router.push(`/search?q=${encodeURIComponent(cityInput.trim())}&partial=true`);
+                      }
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    Szukaj
+                  </button>
+                </div>
+              </div>
+
+              {/* Geolocation Button */}
+              <button
+                onClick={handleGeolocation}
+                disabled={isLoadingLocation}
+                className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {isLoadingLocation ? 'Lokalizacja...' : 'Geolokalizacja'}
+              </button>
+
+              {/* Results Count */}
+              <p className="text-sm font-semibold text-gray-600 whitespace-nowrap">
+                Znaleziono <span className="text-gray-900">{facilities.length}</span> {facilities.length === 1 ? 'placówkę' : 'placówek'}
+              </p>
+
+              {/* List/Map Toggle */}
+              <div className="flex items-center gap-2 bg-gray-900 rounded-xl p-1">
+                <button
+                  onClick={() => setShowMapMobile(false)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    !showMapMobile
+                      ? 'bg-white text-gray-900'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  Lista
+                </button>
+                <button
+                  onClick={() => setShowMapMobile(true)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    showMapMobile
+                      ? 'bg-white text-gray-900'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  Mapa
+                </button>
+              </div>
+            </div>
+
+            {/* LISTA lub MAPA (toggle) */}
+            {!showMapMobile ? (
+              /* LISTA */
+              <div className={`w-full overflow-y-auto h-[calc(100vh-136px)] md:h-[calc(100vh-80px-56px)] ${showMapMobile ? 'hidden md:block' : 'block'}`}>
+                <div className="p-4 md:p-6 space-y-4 max-w-3xl mx-auto">
 
               {isLoading ? (
                 // Loading
@@ -729,27 +791,42 @@ export default function SearchResults({
                   )}
                 </>
               )}
-            </div>
-          </div>
+                </div>
+              </div>
+            ) : (
+              /* MAPA */
+              <div className="w-full bg-gray-100 overflow-hidden h-[calc(100vh-136px)] md:h-[calc(100vh-80px-56px)]">
+                <FacilityMap
+                  facilities={facilities}
+                  userLocation={userLocation}
+                  searchCenter={searchCenter}
+                  powiatBreakdown={powiatBreakdown}
+                  powiatSearchCenters={powiatSearchCenters}
+                  selectedPowiat={selectedPowiat}
+                  onPowiatClick={handlePowiatChange}
+                />
+              </div>
+            )}
 
-          {/* RIGHT - MAP */}
-          <div className={`
-            flex-1 bg-gray-100 overflow-hidden
-            ${showMapMobile ? 'block fixed inset-0 z-40 top-[120px]' : 'hidden md:block'}
-          `}>
-            <FacilityMap
-              facilities={facilities}
-              userLocation={userLocation}
-              searchCenter={searchCenter}
-              powiatBreakdown={powiatBreakdown}
-              powiatSearchCenters={powiatSearchCenters}
-              selectedPowiat={selectedPowiat}
-              onPowiatClick={handlePowiatChange}
-            />
           </div>
 
         </div>
       </div>
+
+      {/* Mobile Map Overlay (fullscreen) */}
+      {showMapMobile && (
+        <div className="md:hidden fixed inset-0 z-40 top-[120px] bg-gray-100">
+          <FacilityMap
+            facilities={facilities}
+            userLocation={userLocation}
+            searchCenter={searchCenter}
+            powiatBreakdown={powiatBreakdown}
+            powiatSearchCenters={powiatSearchCenters}
+            selectedPowiat={selectedPowiat}
+            onPowiatClick={handlePowiatChange}
+          />
+        </div>
+      )}
 
       {/* Comparison Bar */}
       <ComparisonBar

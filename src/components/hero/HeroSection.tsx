@@ -281,14 +281,6 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
           {/* ── LEFT: Headline + Search ── */}
           <div className="space-y-8">
 
-            {/* Eyebrow */}
-            <div className="flex items-center gap-4">
-              <span className="h-px w-10 bg-emerald-600" />
-              <span className="text-[11px] font-extrabold uppercase tracking-[0.3em] text-emerald-700">
-                Oficjalny System Informacyjny
-              </span>
-            </div>
-
             {/* Headline */}
             <h1 className="text-[52px] md:text-[80px] lg:text-[96px] font-black text-slate-900 leading-[0.9] tracking-tighter">
               Szukasz opieki<br />
@@ -479,12 +471,12 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
                 </div>
                 <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Sztuczna Inteligencja</span>
               </div>
-              <h3 className="text-xl font-black text-white mb-2">Asystent Seniora</h3>
+              <h3 className="text-xl font-black text-white mb-2">Asystent Wyboru</h3>
               <p className="text-sm text-slate-300 font-medium leading-relaxed mb-4">
-                Odpowiedz na 4 pytania o stan zdrowia seniora. System wybierze DPS lub ŚDS i przygotuje plan działania.
+                Odpowiedz na 4 pytania o potrzeby seniora - podpowiemy która forma opieki DPS czy ŚDS będzie właściwa i co zrobić dalej.
               </p>
               <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2 group-hover:gap-3 transition-all">
-                Uruchom doradcę <ArrowRight size={14} />
+                Uruchom asystenta <ArrowRight size={14} />
               </span>
             </button>
           </div>
