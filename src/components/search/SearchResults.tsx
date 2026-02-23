@@ -19,6 +19,7 @@ import { SkeletonCard } from './SkeletonCard';
 import { EmptyState } from './EmptyState';
 import { ComparisonBar } from './ComparisonBar';
 import MobileBottomBar from './MobileBottomBar';
+import { SearchBar } from './SearchBar';
 
 // ✅ Use your existing FacilityMap with dynamic import
 const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
@@ -721,46 +722,14 @@ export default function SearchResults({
             {/* Desktop Search & Toggle Bar - sticky */}
             <div className="hidden md:flex items-center justify-between gap-4 px-6 py-4 bg-white border-b border-gray-200 sticky top-20 z-30 lg:left-96">
 
-              {/* Search Input */}
+              {/* Search Bar - compact version */}
               <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={cityInput}
-                    onChange={(e) => setCityInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && cityInput.trim()) {
-                        router.push(`/search?q=${encodeURIComponent(cityInput.trim())}&partial=true`);
-                      }
-                    }}
-                    placeholder="Wpisz miejscowość..."
-                    className="w-full pl-4 pr-24 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
-                  />
-                  <button
-                    onClick={() => {
-                      if (cityInput.trim()) {
-                        router.push(`/search?q=${encodeURIComponent(cityInput.trim())}&partial=true`);
-                      }
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
-                  >
-                    Szukaj
-                  </button>
-                </div>
+                <SearchBar
+                  initialQuery={cityInput}
+                  initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
+                  compact={true}
+                />
               </div>
-
-              {/* Geolocation Button */}
-              <button
-                onClick={handleGeolocation}
-                disabled={isLoadingLocation}
-                className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                {isLoadingLocation ? 'Lokalizacja...' : 'Geolokalizacja'}
-              </button>
 
               {/* Results Count */}
               <p className="text-sm font-semibold text-gray-600 whitespace-nowrap">
