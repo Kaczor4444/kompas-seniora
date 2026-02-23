@@ -552,11 +552,11 @@ export default function SearchResults({
 
       {/* 2-COLUMN LAYOUT (jak Lottie) */}
       <div className="flex-1 w-full relative">
-        <div className="flex">
+        <div className="flex gap-6 lg:px-6 py-4">
 
-          {/* LEFT SIDEBAR - FILTERS (Desktop only) - FIXED */}
-          <aside className="hidden lg:block w-96 overflow-y-auto fixed left-6 top-24 h-[calc(100vh-120px)] z-20">
-            <div className="bg-white border border-slate-300 rounded-xl p-6 space-y-5 shadow-sm">
+          {/* LEFT SIDEBAR - FILTERS (Desktop only) - STICKY */}
+          <aside className="hidden lg:block w-96 shrink-0">
+            <div className="sticky top-24 bg-white border border-slate-300 rounded-xl p-6 space-y-5 shadow-sm max-h-[calc(100vh-120px)] overflow-y-auto">
 
               {/* Filters Header */}
               <div className="flex items-center justify-between mb-1">
@@ -717,10 +717,10 @@ export default function SearchResults({
           </aside>
 
           {/* RIGHT SIDE - LIST OR MAP (toggle jak w Lottie) */}
-          <div className="flex-1 flex flex-col bg-slate-50 lg:ml-[420px]">
+          <div className="flex-1 flex flex-col bg-slate-50">
 
             {/* Desktop Search & Toggle Bar - sticky */}
-            <div className="hidden md:flex items-center justify-between gap-4 px-6 py-4 bg-white border-b border-gray-200 sticky top-20 z-30 lg:left-96">
+            <div className="hidden md:flex items-center justify-between gap-4 px-6 py-4 bg-white border-b border-gray-200 sticky top-20 z-30">
 
               {/* Search Bar - compact version */}
               <div className="flex-1 max-w-md">
