@@ -339,7 +339,8 @@ export default function SearchResults({
     // Distance filter (only when geolocation is active)
     if (userLocation) {
       filtered = filtered.filter(f => {
-        if (f.distance === null || f.distance === undefined) return false;
+        // Jeśli placówka nie ma współrzędnych, nie filtruj po odległości (pokaż ją)
+        if (f.distance === null || f.distance === undefined) return true;
         return f.distance <= maxDistance;
       });
     }
@@ -347,7 +348,8 @@ export default function SearchResults({
     // Distance from searched city filter (only when searchCenter exists)
     if (searchCenter && !userLocation) {
       filtered = filtered.filter(f => {
-        if (f.distanceFromCity === null || f.distanceFromCity === undefined) return false;
+        // Jeśli placówka nie ma współrzędnych, nie filtruj po odległości (pokaż ją)
+        if (f.distanceFromCity === null || f.distanceFromCity === undefined) return true;
         return f.distanceFromCity <= maxDistanceFromCity;
       });
     }
@@ -548,11 +550,11 @@ export default function SearchResults({
       />
 
       {/* 2-COLUMN LAYOUT (jak Lottie) */}
-      <div className="flex-1 w-full relative">
+      <div className="flex w-full">
 
-        {/* LEFT SIDEBAR - FILTERS (Desktop only) - FIXED */}
-        <div className="hidden lg:block fixed left-0 top-20 w-80 h-[calc(100vh-80px)] bg-white border-r border-slate-200 z-20">
-          <div className="h-full p-6 space-y-5 overflow-y-auto pb-8">
+        {/* LEFT SIDEBAR - FILTERS (Desktop only) - STICKY */}
+        <div className="hidden lg:block sticky top-20 w-80 h-fit max-h-[calc(100vh-100px)] bg-white border-r border-slate-200 z-20 self-start">
+          <div className="p-6 space-y-5 overflow-y-auto max-h-[calc(100vh-100px)] pb-8">
 
               {/* Filters Header */}
               <div className="flex items-center justify-between mb-1">
@@ -583,6 +585,18 @@ export default function SearchResults({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Województwo Filter */}
+              <div>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Województwo</label>
+                <select
+                  value="Małopolskie"
+                  disabled
+                  className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-lg text-sm font-bold text-slate-600 cursor-not-allowed"
+                >
+                  <option value="Małopolskie">Małopolskie</option>
+                </select>
               </div>
 
               {/* Powiat Filter */}
@@ -713,10 +727,10 @@ export default function SearchResults({
         </div>
 
         {/* RIGHT SIDE - LIST OR MAP (toggle jak w Lottie) */}
-        <div className="flex-1 flex flex-col bg-slate-50 lg:pl-80">
+        <div className="flex-1 flex flex-col bg-slate-50">
 
           {/* Desktop Header - sticky */}
-          <div className="hidden md:block sticky top-20 z-30 bg-white border-b border-gray-200">
+          <div className="hidden md:block sticky top-20 z-30 bg-white border-b border-gray-200 shadow-md">
               {/* Row 1: Search Bar */}
               <div className="px-6 py-3 border-b border-gray-100">
                 <SearchBar
@@ -789,7 +803,7 @@ export default function SearchResults({
             {/* LISTA lub MAPA (toggle) */}
             {!showMapMobile ? (
               /* LISTA */
-              <div className={`w-full overflow-y-auto h-[calc(100vh-136px)] md:h-[calc(100vh-80px-56px)] ${showMapMobile ? 'hidden md:block' : 'block'}`}>
+              <div className={`w-full overflow-y-auto h-[calc(100vh-136px)] md:h-[calc(100vh-80px-56px)] ${showMapMobile ? 'hidden md:block' : 'block'} relative z-0`}>
                 <div className="p-4 md:p-6 space-y-4 max-w-3xl mx-auto">
 
               {isLoading ? (

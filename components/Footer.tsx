@@ -1,9 +1,6 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 
 const FooterLogo = () => (
   <Image
@@ -17,12 +14,10 @@ const FooterLogo = () => (
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-  const pathname = usePathname();
-  const isSearchPage = pathname?.startsWith('/search');
 
   return (
     <footer className="bg-slate-900 text-slate-300">
-      <div className={`max-w-7xl mx-auto px-4 py-12 transition-all ${isSearchPage ? 'lg:pl-80' : ''}`}>
+      <div className="max-w-7xl mx-auto px-4 py-8">
         
         {/* 4 COLUMNS LAYOUT */}
         {/* Desktop: Logo (left, wide) | GAP-16 | O serwisie | Na skróty | Informacje (close together) */}
