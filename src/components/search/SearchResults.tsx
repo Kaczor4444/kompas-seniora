@@ -138,7 +138,7 @@ export default function SearchResults({
   const [maxDistanceFromCity, setMaxDistanceFromCity] = useState<number>(30); // km (from searched city)
 
   // Track current query from SearchBar - when empty, clear results
-  const [currentQuery, setCurrentQuery] = useState(query || '');
+  const [currentQuery, setCurrentQuery] = useState<string | null>(null);
 
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
@@ -233,8 +233,16 @@ export default function SearchResults({
     return () => window.removeEventListener('toggleMobileMap', handleToggleMap);
   }, []);
 
+  // Set initial facilities from server
+  useEffect(() => {
+    setFacilities(results);
+  }, [results]);
+
   // Clear results and reset filters when query is cleared in SearchBar
   useEffect(() => {
+    // Skip if SearchBar hasn't initialized yet (null = not touched by user)
+    if (currentQuery === null) return;
+
     // Sync cityInput with currentQuery from SearchBar
     setCityInput(currentQuery);
 
@@ -246,12 +254,8 @@ export default function SearchResults({
       setPriceLimit(10000);
       setMaxDistance(30);
       setMaxDistanceFromCity(30);
-    } else if (currentQuery === query) {
-      // Show results when query matches URL
-      setFacilities(results);
     }
-    // else: query changed but user hasn't clicked search yet - keep current facilities
-  }, [currentQuery, query, results]);
+  }, [currentQuery]);
 
   // Load favorites on mount
   useEffect(() => {
@@ -340,7 +344,16 @@ export default function SearchResults({
     if (selectedPowiat !== "Wszystkie") {
       const norm = (s: string) =>
         s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'l');
-      const targetPowiat = norm(selectedPowiat);
+
+      // MAPOWANIE: "m. Kraków" (TERYT) → "krakowski" (baza placówek)
+      let mappedPowiat = selectedPowiat;
+      const normalizedSelected = norm(selectedPowiat);
+
+      if (normalizedSelected === 'm. krakow') {
+        mappedPowiat = 'krakowski';
+      }
+
+      const targetPowiat = norm(mappedPowiat);
       filtered = filtered.filter(f => norm(f.powiat ?? '') === targetPowiat);
     }
 

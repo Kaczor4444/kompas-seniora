@@ -177,7 +177,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       if (powiatParam) {
         // User WYBRAŁ konkretny powiat z dropdownu → użyj tylko tego
-        uniquePowiaty = [normalizePolish(powiatParam)];
+        // MAPOWANIE: "m. Kraków" (TERYT) → "krakowski" (baza placówek)
+        let mappedPowiat = powiatParam;
+        if (normalizePolish(powiatParam) === 'm. krakow') {
+          mappedPowiat = 'krakowski';
+        }
+        uniquePowiaty = [normalizePolish(mappedPowiat)];
       } else {
         // ✅ OPCJA 1b: User WPISAŁ i kliknął "Szukaj" bez wyboru → pokaż TYLKO powiaty z GŁÓWNYCH miejscowości
         // Filtrujemy tylko RM=01,96,98 aby banner nie pokazywał powiatów z "części"
