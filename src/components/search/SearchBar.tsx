@@ -23,6 +23,7 @@ interface SearchBarProps {
   initialQuery?: string;
   initialType?: 'DPS' | 'ŚDS' | 'Wszystkie';
   compact?: boolean; // dla wersji na stronie wyników
+  onQueryChange?: (query: string) => void; // callback when query changes
 }
 
 // Autocomplete Dropdown Component
@@ -110,6 +111,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   initialQuery = '',
   initialType = 'Wszystkie',
   compact = false,
+  onQueryChange,
 }) => {
   const [cityInput, setCityInput] = useState(initialQuery);
   const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>(initialType);
@@ -128,6 +130,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   // Refs for click outside detection
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Notify parent of query changes
+  useEffect(() => {
+    if (onQueryChange) {
+      onQueryChange(cityInput);
+    }
+  }, [cityInput, onQueryChange]);
 
   // Debounced fetch autocomplete suggestions
   useEffect(() => {

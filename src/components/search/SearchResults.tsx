@@ -137,6 +137,9 @@ export default function SearchResults({
   const [maxDistance, setMaxDistance] = useState<number>(30); // km (from geolocation)
   const [maxDistanceFromCity, setMaxDistanceFromCity] = useState<number>(30); // km (from searched city)
 
+  // Track current query from SearchBar - when empty, clear results
+  const [currentQuery, setCurrentQuery] = useState(query || '');
+
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
   // lub pełna lista Małopolski gdy brak danych TERYT (np. wyszukiwanie woj./geoloc)
@@ -229,6 +232,26 @@ export default function SearchResults({
     window.addEventListener('toggleMobileMap', handleToggleMap);
     return () => window.removeEventListener('toggleMobileMap', handleToggleMap);
   }, []);
+
+  // Clear results and reset filters when query is cleared in SearchBar
+  useEffect(() => {
+    // Sync cityInput with currentQuery from SearchBar
+    setCityInput(currentQuery);
+
+    if (currentQuery.trim() === '') {
+      // Clear everything when search is empty
+      setFacilities([]);
+      setSelectedPowiat('Wszystkie');
+      setSelectedProfiles([]);
+      setPriceLimit(10000);
+      setMaxDistance(30);
+      setMaxDistanceFromCity(30);
+    } else if (currentQuery === query) {
+      // Show results when query matches URL
+      setFacilities(results);
+    }
+    // else: query changed but user hasn't clicked search yet - keep current facilities
+  }, [currentQuery, query, results]);
 
   // Load favorites on mount
   useEffect(() => {
@@ -732,12 +755,15 @@ export default function SearchResults({
           {/* Desktop Header - sticky */}
           <div className="hidden md:block sticky top-20 z-30 bg-white border-b border-gray-200 shadow-md">
               {/* Row 1: Search Bar */}
-              <div className="px-6 py-3 border-b border-gray-100">
-                <SearchBar
-                  initialQuery={cityInput}
-                  initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
-                  compact={true}
-                />
+              <div className="px-6 py-3 border-b border-gray-100 flex justify-center">
+                <div className="w-full max-w-2xl">
+                  <SearchBar
+                    initialQuery={cityInput}
+                    initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
+                    compact={true}
+                    onQueryChange={setCurrentQuery}
+                  />
+                </div>
               </div>
 
               {/* Row 2: Active Filters (z wrap) */}
