@@ -10,14 +10,47 @@ interface FilterChip {
 interface ActiveFiltersProps {
   chips: FilterChip[];
   isFavoritesView?: boolean;
+  inline?: boolean; // Nowy prop dla wersji w sticky header
 }
 
 export const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   chips,
-  isFavoritesView = false
+  isFavoritesView = false,
+  inline = false
 }) => {
   if (chips.length === 0) return null;
 
+  // Wersja inline (w sticky header) - bez wrapper, z wrap
+  if (inline) {
+    return (
+      <div className="flex items-center gap-2 flex-wrap">
+        {chips.map((chip, idx) => (
+          <div
+            key={idx}
+            className="
+              flex items-center gap-2
+              px-3 py-1.5
+              rounded-full
+              bg-gray-100 text-gray-700
+              border border-gray-200
+              text-xs font-medium
+              whitespace-nowrap
+            "
+          >
+            {chip.label}
+            <button
+              onClick={chip.clear}
+              className="hover:text-red-500 transition-colors p-0.5"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Wersja oryginalna (sticky, dla mobile/innych miejsc)
   return (
     <div className="sticky top-[72px] md:top-[152px] z-30 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-3">

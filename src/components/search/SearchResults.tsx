@@ -485,9 +485,6 @@ export default function SearchResults({
   return (
     <div className="flex flex-col bg-slate-50 min-h-screen md:-mt-20">
 
-      {/* Active Filters Chips */}
-      <ActiveFilters chips={activeChips} />
-
       {/* Multi-Powiat Info Banner */}
       {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && !userLocation && (
         <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mx-4 md:mx-6 mb-2 rounded-r-lg">
@@ -551,12 +548,11 @@ export default function SearchResults({
       />
 
       {/* 2-COLUMN LAYOUT (jak Lottie) */}
-      <div className="flex-1 w-full relative pb-32">
-        <div className="flex">
+      <div className="flex-1 w-full relative">
 
-          {/* LEFT SIDEBAR - FILTERS (Desktop only) - FIXED */}
-          <aside className="hidden lg:block w-80 shrink-0">
-            <div className="fixed left-0 top-20 w-80 h-[calc(100vh-80px)] bg-white border-r border-slate-200 p-6 space-y-5 overflow-y-auto">
+        {/* LEFT SIDEBAR - FILTERS (Desktop only) - FIXED */}
+        <div className="hidden lg:block fixed left-0 top-20 w-80 h-[calc(100vh-80px)] bg-white border-r border-slate-200 z-20">
+          <div className="h-full p-6 space-y-5 overflow-y-auto pb-8">
 
               {/* Filters Header */}
               <div className="flex items-center justify-between mb-1">
@@ -713,14 +709,14 @@ export default function SearchResults({
                 </div>
               ) : null}
 
-            </div>
-          </aside>
+          </div>
+        </div>
 
-          {/* RIGHT SIDE - LIST OR MAP (toggle jak w Lottie) */}
-          <div className="flex-1 flex flex-col bg-slate-50 lg:ml-80">
+        {/* RIGHT SIDE - LIST OR MAP (toggle jak w Lottie) */}
+        <div className="flex-1 flex flex-col bg-slate-50 lg:pl-80">
 
-            {/* Desktop Header - sticky */}
-            <div className="hidden md:block sticky top-20 z-30 bg-white border-b border-gray-200">
+          {/* Desktop Header - sticky */}
+          <div className="hidden md:block sticky top-20 z-30 bg-white border-b border-gray-200">
               {/* Row 1: Search Bar */}
               <div className="px-6 py-3 border-b border-gray-100">
                 <SearchBar
@@ -730,13 +726,21 @@ export default function SearchResults({
                 />
               </div>
 
-              {/* Row 2: Results Info + Sort + Toggle */}
+              {/* Row 2: Active Filters (z wrap) */}
+              {activeChips.length > 0 && (
+                <div className="px-6 py-3 border-b border-gray-100">
+                  <ActiveFilters chips={activeChips} inline={true} />
+                </div>
+              )}
+
+              {/* Row 3: Results Count + Sort + Toggle */}
               <div className="flex items-center justify-between gap-4 px-6 py-3">
-                {/* Results Count - Lottie style */}
-                <h2 className="text-lg font-bold text-gray-900">
+                {/* Left: Results Count */}
+                <h2 className="text-lg font-bold text-gray-900 whitespace-nowrap">
                   {query ? `${query}: ` : ''}{facilities.length} {facilities.length === 1 ? 'placówka' : facilities.length < 5 ? 'placówki' : 'placówek'}
                 </h2>
 
+                {/* Right: Sort + Toggle */}
                 <div className="flex items-center gap-4">
                   {/* Sort Dropdown - Lottie style */}
                   <div className="flex items-center gap-2">
@@ -917,9 +921,8 @@ export default function SearchResults({
               </div>
             )}
 
-          </div>
-
         </div>
+
       </div>
 
       {/* Mobile Map Overlay (fullscreen) */}

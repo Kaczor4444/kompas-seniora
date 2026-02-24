@@ -408,34 +408,25 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   ) : null;
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Main Content */}
-      <main className="w-full h-screen flex flex-col">
-        <div className="flex-1 overflow-hidden">
-
-            {/* Search Results */}
-            <SearchResults
-              query={query}
-              type={type}
-              results={sortedResults}
-              message={message}
-              terytPowiats={terytPowiats.length > 0 ? terytPowiats : undefined}
-              searchCenter={searchCenter ? { ...searchCenter, name: query } : undefined}
-              userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined}
-              powiatBreakdown={Object.keys(powiatBreakdown).length > 0 ? powiatBreakdown : undefined}
-              powiatSearchCenters={Object.keys(powiatSearchCenters).length > 0 ? powiatSearchCenters : undefined}
-              activeFilters={{
-                wojewodztwo: wojewodztwo !== 'all' ? wojewodztwo : undefined,
-                powiat: powiatParam || undefined,
-                type: type !== 'all' ? type : undefined,
-                careTypes: selectedCareTypes.length > 0 ? selectedCareTypes : undefined,
-                minPrice,
-                maxPrice,
-                showFree: showFree || undefined,
-              }}
-            />
-        </div>
-      </main>
-    </div>
+    <SearchResults
+      query={query}
+      type={type}
+      results={sortedResults}
+      message={message}
+      terytPowiats={terytPowiats.length > 0 ? terytPowiats : undefined}
+      searchCenter={searchCenter ? { ...searchCenter, name: query } : undefined}
+      userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined}
+      powiatBreakdown={Object.keys(powiatBreakdown).length > 0 ? powiatBreakdown : undefined}
+      powiatSearchCenters={Object.keys(powiatSearchCenters).length > 0 ? powiatSearchCenters : undefined}
+      activeFilters={{
+        wojewodztwo: wojewodztwo !== 'all' ? wojewodztwo : undefined,
+        powiat: powiatParam || undefined,
+        type: type !== 'all' ? type : undefined,
+        careTypes: selectedCareTypes.length > 0 ? selectedCareTypes : undefined,
+        minPrice,
+        maxPrice,
+        showFree: showFree || undefined,
+      }}
+    />
   );
 }
