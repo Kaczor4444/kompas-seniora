@@ -101,26 +101,50 @@ export async function GET(request: NextRequest) {
       // 2. Dla każdej lokalizacji TERYT - sprawdź liczbę placówek
       const suggestionsWithCount = await Promise.all(
         terytMatches.map(async (loc) => {
-          const normalizedPowiat = normalizePolish(loc.powiat);
+          const normalizedMiejscowosc = normalizePolish(loc.nazwa);
 
-          // Pobierz wszystkie placówki
+          // 🔧 Mapowanie powiatów TERYT → baza placówek
+          // Miasta na prawach powiatu: "m. Kraków" → "krakowski", etc.
+          const mapTerytPowiatToDb = (terytPowiat: string): string => {
+            const normalized = normalizePolish(terytPowiat);
+            if (normalized === 'm. krakow') return 'krakowski';
+            if (normalized === 'm. nowy sacz') return 'nowosądecki';
+            if (normalized === 'm. tarnow') return 'tarnowski';
+            return terytPowiat;
+          };
+
+          const dbPowiat = mapTerytPowiatToDb(loc.powiat);
+          const normalizedPowiat = normalizePolish(dbPowiat);
+
+          // Pobierz placówki TYLKO z daną miejscowością + powiatem
           const allFacilities = await prisma.placowka.findMany({
-            select: { powiat: true, typ_placowki: true }
+            select: { miejscowosc: true, powiat: true, typ_placowki: true }
           });
 
-          // Filtruj po powiecie (case-insensitive + contains)
+          // 🔧 FIX: Filtruj po MIEJSCOWOŚCI + POWIECIE (nie tylko powiat!)
           const matchingFacilities = allFacilities.filter(f => {
+            // 1. Musi być ta sama miejscowość (exact match, normalized)
+            const normalizedFacilityMiejscowosc = normalizePolish(f.miejscowosc);
+            if (normalizedFacilityMiejscowosc !== normalizedMiejscowosc) {
+              return false;
+            }
+
+            // 2. Musi być ten sam powiat (with contains dla elastyczności)
             const normalizedFacilityPowiat = normalizePolish(f.powiat);
             const powiatMatch = normalizedFacilityPowiat.includes(normalizedPowiat) ||
                                normalizedPowiat.includes(normalizedFacilityPowiat);
 
-            // Filtr typu
+            if (!powiatMatch) {
+              return false;
+            }
+
+            // 3. Filtr typu
             if (typ) {
               if (typ === 'DPS' && f.typ_placowki !== 'DPS') return false;
               if (typ === 'ŚDS' && f.typ_placowki !== 'ŚDS') return false;
             }
 
-            return powiatMatch;
+            return true;
           });
 
           // ✅ Dla części (RM=00) znajdź nazwę nadrzędnej miejscowości
