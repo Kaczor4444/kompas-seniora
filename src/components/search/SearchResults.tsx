@@ -58,12 +58,12 @@ const normalizePolish = (str: string): string => {
 const mapCityCountyToPowiat = (powiat: string): string => {
   const normalized = normalizePolish(powiat);
 
-  // Kraków: "m. Kraków", "Kraków" → "krakowski"
-  if (normalized === 'm. krakow' || normalized === 'krakow') return 'krakowski';
-  // Nowy Sącz: "m. Nowy Sącz", "Nowy Sącz" → "nowosądecki"
-  if (normalized === 'm. nowy sacz' || normalized === 'nowy sacz') return 'nowosądecki';
-  // Tarnów: "m. Tarnów", "Tarnów" → "tarnowski"
-  if (normalized === 'm. tarnow' || normalized === 'tarnow') return 'tarnowski';
+  // Kraków: tylko "m. Kraków" (nie wieś "Kraków"!) → "krakowski"
+  if (normalized === 'm. krakow') return 'krakowski';
+  // Nowy Sącz: "m. Nowy Sącz" → "nowosądecki"
+  if (normalized === 'm. nowy sacz') return 'nowosądecki';
+  // Tarnów: "m. Tarnów" → "tarnowski"
+  if (normalized === 'm. tarnow') return 'tarnowski';
 
   return powiat; // bez zmian dla innych powiatów
 };
@@ -190,7 +190,7 @@ export default function SearchResults({
     // w app/search/page.tsx, więc nie są potrzebne tutaj jako osobne opcje
   ];
   const availablePowiats = terytPowiats && terytPowiats.length > 0
-    ? ["Wszystkie", ...terytPowiats]
+    ? ["Wszystkie", ...Array.from(new Set(terytPowiats.map(mapCityCountyToPowiat)))]
     : ["Wszystkie", ...ALL_MALOPOLSKA_POWIATS];
 
   // Dynamiczne profile — tylko te kody które faktycznie występują w wynikach

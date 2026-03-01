@@ -219,6 +219,41 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleSearchClick = () => {
+    // Auto-select - inteligentne wybieranie sugestii
+    if (suggestions.length > 0) {
+      // Normalizuj input do porównania (bez polskich znaków)
+      const normalizedInput = cityInput
+        .toLowerCase()
+        .trim()
+        .replace(/ł/g, 'l')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+      // Jeśli jest tylko jedna sugestia - zawsze ją wybierz
+      if (suggestions.length === 1) {
+        handleSuggestionClick(suggestions[0]);
+        return;
+      }
+
+      // Jeśli jest wiele sugestii - sprawdź czy któraś jest exact match
+      // API już sortuje - pierwsza exact match jest najlepsza (miasta na prawach powiatu mają priorytet)
+      const exactMatches = suggestions.filter(s => {
+        const normalized = s.nazwa
+          .toLowerCase()
+          .replace(/ł/g, 'l')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+        return normalized === normalizedInput;
+      });
+
+      if (exactMatches.length > 0) {
+        // Wybierz pierwszą - API już posortowało (exact + RM=96/98 mają priorytet)
+        handleSuggestionClick(exactMatches[0]);
+        return;
+      }
+    }
+
+    // Fallback - obecna logika (partial search)
     const params = new URLSearchParams();
     if (cityInput) params.append('q', cityInput);
     if (selectedType !== 'Wszystkie') {

@@ -70,7 +70,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   // Apply mapping for non-'all' values
   const wojewodztwo = wojewodztwoRaw !== 'all' ? (wojewodztwoMap[wojewodztwoRaw] || wojewodztwoRaw) : 'all';
 
-  const powiatParam = params.powiat || '';
+  let powiatParam = params.powiat || ''; // let zamiast const - może być auto-assigned przez exact match detection
   const isPartialSearch = params.partial === 'true';
 
   const userLat = params.lat ? parseFloat(params.lat) : null;
@@ -180,6 +180,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // Pobierz UNIKALNE powiaty gdzie szukana miejscowość istnieje
       // Używamy Set aby usunąć duplikaty z bazy TERYT
       terytPowiats = [...new Set(terytMatches.map((t: any) => t.powiat))].sort();
+
+      // AUTO-ASSIGN powiat gdy exact match (Opcja 1 - fallback dla szybkich userów)
+      // Jeśli user wpisał np. "Olkusz" i kliknął Enter zanim załadowały się sugestie,
+      // automatycznie przypisz powiat z TERYT exact match
+      if (!powiatParam && terytMatches.length > 0) {
+        const exactMatches = terytMatches.filter((t: any) =>
+          normalizePolish(t.nazwa) === normalizedQuery
+        );
+
+        if (exactMatches.length > 0) {
+          // Priorytetyzuj miasta na prawach powiatu (gdy miasto = powiat, np. "m. Kraków")
+          // To unika wybrania wsi "Kraków" w pow. tarnowskim zamiast miasta Kraków
+          const cityCountyMatch = exactMatches.find((t: any) => {
+            const normalizedPowiat = normalizePolish(t.powiat);
+            return normalizedPowiat.includes(normalizedQuery) || normalizedQuery.includes(normalizedPowiat);
+          });
+
+          powiatParam = cityCountyMatch ? cityCountyMatch.powiat : exactMatches[0].powiat;
+        }
+      }
 
       // NOWA LOGIKA: Rozróżniamy czy user wybrał z dropdownu czy kliknął "Szukaj"
       let uniquePowiaty: string[];
