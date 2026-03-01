@@ -1,0 +1,279 @@
+# KOMPAS SENIORA - Dokumentacja dla Claude
+
+## ⚠️ KLUCZOWE INFORMACJE
+
+### 🗄️ BAZA DANYCH
+**UWAGA: Aplikacja używa NEON POSTGRESQL w chmurze, NIE lokalnego SQLite!**
+
+- **Provider**: PostgreSQL (Neon)
+- **Połączenie**: `.env` → `DATABASE_URL`
+- **Total rekordów**: ~147 placówek (produkcja)
+- **SQLite (`prisma/dev.db`)**: NIEUŻYWANY - tylko stare testowe dane (36 rekordów)
+
+**Aby zmodyfikować dane produkcyjne:**
+1. Użyj `npx prisma studio` (GUI)
+2. Lub SQL przez: `psql $DATABASE_URL`
+3. Lub migracja Prisma
+
+---
+
+## 🛠️ TECH STACK
+
+### Frontend
+- **Framework**: Next.js 16.0.8 (App Router)
+- **React**: 19.2.1
+- **Styling**: Tailwind CSS 4
+- **UI Components**:
+  - Headless UI
+  - Heroicons
+  - Lucide React
+  - Framer Motion
+- **Maps**: Leaflet + React Leaflet
+
+### Backend
+- **Database**: PostgreSQL (Neon)
+- **ORM**: Prisma 6.16.2
+- **API**: Next.js API Routes
+
+### Inne
+- **TypeScript**: 5.x
+- **Analytics**: Vercel Analytics
+- **Forms**: React Hook Form + Zod
+- **PDF**: jsPDF
+- **CSV**: PapaParse
+- **Search**: Fuse.js (fuzzy search)
+
+---
+
+## 📁 STRUKTURA PROJEKTU
+
+```
+kompas-seniora/
+├── app/                    # Next.js App Router
+│   ├── search/            # Strona wyszukiwania
+│   ├── placowka/[id]/     # Szczegóły placówki
+│   ├── admin/             # Panel admina
+│   ├── kalkulator/        # Kalkulator kosztów
+│   └── api/               # API endpoints
+│
+├── components/            # Główne komponenty (re-exports)
+├── src/
+│   ├── components/        # Prawdziwe komponenty
+│   │   └── search/        # Komponenty wyszukiwania
+│   ├── hooks/             # Custom hooks
+│   ├── utils/             # Utility functions
+│   └── lib/               # Libraries
+│
+├── prisma/
+│   ├── schema.prisma      # Model bazy danych
+│   └── dev.db             # ❌ NIEUŻYWANY SQLite
+│
+├── scripts/               # Import/migracja danych
+├── public/                # Statyczne pliki
+├── content/               # MDX content
+└── data/                  # Dane pomocnicze
+
+```
+
+---
+
+## 🗂️ MODEL BAZY DANYCH
+
+### Główne tabele:
+
+#### `Placowka` (147 rekordów)
+Główna tabela z placówkami opieki.
+
+**Kluczowe pola:**
+- `miejscowosc` - nazwa miasta/wsi
+- `powiat` - nazwa powiatu
+- `wojewodztwo` - województwo
+- `typ_placowki` - "DPS" lub "ŚDS"
+- `koszt_pobytu` - cena miesięczna
+- `profil_opieki` - CSV string (A, B, C...)
+- `latitude`, `longitude` - geolokalizacja
+
+**Znane problemy danych:**
+- ⚠️ Możliwe trailing spaces w `powiat` i `miejscowosc`
+- ⚠️ Możliwe Unicode encoding issues (NFD vs NFC)
+- ⚠️ Niespójność nazw powiatów: "Kraków" vs "krakowski" vs "m. Kraków"
+
+#### `TerytLocation`
+Baza TERYT - miejscowości dla Małopolski i Śląskiego.
+
+**Pola:**
+- `nazwa_normalized` - bez polskich znaków
+- `rodzaj_miejscowosci` (RM):
+  - `01` = wieś
+  - `96` = miasto na prawach powiatu
+  - `98` = miasto
+  - `00` = część/dzielnica
+
+#### Inne tabele:
+- `PlacowkaAnalytics` - statystyki wyświetleń
+- `PlacowkaEvent` - eventy użytkowników
+- `AppEvent` - eventy app-level
+- `SharedList` - udostępnione listy
+- `PlacowkaCena` - historia cen
+- `MopsContact` - kontakty MOPS
+
+---
+
+## 🔍 SYSTEM WYSZUKIWANIA
+
+### Pliki kluczowe:
+- **Server Component**: `app/search/page.tsx`
+- **Client Component**: `src/components/search/SearchResults.tsx`
+- **SearchBar**: `src/components/search/SearchBar.tsx`
+- **FilterPanel**: `src/components/search/FilterPanel.tsx`
+- **API autocomplete**: `app/api/teryt/suggest/route.ts`
+
+### 5 trybów wyszukiwania:
+1. **GEOLOCATION** - user kliknął "W pobliżu"
+2. **POWIAT ONLY** - klik z mapy Małopolski
+3. **WOJEWÓDZTWO ONLY** - wybór z RegionModal
+4. **Z QUERY + TERYT** - wpisanie miejscowości (Małopolska/Śląsk)
+5. **Z QUERY BEZ TERYT** - fallback dla innych województw
+
+### Auto-select miejscowości (commit bf33d05):
+- **Client-side**: gdy 1 sugestia lub exact match → auto-wybiera
+- **Server-side**: fallback gdy user kliknie Enter bardzo szybko
+- **Priorytetyzacja**: miasta na prawach powiatu (RM=96,98)
+
+### Mapowania miast na prawach powiatu:
+```typescript
+"m. Kraków" → "krakowski"
+"m. Nowy Sącz" → "nowosądecki"
+"m. Tarnów" → "tarnowski"
+```
+
+---
+
+## 🎯 ZNANE PROBLEMY I TODO
+
+### Problemy wydajnościowe:
+1. **N+1 queries** w `/api/teryt/suggest` - pobiera wszystkie placówki dla każdej lokalizacji
+2. **Brak paginacji** - pobiera wszystkie placówki naraz
+3. **Geokodowanie blokuje SSR** - Nominatim API może spowolnić stronę
+4. **Zduplikowana logika** - `normalizePolish()` w 3 miejscach
+
+### Problemy danych:
+1. Trailing spaces w polach `powiat` i `miejscowosc` (PostgreSQL!)
+2. Różne encoding (NFD vs NFC) dla polskich znaków
+3. Niespójność nazw powiatów dla miast na prawach powiatu
+
+### Planowane funkcje:
+- [ ] Podpowiedź "Zawęź do miasta" dla Krakowa i Gorlic
+- [ ] Optymalizacja autocomplete (batch queries)
+- [ ] Paginacja wyników
+- [ ] Geokodowanie client-side
+
+---
+
+## 🔐 ZMIENNE ŚRODOWISKOWE (.env)
+
+```bash
+# Produkcyjna baza PostgreSQL (Neon)
+DATABASE_URL="postgresql://neondb_owner:...@ep-orange-feather-ah5c17d5-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
+
+# Admin Panel
+ADMIN_PASSWORD=KompasSeniora2025!
+```
+
+---
+
+## 📝 NAJWAŻNIEJSZE FUNKCJE POMOCNICZE
+
+### Normalizacja polskich znaków
+```typescript
+// app/search/page.tsx, suggest/route.ts, SearchResults.tsx
+function normalizePolish(str: string): string {
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/ł/g, 'l')
+    .replace(/Ł/g, 'l')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+```
+
+### Mapowanie miast → powiaty
+```typescript
+// SearchResults.tsx:58-69
+const mapCityCountyToPowiat = (powiat: string): string => {
+  const normalized = normalizePolish(powiat);
+  if (normalized === 'm. krakow') return 'krakowski';
+  if (normalized === 'm. nowy sacz') return 'nowosądecki';
+  if (normalized === 'm. tarnow') return 'tarnowski';
+  return powiat;
+};
+```
+
+---
+
+## 🚀 KOMENDY
+
+```bash
+# Development
+npm run dev              # Start dev server (localhost:3000)
+
+# Build
+npm run build           # Production build
+npm start               # Start production server
+
+# Database
+npx prisma studio       # GUI do bazy (⚠️ używa DATABASE_URL!)
+npx prisma migrate dev  # Nowa migracja
+npx prisma generate     # Regeneruj Prisma Client
+
+# Data import
+npm run import          # Import CSV data
+```
+
+---
+
+## ⚡ SZYBKIE SPRAWDZENIE
+
+### Która baza jest używana?
+```bash
+# Sprawdź .env
+cat .env | grep DATABASE_URL
+
+# Jeśli: postgresql:// → Neon PostgreSQL ✅
+# Jeśli: file:./prisma/dev.db → SQLite ❌ (stare!)
+```
+
+### Ile rekordów w produkcji?
+```bash
+npx prisma studio
+# Otwórz model "Placowka" → powinno być ~147
+```
+
+### Test wyszukiwania
+1. Otwórz http://localhost:3000
+2. Wpisz "krakow" → kliknij Szukaj
+3. Powinno pokazać 9 placówek (powiat krakowski)
+4. Filtr powiat powinien pokazywać "krakowski"
+
+---
+
+## 📌 COMMIT HISTORY (ostatnie)
+
+- **bf33d05**: feat: Auto-select miejscowości (client + server fallback)
+- **b571c85**: fix: Czyszczenie SQLite (❌ TO BYŁA POMYŁKA - nie wpływa na aplikację!)
+- **4d3f973**: fix: Liczby placówek i filtry dla miast na prawach powiatu
+
+---
+
+## 🆘 GDY COŚ NIE DZIAŁA
+
+1. **Sprawdź którą bazę używasz** - powinien być PostgreSQL!
+2. **Restart dev server** - cache może pokazywać stare dane
+3. **Hard refresh przeglądarki** - Cmd+Shift+R
+4. **Sprawdź console** - błędy API/bazy
+5. **Prisma Studio** - zweryfikuj dane w produkcji
+
+---
+
+Ostatnia aktualizacja: 2026-03-01
