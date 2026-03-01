@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-02-20 (sesja #5 - reimport TERYT z filtrowaniem RM)
+> Ostatnia aktualizacja: 2026-03-01 (sesja #6 - mapowanie miast na prawach powiatu)
 
 ---
 
@@ -698,6 +698,87 @@ Projekt używał wcześniej mieszanki czcionek: Playfair Display (serif) dla nag
 3. **`package.json`** — `next-mdx-remote` v5.0.0 → v6.0.0 (Vercel blokował CVE)
 
 4. **`PROJEKT_DOKUMENTACJA.md`** — ten plik (dokumentacja referencyjna)
+
+---
+
+## 21. MIASTA NA PRAWACH POWIATU - MAPOWANIE POWIATÓW
+
+**Problem:** W Polsce istnieją miasta na prawach powiatu (powiaty grodzkie), które mają odrębne nazwy w systemie TERYT, ale w bazie placówek są przypisane do powiatów ziemskich (land counties).
+
+### Przykład: Kraków
+
+**W bazie TERYT:**
+- `m. Kraków` (miasto na prawach powiatu, rodzaj_miejscowosci: 96)
+- `Kraków` w powiecie `tarnowski` (wieś o tej samej nazwie)
+
+**W bazie placówek (Postgres):**
+- Wszystkie placówki w Krakowie mają `powiat = "krakowski"` (powiat ziemski)
+
+### Problem wyszukiwania
+
+Gdy użytkownik:
+1. Wpisuje "Kraków" → autocomplete pokazuje "Kraków (Powiat m. Kraków)"
+2. Klika na sugestię → URL: `/search?q=Kraków&powiat=m.+Kraków`
+3. Bez mapowania → brak wyników (bo w bazie jest "krakowski", nie "m. Kraków")
+
+### Rozwiązanie (sesja #6, 2026-03-01)
+
+**Dodano mapowanie w `app/search/page.tsx`:**
+
+```typescript
+// TRYB 1 (z query) - linia ~190
+if (powiatParam) {
+  let mappedPowiat = powiatParam;
+  const normalized = normalizePolish(powiatParam);
+
+  // Kraków: "m. Kraków", "Kraków" → "krakowski"
+  if (normalized === 'm. krakow' || normalized === 'krakow') {
+    mappedPowiat = 'krakowski';
+  }
+  // Nowy Sącz: "m. Nowy Sącz", "Nowy Sącz" → "nowosądecki"
+  else if (normalized === 'm. nowy sacz' || normalized === 'nowy sacz') {
+    mappedPowiat = 'nowosądecki';
+  }
+  // Tarnów: "m. Tarnów", "Tarnów" → "tarnowski"
+  else if (normalized === 'm. tarnow' || normalized === 'tarnow') {
+    mappedPowiat = 'tarnowski';
+  }
+
+  uniquePowiaty = [normalizePolish(mappedPowiat)];
+}
+
+// TRYB 5 (powiat only) - linia ~95
+// Analogiczne mapowanie dla wyszukiwania tylko po powiecie (bez query)
+```
+
+**Usunięto z hardcoded listy powiatów w `src/components/search/SearchResults.tsx`:**
+- Usunięto: `"Kraków", "Nowy Sącz", "Tarnów"` (linia 151)
+- Uzasadnienie: miasta na prawach powiatu są automatycznie mapowane na odpowiadające im powiaty ziemskie
+
+### Miasta na prawach powiatu w Małopolsce
+
+| Miasto TERYT | Powiat TERYT | Mapowanie na powiat w bazie |
+|--------------|--------------|------------------------------|
+| m. Kraków | m. Kraków | → krakowski |
+| m. Nowy Sącz | m. Nowy Sącz | → nowosądecki |
+| m. Tarnów | m. Tarnów | → tarnowski |
+
+### Wnioski
+
+1. **Zawsze mapuj miasta na prawach powiatu** w logice wyszukiwania (zarówno TRYB 1 jak i TRYB 5)
+2. **Nie dodawaj nazw miast** do listy powiatów w dropdown - użyj tylko nazw powiatów ziemskich
+3. **Użyj normalizacji** (`normalizePolish()`) aby obsłużyć różne warianty: "m. Kraków", "Kraków", "m. Krakow", "Krakow"
+4. **Sprawdź inne województwa** kiedy będą dodawane - inne miasta na prawach powiatu będą wymagały podobnego mapowania
+
+### Testowanie
+
+Po wprowadzeniu poprawek, wszystkie następujące wyszukiwania powinny dawać te same wyniki:
+- `/search?q=Kraków&powiat=m.+Kraków` ✅
+- `/search?q=Kraków&powiat=Kraków` ✅
+- `/search?q=Kraków&powiat=krakowski` ✅
+- `/search?powiat=m.+Kraków` (bez query) ✅
+- `/search?powiat=Kraków` (bez query) ✅
+- `/search?powiat=krakowski` (bez query) ✅
 
 ---
 

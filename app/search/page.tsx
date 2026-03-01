@@ -96,7 +96,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const allFacilities = await prisma.placowka.findMany({
       orderBy: { nazwa: 'asc' },
     });
-    const normalizedTarget = normalizePolish(powiatParam);
+
+    // Apply city county mapping before filtering
+    let mappedPowiat = powiatParam;
+    const normalized = normalizePolish(powiatParam);
+    if (normalized === 'm. krakow' || normalized === 'krakow') {
+      mappedPowiat = 'krakowski';
+    } else if (normalized === 'm. nowy sacz' || normalized === 'nowy sacz') {
+      mappedPowiat = 'nowosądecki';
+    } else if (normalized === 'm. tarnow' || normalized === 'tarnow') {
+      mappedPowiat = 'tarnowski';
+    }
+
+    const normalizedTarget = normalizePolish(mappedPowiat);
     results = allFacilities.filter(facility => {
       const normalizedFacilityPowiat = normalizePolish(facility.powiat);
       return normalizedFacilityPowiat === normalizedTarget || normalizedFacilityPowiat.includes(normalizedTarget);
@@ -133,7 +145,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     if (hasTerytData) {
       const baseWhere: any = {};
       if (wojewodztwo !== 'all') baseWhere.wojewodztwo = wojewodztwoDbName;
-      if (powiatParam) baseWhere.powiat = powiatParam;
+      // ✅ NIE filtruj po powiatParam w zapytaniu TERYT - chcemy zobaczyć WSZYSTKIE
+      // miejscowości o danej nazwie, żeby móc sugerować alternatywy
+      // if (powiatParam) baseWhere.powiat = powiatParam;
 
       // Zawsze próbuj najpierw exact match — unika "Krakowska" w nowosądeckim
       // gdy user wpisał "Kraków"
@@ -177,11 +191,24 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       if (powiatParam) {
         // User WYBRAŁ konkretny powiat z dropdownu → użyj tylko tego
-        // MAPOWANIE: "m. Kraków" (TERYT) → "krakowski" (baza placówek)
+        // MAPOWANIE: "m. Kraków" / "Kraków" (TERYT/dropdown) → "krakowski" (baza placówek)
+        // Analogicznie dla innych miast na prawach powiatu
         let mappedPowiat = powiatParam;
-        if (normalizePolish(powiatParam) === 'm. krakow') {
+        const normalized = normalizePolish(powiatParam);
+
+        // Kraków: "m. Kraków", "Kraków" → "krakowski"
+        if (normalized === 'm. krakow' || normalized === 'krakow') {
           mappedPowiat = 'krakowski';
         }
+        // Nowy Sącz: "m. Nowy Sącz", "Nowy Sącz" → "nowosądecki"
+        else if (normalized === 'm. nowy sacz' || normalized === 'nowy sacz') {
+          mappedPowiat = 'nowosądecki';
+        }
+        // Tarnów: "m. Tarnów", "Tarnów" → "tarnowski"
+        else if (normalized === 'm. tarnow' || normalized === 'tarnow') {
+          mappedPowiat = 'tarnowski';
+        }
+
         uniquePowiaty = [normalizePolish(mappedPowiat)];
       } else {
         // ✅ OPCJA 1b: User WPISAŁ i kliknął "Szukaj" bez wyboru → pokaż TYLKO powiaty z GŁÓWNYCH miejscowości
@@ -189,16 +216,42 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         const mainTerytMatches = terytMatches.filter((t: any) =>
           ['01', '96', '98'].includes(t.rodzaj_miejscowosci || '')
         );
-        uniquePowiaty = [...new Set(mainTerytMatches.map((t: any) => normalizePolish(t.powiat)))];
+
+        // Mapuj powiaty z TERYT na powiaty w bazie placówek (miasta na prawach powiatu)
+        const terytPowiaty = [...new Set(mainTerytMatches.map((t: any) => t.powiat))];
+        const mappedPowiaty = terytPowiaty.map(powiat => {
+          const normalized = normalizePolish(powiat);
+
+          // Kraków: "m. Kraków" → "krakowski"
+          if (normalized === 'm. krakow') return 'krakowski';
+          // Nowy Sącz: "m. Nowy Sącz" → "nowosądecki"
+          if (normalized === 'm. nowy sacz') return 'nowosądecki';
+          // Tarnów: "m. Tarnów" → "tarnowski"
+          if (normalized === 'm. tarnow') return 'tarnowski';
+
+          return powiat; // bez zmian dla innych powiatów
+        });
+
+        uniquePowiaty = [...new Set(mappedPowiaty.map(p => normalizePolish(p)))];
       }
 
       // Filtruj placówki według wybranych powiatów
       if (uniquePowiaty.length > 0) {
         results = allFacilities.filter(facility => {
           const normalizedFacilityPowiat = normalizePolish(facility.powiat);
-          return uniquePowiaty.some(powiat => {
+          const powiatMatches = uniquePowiaty.some(powiat => {
             return normalizedFacilityPowiat.includes(powiat) || powiat.includes(normalizedFacilityPowiat);
           });
+
+          // ✅ NOWA LOGIKA: Gdy user WYBRAŁ konkretny powiat (powiatParam),
+          // filtruj także po miejscowości
+          if (powiatParam && powiatMatches) {
+            // Sprawdź czy placówka jest w szukanej miejscowości
+            const normalizedFacilityCity = normalizePolish(facility.miejscowosc || '');
+            return normalizedFacilityCity.includes(normalizedQuery) || normalizedQuery.includes(normalizedFacilityCity);
+          }
+
+          return powiatMatches;
         });
 
         // Policz rozkład placówek per powiat (dla banneru informacyjnego)
@@ -225,16 +278,53 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         if (results.length === 0) {
           // Brak placówek w znalezionych powiatach
-          const nearbyFacilities = await prisma.placowka.findMany({
-            where: {},
-            select: { powiat: true },
-            distinct: ['powiat'],
-            take: 5,
-          });
-
-          const powiatySuggestions = nearbyFacilities.map(f => f.powiat).join(', ');
+          const displayQuery = query.charAt(0).toUpperCase() + query.slice(1);
           const wojewodztwoInfo = wojewodztwo === 'all' ? '' : ` (${wojewodztwoName})`;
-          message = `Nie znaleźliśmy ${facilityWord} w ${uniquePowiaty.join(', ')}${wojewodztwoInfo}. Spróbuj wyszukać w: ${powiatySuggestions}`;
+
+          // PRZYPADEK 1: User wybrał konkretny powiat z autocomplete
+          if (powiatParam) {
+            // Sprawdź czy miejscowość istnieje w innych powiatach (potencjalne alternatywy)
+            const otherPowiats = terytPowiats.filter(p => normalizePolish(p) !== normalizePolish(powiatParam));
+
+            if (otherPowiats.length > 0) {
+              // Miejscowość istnieje w innych lokalizacjach - zasugeruj je
+              const suggestions = otherPowiats.map(p => {
+                // Czytelne wyświetlanie nazw powiatów
+                const norm = normalizePolish(p);
+                if (norm === 'm. krakow') return 'miasto Kraków';
+                if (norm === 'm. nowy sacz') return 'miasto Nowy Sącz';
+                if (norm === 'm. tarnow') return 'miasto Tarnów';
+                // Dla zwykłych powiatów dodaj "powiat"
+                return `powiat ${p}`;
+              }).join(' lub ');
+
+              message = `Nie znaleźliśmy ${facilityWord} w miejscowości "${displayQuery}" (powiat ${powiatParam}). Czy chodziło Ci o ${suggestions}?`;
+            } else {
+              // Miejscowość istnieje tylko w jednym powiecie
+              message = `Nie znaleźliśmy ${facilityWord} w miejscowości "${displayQuery}" (powiat ${powiatParam})${wojewodztwoInfo}.`;
+            }
+          }
+          // PRZYPADEK 2: User kliknął "Szukaj" bez wyboru konkretnego powiatu
+          else {
+            if (uniquePowiaty.length > 1) {
+              // Przeszukano wiele powiatów - pokaż które
+              const displayPowiats = terytPowiats.map(p => {
+                const norm = normalizePolish(p);
+                if (norm === 'm. krakow') return 'm. Kraków';
+                if (norm === 'm. nowy sacz') return 'm. Nowy Sącz';
+                if (norm === 'm. tarnow') return 'm. Tarnów';
+                return p;
+              }).join(', ');
+              message = `Nie znaleźliśmy ${facilityWord} w okolicy miejscowości "${displayQuery}". Przeszukaliśmy powiaty: ${displayPowiats}${wojewodztwoInfo}.`;
+            } else if (uniquePowiaty.length === 1) {
+              // Przeszukano jeden powiat
+              const displayPowiat = terytPowiats.length > 0 ? terytPowiats[0] : uniquePowiaty[0];
+              message = `Nie znaleźliśmy ${facilityWord} w miejscowości "${displayQuery}" (powiat ${displayPowiat})${wojewodztwoInfo}.`;
+            } else {
+              // Fallback (nie powinno się zdarzyć)
+              message = `Nie znaleźliśmy ${facilityWord} dla "${displayQuery}"${wojewodztwoInfo}.`;
+            }
+          }
         } else {
           message = '';
         }

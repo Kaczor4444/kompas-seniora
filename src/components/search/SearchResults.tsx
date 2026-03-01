@@ -43,6 +43,31 @@ const getProfileName = (code: string): string => {
   return mapping[code] || code;
 };
 
+// Normalizacja polskich znaków (konsystentne z app/search/page.tsx)
+const normalizePolish = (str: string): string => {
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/ł/g, 'l')
+    .replace(/Ł/g, 'l')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+};
+
+// Mapowanie miast na prawach powiatu (TERYT) → powiaty ziemskie (baza placówek)
+const mapCityCountyToPowiat = (powiat: string): string => {
+  const normalized = normalizePolish(powiat);
+
+  // Kraków: "m. Kraków", "Kraków" → "krakowski"
+  if (normalized === 'm. krakow' || normalized === 'krakow') return 'krakowski';
+  // Nowy Sącz: "m. Nowy Sącz", "Nowy Sącz" → "nowosądecki"
+  if (normalized === 'm. nowy sacz' || normalized === 'nowy sacz') return 'nowosądecki';
+  // Tarnów: "m. Tarnów", "Tarnów" → "tarnowski"
+  if (normalized === 'm. tarnow' || normalized === 'tarnow') return 'tarnowski';
+
+  return powiat; // bez zmian dla innych powiatów
+};
+
 // ===== TYPES (from your existing structure) =====
 interface Facility {
   id: number;
@@ -115,9 +140,21 @@ export default function SearchResults({
   const [selectedVoivodeship, setSelectedVoivodeship] = useState(
     activeFilters?.wojewodztwo || "Wszystkie"
   );
-  const [selectedPowiat, setSelectedPowiat] = useState(
-    activeFilters?.powiat || "Wszystkie"
-  );
+
+  // Auto-select powiat jeśli:
+  // 1. User wybrał powiat z autocomplete (activeFilters.powiat)
+  // 2. User wpisał miejscowość która istnieje w JEDNYM powiecie (terytPowiats.length === 1)
+  const getInitialPowiat = () => {
+    if (activeFilters?.powiat) {
+      return mapCityCountyToPowiat(activeFilters.powiat);
+    }
+    if (terytPowiats && terytPowiats.length === 1) {
+      return mapCityCountyToPowiat(terytPowiats[0]);
+    }
+    return "Wszystkie";
+  };
+
+  const [selectedPowiat, setSelectedPowiat] = useState(getInitialPowiat());
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
   const [priceLimit, setPriceLimit] = useState(
     activeFilters?.maxPrice || 10000
@@ -148,7 +185,9 @@ export default function SearchResults({
     "krakowski", "limanowski", "miechowski", "myślenicki", "nowosądecki",
     "nowotarski", "olkuski", "oświęcimski", "proszowicki", "suski",
     "tarnowski", "tatrzański", "wadowicki", "wielicki",
-    "Kraków", "Nowy Sącz", "Tarnów",
+    // Note: miasta na prawach powiatu (m. Kraków, m. Nowy Sącz, m. Tarnów) są mapowane
+    // na odpowiadające im powiaty ziemskie (krakowski, nowosądecki, tarnowski)
+    // w app/search/page.tsx, więc nie są potrzebne tutaj jako osobne opcje
   ];
   const availablePowiats = terytPowiats && terytPowiats.length > 0
     ? ["Wszystkie", ...terytPowiats]
@@ -223,8 +262,14 @@ export default function SearchResults({
 
   // Sync filter state when activeFilters prop changes (e.g. after router.push navigation)
   useEffect(() => {
-    setSelectedPowiat(activeFilters?.powiat || "Wszystkie");
-  }, [activeFilters?.powiat]);
+    if (activeFilters?.powiat) {
+      setSelectedPowiat(mapCityCountyToPowiat(activeFilters.powiat));
+    } else if (terytPowiats && terytPowiats.length === 1) {
+      setSelectedPowiat(mapCityCountyToPowiat(terytPowiats[0]));
+    } else {
+      setSelectedPowiat("Wszystkie");
+    }
+  }, [activeFilters?.powiat, terytPowiats]);
 
   // Mobile map toggle via custom event from MobileStickyBar
   useEffect(() => {
@@ -462,9 +507,12 @@ export default function SearchResults({
       const targetPowiat = normPowiat(powiat);
       const hasResults = results.some(f => normPowiat(f.powiat ?? '') === targetPowiat);
       if (!hasResults) {
-        // Powiat not in current server results — navigate to powiat-only search
-        // Nie przekazujemy q — user wybrał konkretny powiat, nie szuka już po mieście
+        // Powiat not in current server results — navigate with BOTH query and powiat
+        // ✅ Zachowujemy query żeby dostać odpowiedni komunikat o braku wyników
         const params = new URLSearchParams();
+        if (query && query.trim() !== '') {
+          params.set('q', query);
+        }
         params.set('powiat', powiat);
         router.push(`/search?${params.toString()}`);
         return;
