@@ -21,10 +21,17 @@ export async function GET() {
       return acc;
     }, {} as Record<string, number>);
 
-    const cityStats = facilitiesByCity.map(item => ({
-      name: item.miejscowosc,
-      count: item._count.id,
-    }));
+    // ✅ Deduplikuj miasta (trim spacji) i zsumuj liczniki
+    const cityMap = new Map<string, number>();
+    for (const item of facilitiesByCity) {
+      const trimmedName = item.miejscowosc.trim();
+      const currentCount = cityMap.get(trimmedName) || 0;
+      cityMap.set(trimmedName, currentCount + item._count.id);
+    }
+
+    const cityStats = Array.from(cityMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
 
     const totalFacilities = await prisma.placowka.count();
 

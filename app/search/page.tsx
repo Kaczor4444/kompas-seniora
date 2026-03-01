@@ -196,8 +196,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         let mappedPowiat = powiatParam;
         const normalized = normalizePolish(powiatParam);
 
-        // Kraków: "m. Kraków", "Kraków" → "krakowski"
-        if (normalized === 'm. krakow' || normalized === 'krakow') {
+        // Kraków: "m. Kraków", "Kraków", "krakowski" → "krakowski"
+        if (normalized === 'm. krakow' || normalized === 'krakow' || normalized === 'krakowski') {
           mappedPowiat = 'krakowski';
         }
         // Nowy Sącz: "m. Nowy Sącz", "Nowy Sącz" → "nowosądecki"
@@ -238,20 +238,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // Filtruj placówki według wybranych powiatów
       if (uniquePowiaty.length > 0) {
         results = allFacilities.filter(facility => {
-          const normalizedFacilityPowiat = normalizePolish(facility.powiat);
+          // ✅ MAPUJ nazwę powiatu z bazy (obsługa "Kraków" → "krakowski")
+          let facilityPowiat = facility.powiat;
+          const normFacilityPowiat = normalizePolish(facilityPowiat);
+
+          // Zmapuj miasta na prawach powiatu z BAZY na powiaty ziemskie
+          if (normFacilityPowiat === 'krakow') {
+            facilityPowiat = 'krakowski';
+          } else if (normFacilityPowiat === 'nowy sacz') {
+            facilityPowiat = 'nowosądecki';
+          } else if (normFacilityPowiat === 'tarnow') {
+            facilityPowiat = 'tarnowski';
+          }
+
+          const normalizedFacilityPowiat = normalizePolish(facilityPowiat);
           const powiatMatches = uniquePowiaty.some(powiat => {
             return normalizedFacilityPowiat.includes(powiat) || powiat.includes(normalizedFacilityPowiat);
           });
 
-          // ✅ NOWA LOGIKA: Gdy user WYBRAŁ konkretny powiat (powiatParam),
-          // filtruj także po miejscowości
-          if (powiatParam && powiatMatches) {
-            // Sprawdź czy placówka jest w szukanej miejscowości
-            const normalizedFacilityCity = normalizePolish(facility.miejscowosc || '');
-            return normalizedFacilityCity.includes(normalizedQuery) || normalizedQuery.includes(normalizedFacilityCity);
-          }
+          // ✅ Nie pasuje do powiatu? Odrzuć
+          if (!powiatMatches) return false;
 
-          return powiatMatches;
+          // ✅ ZAWSZE filtruj po miejscowości gdy user szuka konkretnego miasta
+          // (zarówno z autocomplete z powiatParam, jak i kliknięcie z głównej bez powiatParam)
+          const normalizedFacilityCity = normalizePolish(facility.miejscowosc || '');
+          return normalizedFacilityCity.includes(normalizedQuery) || normalizedQuery.includes(normalizedFacilityCity);
         });
 
         // Policz rozkład placówek per powiat (dla banneru informacyjnego)

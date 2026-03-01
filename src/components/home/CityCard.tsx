@@ -11,9 +11,30 @@ interface CityCardProps {
 }
 
 const CityCard = memo(({ name, slug, count }: CityCardProps) => {
+  // ✅ Dla miast na prawach powiatu dodaj parametr powiat
+  const getCitySearchUrl = () => {
+    const nameLower = name.toLowerCase();
+
+    // Kraków → powiat krakowski (35 placówek w mieście)
+    if (nameLower === 'kraków') {
+      return `/search?q=${slug}&powiat=krakowski`;
+    }
+    // Nowy Sącz → powiat nowosądecki
+    if (nameLower === 'nowy sącz') {
+      return `/search?q=${slug}&powiat=nowosądecki`;
+    }
+    // Tarnów → powiat tarnowski
+    if (nameLower === 'tarnów') {
+      return `/search?q=${slug}&powiat=tarnowski`;
+    }
+
+    // Dla innych miast - tylko query
+    return `/search?q=${slug}`;
+  };
+
   return (
     <Link
-      href={`/search?q=${slug}`}
+      href={getCitySearchUrl()}
       className="group"
       aria-label={`Zobacz ${count} ${count === 1 ? 'placówkę' : count < 5 ? 'placówki' : 'placówek'} w ${name}`}
     >

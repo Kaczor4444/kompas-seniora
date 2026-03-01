@@ -399,7 +399,22 @@ export default function SearchResults({
       }
 
       const targetPowiat = norm(mappedPowiat);
-      filtered = filtered.filter(f => norm(f.powiat ?? '') === targetPowiat);
+      filtered = filtered.filter(f => {
+        // ✅ MAPUJ także powiat z FACILITIES (tak jak w app/search/page.tsx)
+        let facilityPowiat = f.powiat ?? '';
+        const normFacilityPowiat = norm(facilityPowiat);
+
+        // Zmapuj miasta na prawach powiatu
+        if (normFacilityPowiat === 'krakow') {
+          facilityPowiat = 'krakowski';
+        } else if (normFacilityPowiat === 'nowy sacz') {
+          facilityPowiat = 'nowosądecki';
+        } else if (normFacilityPowiat === 'tarnow') {
+          facilityPowiat = 'tarnowski';
+        }
+
+        return norm(facilityPowiat) === targetPowiat;
+      });
     }
 
     // Profile filter - selectedProfiles is an array of code letters
