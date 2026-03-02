@@ -397,11 +397,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     }
   }
 
-  // FILTROWANIE PO TYPIE (DPS / SDS)
+  // FILTROWANIE PO TYPIE (DPS / ŚDS)
+  // ⚠️ UWAGA: W bazie wartości to "DPS" i "ŚDS" (z polskim znakiem Ś!)
   if (type === 'dps') {
-    results = results.filter(f => f.typ_placowki && f.typ_placowki.toUpperCase().includes('DPS'));
+    results = results.filter(f => f.typ_placowki === 'DPS');
   } else if (type === 'sds') {
-    results = results.filter(f => f.typ_placowki && f.typ_placowki.toUpperCase().includes('SDS'));
+    results = results.filter(f => f.typ_placowki === 'ŚDS');
   }
 
   // FILTROWANIE PO CENIE

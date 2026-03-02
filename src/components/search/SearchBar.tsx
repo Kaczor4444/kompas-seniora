@@ -201,7 +201,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     params.append('q', suggestion.nazwa);
     params.append('powiat', suggestion.powiat);
     if (selectedType !== 'Wszystkie') {
-      params.append('type', selectedType === 'DPS' ? 'dps' : 'śds');
+      params.append('type', selectedType === 'DPS' ? 'dps' : 'sds');
     }
     window.location.href = `/search?${params.toString()}`;
   };
@@ -213,7 +213,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     params.append('q', cityInput);
     params.append('partial', 'true');
     if (selectedType !== 'Wszystkie') {
-      params.append('type', selectedType === 'DPS' ? 'dps' : 'śds');
+      params.append('type', selectedType === 'DPS' ? 'dps' : 'sds');
     }
     window.location.href = `/search?${params.toString()}`;
   };
@@ -257,7 +257,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     const params = new URLSearchParams();
     if (cityInput) params.append('q', cityInput);
     if (selectedType !== 'Wszystkie') {
-      params.append('type', selectedType === 'DPS' ? 'dps' : 'śds');
+      params.append('type', selectedType === 'DPS' ? 'dps' : 'sds');
     }
     window.location.href = `/search?${params.toString()}`;
   };
