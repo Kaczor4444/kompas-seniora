@@ -335,6 +335,9 @@ export default function FacilityMap({
         .leaflet-pane {
           z-index: 1 !important;
         }
+        .map-tiles-light {
+          filter: brightness(1.15) contrast(0.8) saturate(0.65) hue-rotate(5deg);
+        }
       `}</style>
       
       <div className="h-full rounded-lg overflow-hidden border border-gray-200">
@@ -349,6 +352,7 @@ export default function FacilityMap({
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            className="map-tiles-light"
           />
           
           <AutoFitBounds
