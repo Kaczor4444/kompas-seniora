@@ -442,7 +442,12 @@ export default function SearchResults({
     }
 
     // Distance from searched city filter (only when searchCenter exists)
-    if (searchCenter && !userLocation) {
+    // ✅ WYŁĄCZ dla miast na prawach powiatu (pokazujemy cały powiat)
+    const isCityCounty = ['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
+      query.toLowerCase().includes(city)
+    );
+
+    if (searchCenter && !userLocation && !isCityCounty) {
       filtered = filtered.filter(f => {
         // Jeśli placówka nie ma współrzędnych, nie filtruj po odległości (pokaż ją)
         if (f.distanceFromCity === null || f.distanceFromCity === undefined) return true;
@@ -584,45 +589,90 @@ export default function SearchResults({
 
   // ===== RENDER =====
   return (
-    <div className="flex flex-col bg-slate-50 min-h-screen md:-mt-20">
+    <section className="bg-stone-50 min-h-screen pb-24">
 
-      {/* Multi-Powiat Info Banner */}
-      {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && !userLocation && (
-        <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mx-4 md:mx-6 mb-2 rounded-r-lg">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 mt-0.5">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      {/* HERO SECTION - jak w Poradnikach */}
+      <div className="bg-emerald-600 text-white relative overflow-hidden mb-8 md:mb-12">
+        {/* Decorative Icon */}
+        <div className="absolute top-0 right-0 opacity-10 pointer-events-none">
+          <svg className="w-96 h-96 -mr-20 -mt-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
+          {/* Back Button */}
+          <button
+            onClick={() => router.push('/')}
+            className="group flex items-center gap-2 text-emerald-100 hover:text-white font-bold mb-6 md:mb-8 transition-colors px-4 py-2 rounded-xl hover:bg-emerald-700/50 w-fit"
+          >
+            <div className="w-8 h-8 rounded-full bg-emerald-700/50 border border-emerald-500 flex items-center justify-center group-hover:border-white/50 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-blue-900 mb-1">
-                Znaleziono "{query}" w kilku lokalizacjach:
-              </p>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {Object.entries(powiatBreakdown)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([powiat, count]) => (
-                    <button
-                      key={powiat}
-                      onClick={() => handlePowiatChange(powiat)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-blue-800 text-xs font-medium rounded-full border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer active:scale-95"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      {powiat} ({count})
-                    </button>
-                  ))}
-              </div>
-              <p className="text-xs text-blue-700">
-                Kliknij na powiat, aby zobaczyć tylko placówki z tej lokalizacji.
-              </p>
+            Wróć do strony głównej
+          </button>
+
+          {/* Title */}
+          <h1 className="text-3xl md:text-5xl font-black mb-4 md:mb-6 text-center md:text-left tracking-tighter">
+            {query ? `${query}: ` : ''}{facilities.length} {facilities.length === 1 ? 'placówka' : facilities.length < 5 ? 'placówki' : 'placówek'}
+          </h1>
+
+          {/* SearchBar */}
+          <div className="max-w-2xl mb-8">
+            <SearchBar
+              initialQuery={cityInput}
+              initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
+              compact={false}
+              onQueryChange={setCurrentQuery}
+            />
+          </div>
+
+          {/* Sort + Toggle Controls */}
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-emerald-100 text-sm font-bold">Sortuj:</span>
+              <select className="px-3 py-2 bg-white/90 backdrop-blur border border-emerald-200 rounded-lg text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-white">
+                <option>Rekomendowane</option>
+                <option>Odległość</option>
+                <option>Cena: rosnąco</option>
+                <option>Cena: malejąco</option>
+              </select>
+            </div>
+
+            {/* List/Map Toggle */}
+            <div className="flex items-center gap-2 bg-emerald-700/50 rounded-xl p-1">
+              <button
+                onClick={() => setShowMapMobile(false)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  !showMapMobile
+                    ? 'bg-white text-gray-900'
+                    : 'text-emerald-100 hover:text-white'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                Lista
+              </button>
+              <button
+                onClick={() => setShowMapMobile(true)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  showMapMobile
+                    ? 'bg-white text-gray-900'
+                    : 'text-emerald-100 hover:text-white'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                Mapa
+              </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Mobile Filter Panel Modal */}
       <FilterPanel
@@ -648,12 +698,176 @@ export default function SearchResults({
         onApply={handleApplyFilters}
       />
 
-      {/* 2-COLUMN LAYOUT (jak Lottie) */}
-      <div className="flex w-full">
+      {/* CONTENT + SIDEBAR LAYOUT (jak Poradniki) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-8 md:gap-12">
 
-        {/* LEFT SIDEBAR - FILTERS (Desktop only) - STICKY */}
-        <div className="hidden lg:block sticky top-20 w-80 h-fit max-h-[calc(100vh-100px)] bg-white border-r border-slate-200 z-20 self-start">
-          <div className="p-6 space-y-5 overflow-y-auto max-h-[calc(100vh-100px)] pb-8">
+          {/* LEFT CONTENT AREA */}
+          <div className="flex-1 min-w-0">
+
+            {/* Active Filters Pills (jak kategorie w Poradnikach) */}
+            {activeChips.length > 0 && (
+              <div className="flex overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:flex-wrap scrollbar-hide gap-2 items-center snap-x mb-8">
+                {activeChips.map((chip, idx) => (
+                  <button
+                    key={idx}
+                    onClick={chip.clear}
+                    className="whitespace-nowrap snap-start px-4 py-2 rounded-xl text-sm font-bold transition-all bg-slate-800 text-white shadow-md hover:bg-emerald-600 flex items-center gap-2 flex-shrink-0"
+                  >
+                    <span>{chip.label}</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Multi-Powiat Info Banner */}
+            {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && !userLocation && (
+              <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mb-6 rounded-r-lg">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-blue-900 mb-1">
+                      Znaleziono "{query}" w kilku lokalizacjach:
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {Object.entries(powiatBreakdown)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([powiat, count]) => (
+                          <button
+                            key={powiat}
+                            onClick={() => handlePowiatChange(powiat)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-blue-800 text-xs font-medium rounded-full border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer active:scale-95"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {powiat} ({count})
+                          </button>
+                        ))}
+                    </div>
+                    <p className="text-xs text-blue-700">
+                      Kliknij na powiat, aby zobaczyć tylko placówki z tej lokalizacji.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Facilities Grid - SINGLE COLUMN */}
+            <div className="space-y-6">
+              {isLoading ? (
+                [1, 2, 3, 4].map(i => <SkeletonCard key={i} />)
+              ) : facilities.length === 0 && message ? (
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                  </div>
+                  <p className="text-slate-700 font-semibold text-base mb-1">{message}</p>
+                  <p className="text-slate-400 text-sm">Przykłady: Kraków, Tarnów, Nowy Sącz, Zakopane</p>
+                </div>
+              ) : facilities.length === 0 ? (
+                <EmptyState onResetFilters={resetFilters} cityInput={cityInput} />
+              ) : (
+                <>
+                  {facilities.slice(0, visibleCount).map(fac => (
+                    <FacilityCard
+                      key={fac.id}
+                      facility={{
+                        id: fac.id,
+                        name: fac.nazwa,
+                        type: fac.typ_placowki as 'DPS' | 'ŚDS',
+                        city: fac.miejscowosc || '',
+                        powiat: fac.powiat || '',
+                        category: fac.typ_placowki === 'DPS' ? 'Dom Pomocy Społecznej' : 'Środowiskowy Dom Samopomocy',
+                        price: fac.koszt_pobytu || 0,
+                        street: fac.ulica,
+                        image: '/images/placeholder-facility.jpg',
+                        waitTime: 'Brak danych',
+                        profileLabels: getShortProfileLabels(fac.profil_opieki, fac.typ_placowki),
+                        distance: fac.distance
+                      }}
+                      userLocation={userLocation}
+                      isHovered={hoveredId === fac.id}
+                      isSaved={favoritesState.includes(fac.id)}
+                      isCompared={selectedForCompare.includes(fac.id)}
+                      onHover={setHoveredId}
+                      onClick={() => handleFacilityClick(fac.id, fac.powiat)}
+                      onToggleSave={(e) => {
+                        e.stopPropagation();
+                        if (isFavorite(fac.id)) {
+                          removeFavorite(fac.id);
+                        } else {
+                          addFavorite({
+                            id: fac.id,
+                            nazwa: fac.nazwa,
+                            miejscowosc: fac.miejscowosc,
+                            powiat: fac.powiat,
+                            typ_placowki: fac.typ_placowki,
+                            koszt_pobytu: fac.koszt_pobytu,
+                            telefon: fac.telefon,
+                            ulica: fac.ulica,
+                            kod_pocztowy: fac.kod_pocztowy,
+                            email: fac.email,
+                            www: fac.www,
+                            liczba_miejsc: fac.liczba_miejsc,
+                            profil_opieki: fac.profil_opieki,
+                            addedAt: new Date().toISOString()
+                          });
+                        }
+                        window.dispatchEvent(new Event("favoritesChanged"));
+                      }}
+                      onToggleCompare={(e) => toggleCompare(fac.id, e)}
+                    />
+                  ))}
+
+                  {/* Load More Button */}
+                  {visibleCount < facilities.length && (
+                    <div className="pt-8 flex flex-col items-center gap-4">
+                      <div className="text-sm font-bold text-slate-400">
+                        Widzisz <span className="text-slate-900">{Math.min(visibleCount, facilities.length)}</span> z <span className="text-slate-900">{facilities.length}</span> placówek
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsLoadingMore(true);
+                          setTimeout(() => {
+                            setVisibleCount(prev => prev + 20);
+                            setIsLoadingMore(false);
+                          }, 600);
+                        }}
+                        disabled={isLoadingMore}
+                        className="group bg-white border-2 border-stone-200 text-slate-800 font-bold py-4 px-10 rounded-2xl hover:border-emerald-600 hover:text-emerald-600 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-3"
+                      >
+                        {isLoadingMore ? (
+                          <span>Ładowanie...</span>
+                        ) : (
+                          <>
+                            <span>Pokaż więcej wyników</span>
+                            <svg className="w-5 h-5 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* RIGHT SIDEBAR - FILTERS (Desktop only) - STICKY */}
+          <aside className="hidden lg:block w-80 flex-shrink-0">
+            <div className="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm sticky top-32 space-y-5">
 
               {/* Filters Header */}
               <div className="flex items-center justify-between mb-1">
@@ -782,268 +996,67 @@ export default function SearchResults({
               )}
 
               {/* Distance Filter */}
-              {userLocation ? (
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                    Odległość: <span className="text-slate-900">do {maxDistance} km</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="5"
-                    max="100"
-                    step="5"
-                    value={maxDistance}
-                    onChange={(e) => setMaxDistance(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
-                  />
-                  <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
-                    <span>5 km</span>
-                    <span>100 km</span>
-                  </div>
-                </div>
-              ) : searchCenter ? (
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                    Od {searchCenter.name}: <span className="text-slate-900">do {maxDistanceFromCity} km</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="5"
-                    max="100"
-                    step="5"
-                    value={maxDistanceFromCity}
-                    onChange={(e) => setMaxDistanceFromCity(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
-                  />
-                  <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
-                    <span>5 km</span>
-                    <span>100 km</span>
-                  </div>
-                </div>
-              ) : null}
+              {/* ✅ Ukryj dla miast na prawach powiatu (pokazujemy cały powiat) */}
+              {(() => {
+                const isCityCounty = ['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
+                  query.toLowerCase().includes(city)
+                );
+
+                if (userLocation) {
+                  return (
+                    <div>
+                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                        Odległość: <span className="text-slate-900">do {maxDistance} km</span>
+                      </label>
+                      <input
+                        type="range"
+                        min="5"
+                        max="100"
+                        step="5"
+                        value={maxDistance}
+                        onChange={(e) => setMaxDistance(parseInt(e.target.value))}
+                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+                      />
+                      <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+                        <span>5 km</span>
+                        <span>100 km</span>
+                      </div>
+                    </div>
+                  );
+                } else if (searchCenter && !isCityCounty) {
+                  return (
+                    <div>
+                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                        Od {searchCenter.name}: <span className="text-slate-900">do {maxDistanceFromCity} km</span>
+                      </label>
+                      <input
+                        type="range"
+                        min="5"
+                        max="100"
+                        step="5"
+                        value={maxDistanceFromCity}
+                        onChange={(e) => setMaxDistanceFromCity(parseInt(e.target.value))}
+                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+                      />
+                      <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+                        <span>5 km</span>
+                        <span>100 km</span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
 
           </div>
-        </div>
-
-        {/* RIGHT SIDE - LIST OR MAP (toggle jak w Lottie) */}
-        <div className="flex-1 flex flex-col bg-slate-50">
-
-          {/* Desktop Header - sticky */}
-          <div className="hidden md:block sticky top-20 z-30 bg-white border-b border-gray-200 shadow-md">
-              {/* Row 1: Search Bar */}
-              <div className="px-6 py-3 border-b border-gray-100 flex justify-center">
-                <div className="w-full max-w-2xl">
-                  <SearchBar
-                    initialQuery={cityInput}
-                    initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
-                    compact={true}
-                    onQueryChange={setCurrentQuery}
-                  />
-                </div>
-              </div>
-
-              {/* Row 2: Active Filters (z wrap) */}
-              {activeChips.length > 0 && (
-                <div className="px-6 py-3 border-b border-gray-100">
-                  <ActiveFilters chips={activeChips} inline={true} />
-                </div>
-              )}
-
-              {/* Row 3: Results Count + Sort + Toggle */}
-              <div className="flex items-center justify-between gap-4 px-6 py-3">
-                {/* Left: Results Count */}
-                <h2 className="text-lg font-bold text-gray-900 whitespace-nowrap">
-                  {query ? `${query}: ` : ''}{facilities.length} {facilities.length === 1 ? 'placówka' : facilities.length < 5 ? 'placówki' : 'placówek'}
-                </h2>
-
-                {/* Right: Sort + Toggle */}
-                <div className="flex items-center gap-4">
-                  {/* Sort Dropdown - Lottie style */}
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-gray-600">Sortuj:</label>
-                    <select className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                      <option>Rekomendowane</option>
-                      <option>Odległość</option>
-                      <option>Cena: rosnąco</option>
-                      <option>Cena: malejąco</option>
-                    </select>
-                  </div>
-
-                  {/* List/Map Toggle */}
-                  <div className="flex items-center gap-2 bg-gray-900 rounded-xl p-1">
-                    <button
-                      onClick={() => setShowMapMobile(false)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                        !showMapMobile
-                          ? 'bg-white text-gray-900'
-                          : 'text-gray-300 hover:text-white'
-                      }`}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                      </svg>
-                      Lista
-                    </button>
-                    <button
-                      onClick={() => setShowMapMobile(true)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                        showMapMobile
-                          ? 'bg-white text-gray-900'
-                          : 'text-gray-300 hover:text-white'
-                      }`}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                      </svg>
-                      Mapa
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* LISTA lub MAPA (toggle) */}
-            {!showMapMobile ? (
-              /* LISTA */
-              <div className={`w-full overflow-y-auto h-[calc(100vh-136px)] md:h-[calc(100vh-80px-56px)] ${showMapMobile ? 'hidden md:block' : 'block'} relative z-0`}>
-                <div className="p-4 md:p-6 space-y-4 max-w-3xl mx-auto">
-
-              {isLoading ? (
-                // Loading
-                [1, 2, 3, 4].map(i => <SkeletonCard key={i} />)
-              ) : facilities.length === 0 && message ? (
-                // Komunikat z serwera (np. miejscowość poza Małopolską)
-                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                  <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                  </div>
-                  <p className="text-slate-700 font-semibold text-base mb-1">{message}</p>
-                  <p className="text-slate-400 text-sm">Przykłady: Kraków, Tarnów, Nowy Sącz, Zakopane</p>
-                </div>
-              ) : facilities.length === 0 ? (
-                // Empty State (po filtrowaniu po stronie klienta)
-                <EmptyState onResetFilters={resetFilters} cityInput={cityInput} />
-              ) : (
-                <>
-                  {/* Results Count */}
-                  <div className="flex items-center justify-between mb-4 px-1">
-                    <p className="text-sm font-semibold text-gray-600">
-                      Znaleziono <span className="text-gray-900">{facilities.length}</span> {facilities.length === 1 ? 'placówkę' : 'placówek'}
-                    </p>
-                  </div>
-
-                  {/* Facility Cards */}
-                  {facilities.slice(0, visibleCount).map(fac => (
-                  <FacilityCard
-                    key={fac.id}
-                    facility={{
-                      id: fac.id,
-                      name: fac.nazwa,
-                      type: fac.typ_placowki as 'DPS' | 'ŚDS',
-                      city: fac.miejscowosc || '',
-                      powiat: fac.powiat || '',
-                      category: fac.typ_placowki === 'DPS' ? 'Dom Pomocy Społecznej' : 'Środowiskowy Dom Samopomocy',
-                      price: fac.koszt_pobytu || 0,
-                      street: fac.ulica,
-                      image: '/images/placeholder-facility.jpg', // Add your image logic
-                      waitTime: 'Brak danych',
-                      profileLabels: getShortProfileLabels(fac.profil_opieki, fac.typ_placowki),
-                      distance: fac.distance
-                    }}
-                    userLocation={userLocation}
-                    isHovered={hoveredId === fac.id}
-                    isSaved={favoritesState.includes(fac.id)}
-                    isCompared={selectedForCompare.includes(fac.id)}
-                    onHover={setHoveredId}
-                    onClick={() => handleFacilityClick(fac.id, fac.powiat)}
-                    onToggleSave={(e) => {
-                      e.stopPropagation();
-                      
-                      if (isFavorite(fac.id)) {
-                        removeFavorite(fac.id);
-                      } else {
-                        addFavorite({
-                          id: fac.id,
-                          nazwa: fac.nazwa,
-                          miejscowosc: fac.miejscowosc,
-                          powiat: fac.powiat,
-                          typ_placowki: fac.typ_placowki,
-                          koszt_pobytu: fac.koszt_pobytu,
-                          telefon: fac.telefon,
-                          ulica: fac.ulica,
-                          kod_pocztowy: fac.kod_pocztowy,
-                          email: fac.email,
-                          www: fac.www,
-                          liczba_miejsc: fac.liczba_miejsc,
-                          profil_opieki: fac.profil_opieki,
-                          addedAt: new Date().toISOString()
-                        });
-                      }
-                      
-                      window.dispatchEvent(new Event("favoritesChanged"));
-                    }}
-                    onToggleCompare={(e) => toggleCompare(fac.id, e)}
-                  />
-                ))}
-
-                  {/* Load More Button */}
-                  {visibleCount < facilities.length && (
-                    <div className="pt-8 pb-48 md:pb-8 flex flex-col items-center gap-4">
-                      <div className="text-sm font-bold text-slate-400">
-                        Widzisz <span className="text-slate-900">{Math.min(visibleCount, facilities.length)}</span> z <span className="text-slate-900">{facilities.length}</span> placówek
-                      </div>
-                      <button
-                        onClick={() => {
-                          setIsLoadingMore(true);
-                          setTimeout(() => {
-                            setVisibleCount(prev => prev + 20);
-                            setIsLoadingMore(false);
-                          }, 600);
-                        }}
-                        disabled={isLoadingMore}
-                        className="group bg-white border-2 border-stone-200 text-slate-800 font-bold py-4 px-10 rounded-2xl hover:border-emerald-600 hover:text-emerald-600 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-3"
-                      >
-                        {isLoadingMore ? (
-                          <span>Ładowanie...</span>
-                        ) : (
-                          <>
-                            <span>Pokaż więcej wyników</span>
-                            <svg className="w-5 h-5 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-                </div>
-              </div>
-            ) : (
-              /* MAPA */
-              <div className="w-full bg-gray-100 overflow-hidden h-[calc(100vh-136px)] md:h-[calc(100vh-80px-56px)]">
-                <FacilityMap
-                  facilities={facilities}
-                  userLocation={userLocation}
-                  searchCenter={searchCenter}
-                  powiatBreakdown={powiatBreakdown}
-                  powiatSearchCenters={powiatSearchCenters}
-                  selectedPowiat={selectedPowiat}
-                  onPowiatClick={handlePowiatChange}
-                />
-              </div>
-            )}
+        </aside>
 
         </div>
-
       </div>
 
-      {/* Mobile Map Overlay (fullscreen) */}
+      {/* MAP VIEW (fullscreen overlay when showMapMobile=true) */}
       {showMapMobile && (
-        <div className="md:hidden fixed inset-0 z-40 top-[120px] bg-gray-100">
+        <div className="fixed inset-0 z-40 top-20 bg-gray-100">
           <FacilityMap
             facilities={facilities}
             userLocation={userLocation}
@@ -1063,18 +1076,6 @@ export default function SearchResults({
         onRemove={(id) => setSelectedForCompare(prev => prev.filter(fid => fid !== id))}
         onClear={() => setSelectedForCompare([])}
       />
-
-      {/* Mobile Bottom Bar (hidden when comparison bar is active) */}
-      {!selectedForCompare.length && (
-        <MobileBottomBar
-          showMap={showMapMobile}
-          onToggleMap={setShowMapMobile}
-          activeFiltersCount={activeChips.length}
-          onOpenFilters={() => setShowFilters(true)}
-          hasUserLocation={!!userLocation}
-          onGeolocation={handleGeolocation}
-        />
-      )}
-    </div>
+    </section>
   );
 }
