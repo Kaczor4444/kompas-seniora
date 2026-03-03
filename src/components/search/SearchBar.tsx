@@ -263,8 +263,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Blokuj Enter gdy brak walidacji
+    const isSearchDisabled = cityInput.length < 2 || validationState !== 'valid';
+
     if (!showDropdown || suggestions.length === 0) {
-      if (e.key === 'Enter') handleSearchClick();
+      if (e.key === 'Enter' && !isSearchDisabled) handleSearchClick();
       return;
     }
     switch (e.key) {
@@ -370,7 +373,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           {/* Search button */}
           <button
             onClick={handleSearchClick}
-            className="bg-slate-900 hover:bg-emerald-700 text-white m-1.5 px-6 rounded-lg font-black text-[11px] uppercase tracking-[0.15em] transition-colors active:scale-95 whitespace-nowrap"
+            disabled={cityInput.length < 2 || validationState !== 'valid'}
+            className="bg-slate-900 hover:bg-emerald-700 text-white m-1.5 px-6 rounded-lg font-black text-[11px] uppercase tracking-[0.15em] transition-colors active:scale-95 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-900"
           >
             Szukaj
           </button>

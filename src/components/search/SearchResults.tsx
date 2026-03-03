@@ -165,6 +165,7 @@ export default function SearchResults({
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [selectedForCompare, setSelectedForCompare] = useState<number[]>([]);
   const [showProfilesMenu, setShowProfilesMenu] = useState(false);
+  const [showMapFilters, setShowMapFilters] = useState(false);
 
   const [facilities, setFacilities] = useState<Facility[]>(results);
   const [isLoading, setIsLoading] = useState(false);
@@ -614,11 +615,6 @@ export default function SearchResults({
             Wróć do strony głównej
           </button>
 
-          {/* Title */}
-          <h1 className="text-3xl md:text-5xl font-black mb-4 md:mb-6 text-center md:text-left tracking-tighter">
-            {query ? `${query}: ` : ''}{facilities.length} {facilities.length === 1 ? 'placówka' : facilities.length < 5 ? 'placówki' : 'placówek'}
-          </h1>
-
           {/* SearchBar */}
           <div className="max-w-2xl mb-8">
             <SearchBar
@@ -629,8 +625,22 @@ export default function SearchResults({
             />
           </div>
 
-          {/* Sort + Toggle Controls */}
+          {/* Results Count + Sort + Toggle Controls */}
           <div className="flex flex-wrap items-center gap-4">
+            {/* Results Count */}
+            <div className="text-white font-bold text-lg">
+              Znaleziono {facilities.length} {(() => {
+                const count = facilities.length;
+                if (count === 1) return 'placówkę';
+                const lastDigit = count % 10;
+                const lastTwoDigits = count % 100;
+                if (lastTwoDigits >= 10 && lastTwoDigits <= 21) return 'placówek';
+                if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
+                return 'placówek';
+              })()}
+            </div>
+
+            {/* Sortowanie */}
             <div className="flex items-center gap-2">
               <span className="text-emerald-100 text-sm font-bold">Sortuj:</span>
               <select className="px-3 py-2 bg-white/90 backdrop-blur border border-emerald-200 rounded-lg text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-white">
@@ -1056,16 +1066,196 @@ export default function SearchResults({
 
       {/* MAP VIEW (fullscreen overlay when showMapMobile=true) */}
       {showMapMobile && (
-        <div className="fixed inset-0 z-40 top-20 bg-gray-100">
-          <FacilityMap
-            facilities={facilities}
-            userLocation={userLocation}
-            searchCenter={searchCenter}
-            powiatBreakdown={powiatBreakdown}
-            powiatSearchCenters={powiatSearchCenters}
-            selectedPowiat={selectedPowiat}
-            onPowiatClick={handlePowiatChange}
-          />
+        <div className="fixed inset-0 z-40 top-20 bg-stone-50">
+          {/* Top Bar with SearchBar */}
+          <div className="bg-white border-b border-stone-200 shadow-sm px-4 py-3">
+            <div className="max-w-5xl mx-auto flex items-center gap-4">
+              {/* SearchBar */}
+              <div className="flex-1">
+                <SearchBar
+                  initialQuery={cityInput}
+                  initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
+                  compact={true}
+                  onQueryChange={setCurrentQuery}
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-2 flex-shrink-0">
+                {/* Toggle Filters */}
+                <button
+                  onClick={() => setShowMapFilters(!showMapFilters)}
+                  className={`px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 ${
+                    showMapFilters
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-white text-slate-900 hover:bg-emerald-600 hover:text-white'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                  <span className="hidden md:inline">Filtry</span>
+                  {activeChips.length > 0 && (
+                    <span className="px-2 py-0.5 bg-white text-emerald-600 text-xs rounded-full font-black">
+                      {activeChips.length}
+                    </span>
+                  )}
+                </button>
+
+                {/* Back to List */}
+                <button
+                  onClick={() => setShowMapMobile(false)}
+                  className="bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  <span className="hidden md:inline">Lista</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Content Area */}
+          <div className="h-[calc(100%-80px)] flex">
+            {/* Sliding Filters Sidebar */}
+            <aside
+              className={`bg-white border-r border-stone-200 shadow-lg transition-all duration-300 ease-in-out overflow-y-auto ${
+                showMapFilters ? 'w-80' : 'w-0'
+              }`}
+            >
+              {showMapFilters && (
+                <div className="p-6 space-y-5 w-80">
+                  {/* Filters Header */}
+                  <div className="flex items-center justify-between mb-1">
+                    <h2 className="text-xl font-black text-slate-900 tracking-tight">Filtry</h2>
+                    <button
+                      onClick={resetFilters}
+                      className="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
+                    >
+                      Wyczyść
+                    </button>
+                  </div>
+
+                  {/* Type Filter */}
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Typ placówki</label>
+                    <div className="flex gap-2">
+                      {['all', 'DPS', 'ŚDS'].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => setSelectedType(type)}
+                          className={`flex-1 px-3 py-2 rounded-lg font-black text-[11px] uppercase tracking-wider transition-all ${
+                            selectedType === type
+                              ? 'bg-slate-900 text-white'
+                              : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                          }`}
+                        >
+                          {type === 'all' ? 'Wszystkie' : type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Powiat Filter */}
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Powiat</label>
+                    <select
+                      value={selectedPowiat}
+                      onChange={(e) => handlePowiatChange(e.target.value)}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 transition-colors"
+                    >
+                      {availablePowiats.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Profile Filter */}
+                  {availableProfiles.length > 0 && (
+                    <div>
+                      <button
+                        onClick={() => setShowProfilesMenu(!showProfilesMenu)}
+                        className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
+                      >
+                        <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
+                        <svg
+                          className={`w-4 h-4 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {showProfilesMenu && (
+                        <div className="space-y-1.5 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                          {availableProfiles.map((code) => {
+                            const isSelected = selectedProfiles.includes(code);
+                            return (
+                              <label
+                                key={code}
+                                className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedProfiles([...selectedProfiles, code]);
+                                    } else {
+                                      setSelectedProfiles(selectedProfiles.filter(c => c !== code));
+                                    }
+                                  }}
+                                  className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                                />
+                                <span className="text-sm font-medium text-slate-700">{getProfileName(code)}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Price Filter */}
+                  {selectedType !== 'ŚDS' && (
+                    <div>
+                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                        Cena do: <span className="text-slate-900">{priceLimit} zł</span>
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10000"
+                        step="100"
+                        value={priceLimit}
+                        onChange={(e) => setPriceLimit(parseInt(e.target.value))}
+                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+                      />
+                      <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+                        <span>0 zł</span>
+                        <span>10000 zł</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </aside>
+
+            {/* Map */}
+            <div className="flex-1">
+              <FacilityMap
+                facilities={facilities}
+                userLocation={userLocation}
+                searchCenter={searchCenter}
+                powiatBreakdown={powiatBreakdown}
+                powiatSearchCenters={powiatSearchCenters}
+                selectedPowiat={selectedPowiat}
+                onPowiatClick={handlePowiatChange}
+              />
+            </div>
+          </div>
         </div>
       )}
 
