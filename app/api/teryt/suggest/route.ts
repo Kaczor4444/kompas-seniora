@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 // Funkcja normalizacji polskich znaków
 function normalizePolish(str: string): string {
   return str
+    .trim() // 🆕 Usuń trailing/leading spaces
     .toLowerCase()
     .replace(/ł/g, 'l')
     .replace(/Ł/g, 'l')
@@ -107,9 +108,10 @@ export async function GET(request: NextRequest) {
           // Miasta na prawach powiatu: "m. Kraków" → "krakowski", etc.
           const mapTerytPowiatToDb = (terytPowiat: string): string => {
             const normalized = normalizePolish(terytPowiat);
-            if (normalized === 'm. krakow') return 'krakowski';
-            if (normalized === 'm. nowy sacz') return 'nowosądecki';
-            if (normalized === 'm. tarnow') return 'tarnowski';
+            // Obsługa wariantów: "m. Kraków", "Miasto Kraków" → "krakowski"
+            if (normalized === 'm. krakow' || normalized === 'miasto krakow') return 'krakowski';
+            if (normalized === 'm. nowy sacz' || normalized === 'miasto nowy sacz') return 'nowosądecki';
+            if (normalized === 'm. tarnow' || normalized === 'miasto tarnow') return 'tarnowski';
             return terytPowiat;
           };
 

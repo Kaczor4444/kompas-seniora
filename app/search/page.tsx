@@ -184,7 +184,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // AUTO-ASSIGN powiat gdy exact match (Opcja 1 - fallback dla szybkich userów)
       // Jeśli user wpisał np. "Olkusz" i kliknął Enter zanim załadowały się sugestie,
       // automatycznie przypisz powiat z TERYT exact match
-      if (!powiatParam && terytMatches.length > 0) {
+      // ✅ WYŁĄCZ dla miast na prawach powiatu (Kraków, Nowy Sącz, Tarnów)
+      const isCityCountyQuery = ['krakow', 'nowy sacz', 'tarnow'].includes(normalizedQuery);
+
+      if (!powiatParam && terytMatches.length > 0 && !isCityCountyQuery) {
         const exactMatches = terytMatches.filter((t: any) =>
           normalizePolish(t.nazwa) === normalizedQuery
         );
@@ -203,6 +206,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       // NOWA LOGIKA: Rozróżniamy czy user wybrał z dropdownu czy kliknął "Szukaj"
       let uniquePowiaty: string[];
+
+      // DEBUG
+      console.log('🔍 SERVER DEBUG:', {
+        query,
+        normalizedQuery,
+        powiatParam,
+        terytPowiats: terytPowiats.length,
+      });
 
       // Wstępne załadowanie placówek
       const allFacilities = await prisma.placowka.findMany({
@@ -242,12 +253,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         const mappedPowiaty = terytPowiaty.map(powiat => {
           const normalized = normalizePolish(powiat);
 
-          // Kraków: "m. Kraków" → "krakowski"
-          if (normalized === 'm. krakow') return 'krakowski';
-          // Nowy Sącz: "m. Nowy Sącz" → "nowosądecki"
-          if (normalized === 'm. nowy sacz') return 'nowosądecki';
-          // Tarnów: "m. Tarnów" → "tarnowski"
-          if (normalized === 'm. tarnow') return 'tarnowski';
+          // Kraków: "m. Kraków" lub "Miasto Kraków" → "krakowski"
+          if (normalized === 'm. krakow' || normalized === 'miasto krakow') return 'krakowski';
+          // Nowy Sącz: "m. Nowy Sącz" lub "Miasto Nowy Sącz" → "nowosądecki"
+          if (normalized === 'm. nowy sacz' || normalized === 'miasto nowy sacz') return 'nowosądecki';
+          // Tarnów: "m. Tarnów" lub "Miasto Tarnów" → "tarnowski"
+          if (normalized === 'm. tarnow' || normalized === 'miasto tarnow') return 'tarnowski';
 
           return powiat; // bez zmian dla innych powiatów
         });
@@ -279,8 +290,32 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           // ✅ Nie pasuje do powiatu? Odrzuć
           if (!powiatMatches) return false;
 
-          // ✅ ZAWSZE filtruj po miejscowości gdy user szuka konkretnego miasta
-          // (zarówno z autocomplete z powiatParam, jak i kliknięcie z głównej bez powiatParam)
+          // ✅ Filtruj po miejscowości TYLKO gdy:
+          // 1. User wybrał konkretny powiat z autocomplete (powiatParam), LUB
+          // 2. Szukana miejscowość NIE jest miastem na prawach powiatu (Kraków, Nowy Sącz, Tarnów)
+
+          // Rozpoznaj miasta na prawach powiatu
+          const isCityCounty = ['krakow', 'nowy sacz', 'tarnow'].includes(normalizedQuery);
+
+          // DEBUG
+          if (normalizedQuery === 'krakow' && !powiatParam) {
+            console.log('🔍 DEBUG Kraków facility:', {
+              nazwa: facility.nazwa,
+              miejscowosc: facility.miejscowosc,
+              powiat: facility.powiat,
+              isCityCounty,
+              powiatParam,
+              willShow: isCityCounty
+            });
+          }
+
+          // Jeśli to miasto na prawach powiatu i user NIE wybrał konkretnej lokalizacji z dropdown,
+          // pokaż cały powiat (nie filtruj po miejscowości)
+          if (isCityCounty && !powiatParam) {
+            return true; // Pokaż wszystkie placówki z powiatu
+          }
+
+          // W pozostałych przypadkach filtruj po miejscowości
           const normalizedFacilityCity = normalizePolish(facility.miejscowosc || '');
           return normalizedFacilityCity.includes(normalizedQuery) || normalizedQuery.includes(normalizedFacilityCity);
         });

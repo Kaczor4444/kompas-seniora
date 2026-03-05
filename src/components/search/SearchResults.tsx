@@ -58,12 +58,12 @@ const normalizePolish = (str: string): string => {
 const mapCityCountyToPowiat = (powiat: string): string => {
   const normalized = normalizePolish(powiat);
 
-  // Kraków: tylko "m. Kraków" (nie wieś "Kraków"!) → "krakowski"
-  if (normalized === 'm. krakow') return 'krakowski';
-  // Nowy Sącz: "m. Nowy Sącz" → "nowosądecki"
-  if (normalized === 'm. nowy sacz') return 'nowosądecki';
-  // Tarnów: "m. Tarnów" → "tarnowski"
-  if (normalized === 'm. tarnow') return 'tarnowski';
+  // Kraków: "m. Kraków" lub "Miasto Kraków" → "krakowski"
+  if (normalized === 'm. krakow' || normalized === 'miasto krakow') return 'krakowski';
+  // Nowy Sącz: "m. Nowy Sącz" lub "Miasto Nowy Sącz" → "nowosądecki"
+  if (normalized === 'm. nowy sacz' || normalized === 'miasto nowy sacz') return 'nowosądecki';
+  // Tarnów: "m. Tarnów" lub "Miasto Tarnów" → "tarnowski"
+  if (normalized === 'm. tarnow' || normalized === 'miasto tarnow') return 'tarnowski';
 
   return powiat; // bez zmian dla innych powiatów
 };
