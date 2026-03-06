@@ -620,7 +620,7 @@ export default function SearchResults({
             <SearchBar
               initialQuery={cityInput}
               initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
-              compact={false}
+              compact={true}
               onQueryChange={setCurrentQuery}
             />
           </div>
