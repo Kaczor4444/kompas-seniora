@@ -177,9 +177,8 @@ export default function SearchResults({
   // Track current query from SearchBar - when empty, clear results
   const [currentQuery, setCurrentQuery] = useState<string | null>(null);
 
-  // Auto-collapse profiles on scroll down, expand on scroll up
+  // Profile filter collapsed by default - manual toggle only
   const [showProfilesExpanded, setShowProfilesExpanded] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
@@ -281,26 +280,6 @@ export default function SearchResults({
     window.addEventListener('toggleMobileMap', handleToggleMap);
     return () => window.removeEventListener('toggleMobileMap', handleToggleMap);
   }, []);
-
-  // Auto-collapse profiles on scroll down, expand on scroll up
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down & past threshold
-        setShowProfilesExpanded(false);
-      } else if (currentScrollY < lastScrollY) {
-        // Scrolling up
-        setShowProfilesExpanded(true);
-      }
-
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
 
   // Set initial facilities from server
   useEffect(() => {
