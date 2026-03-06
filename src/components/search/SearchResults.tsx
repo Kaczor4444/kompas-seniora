@@ -805,57 +805,40 @@ export default function SearchResults({
               )}
 
               {/* Distance Filter */}
-              {/* ✅ Ukryj dla miast na prawach powiatu (pokazujemy cały powiat) */}
-              {(() => {
-                const isCityCounty = ['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
-                  query.toLowerCase().includes(city)
-                );
-
-                if (userLocation) {
-                  return (
-                    <div>
-                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                        Odległość: <span className="text-slate-900">do {maxDistance} km</span>
-                      </label>
-                      <input
-                        type="range"
-                        min="5"
-                        max="100"
-                        step="5"
-                        value={maxDistance}
-                        onChange={(e) => setMaxDistance(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
-                      />
-                      <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
-                        <span>5 km</span>
-                        <span>100 km</span>
-                      </div>
-                    </div>
-                  );
-                } else if (searchCenter && !isCityCounty) {
-                  return (
-                    <div>
-                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                        Od {searchCenter.name}: <span className="text-slate-900">do {maxDistanceFromCity} km</span>
-                      </label>
-                      <input
-                        type="range"
-                        min="5"
-                        max="100"
-                        step="5"
-                        value={maxDistanceFromCity}
-                        onChange={(e) => setMaxDistanceFromCity(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
-                      />
-                      <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
-                        <span>5 km</span>
-                        <span>100 km</span>
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
+              {facilities.length > 0 && !['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
+                query.toLowerCase().includes(city)
+              ) && (
+                <div>
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                    {userLocation ? (
+                      <>Odległość: <span className="text-slate-900">do {maxDistance} km</span></>
+                    ) : searchCenter ? (
+                      <>Od {searchCenter.name}: <span className="text-slate-900">do {maxDistanceFromCity} km</span></>
+                    ) : (
+                      <>Odległość: <span className="text-slate-900">do {maxDistanceFromCity} km</span></>
+                    )}
+                  </label>
+                  <input
+                    type="range"
+                    min="5"
+                    max="100"
+                    step="5"
+                    value={userLocation ? maxDistance : maxDistanceFromCity}
+                    onChange={(e) => {
+                      if (userLocation) {
+                        setMaxDistance(parseInt(e.target.value));
+                      } else {
+                        setMaxDistanceFromCity(parseInt(e.target.value));
+                      }
+                    }}
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+                  />
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+                    <span>5 km</span>
+                    <span>100 km</span>
+                  </div>
+                </div>
+              )}
 
           </div>
         </aside>
