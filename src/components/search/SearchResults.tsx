@@ -804,8 +804,8 @@ export default function SearchResults({
                 </div>
               )}
 
-              {/* Distance Filter */}
-              {facilities.length > 0 && !['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
+              {/* Distance Filter - zawsze widoczny */}
+              {!['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
                 query.toLowerCase().includes(city)
               ) && (
                 <div>
