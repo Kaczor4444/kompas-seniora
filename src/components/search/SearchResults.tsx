@@ -164,7 +164,6 @@ export default function SearchResults({
   const [showMapMobile, setShowMapMobile] = useState(false);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [selectedForCompare, setSelectedForCompare] = useState<number[]>([]);
-  const [showProfilesMenu, setShowProfilesMenu] = useState(false);
   const [showMapFilters, setShowMapFilters] = useState(false);
 
   const [facilities, setFacilities] = useState<Facility[]>(results);
@@ -945,47 +944,33 @@ export default function SearchResults({
               {/* Profile Filter */}
               {availableProfiles.length > 0 && (
                 <div>
-                  <button
-                    onClick={() => setShowProfilesMenu(!showProfilesMenu)}
-                    className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
-                  >
-                    <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {showProfilesMenu && (
-                    <div className="space-y-1.5 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                      {availableProfiles.map((code) => {
-                        const isSelected = selectedProfiles.includes(code);
-                        return (
-                          <label
-                            key={code}
-                            className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedProfiles([...selectedProfiles, code]);
-                                } else {
-                                  setSelectedProfiles(selectedProfiles.filter(c => c !== code));
-                                }
-                              }}
-                              className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
-                            />
-                            <span className="text-sm font-medium text-slate-700">{getProfileName(code)}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                    Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {availableProfiles.map((code) => {
+                      const isSelected = selectedProfiles.includes(code);
+                      return (
+                        <button
+                          key={code}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedProfiles(selectedProfiles.filter(c => c !== code));
+                            } else {
+                              setSelectedProfiles([...selectedProfiles, code]);
+                            }
+                          }}
+                          className={`px-3 py-2 rounded-lg font-bold text-xs transition-all ${
+                            isSelected
+                              ? 'bg-slate-900 text-white'
+                              : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                          }`}
+                        >
+                          {getProfileName(code)}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
@@ -1180,47 +1165,33 @@ export default function SearchResults({
                   {/* Profile Filter */}
                   {availableProfiles.length > 0 && (
                     <div>
-                      <button
-                        onClick={() => setShowProfilesMenu(!showProfilesMenu)}
-                        className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
-                      >
-                        <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
-                        <svg
-                          className={`w-4 h-4 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      {showProfilesMenu && (
-                        <div className="space-y-1.5 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                          {availableProfiles.map((code) => {
-                            const isSelected = selectedProfiles.includes(code);
-                            return (
-                              <label
-                                key={code}
-                                className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setSelectedProfiles([...selectedProfiles, code]);
-                                    } else {
-                                      setSelectedProfiles(selectedProfiles.filter(c => c !== code));
-                                    }
-                                  }}
-                                  className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
-                                />
-                                <span className="text-sm font-medium text-slate-700">{getProfileName(code)}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
+                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                        Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {availableProfiles.map((code) => {
+                          const isSelected = selectedProfiles.includes(code);
+                          return (
+                            <button
+                              key={code}
+                              onClick={() => {
+                                if (isSelected) {
+                                  setSelectedProfiles(selectedProfiles.filter(c => c !== code));
+                                } else {
+                                  setSelectedProfiles([...selectedProfiles, code]);
+                                }
+                              }}
+                              className={`px-3 py-2 rounded-lg font-bold text-xs transition-all ${
+                                isSelected
+                                  ? 'bg-slate-900 text-white'
+                                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                              }`}
+                            >
+                              {getProfileName(code)}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
 
