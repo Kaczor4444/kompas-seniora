@@ -624,6 +624,7 @@ export default function SearchResults({
               initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
               compact={true}
               onQueryChange={setCurrentQuery}
+              disableAutocomplete={true}
             />
           </div>
 
@@ -1072,6 +1073,7 @@ export default function SearchResults({
                   initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
                   compact={true}
                   onQueryChange={setCurrentQuery}
+                  disableAutocomplete={true}
                 />
               </div>
 

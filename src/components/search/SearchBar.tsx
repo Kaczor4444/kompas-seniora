@@ -24,6 +24,7 @@ interface SearchBarProps {
   initialType?: 'DPS' | 'ŚDS' | 'Wszystkie';
   compact?: boolean; // dla wersji na stronie wyników
   onQueryChange?: (query: string) => void; // callback when query changes
+  disableAutocomplete?: boolean; // wyłącz dropdown na stronie wyników
 }
 
 // Autocomplete Dropdown Component
@@ -112,6 +113,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   initialType = 'Wszystkie',
   compact = false,
   onQueryChange,
+  disableAutocomplete = false,
 }) => {
   const [cityInput, setCityInput] = useState(initialQuery);
   const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>(initialType);
@@ -140,6 +142,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   // Debounced fetch autocomplete suggestions
   useEffect(() => {
+    // Wyłącz autocomplete na stronie wyników
+    if (disableAutocomplete) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      setValidationState('idle');
+      return;
+    }
+
     if (cityInput.length < 2) {
       setSuggestions([]);
       setShowDropdown(false);
@@ -176,7 +186,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [cityInput, selectedType]);
+  }, [cityInput, selectedType, disableAutocomplete]);
 
   // Click outside to close dropdown
   useEffect(() => {
