@@ -681,6 +681,24 @@ export default function SearchResults({
               </button>
             </div>
           </div>
+
+          {/* Active Filters Pills */}
+          {activeChips.length > 0 && (
+            <div className="flex overflow-x-auto pb-2 lg:flex-wrap scrollbar-hide gap-2 items-center snap-x mt-6">
+              {activeChips.map((chip, idx) => (
+                <button
+                  key={idx}
+                  onClick={chip.clear}
+                  className="whitespace-nowrap snap-start px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-900 shadow-md hover:bg-emerald-700 hover:text-white flex items-center gap-2 flex-shrink-0"
+                >
+                  <span>{chip.label}</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -714,24 +732,6 @@ export default function SearchResults({
 
           {/* LEFT CONTENT AREA */}
           <div className="flex-1 min-w-0">
-
-            {/* Active Filters Pills (jak kategorie w Poradnikach) */}
-            {activeChips.length > 0 && (
-              <div className="flex overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:flex-wrap scrollbar-hide gap-2 items-center snap-x mb-8">
-                {activeChips.map((chip, idx) => (
-                  <button
-                    key={idx}
-                    onClick={chip.clear}
-                    className="whitespace-nowrap snap-start px-4 py-2 rounded-xl text-sm font-bold transition-all bg-slate-800 text-white shadow-md hover:bg-emerald-600 flex items-center gap-2 flex-shrink-0"
-                  >
-                    <span>{chip.label}</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                ))}
-              </div>
-            )}
 
             {/* Multi-Powiat Info Banner */}
             {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && !userLocation && (
