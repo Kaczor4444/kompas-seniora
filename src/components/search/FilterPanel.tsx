@@ -195,26 +195,41 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       )}
 
       {/* Distance from City Filter */}
-      {searchCenter && !userLocation && maxDistanceFromCity !== undefined && onMaxDistanceFromCityChange && (
-        <div className="mb-6 pb-6 border-b border-gray-200">
-          <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
-            Odległość od {searchCenter.name}: <span className="text-gray-900 font-semibold">{maxDistanceFromCity === 100 ? 'Wszystkie' : `do ${maxDistanceFromCity} km`}</span>
-          </label>
-          <input
-            type="range"
-            min="5"
-            max="100"
-            step="5"
-            value={maxDistanceFromCity}
-            onChange={(e) => onMaxDistanceFromCityChange(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-          />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>5 km</span>
-            <span>100 km</span>
+      {/* ✅ Ukryj dla miast na prawach powiatu (pokazujemy cały powiat) */}
+      {(() => {
+        if (!searchCenter || userLocation || maxDistanceFromCity === undefined || !onMaxDistanceFromCityChange) {
+          return null;
+        }
+
+        const isCityCounty = ['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
+          searchCenter.name.toLowerCase().includes(city)
+        );
+
+        if (isCityCounty) {
+          return null; // Ukryj slider dla miast na prawach powiatu
+        }
+
+        return (
+          <div className="mb-6 pb-6 border-b border-gray-200">
+            <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
+              Odległość od {searchCenter.name}: <span className="text-gray-900 font-semibold">{maxDistanceFromCity === 100 ? 'Wszystkie' : `do ${maxDistanceFromCity} km`}</span>
+            </label>
+            <input
+              type="range"
+              min="5"
+              max="100"
+              step="5"
+              value={maxDistanceFromCity}
+              onChange={(e) => onMaxDistanceFromCityChange(Number(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>5 km</span>
+              <span>100 km</span>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Actions */}
       <div className="flex items-center justify-between">

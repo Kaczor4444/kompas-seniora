@@ -20,8 +20,9 @@ export async function GET(request: NextRequest) {
     const wojewodztwo = searchParams.get('woj') || '';
     const powiat = searchParams.get('powiat') || '';
     const typ = searchParams.get('typ') || ''; // "DPS" lub "ŚDS"
+    const isAdmin = searchParams.get('admin') === 'true'; // 🆕 Admin mode - pokaż wszystkie miasta
 
-    console.log('🔍 AUTOCOMPLETE API:', { query, wojewodztwo, powiat, typ });
+    console.log('🔍 AUTOCOMPLETE API:', { query, wojewodztwo, powiat, typ, isAdmin });
 
     // Minimum 2 znaki
     if (query.length < 2) {
@@ -72,10 +73,10 @@ export async function GET(request: NextRequest) {
         terytWhere.powiat = powiat;
       }
 
-      const terytMatches = await prisma.terytLocation.findMany({
+      // 🔧 SORTOWANIE: Priorytetyzuj miasta (RM=96,98) przed wsiami (RM=01) przed częściami (RM=00,03)
+      const allTerytMatches = await prisma.terytLocation.findMany({
         where: terytWhere,
-        distinct: ['nazwa', 'powiat'],
-        take: 50, // Zwiększono z 20 żeby pokazać więcej opcji
+        take: 200, // Zwiększ limit bo będziemy filtrować później
         orderBy: {
           nazwa: 'asc'
         },
@@ -83,11 +84,39 @@ export async function GET(request: NextRequest) {
           nazwa: true,
           powiat: true,
           wojewodztwo: true,
-          rodzaj_miejscowosci: true, // ✅ OPCJA 1b: pobierz RM dla priorytetyzacji
-          teryt_sym: true, // ✅ Symbol TERYT
-          teryt_sympod: true // ✅ Symbol nadrzędnej miejscowości (dla części)
+          rodzaj_miejscowosci: true,
+          teryt_sym: true,
+          teryt_sympod: true
         }
       });
+
+      // 🔧 DEDUPLIKACJA: Dla każdej pary (nazwa, powiat) weź najlepszy RM
+      const deduplicatedMap = new Map<string, typeof allTerytMatches[0]>();
+
+      for (const loc of allTerytMatches) {
+        const key = `${loc.nazwa}|${loc.powiat}`;
+        const existing = deduplicatedMap.get(key);
+
+        if (!existing) {
+          deduplicatedMap.set(key, loc);
+        } else {
+          // Priorytetyzacja: 96 > 98 > 01 > 03 > 00
+          const rmPriority = (rm: string | null) => {
+            if (rm === '96') return 5; // Miasto na prawach powiatu
+            if (rm === '98') return 4; // Miasto
+            if (rm === '01') return 3; // Wieś
+            if (rm === '03') return 2; // Osada
+            if (rm === '00') return 1; // Część miejscowości
+            return 0;
+          };
+
+          if (rmPriority(loc.rodzaj_miejscowosci) > rmPriority(existing.rodzaj_miejscowosci)) {
+            deduplicatedMap.set(key, loc);
+          }
+        }
+      }
+
+      const terytMatches = Array.from(deduplicatedMap.values()).slice(0, 50);
 
       console.log('  TERYT matches:', terytMatches.length);
 
@@ -172,8 +201,9 @@ export async function GET(request: NextRequest) {
 
       // 3. Filtruj tylko te które mają placówki + sortuj po liczbie
       // ✅ OPCJA 1b: Priorytetyzacja głównych (RM=01,96,98) nad częściami (RM=00)
+      // 🆕 W trybie admin - pokazuj WSZYSTKIE miejscowości (nawet bez placówek)
       let withFacilities = suggestionsWithCount
-        .filter(s => s.facilitiesCount > 0)
+        .filter(s => isAdmin || s.facilitiesCount > 0)
         .sort((a, b) => {
           // 1. BOOST: Exact match goes first
           const aExact = normalizePolish(a.nazwa).toLowerCase() === normalizedQuery;

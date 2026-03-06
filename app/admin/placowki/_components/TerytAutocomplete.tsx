@@ -46,7 +46,8 @@ export default function TerytAutocomplete({
     setLoading(true);
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/teryt/suggest?q=${encodeURIComponent(query)}`);
+        // 🆕 Admin mode - pokazuj wszystkie miasta TERYT (nawet bez placówek)
+        const res = await fetch(`/api/teryt/suggest?q=${encodeURIComponent(query)}&admin=true`);
         const data = await res.json();
         setSuggestions(data.suggestions || []);
       } catch (err) {

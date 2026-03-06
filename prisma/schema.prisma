@@ -134,7 +134,7 @@ model AppEvent {
 
 model MopsContact {
   id           Int       @id @default(autoincrement())
-  city         String    @unique
+  city         String
   cityDisplay  String
   typ          String    @default("MOPS")
   gmina        String?
@@ -152,7 +152,9 @@ model MopsContact {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  @@unique([city, name])
   @@index([city])
+  @@index([typ])
   @@index([wojewodztwo])
   @@index([verified])
 }

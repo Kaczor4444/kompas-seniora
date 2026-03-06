@@ -6,14 +6,47 @@ export const revalidate = 3600;
 
 export default async function Home() {
   // 📊 Fetch real-time facility count and per-powiat breakdown
-  const [totalFacilities, powiatGroups] = await Promise.all([
+  const [totalFacilities, allFacilities] = await Promise.all([
     prisma.placowka.count(),
-    prisma.placowka.groupBy({ by: ['powiat'], _count: { _all: true } }),
+    prisma.placowka.findMany({
+      select: { powiat: true, miejscowosc: true }
+    }),
   ]);
 
   const powiatCounts: Record<string, number> = {};
-  for (const group of powiatGroups) {
-    if (group.powiat) powiatCounts[group.powiat] = group._count._all;
+
+  // Count facilities per powiat
+  for (const facility of allFacilities) {
+    if (!facility.powiat) continue;
+    powiatCounts[facility.powiat] = (powiatCounts[facility.powiat] || 0) + 1;
+  }
+
+  // ✅ Miasta na prawach powiatu - dodaj osobne liczniki dla miast
+  // Kraków (miasto) - tylko placówki w mieście Kraków
+  const krakowCity = allFacilities.filter(f =>
+    f.powiat?.toLowerCase().includes('krakow') &&
+    f.miejscowosc === 'Kraków'
+  ).length;
+  if (krakowCity > 0) {
+    powiatCounts['Kraków'] = krakowCity;
+  }
+
+  // Nowy Sącz (miasto) - tylko placówki w mieście Nowy Sącz
+  const nowySaczCity = allFacilities.filter(f =>
+    (f.powiat?.toLowerCase().includes('nowosądecki') || f.powiat?.toLowerCase().includes('nowosadecki')) &&
+    f.miejscowosc === 'Nowy Sącz'
+  ).length;
+  if (nowySaczCity > 0) {
+    powiatCounts['Nowy Sącz'] = nowySaczCity;
+  }
+
+  // Tarnów (miasto) - tylko placówki w mieście Tarnów
+  const tarnowCity = allFacilities.filter(f =>
+    f.powiat?.toLowerCase().includes('tarnowski') &&
+    f.miejscowosc === 'Tarnów'
+  ).length;
+  if (tarnowCity > 0) {
+    powiatCounts['Tarnów'] = tarnowCity;
   }
 
   return <HomeClient totalFacilities={totalFacilities} powiatCounts={powiatCounts} />;

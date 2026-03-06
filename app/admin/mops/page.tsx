@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Plus, Search, Edit, Trash2, CheckCircle, XCircle, ExternalLink, RefreshCw } from 'lucide-react';
+import { formatPhoneNumber } from '@/lib/phone-utils';
 
 interface MopsRecord {
   id: number;
@@ -89,6 +90,20 @@ export default function AdminMopsPage() {
           </p>
         </div>
         <div className="flex gap-3">
+          <a
+            href="/api/admin/mops/export/csv?mode=data"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            title="Eksportuj wszystkie dane MOPS/GOPS do CSV"
+          >
+            📥 Eksport CSV
+          </a>
+          <a
+            href="/api/admin/mops/export/csv?mode=template"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            title="Pobierz pusty template CSV"
+          >
+            📄 Template CSV
+          </a>
           <button onClick={fetchData} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
             <RefreshCw className="h-4 w-4" /> Odśwież
           </button>
@@ -172,13 +187,16 @@ export default function AdminMopsPage() {
                     <td className="px-4 py-3 text-sm text-gray-700 max-w-[220px]">
                       <span className="block truncate">{r.name}</span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{r.phone}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{formatPhoneNumber(r.phone)}</td>
                     <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px]">
                       <span className="block truncate">{r.address}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm">
                       {r.website ? (
-                        <a href={r.website} target="_blank" rel="noopener noreferrer"
+                        <a
+                          href={r.website.startsWith('http://') || r.website.startsWith('https://') ? r.website : `https://${r.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="flex items-center gap-1 text-blue-600 hover:text-blue-800">
                           <ExternalLink className="h-3 w-3" />
                           <span className="truncate max-w-[120px]">{r.website.replace(/^https?:\/\//, '')}</span>

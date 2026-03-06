@@ -34,8 +34,10 @@ import {
   Activity,
   Car,
   Cross,
-  PenLine
+  PenLine,
+  ClipboardList
 } from 'lucide-react';
+import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import dynamic from 'next/dynamic';
@@ -666,6 +668,49 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
 
           </div>
 
+        </div>
+
+        {/* JAK ZŁOŻYĆ WNIOSEK - MOPS/GOPS INFO */}
+        <div className="max-w-3xl mx-auto my-12">
+          <div className="bg-gradient-to-br from-blue-50 to-emerald-50 p-8 md:p-10 rounded-[2rem] border-2 border-blue-100 shadow-sm">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shrink-0">
+                <ClipboardList size={28} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-black text-slate-900 mb-2">
+                  Jak złożyć wniosek o miejsce w {placowka.typ_placowki}?
+                </h3>
+                <p className="text-slate-600 leading-relaxed">
+                  Wniosek o skierowanie składa się w <strong>ośrodku pomocy społecznej (MOPS/GOPS)</strong> właściwym
+                  dla <strong>miejsca zamieszkania</strong> osoby potrzebującej opieki,
+                  <span className="text-blue-700 font-bold"> nie lokalizacji placówki</span>.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-blue-200 mb-6">
+              <div className="flex items-start gap-3 text-sm text-slate-700 leading-relaxed">
+                <Info size={18} className="shrink-0 mt-0.5 text-blue-600" />
+                <p>
+                  <strong>Przykład:</strong> Jeśli osoba mieszka w Krakowie, ale szuka miejsca w DPS w Grybowie,
+                  wniosek składa się w MOPS Kraków, nie w Grybowie.
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/mops"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg flex items-center justify-center gap-3 group"
+            >
+              <ClipboardList size={20} className="group-hover:rotate-12 transition-transform" />
+              Znajdź właściwy MOPS/GOPS
+            </Link>
+
+            <p className="text-xs text-slate-500 text-center mt-4">
+              Mamy w bazie 178 ośrodków pomocy społecznej w Małopolsce
+            </p>
+          </div>
         </div>
 
         {/* FOOTER */}
