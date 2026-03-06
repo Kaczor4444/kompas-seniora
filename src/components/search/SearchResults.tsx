@@ -684,9 +684,18 @@ export default function SearchResults({
                 <h2 className="text-xl font-black text-slate-900 tracking-tight">Filtry</h2>
                 <button
                   onClick={resetFilters}
-                  className="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
+                  className={`text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 ${
+                    activeChips.length > 0
+                      ? 'text-red-600 hover:text-red-700'
+                      : 'text-slate-400 hover:text-emerald-600'
+                  }`}
                 >
                   Wyczyść
+                  {activeChips.length > 0 && (
+                    <span className="bg-red-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                      {activeChips.length}
+                    </span>
+                  )}
                 </button>
               </div>
 
@@ -1117,9 +1126,18 @@ export default function SearchResults({
                     <h2 className="text-xl font-black text-slate-900 tracking-tight">Filtry</h2>
                     <button
                       onClick={resetFilters}
-                      className="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
+                      className={`text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 ${
+                        activeChips.length > 0
+                          ? 'text-red-600 hover:text-red-700'
+                          : 'text-slate-400 hover:text-emerald-600'
+                      }`}
                     >
                       Wyczyść
+                      {activeChips.length > 0 && (
+                        <span className="bg-red-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                          {activeChips.length}
+                        </span>
+                      )}
                     </button>
                   </div>
 
