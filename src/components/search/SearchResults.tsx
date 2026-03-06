@@ -684,7 +684,7 @@ export default function SearchResults({
 
           {/* Active Filters Pills */}
           {activeChips.length > 0 && (
-            <div className="flex overflow-x-auto pb-2 lg:flex-wrap scrollbar-hide gap-2 items-center snap-x mt-6">
+            <div className="flex overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 pb-2 lg:flex-wrap scrollbar-hide gap-2 items-center snap-x snap-mandatory scroll-px-4 mt-6">
               {activeChips.map((chip, idx) => (
                 <button
                   key={idx}
