@@ -178,7 +178,7 @@ export default function SearchResults({
   const [currentQuery, setCurrentQuery] = useState<string | null>(null);
 
   // Auto-collapse profiles on scroll down, expand on scroll up
-  const [showProfilesExpanded, setShowProfilesExpanded] = useState(true);
+  const [showProfilesExpanded, setShowProfilesExpanded] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
 
   // ===== COMPUTED =====
