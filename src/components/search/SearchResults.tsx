@@ -686,13 +686,13 @@ export default function SearchResults({
                   onClick={resetFilters}
                   className={`text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 ${
                     activeChips.length > 0
-                      ? 'text-red-600 hover:text-red-700'
+                      ? 'text-emerald-600 hover:text-emerald-700'
                       : 'text-slate-400 hover:text-emerald-600'
                   }`}
                 >
                   Wyczyść
                   {activeChips.length > 0 && (
-                    <span className="bg-red-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                    <span className="bg-emerald-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                       {activeChips.length}
                     </span>
                   )}
@@ -1128,13 +1128,13 @@ export default function SearchResults({
                       onClick={resetFilters}
                       className={`text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 ${
                         activeChips.length > 0
-                          ? 'text-red-600 hover:text-red-700'
+                          ? 'text-emerald-600 hover:text-emerald-700'
                           : 'text-slate-400 hover:text-emerald-600'
                       }`}
                     >
                       Wyczyść
                       {activeChips.length > 0 && (
-                        <span className="bg-red-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                        <span className="bg-emerald-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                           {activeChips.length}
                         </span>
                       )}
