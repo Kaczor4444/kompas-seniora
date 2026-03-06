@@ -625,21 +625,8 @@ export default function SearchResults({
             />
           </div>
 
-          {/* Results Count + Sort + Toggle Controls */}
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Results Count */}
-            <div className="text-white font-bold text-lg">
-              Znaleziono {facilities.length} {(() => {
-                const count = facilities.length;
-                if (count === 1) return 'placówkę';
-                const lastDigit = count % 10;
-                const lastTwoDigits = count % 100;
-                if (lastTwoDigits >= 10 && lastTwoDigits <= 21) return 'placówek';
-                if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
-                return 'placówek';
-              })()}
-            </div>
-
+          {/* Sort + Toggle Controls */}
+          <div className="flex items-center justify-between gap-4">
             {/* Sortowanie */}
             <div className="flex items-center gap-2">
               <span className="text-emerald-100 text-sm font-bold">Sortuj:</span>
@@ -768,6 +755,23 @@ export default function SearchResults({
                     </p>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Results Count */}
+            {facilities.length > 0 && (
+              <div className="mb-6">
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                  Znaleziono {facilities.length} {(() => {
+                    const count = facilities.length;
+                    if (count === 1) return 'placówkę';
+                    const lastDigit = count % 10;
+                    const lastTwoDigits = count % 100;
+                    if (lastTwoDigits >= 10 && lastTwoDigits <= 21) return 'placówek';
+                    if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
+                    return 'placówek';
+                  })()}
+                </h2>
               </div>
             )}
 
