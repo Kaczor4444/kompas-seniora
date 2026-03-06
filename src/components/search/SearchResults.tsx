@@ -718,170 +718,8 @@ export default function SearchResults({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-8 md:gap-12">
 
-          {/* LEFT CONTENT AREA */}
-          <div className="flex-1 min-w-0">
-
-            {/* Multi-Powiat Info Banner */}
-            {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && !userLocation && (
-              <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mb-6 rounded-r-lg">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-0.5">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-blue-900 mb-1">
-                      Znaleziono "{query}" w kilku lokalizacjach:
-                    </p>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {Object.entries(powiatBreakdown)
-                        .sort((a, b) => b[1] - a[1])
-                        .map(([powiat, count]) => (
-                          <button
-                            key={powiat}
-                            onClick={() => handlePowiatChange(powiat)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-blue-800 text-xs font-medium rounded-full border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer active:scale-95"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {powiat} ({count})
-                          </button>
-                        ))}
-                    </div>
-                    <p className="text-xs text-blue-700">
-                      Kliknij na powiat, aby zobaczyć tylko placówki z tej lokalizacji.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Results Count */}
-            {facilities.length > 0 && (
-              <div className="mb-6">
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                  Znaleziono {facilities.length} {(() => {
-                    const count = facilities.length;
-                    if (count === 1) return 'placówkę';
-                    const lastDigit = count % 10;
-                    const lastTwoDigits = count % 100;
-                    if (lastTwoDigits >= 10 && lastTwoDigits <= 21) return 'placówek';
-                    if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
-                    return 'placówek';
-                  })()}
-                </h2>
-              </div>
-            )}
-
-            {/* Facilities Grid - SINGLE COLUMN */}
-            <div className="space-y-6">
-              {isLoading ? (
-                [1, 2, 3, 4].map(i => <SkeletonCard key={i} />)
-              ) : facilities.length === 0 && message ? (
-                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                  <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                  </div>
-                  <p className="text-slate-700 font-semibold text-base mb-1">{message}</p>
-                  <p className="text-slate-400 text-sm">Przykłady: Kraków, Tarnów, Nowy Sącz, Zakopane</p>
-                </div>
-              ) : facilities.length === 0 ? (
-                <EmptyState onResetFilters={resetFilters} cityInput={cityInput} />
-              ) : (
-                <>
-                  {facilities.slice(0, visibleCount).map(fac => (
-                    <FacilityCard
-                      key={fac.id}
-                      facility={{
-                        id: fac.id,
-                        name: fac.nazwa,
-                        type: fac.typ_placowki as 'DPS' | 'ŚDS',
-                        city: fac.miejscowosc || '',
-                        powiat: fac.powiat || '',
-                        category: fac.typ_placowki === 'DPS' ? 'Dom Pomocy Społecznej' : 'Środowiskowy Dom Samopomocy',
-                        price: fac.koszt_pobytu || 0,
-                        street: fac.ulica,
-                        image: '/images/placeholder-facility.jpg',
-                        waitTime: 'Brak danych',
-                        profileLabels: getShortProfileLabels(fac.profil_opieki, fac.typ_placowki),
-                        distance: fac.distance
-                      }}
-                      userLocation={userLocation}
-                      isHovered={hoveredId === fac.id}
-                      isSaved={favoritesState.includes(fac.id)}
-                      isCompared={selectedForCompare.includes(fac.id)}
-                      onHover={setHoveredId}
-                      onClick={() => handleFacilityClick(fac.id, fac.powiat)}
-                      onToggleSave={(e) => {
-                        e.stopPropagation();
-                        if (isFavorite(fac.id)) {
-                          removeFavorite(fac.id);
-                        } else {
-                          addFavorite({
-                            id: fac.id,
-                            nazwa: fac.nazwa,
-                            miejscowosc: fac.miejscowosc,
-                            powiat: fac.powiat,
-                            typ_placowki: fac.typ_placowki,
-                            koszt_pobytu: fac.koszt_pobytu,
-                            telefon: fac.telefon,
-                            ulica: fac.ulica,
-                            kod_pocztowy: fac.kod_pocztowy,
-                            email: fac.email,
-                            www: fac.www,
-                            liczba_miejsc: fac.liczba_miejsc,
-                            profil_opieki: fac.profil_opieki,
-                            addedAt: new Date().toISOString()
-                          });
-                        }
-                        window.dispatchEvent(new Event("favoritesChanged"));
-                      }}
-                      onToggleCompare={(e) => toggleCompare(fac.id, e)}
-                    />
-                  ))}
-
-                  {/* Load More Button */}
-                  {visibleCount < facilities.length && (
-                    <div className="pt-8 flex flex-col items-center gap-4">
-                      <div className="text-sm font-bold text-slate-400">
-                        Widzisz <span className="text-slate-900">{Math.min(visibleCount, facilities.length)}</span> z <span className="text-slate-900">{facilities.length}</span> placówek
-                      </div>
-                      <button
-                        onClick={() => {
-                          setIsLoadingMore(true);
-                          setTimeout(() => {
-                            setVisibleCount(prev => prev + 20);
-                            setIsLoadingMore(false);
-                          }, 600);
-                        }}
-                        disabled={isLoadingMore}
-                        className="group bg-white border-2 border-stone-200 text-slate-800 font-bold py-4 px-10 rounded-2xl hover:border-emerald-600 hover:text-emerald-600 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-3"
-                      >
-                        {isLoadingMore ? (
-                          <span>Ładowanie...</span>
-                        ) : (
-                          <>
-                            <span>Pokaż więcej wyników</span>
-                            <svg className="w-5 h-5 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT SIDEBAR - FILTERS (Desktop only) - STICKY */}
-          <aside className="hidden lg:block w-80 flex-shrink-0">
+          {/* LEFT SIDEBAR - FILTERS (Desktop only) - STICKY */}
+          <aside className="hidden lg:block w-80 flex-shrink-0 order-2 lg:order-1">
             <div className="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm sticky top-32 space-y-5">
 
               {/* Filters Header */}
@@ -1051,6 +889,168 @@ export default function SearchResults({
 
           </div>
         </aside>
+
+          {/* RIGHT CONTENT AREA */}
+          <div className="flex-1 min-w-0 order-1 lg:order-2">
+
+            {/* Multi-Powiat Info Banner */}
+            {powiatBreakdown && Object.keys(powiatBreakdown).length > 1 && cityInput && cityInput.trim() !== '' && !userLocation && (
+              <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mb-6 rounded-r-lg">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-blue-900 mb-1">
+                      Znaleziono "{query}" w kilku lokalizacjach:
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {Object.entries(powiatBreakdown)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([powiat, count]) => (
+                          <button
+                            key={powiat}
+                            onClick={() => handlePowiatChange(powiat)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-blue-800 text-xs font-medium rounded-full border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer active:scale-95"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {powiat} ({count})
+                          </button>
+                        ))}
+                    </div>
+                    <p className="text-xs text-blue-700">
+                      Kliknij na powiat, aby zobaczyć tylko placówki z tej lokalizacji.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Results Count */}
+            {facilities.length > 0 && (
+              <div className="mb-6">
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                  Znaleziono {facilities.length} {(() => {
+                    const count = facilities.length;
+                    if (count === 1) return 'placówkę';
+                    const lastDigit = count % 10;
+                    const lastTwoDigits = count % 100;
+                    if (lastTwoDigits >= 10 && lastTwoDigits <= 21) return 'placówek';
+                    if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
+                    return 'placówek';
+                  })()}
+                </h2>
+              </div>
+            )}
+
+            {/* Facilities Grid - SINGLE COLUMN */}
+            <div className="space-y-6">
+              {isLoading ? (
+                [1, 2, 3, 4].map(i => <SkeletonCard key={i} />)
+              ) : facilities.length === 0 && message ? (
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                  </div>
+                  <p className="text-slate-700 font-semibold text-base mb-1">{message}</p>
+                  <p className="text-slate-400 text-sm">Przykłady: Kraków, Tarnów, Nowy Sącz, Zakopane</p>
+                </div>
+              ) : facilities.length === 0 ? (
+                <EmptyState onResetFilters={resetFilters} cityInput={cityInput} />
+              ) : (
+                <>
+                  {facilities.slice(0, visibleCount).map(fac => (
+                    <FacilityCard
+                      key={fac.id}
+                      facility={{
+                        id: fac.id,
+                        name: fac.nazwa,
+                        type: fac.typ_placowki as 'DPS' | 'ŚDS',
+                        city: fac.miejscowosc || '',
+                        powiat: fac.powiat || '',
+                        category: fac.typ_placowki === 'DPS' ? 'Dom Pomocy Społecznej' : 'Środowiskowy Dom Samopomocy',
+                        price: fac.koszt_pobytu || 0,
+                        street: fac.ulica,
+                        image: '/images/placeholder-facility.jpg',
+                        waitTime: 'Brak danych',
+                        profileLabels: getShortProfileLabels(fac.profil_opieki, fac.typ_placowki),
+                        distance: fac.distance
+                      }}
+                      userLocation={userLocation}
+                      isHovered={hoveredId === fac.id}
+                      isSaved={favoritesState.includes(fac.id)}
+                      isCompared={selectedForCompare.includes(fac.id)}
+                      onHover={setHoveredId}
+                      onClick={() => handleFacilityClick(fac.id, fac.powiat)}
+                      onToggleSave={(e) => {
+                        e.stopPropagation();
+                        if (isFavorite(fac.id)) {
+                          removeFavorite(fac.id);
+                        } else {
+                          addFavorite({
+                            id: fac.id,
+                            nazwa: fac.nazwa,
+                            miejscowosc: fac.miejscowosc,
+                            powiat: fac.powiat,
+                            typ_placowki: fac.typ_placowki,
+                            koszt_pobytu: fac.koszt_pobytu,
+                            telefon: fac.telefon,
+                            ulica: fac.ulica,
+                            kod_pocztowy: fac.kod_pocztowy,
+                            email: fac.email,
+                            www: fac.www,
+                            liczba_miejsc: fac.liczba_miejsc,
+                            profil_opieki: fac.profil_opieki,
+                            addedAt: new Date().toISOString()
+                          });
+                        }
+                        window.dispatchEvent(new Event("favoritesChanged"));
+                      }}
+                      onToggleCompare={(e) => toggleCompare(fac.id, e)}
+                    />
+                  ))}
+
+                  {/* Load More Button */}
+                  {visibleCount < facilities.length && (
+                    <div className="pt-8 flex flex-col items-center gap-4">
+                      <div className="text-sm font-bold text-slate-400">
+                        Widzisz <span className="text-slate-900">{Math.min(visibleCount, facilities.length)}</span> z <span className="text-slate-900">{facilities.length}</span> placówek
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsLoadingMore(true);
+                          setTimeout(() => {
+                            setVisibleCount(prev => prev + 20);
+                            setIsLoadingMore(false);
+                          }, 600);
+                        }}
+                        disabled={isLoadingMore}
+                        className="group bg-white border-2 border-stone-200 text-slate-800 font-bold py-4 px-10 rounded-2xl hover:border-emerald-600 hover:text-emerald-600 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-3"
+                      >
+                        {isLoadingMore ? (
+                          <span>Ładowanie...</span>
+                        ) : (
+                          <>
+                            <span>Pokaż więcej wyników</span>
+                            <svg className="w-5 h-5 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
 
         </div>
       </div>
