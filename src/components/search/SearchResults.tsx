@@ -177,6 +177,10 @@ export default function SearchResults({
   // Track current query from SearchBar - when empty, clear results
   const [currentQuery, setCurrentQuery] = useState<string | null>(null);
 
+  // Auto-collapse profiles on scroll down, expand on scroll up
+  const [showProfilesExpanded, setShowProfilesExpanded] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
   // lub pełna lista Małopolski gdy brak danych TERYT (np. wyszukiwanie woj./geoloc)
@@ -277,6 +281,26 @@ export default function SearchResults({
     window.addEventListener('toggleMobileMap', handleToggleMap);
     return () => window.removeEventListener('toggleMobileMap', handleToggleMap);
   }, []);
+
+  // Auto-collapse profiles on scroll down, expand on scroll up
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down & past threshold
+        setShowProfilesExpanded(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setShowProfilesExpanded(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   // Set initial facilities from server
   useEffect(() => {
@@ -736,33 +760,46 @@ export default function SearchResults({
               {/* Profile Filter */}
               {availableProfiles.length > 0 && (
                 <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                    Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {availableProfiles.map((code) => {
-                      const isSelected = selectedProfiles.includes(code);
-                      return (
-                        <button
-                          key={code}
-                          onClick={() => {
-                            if (isSelected) {
-                              setSelectedProfiles(selectedProfiles.filter(c => c !== code));
-                            } else {
-                              setSelectedProfiles([...selectedProfiles, code]);
-                            }
-                          }}
-                          className={`px-3 py-2 rounded-lg font-bold text-xs transition-all ${
-                            isSelected
-                              ? 'bg-slate-900 text-white'
-                              : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
-                          }`}
-                        >
-                          {getProfileName(code)}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <button
+                    onClick={() => setShowProfilesExpanded(!showProfilesExpanded)}
+                    className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
+                  >
+                    <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
+                    <svg
+                      className={`w-4 h-4 transition-transform ${showProfilesExpanded ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {showProfilesExpanded && (
+                    <div className="flex flex-wrap gap-2">
+                      {availableProfiles.map((code) => {
+                        const isSelected = selectedProfiles.includes(code);
+                        return (
+                          <button
+                            key={code}
+                            onClick={() => {
+                              if (isSelected) {
+                                setSelectedProfiles(selectedProfiles.filter(c => c !== code));
+                              } else {
+                                setSelectedProfiles([...selectedProfiles, code]);
+                              }
+                            }}
+                            className={`px-3 py-2 rounded-lg font-bold text-xs transition-all ${
+                              isSelected
+                                ? 'bg-slate-900 text-white'
+                                : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                            }`}
+                          >
+                            {getProfileName(code)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1165,33 +1202,46 @@ export default function SearchResults({
                   {/* Profile Filter */}
                   {availableProfiles.length > 0 && (
                     <div>
-                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                        Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        {availableProfiles.map((code) => {
-                          const isSelected = selectedProfiles.includes(code);
-                          return (
-                            <button
-                              key={code}
-                              onClick={() => {
-                                if (isSelected) {
-                                  setSelectedProfiles(selectedProfiles.filter(c => c !== code));
-                                } else {
-                                  setSelectedProfiles([...selectedProfiles, code]);
-                                }
-                              }}
-                              className={`px-3 py-2 rounded-lg font-bold text-xs transition-all ${
-                                isSelected
-                                  ? 'bg-slate-900 text-white'
-                                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
-                              }`}
-                            >
-                              {getProfileName(code)}
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <button
+                        onClick={() => setShowProfilesExpanded(!showProfilesExpanded)}
+                        className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
+                      >
+                        <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
+                        <svg
+                          className={`w-4 h-4 transition-transform ${showProfilesExpanded ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {showProfilesExpanded && (
+                        <div className="flex flex-wrap gap-2">
+                          {availableProfiles.map((code) => {
+                            const isSelected = selectedProfiles.includes(code);
+                            return (
+                              <button
+                                key={code}
+                                onClick={() => {
+                                  if (isSelected) {
+                                    setSelectedProfiles(selectedProfiles.filter(c => c !== code));
+                                  } else {
+                                    setSelectedProfiles([...selectedProfiles, code]);
+                                  }
+                                }}
+                                className={`px-3 py-2 rounded-lg font-bold text-xs transition-all ${
+                                  isSelected
+                                    ? 'bg-slate-900 text-white'
+                                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                                }`}
+                              >
+                                {getProfileName(code)}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   )}
 
