@@ -615,7 +615,7 @@ export default function SearchResults({
           </button>
 
           {/* SearchBar */}
-          <div className="max-w-2xl mb-8">
+          <div className="max-w-2xl">
             <SearchBar
               initialQuery={cityInput}
               initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
@@ -624,55 +624,9 @@ export default function SearchResults({
             />
           </div>
 
-          {/* Sort + Toggle Controls - tylko gdy są wyniki */}
-          {facilities.length > 0 && (
-            <div className="flex items-center justify-between gap-4">
-              {/* Sortowanie */}
-              <div className="flex items-center gap-2">
-                <span className="text-emerald-100 text-sm font-bold">Sortuj:</span>
-                <select className="px-3 py-2 bg-white/90 backdrop-blur border border-emerald-200 rounded-lg text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-white">
-                  <option>Rekomendowane</option>
-                  <option>Odległość</option>
-                  <option>Cena: rosnąco</option>
-                  <option>Cena: malejąco</option>
-                </select>
-              </div>
-
-              {/* List/Map Toggle */}
-              <div className="flex items-center gap-2 bg-emerald-700/50 rounded-xl p-1">
-                <button
-                  onClick={() => setShowMapMobile(false)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                    !showMapMobile
-                      ? 'bg-white text-gray-900'
-                      : 'text-emerald-100 hover:text-white'
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                  </svg>
-                  Lista
-                </button>
-                <button
-                  onClick={() => setShowMapMobile(true)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                    showMapMobile
-                      ? 'bg-white text-gray-900'
-                      : 'text-emerald-100 hover:text-white'
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
-                  Mapa
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Active Filters Pills */}
           {activeChips.length > 0 && (
-            <div className="flex overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 pb-2 lg:flex-wrap scrollbar-hide gap-2 items-center snap-x snap-mandatory scroll-px-4 mt-6">
+            <div className="flex overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 pb-2 lg:flex-wrap scrollbar-hide gap-2 items-center snap-x snap-mandatory scroll-px-4 mt-6 mb-6">
               {activeChips.map((chip, idx) => (
                 <button
                   key={idx}
@@ -927,6 +881,52 @@ export default function SearchResults({
                       Kliknij na powiat, aby zobaczyć tylko placówki z tej lokalizacji.
                     </p>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sort + Toggle Controls - tylko gdy są wyniki */}
+            {facilities.length > 0 && (
+              <div className="flex items-center justify-between gap-4 mb-6">
+                {/* Sortowanie */}
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 text-sm font-bold">Sortuj:</span>
+                  <select className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option>Rekomendowane</option>
+                    <option>Odległość</option>
+                    <option>Cena: rosnąco</option>
+                    <option>Cena: malejąco</option>
+                  </select>
+                </div>
+
+                {/* List/Map Toggle */}
+                <div className="flex items-center gap-2 bg-slate-100 rounded-xl p-1">
+                  <button
+                    onClick={() => setShowMapMobile(false)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                      !showMapMobile
+                        ? 'bg-slate-900 text-white'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    Lista
+                  </button>
+                  <button
+                    onClick={() => setShowMapMobile(true)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                      showMapMobile
+                        ? 'bg-slate-900 text-white'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                    Mapa
+                  </button>
                 </div>
               </div>
             )}
