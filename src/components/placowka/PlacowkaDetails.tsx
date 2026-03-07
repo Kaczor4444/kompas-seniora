@@ -128,6 +128,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
   const [activeTab, setActiveTab] = useState<'info' | 'pricing'>('info');
   const [isSaved, setIsSaved] = useState(false); // localStorage czytany w useEffect po hydratacji
   const [isInComparison, setIsInComparison] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   useEffect(() => {
     const viewCount = incrementSessionViews();
@@ -212,6 +213,68 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
       } catch (err) {
         console.log('Error sharing:', err);
       }
+    }
+  };
+
+  const handleGetDirections = async () => {
+    if (!placowka.latitude || !placowka.longitude) {
+      // Brak koordynatów - otwórz Google Maps z wyszukiwaniem adresu
+      const address = encodeURIComponent(
+        `${placowka.ulica ? placowka.ulica + ', ' : ''}${placowka.miejscowosc}`
+      );
+      window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+      return;
+    }
+
+    setIsGettingLocation(true);
+
+    try {
+      // Próbuj pobrać geolokalizację użytkownika
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 300000, // 5 minut cache
+        });
+      });
+
+      // Sukces - otwórz Google Maps z trasą origin → destination
+      const origin = `${position.coords.latitude},${position.coords.longitude}`;
+      const destination = `${placowka.latitude},${placowka.longitude}`;
+      const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
+
+      window.open(url, '_blank');
+
+      // Track event
+      trackEvent({
+        placowkaId: placowka.id,
+        eventType: 'website_click',
+        metadata: {
+          action: 'directions_with_geolocation',
+          viewsInSession: getSessionViewCount()
+        },
+      });
+
+    } catch (error) {
+      // Użytkownik odmówił lub błąd - otwórz Google Maps bez origin
+      // (użytkownik sam wpisze punkt startowy)
+      const destination = `${placowka.latitude},${placowka.longitude}`;
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
+
+      window.open(url, '_blank');
+
+      // Track event
+      trackEvent({
+        placowkaId: placowka.id,
+        eventType: 'website_click',
+        metadata: {
+          action: 'directions_without_geolocation',
+          error: error instanceof Error ? error.message : 'geolocation_denied',
+          viewsInSession: getSessionViewCount()
+        },
+      });
+    } finally {
+      setIsGettingLocation(false);
     }
   };
 
@@ -447,27 +510,49 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
 
             {/* MAP SECTION */}
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm">
-              <h3 className="font-black text-2xl text-slate-900 mb-6 flex items-center justify-between">
+              <h3 className="font-black text-2xl text-slate-900 mb-6">
                 Lokalizacja na mapie
-                {placowka.latitude && placowka.longitude && (
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${placowka.latitude},${placowka.longitude}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm font-sans font-bold text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1"
-                  >
-                    Otwórz w Google Maps
-                    <ArrowLeft className="rotate-180" size={14}/>
-                  </a>
-                )}
               </h3>
-              <div className="h-[400px]">
+              <div className="h-[400px] mb-4">
                 <FacilityMap
                   facilities={[placowka]}
                   mode="single"
                   showDirections={false}
                 />
               </div>
+
+              {/* MAP ACTION BUTTONS */}
+              {placowka.latitude && placowka.longitude && (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${placowka.latitude},${placowka.longitude}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-stone-200 hover:border-primary-300 hover:bg-primary-50 text-slate-700 hover:text-primary-700 px-4 py-3 rounded-xl text-sm font-bold transition-all"
+                  >
+                    <MapPin size={18} />
+                    Zobacz na mapie
+                  </a>
+
+                  <button
+                    onClick={handleGetDirections}
+                    disabled={isGettingLocation}
+                    className="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white px-4 py-3 rounded-xl text-sm font-bold transition-all active:scale-95 disabled:cursor-not-allowed"
+                  >
+                    {isGettingLocation ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Pobieram lokalizację...
+                      </>
+                    ) : (
+                      <>
+                        <Car size={18} />
+                        Wyznacz trasę
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </section>
 
           </div>
@@ -536,6 +621,26 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       <Mail size={20} />
                       Wyślij zapytanie
                     </a>
+                  )}
+
+                  {placowka.latitude && placowka.longitude && (
+                    <button
+                      onClick={handleGetDirections}
+                      disabled={isGettingLocation}
+                      className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isGettingLocation ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Pobieram...
+                        </>
+                      ) : (
+                        <>
+                          <Car size={20} />
+                          Jak dojechać
+                        </>
+                      )}
+                    </button>
                   )}
                 </div>
 
