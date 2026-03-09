@@ -289,6 +289,11 @@ export default function SearchResults({
     setFacilities(results);
   }, [results]);
 
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [selectedType, selectedVoivodeship, selectedPowiat, selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity]);
+
   // Clear results and reset filters when query is cleared in SearchBar
   useEffect(() => {
     // Skip if SearchBar hasn't initialized yet (null = not touched by user)
