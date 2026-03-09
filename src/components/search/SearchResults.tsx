@@ -1297,6 +1297,7 @@ export default function SearchResults({
                       </div>
                     </div>
                   )}
+                  </div>
                 </div>
               </>
             )}
