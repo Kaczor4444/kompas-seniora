@@ -24,6 +24,24 @@ async function geocodeCity(cityName: string, powiat?: string, woj?: string): Pro
   }
 }
 
+// Reverse geocoding - zamienia współrzędne GPS na nazwę miasta
+async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pl`,
+      { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 } }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+
+    // Priorytetyzuj: city > town > village > county
+    const location = data.address?.city || data.address?.town || data.address?.village || data.address?.county;
+    return location || null;
+  } catch {
+    return null;
+  }
+}
+
 interface SearchPageProps {
   searchParams: Promise<{
     q?: string;
@@ -86,9 +104,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   // TRYB 3: GEOLOCATION SEARCH
   if (isNearSearch && userLat && userLng && !query) {
-    const DEFAULT_RADIUS_KM = 50;
+    // ⚠️ ZMIENIONO: 50km → 30km (50km dawało 60 placówek dla Krakowa = za dużo)
+    // 30km = ~20 minut jazdy, powinno dać 15-25 placówek
+    const DEFAULT_RADIUS_KM = 30;
     const MIN_RESULTS = 3;
-    const EXTENDED_RADIUS_KM = 100;
+    const EXTENDED_RADIUS_KM = 50; // Zmniejszono też extended: 100km → 50km
 
     // Pobierz wszystkie placówki
     const allFacilities = await prisma.placowka.findMany({
@@ -134,7 +154,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         message = `Znaleźliśmy tylko ${countIn50km} ${countIn50km === 1 ? 'placówkę' : 'placówki'} w promieniu ${DEFAULT_RADIUS_KM}km. Pokazujemy także ${nearbyFacilities.length - countIn50km} placówek w promieniu ${EXTENDED_RADIUS_KM}km.`;
       }
     } else {
-      message = `Znaleźliśmy ${nearbyFacilities.length} ${nearbyFacilities.length === 1 ? 'placówkę' : nearbyFacilities.length < 5 ? 'placówki' : 'placówek'} w promieniu ${DEFAULT_RADIUS_KM}km od Ciebie.`;
+      // Reverse geocoding - pobierz nazwę miasta użytkownika
+      const userLocationName = await reverseGeocode(userLat, userLng);
+      const locationInfo = userLocationName ? ` (okolice ${userLocationName})` : '';
+
+      message = `Znaleźliśmy ${nearbyFacilities.length} ${nearbyFacilities.length === 1 ? 'placówkę' : nearbyFacilities.length < 5 ? 'placówki' : 'placówek'} w promieniu ${DEFAULT_RADIUS_KM}km od Ciebie${locationInfo}.`;
     }
 
     results = nearbyFacilities;

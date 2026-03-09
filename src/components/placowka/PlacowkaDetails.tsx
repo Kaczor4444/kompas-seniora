@@ -23,7 +23,6 @@ import {
   Utensils,
   Stethoscope,
   CalendarCheck,
-  Image as ImageIcon,
   Clock,
   Shield,
   ShieldCheck,
@@ -120,6 +119,33 @@ function incrementSessionViews(): number {
   const count = getSessionViewCount() + 1;
   sessionStorage.setItem(SESSION_VIEWS_KEY, String(count));
   return count;
+}
+
+// Generate facility description from available data
+function generateFacilityDescription(placowka: Placowka): string {
+  const parts: string[] = [];
+
+  // Type and location
+  parts.push(`${placowka.typ_placowki} zlokalizowany w powiecie ${placowka.powiat}.`);
+
+  // Provider
+  if (placowka.prowadzacy) {
+    parts.push(`Placówka prowadzona przez ${placowka.prowadzacy}.`);
+  }
+
+  // Capacity
+  if (placowka.liczba_miejsc) {
+    let capacityText = `Dysponuje ${placowka.liczba_miejsc} miejscami`;
+
+    // Add "za życiem" info for ŚDS
+    if (placowka.typ_placowki.includes('ŚDS') && placowka.miejsca_za_zyciem) {
+      capacityText += `, w tym ${placowka.miejsca_za_zyciem} miejscami za życiem`;
+    }
+
+    parts.push(capacityText + '.');
+  }
+
+  return parts.join(' ');
 }
 
 export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
@@ -293,16 +319,6 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
     return <Users size={18} className="text-primary-600" />;
   };
 
-  // Placeholder images based on facility type
-  const getPlaceholderImage = (index: number) => {
-    const colors = ['bg-slate-200', 'bg-slate-300', 'bg-slate-100', 'bg-slate-250', 'bg-slate-200'];
-    return (
-      <div className={`w-full h-full ${colors[index]} flex items-center justify-center`}>
-        <ImageIcon size={48} className="text-slate-400" />
-      </div>
-    );
-  };
-
   return (
     <div className="bg-stone-50 min-h-screen pb-24 animate-fade-in-up">
       {/* STICKY HEADER NAV */}
@@ -341,8 +357,8 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-8">
 
-        {/* HEADER SECTION */}
-        <div className="mb-10 space-y-4">
+        {/* HEADER SECTION - COMPACT */}
+        <div className="mb-8 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="bg-slate-900 text-white text-[9px] font-black uppercase px-2.5 py-1 rounded-md tracking-widest">
               {placowka.typ_placowki}
@@ -358,30 +374,14 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             )}
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-            <div>
-              <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight mb-3">
-                {placowka.nazwa}
-              </h1>
-              <div className="flex items-center gap-2 text-slate-400 font-bold">
-                <MapPin size={18} className="text-primary-600" />
-                <span>{placowka.ulica && `${placowka.ulica}, `}{placowka.miejscowosc}</span>
-              </div>
+          <div>
+            <h1 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight tracking-tight mb-2">
+              {placowka.nazwa}
+            </h1>
+            <div className="flex items-center gap-2 text-slate-500 font-bold text-sm">
+              <MapPin size={16} className="text-primary-600" />
+              <span>{placowka.ulica && `${placowka.ulica}, `}{placowka.miejscowosc}</span>
             </div>
-
-            {placowka.data_aktualizacji && (
-              <div className="flex items-center gap-2 text-slate-600 bg-white px-4 py-2 rounded-xl border border-stone-100 shadow-sm">
-                <CalendarCheck size={16} className="text-emerald-500" />
-                <div className="text-sm">
-                  <span className="block text-[9px] font-black uppercase tracking-widest text-slate-400">
-                    Ostatnia aktualizacja
-                  </span>
-                  <span className="font-bold">
-                    {getSmartDateFormat(new Date(placowka.data_aktualizacji))}
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -401,167 +401,182 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
           </div>
         )}
 
-        {/* QUICK STATS BAR */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-          <div className="flex flex-col gap-2 p-4 bg-white rounded-2xl border border-stone-100 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
-                <Clock size={20} />
-              </div>
-              <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Dostępność</div>
-                <div className="font-bold text-slate-900">{waitTime || 'Zapytaj'}</div>
+        {/* QUICK STATS BAR - COMPACT */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 shadow-sm">
+            <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600 shrink-0">
+              <Clock size={18} />
+            </div>
+            <div>
+              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Dostępność</div>
+              <div className="font-bold text-slate-900 text-sm">{waitTime || 'Zapytaj'}</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 shadow-sm">
+            <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-700 shrink-0">
+              <Banknote size={18} />
+            </div>
+            <div>
+              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Koszt (mc)</div>
+              <div className="font-bold text-slate-900 text-sm">
+                {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł` : 'NFZ'}
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 p-4 bg-white rounded-2xl border border-stone-100 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700">
-                <Banknote size={20} />
-              </div>
-              <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Koszt (mc)</div>
-                <div className="font-bold text-slate-900">
-                  {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł` : 'NFZ'}
-                </div>
-              </div>
+          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 shadow-sm">
+            <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-700 shrink-0">
+              <Shield size={18} />
+            </div>
+            <div>
+              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Status</div>
+              <div className="font-bold text-slate-900 text-sm">{placowka.typ_placowki.includes('DPS') ? 'Publiczna' : 'Publiczna'}</div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 p-4 bg-white rounded-2xl border border-stone-100 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-700">
-                <Shield size={20} />
-              </div>
-              <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Status prawny</div>
-                <div className="font-bold text-slate-900 text-sm">{placowka.typ_placowki.includes('DPS') ? 'Publiczna (DPS)' : 'Publiczna (ŚDS)'}</div>
-              </div>
+          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 shadow-sm">
+            <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center text-blue-700 shrink-0">
+              <MapPin size={18} />
             </div>
-          </div>
-
-          <div className="flex flex-col gap-2 p-4 bg-white rounded-2xl border border-stone-100 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-700">
-                <MapPin size={20} />
-              </div>
-              <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Powiat</div>
-                <div className="font-bold text-slate-900 text-sm">{placowka.powiat}</div>
-              </div>
+            <div>
+              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Powiat</div>
+              <div className="font-bold text-slate-900 text-sm">{placowka.powiat}</div>
             </div>
           </div>
         </div>
 
-        {/* MAIN CONTENT - 2 COLUMN LAYOUT */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
+        {/* MAIN CONTENT - 2 COLUMN LAYOUT (66% / 33%) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
 
-          {/* LEFT COLUMN - CONTENT (60%) */}
-          <div className="lg:col-span-3 space-y-10">
+          {/* LEFT COLUMN - CONTENT (66%) */}
+          <div className="lg:col-span-2 space-y-8">
 
-            {/* HERO IMAGE */}
-            <div className="relative h-[300px] md:h-[450px] rounded-[2.5rem] overflow-hidden shadow-xl group">
-              <div className="w-full h-full bg-gradient-to-br from-slate-200 via-slate-100 to-stone-200 flex items-center justify-center">
-                <ImageIcon size={64} className="text-slate-400" />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-8 left-8 text-white">
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-80">
-                  <ImageIcon size={14} /> Zdjęcie placówki (wkrótce)
-                </div>
-              </div>
-            </div>
-
-            {/* PROFIL DZIAŁALNOŚCI */}
-            <section>
-              <h3 className="text-2xl font-black text-slate-900 mb-6">
-                Profil działalności
+            {/* O PLACÓWCE I STANDARDY - JEDEN KAFELEK */}
+            <section className="bg-white p-6 md:p-8 rounded-2xl border border-stone-100 shadow-sm">
+              <h3 className="text-2xl font-black text-slate-900 mb-6 border-b border-stone-200 pb-4">
+                O placówce
               </h3>
-              <p className="text-slate-600 leading-relaxed text-lg">
-                Placówka <strong>{placowka.nazwa}</strong> zapewnia profesjonalną opiekę
-                w kategorii {placowka.typ_placowki}. Znajduje się w {placowka.miejscowosc},
-                gmina {placowka.gmina}, powiat {placowka.powiat}.
-                {placowka.liczba_miejsc && ` Oferuje ${placowka.liczba_miejsc} miejsc dla podopiecznych.`}
+              <p className="text-slate-600 leading-relaxed text-lg mb-8">
+                {generateFacilityDescription(placowka)}
               </p>
+
+              {/* RODZAJ PLACÓWKI - WEWNĄTRZ TEGO SAMEGO KAFELKA */}
+              {profiles.length > 0 && (
+                <>
+                  <h3 className="text-2xl font-black text-slate-900 mb-6 pt-6 border-t border-stone-200">
+                    Rodzaj placówki
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {profiles.map((profile, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-4 p-5 bg-stone-50 rounded-2xl border border-stone-100 transition-all hover:border-primary-100 hover:-translate-y-0.5"
+                      >
+                        <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 shrink-0">
+                          {getIconForFeature(profile)}
+                        </div>
+                        <span className="font-bold text-slate-700">{profile}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </section>
 
-            {/* STANDARDY I UDOGODNIENIA */}
-            {profiles.length > 0 && (
-              <section>
-                <h3 className="text-2xl font-black text-slate-900 mb-6">
-                  Standardy i udogodnienia
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {profiles.map((profile, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-stone-100 shadow-sm transition-all hover:border-primary-100 hover:-translate-y-0.5"
-                    >
-                      <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 shrink-0">
-                        {getIconForFeature(profile)}
-                      </div>
-                      <span className="font-bold text-slate-700">{profile}</span>
-                    </div>
-                  ))}
+            {/* JAK ZŁOŻYĆ WNIOSEK - PROCEDURAL GUIDE */}
+            <section className="bg-white p-6 md:p-8 rounded-2xl border border-stone-100 shadow-sm">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                  <ClipboardList size={24} className="text-white" />
                 </div>
-              </section>
-            )}
-
-            {/* MAP SECTION */}
-            <section className="bg-white p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm">
-              <h3 className="font-black text-2xl text-slate-900 mb-6">
-                Lokalizacja na mapie
-              </h3>
-              <div className="h-[400px] mb-4">
-                <FacilityMap
-                  facilities={[placowka]}
-                  mode="single"
-                  showDirections={false}
-                />
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 mb-2">
+                    Jak złożyć wniosek?
+                  </h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Proces ubiegania się o miejsce w {placowka.typ_placowki}
+                  </p>
+                </div>
               </div>
 
-              {/* MAP ACTION BUTTONS */}
-              {placowka.latitude && placowka.longitude && (
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${placowka.latitude},${placowka.longitude}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-stone-200 hover:border-primary-300 hover:bg-primary-50 text-slate-700 hover:text-primary-700 px-4 py-3 rounded-xl text-sm font-bold transition-all"
-                  >
-                    <MapPin size={18} />
-                    Zobacz na mapie
-                  </a>
+              <ol className="space-y-5 mb-6">
+                <li className="flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Złóż wniosek w MOPS/GOPS</h4>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      Skompletuj dokumenty (zaświadczenie lekarskie, dowód, dokumenty o dochodach) i złóż wniosek w odpowiednim ośrodku pomocy społecznej.
+                    </p>
+                  </div>
+                </li>
 
-                  <button
-                    onClick={handleGetDirections}
-                    disabled={isGettingLocation}
-                    className="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white px-4 py-3 rounded-xl text-sm font-bold transition-all active:scale-95 disabled:cursor-not-allowed"
-                  >
-                    {isGettingLocation ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Pobieram lokalizację...
-                      </>
-                    ) : (
-                      <>
-                        <Car size={18} />
-                        Wyznacz trasę
-                      </>
-                    )}
-                  </button>
+                <li className="flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Przejdź wywiad środowiskowy</h4>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      Pracownik socjalny przeprowadzi rozmowę w domu, aby ocenić sytuację i potrzeby osoby wymagającej opieki.
+                    </p>
+                  </div>
+                </li>
+
+                <li className="flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Otrzymaj decyzję i czekaj na miejsce</h4>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      MOPS/GOPS wyda decyzję o skierowaniu. Następnie czekasz na wolne miejsce w placówce odpowiedniego profilu.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+
+              <div className="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-xl mb-6">
+                <div className="flex items-start gap-3">
+                  <AlertCircle size={20} className="shrink-0 mt-0.5 text-amber-600" />
+                  <div className="text-sm text-slate-700 leading-relaxed">
+                    <p className="font-bold text-amber-900 mb-2">Ważne: Wniosek składasz według miejsca zamieszkania</p>
+                    <p>
+                      Nawet jeśli szukasz miejsca w {placowka.miejscowosc}, musisz złożyć wniosek w MOPS/GOPS właściwym dla
+                      <strong> miejsca zameldowania seniora</strong>, a nie lokalizacji placówki.
+                    </p>
+                  </div>
                 </div>
-              )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Link
+                  href="/mops"
+                  className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-sm"
+                >
+                  <ClipboardList size={18} />
+                  Znajdź MOPS/GOPS
+                </Link>
+
+                <Link
+                  href={placowka.typ_placowki === 'DPS' ? '/poradniki/finanse-prawne/proces-przyjecia-dps' : '/poradniki/wybor-opieki/wybor-placowki'}
+                  className="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 text-white py-3 px-4 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-sm"
+                >
+                  <Book size={18} />
+                  Szczegółowy przewodnik
+                </Link>
+              </div>
             </section>
 
           </div>
 
-          {/* RIGHT COLUMN - SIDEBAR (40%) */}
-          <div className="lg:col-span-2 space-y-8">
+          {/* RIGHT COLUMN - SIDEBAR (33%) */}
+          <div className="lg:col-span-1 space-y-6">
 
             {/* DARK CTA CARD - CONVERSION GOLD */}
-            <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white relative overflow-hidden shadow-xl">
+            <div className="bg-slate-900 p-8 rounded-2xl text-white relative overflow-hidden shadow-xl">
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
               <div className="relative z-10 space-y-6">
 
@@ -580,24 +595,6 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                     </div>
                   )}
                 </div>
-
-                <div className="h-px bg-white/10 w-full"></div>
-
-                {/* QUICK INFO */}
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Czas oczekiwania</span>
-                    <span className="font-bold">{waitTime || 'Zapytaj'}</span>
-                  </div>
-                  {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Dofinansowanie</span>
-                      <span className="font-bold text-emerald-400">Dostępne</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="h-px bg-white/10 w-full"></div>
 
                 {/* CTA BUTTONS */}
                 <div className="space-y-3">
@@ -622,26 +619,6 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       Wyślij zapytanie
                     </a>
                   )}
-
-                  {placowka.latitude && placowka.longitude && (
-                    <button
-                      onClick={handleGetDirections}
-                      disabled={isGettingLocation}
-                      className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isGettingLocation ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Pobieram...
-                        </>
-                      ) : (
-                        <>
-                          <Car size={20} />
-                          Jak dojechać
-                        </>
-                      )}
-                    </button>
-                  )}
                 </div>
 
                 {/* INFO NOTE — tylko DPS */}
@@ -658,7 +635,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             </div>
 
             {/* CONTACT INFO CARD */}
-            <div className="bg-white p-8 rounded-[2.5rem] border border-stone-200 shadow-xl relative overflow-hidden">
+            <div className="bg-white p-8 rounded-2xl border border-stone-200 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1.5 bg-emerald-500"></div>
 
               <h4 className="text-xl font-bold mb-6 text-slate-900 flex items-center gap-3">
@@ -735,121 +712,119 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
               </div>
             </div>
 
-            {/* VERIFICATION INFO */}
-            <div className="bg-white p-6 rounded-[2rem] border border-stone-100 shadow-sm space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
-                  <Clock size={24} />
-                </div>
-                <div>
-                  <span className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                    Oczekiwanie
-                  </span>
-                  <span className="text-lg font-bold text-slate-900">
-                    {waitTime || 'Zapytaj'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="h-px bg-stone-100"></div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-                  <ShieldCheck size={24} />
-                </div>
-                <div>
-                  <span className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                    Weryfikacja
-                  </span>
-                  <span className="text-lg font-bold text-slate-900">Zgodna z BIP</span>
-                  {placowka.zrodlo && (
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      Źródło: {placowka.zrodlo.includes('muw.pl') ? 'MUW' : 'Urząd'}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
           </div>
 
         </div>
 
-        {/* JAK ZŁOŻYĆ WNIOSEK - MOPS/GOPS INFO */}
-        <div className="max-w-3xl mx-auto my-12">
-          <div className="bg-gradient-to-br from-blue-50 to-emerald-50 p-8 md:p-10 rounded-[2rem] border-2 border-blue-100 shadow-sm">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-                <ClipboardList size={28} className="text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-black text-slate-900 mb-2">
-                  Jak złożyć wniosek o miejsce w {placowka.typ_placowki}?
-                </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Wniosek o skierowanie składa się w <strong>ośrodku pomocy społecznej (MOPS/GOPS)</strong> właściwym
-                  dla <strong>miejsca zamieszkania</strong> osoby potrzebującej opieki,
-                  <span className="text-blue-700 font-bold"> nie lokalizacji placówki</span>.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-blue-200 mb-6">
-              <div className="flex items-start gap-3 text-sm text-slate-700 leading-relaxed">
-                <Info size={18} className="shrink-0 mt-0.5 text-blue-600" />
-                <p>
-                  <strong>Przykład:</strong> Jeśli osoba mieszka w Krakowie, ale szuka miejsca w DPS w Grybowie,
-                  wniosek składa się w MOPS Kraków, nie w Grybowie.
-                </p>
-              </div>
-            </div>
-
-            <Link
-              href="/mops"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg flex items-center justify-center gap-3 group"
-            >
-              <ClipboardList size={20} className="group-hover:rotate-12 transition-transform" />
-              Znajdź właściwy MOPS/GOPS
-            </Link>
-
-            <p className="text-xs text-slate-500 text-center mt-4">
-              Mamy w bazie 178 ośrodków pomocy społecznej w Małopolsce
+        {/* LOKALIZACJA - FULL WIDTH */}
+        <section className="bg-white p-6 md:p-8 rounded-2xl border border-stone-200 shadow-xl mb-8">
+          {/* NAGŁÓWEK Z ADRESEM W TEJ SAMEJ LINIJCE */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+            <h3 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+              <MapPin size={24} className="text-primary-600" />
+              Lokalizacja
+            </h3>
+            <p className="text-slate-600 font-medium">
+              {placowka.ulica && `${placowka.ulica}, `}
+              {placowka.kod_pocztowy && `${placowka.kod_pocztowy} `}
+              {placowka.miejscowosc}, {placowka.powiat}
             </p>
           </div>
-        </div>
 
-        {/* FOOTER */}
-        <div className="border-t border-stone-200 pt-8 mt-12">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
-            <div className="flex items-center gap-2">
-              <Info size={16} />
-              <span>
-                <strong>Źródło danych:</strong>{' '}
-                {placowka.zrodlo ? (
-                  <a
-                    href={placowka.zrodlo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary-600 hover:text-primary-700 hover:underline transition-colors"
-                  >
-                    {placowka.zrodlo.includes('muw.pl')
-                      ? 'Małopolski Urząd Wojewódzki'
-                      : 'Urząd Miasta/Gminy'}
-                  </a>
+          {/* DUŻA MAPA - FULL WIDTH */}
+          <div className="h-[500px] mb-6 rounded-2xl overflow-hidden border border-stone-200">
+            <FacilityMap
+              facilities={[placowka]}
+              mode="single"
+              showDirections={false}
+            />
+          </div>
+
+          {/* MAP ACTION BUTTONS */}
+          {placowka.latitude && placowka.longitude && (
+            <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${placowka.latitude},${placowka.longitude}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-stone-200 hover:border-primary-300 hover:bg-primary-50 text-slate-700 hover:text-primary-700 px-6 py-4 rounded-xl text-sm font-bold transition-all"
+              >
+                <MapPin size={20} />
+                Zobacz na mapie
+              </a>
+
+              <button
+                onClick={handleGetDirections}
+                disabled={isGettingLocation}
+                className="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white px-6 py-4 rounded-xl text-sm font-bold transition-all active:scale-95 disabled:cursor-not-allowed"
+              >
+                {isGettingLocation ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Pobieram lokalizację...
+                  </>
                 ) : (
-                  'Urząd Miasta/Gminy'
+                  <>
+                    <Car size={20} />
+                    Wyznacz trasę
+                  </>
                 )}
-              </span>
+              </button>
             </div>
-            {placowka.data_aktualizacji && (
-              <div className="flex items-center gap-2">
-                <CalendarCheck size={16} className="text-emerald-500" />
-                <span>
-                  <strong>Ostatnia aktualizacja:</strong>{' '}
-                  {formatPolishDate(new Date(placowka.data_aktualizacji))}
-                </span>
+          )}
+        </section>
+
+        {/* DANE ZWERYFIKOWANE - SZEROKOŚĆ SIDEBARA */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          <div className="lg:col-span-2"></div>
+
+          <div className="lg:col-span-1">
+            <div className="bg-emerald-50 border-2 border-emerald-200 p-6 rounded-2xl">
+              <div className="flex items-center gap-3 text-emerald-700 mb-4">
+                <ShieldCheck size={20} />
+                <span className="font-black text-sm uppercase tracking-wider">Dane zweryfikowane</span>
               </div>
-            )}
+
+              <div className="space-y-3 text-sm">
+                {/* Źródło danych z linkiem */}
+                <div>
+                  <div className="text-emerald-600 font-medium mb-1">Źródło danych:</div>
+                  <div className="font-bold text-emerald-900">
+                    {placowka.zrodlo ? (
+                      <a
+                        href={placowka.zrodlo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-emerald-700 hover:text-emerald-900 hover:underline transition-colors"
+                      >
+                        {placowka.zrodlo.includes('muw.pl')
+                          ? 'Małopolski Urząd Wojewódzki'
+                          : 'Urząd Miasta/Gminy'}
+                      </a>
+                    ) : (
+                      'Urząd Miasta/Gminy'
+                    )}
+                  </div>
+                </div>
+
+                {/* Ostatnia aktualizacja */}
+                {placowka.data_aktualizacji && (
+                  <div>
+                    <div className="text-emerald-600 font-medium mb-1">Ostatnia aktualizacja:</div>
+                    <div className="font-bold text-emerald-900 flex items-center gap-2">
+                      <CalendarCheck size={16} className="text-emerald-600" />
+                      {formatPolishDate(new Date(placowka.data_aktualizacji))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Oczekiwanie */}
+                <div className="pt-3 border-t border-emerald-200">
+                  <div className="text-emerald-600 font-medium mb-1">Czas oczekiwania:</div>
+                  <div className="font-bold text-emerald-900">{waitTime || 'Zapytaj'}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

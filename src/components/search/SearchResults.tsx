@@ -168,12 +168,13 @@ export default function SearchResults({
 
   const [facilities, setFacilities] = useState<Facility[]>(results);
   const [isLoading, setIsLoading] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(20);
+  // ⚠️ ZMIENIONO: 20 → 10 (lepszy UX + trudniejszy scraping)
+  const [visibleCount, setVisibleCount] = useState(10);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [favoritesState, setFavoritesState] = useState<number[]>([]);
-  // ⚠️ ZMIENIONE z 30km na 50km aby dopasować do servera (app/search/page.tsx DEFAULT_RADIUS_KM = 50)
-  // Server filtruje do 50km (lub 100km jeśli < 3 wyniki), więc client musi używać tego samego limitu
-  const [maxDistance, setMaxDistance] = useState<number>(50); // km (from geolocation)
+  // ⚠️ DOSTOSOWANE do servera (app/search/page.tsx DEFAULT_RADIUS_KM = 30)
+  // Server filtruje do 30km (lub 50km jeśli < 3 wyniki), więc client musi używać tego samego limitu
+  const [maxDistance, setMaxDistance] = useState<number>(30); // km (from geolocation)
   const [maxDistanceFromCity, setMaxDistanceFromCity] = useState<number>(30); // km (from searched city)
 
   // Track current query from SearchBar - when empty, clear results
@@ -1034,7 +1035,7 @@ export default function SearchResults({
                         onClick={() => {
                           setIsLoadingMore(true);
                           setTimeout(() => {
-                            setVisibleCount(prev => prev + 20);
+                            setVisibleCount(prev => prev + 10); // Ładuj po 10
                             setIsLoadingMore(false);
                           }, 600);
                         }}
