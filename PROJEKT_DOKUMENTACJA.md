@@ -1,7 +1,58 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-03-01 (sesja #6 - mapowanie miast na prawach powiatu)
+> Ostatnia aktualizacja: 2026-03-09 (sesja #7 - geolokalizacja + test mode)
+
+---
+
+## ⚠️ TYMCZASOWE ZMIANY DO USUNIĘCIA PO TESTACH
+
+### 🧪 TEST MODE - Hardcoded geolokalizacja (2026-03-09)
+
+**Lokalizacja:** `/src/components/search/SearchBar.tsx` (linia ~306)
+
+**Problem:** Testowanie geolokalizacji z UK (brak prawdziwego GPS w Polsce)
+
+**Rozwiązanie tymczasowe:**
+- Hardcoded lokalizacja: **Kraków** (50.0647°N, 19.9450°E)
+- Aktywowany przez `const TEST_MODE = true`
+
+**JAK USUNĄĆ PO TESTACH:**
+
+**Opcja 1 (szybka):**
+```typescript
+const TEST_MODE = false; // ← zmień true na false
+```
+
+**Opcja 2 (czyszczenie):**
+Usuń cały blok kodu między komentarzami:
+```
+// ⚠️ TODO: USUNĄĆ PO TESTACH! ⚠️
+...
+// KONIEC HARDCODED TEST MODE
+```
+
+**Weryfikacja:** Po usunięciu, przycisk "Namierz moją lokalizację" powinien prosić o pozwolenie GPS w przeglądarce.
+
+---
+
+### 📍 Funkcja geolokalizacji - co dodano (2026-03-09)
+
+**Lokalizacja:** `/app/search/page.tsx` (linia ~87, TRYB 3)
+
+**Nowa logika:**
+1. **Domyślny promień:** 50km
+2. **Auto-rozszerzenie:** Do 100km jeśli < 3 wyniki
+3. **Komunikaty:**
+   - "Znaleźliśmy X placówek w promieniu 50km od Ciebie"
+   - "Znaleźliśmy tylko 2 placówki w promieniu 50km. Pokazujemy także 7 placówek w promieniu 100km"
+
+**Parametry do dostrojenia:**
+```typescript
+const DEFAULT_RADIUS_KM = 50;    // Domyślny promień
+const MIN_RESULTS = 3;            // Próg auto-rozszerzenia
+const EXTENDED_RADIUS_KM = 100;  // Rozszerzony promień
+```
 
 ---
 

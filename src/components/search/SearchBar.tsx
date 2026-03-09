@@ -304,6 +304,35 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleGeolocation = () => {
+    // ========================================
+    // ⚠️ TODO: USUNĄĆ PO TESTACH! ⚠️
+    //
+    // TYMCZASOWY TEST MODE - hardcoded lokalizacja Kraków
+    // Pozwala testować geolokalizację z UK bez prawdziwego GPS
+    //
+    // JAK USUNĄĆ:
+    // 1. Usuń cały blok od linii "const TEST_MODE = true"
+    //    do "// KONIEC HARDCODED TEST MODE"
+    // 2. Lub po prostu ustaw: const TEST_MODE = false;
+    //
+    // DOKUMENTACJA: Zobacz PROJEKT_DOKUMENTACJA.md sekcja "Tymczasowe zmiany"
+    // ========================================
+    const TEST_MODE = true; // ← ZMIEŃ NA FALSE LUB USUŃ CAŁY BLOK
+
+    if (TEST_MODE) {
+      setIsGeoLoading(true);
+      // Kraków: 50.0647°N, 19.9450°E (centrum Małopolski)
+      const latitude = 50.0647;
+      const longitude = 19.9450;
+      setTimeout(() => {
+        window.location.href = `/search?lat=${latitude}&lng=${longitude}&near=true`;
+      }, 500); // Symuluj małe opóźnienie jak przy prawdziwym GPS
+      return;
+    }
+    // ========================================
+    // KONIEC HARDCODED TEST MODE
+    // ========================================
+
     if (!navigator.geolocation) {
       alert('Twoja przeglądarka nie obsługuje geolokalizacji');
       return;

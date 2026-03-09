@@ -86,10 +86,58 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   // TRYB 3: GEOLOCATION SEARCH
   if (isNearSearch && userLat && userLng && !query) {
-    results = await prisma.placowka.findMany({
+    const DEFAULT_RADIUS_KM = 50;
+    const MIN_RESULTS = 3;
+    const EXTENDED_RADIUS_KM = 100;
+
+    // Pobierz wszystkie placówki
+    const allFacilities = await prisma.placowka.findMany({
       orderBy: { nazwa: 'asc' },
     });
-    message = '';
+
+    // Oblicz dystanse dla wszystkich placówek
+    const facilitiesWithDistance = allFacilities.map(facility => {
+      const distance = facility.latitude && facility.longitude
+        ? calculateDistance(
+            userLat,
+            userLng,
+            parseFloat(facility.latitude),
+            parseFloat(facility.longitude)
+          )
+        : 999999; // Placówki bez koordynatów na końcu
+
+      return {
+        ...facility,
+        distance,
+      };
+    });
+
+    // Sortuj po odległości
+    facilitiesWithDistance.sort((a, b) => a.distance - b.distance);
+
+    // Filtruj do domyślnego promienia (50km)
+    let nearbyFacilities = facilitiesWithDistance.filter(
+      f => f.distance <= DEFAULT_RADIUS_KM
+    );
+
+    // Auto-rozszerz promień jeśli za mało wyników (< 3)
+    if (nearbyFacilities.length < MIN_RESULTS) {
+      nearbyFacilities = facilitiesWithDistance.filter(
+        f => f.distance <= EXTENDED_RADIUS_KM
+      );
+
+      const countIn50km = facilitiesWithDistance.filter(f => f.distance <= DEFAULT_RADIUS_KM).length;
+
+      if (countIn50km === 0) {
+        message = `W promieniu ${DEFAULT_RADIUS_KM}km nie znaleźliśmy żadnych placówek. Pokazujemy ${nearbyFacilities.length} placówek w promieniu ${EXTENDED_RADIUS_KM}km.`;
+      } else {
+        message = `Znaleźliśmy tylko ${countIn50km} ${countIn50km === 1 ? 'placówkę' : 'placówki'} w promieniu ${DEFAULT_RADIUS_KM}km. Pokazujemy także ${nearbyFacilities.length - countIn50km} placówek w promieniu ${EXTENDED_RADIUS_KM}km.`;
+      }
+    } else {
+      message = `Znaleźliśmy ${nearbyFacilities.length} ${nearbyFacilities.length === 1 ? 'placówkę' : nearbyFacilities.length < 5 ? 'placówki' : 'placówek'} w promieniu ${DEFAULT_RADIUS_KM}km od Ciebie.`;
+    }
+
+    results = nearbyFacilities;
   }
   // TRYB 5: POWIAT ONLY (klik z mapy Małopolski)
   else if (!query && powiatParam && wojewodztwo === 'all') {
