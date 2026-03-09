@@ -49,6 +49,46 @@ export function formatDistance(distance: number): string {
     const meters = Math.round(distance * 1000);
     return `${meters} m`;
   }
-  
+
   return `${distance} km`;
+}
+
+/**
+ * Oblicza szacunkowy czas dojazdu na podstawie odległości
+ * Uwzględnia różne typy dróg (lokalne, wojewódzkie, ekspresowe)
+ *
+ * @param km - odległość w kilometrach
+ * @returns sformatowany string, np. "~20 min" lub "~1 h 15 min"
+ */
+export function estimateDriveTime(km: number): string {
+  // Prędkości średnie dla różnych zakresów (w km/h)
+  // 0-10 km: drogi lokalne, korki w mieście (~40 km/h)
+  // 10-30 km: drogi wojewódzkie (~50 km/h)
+  // 30-50 km: drogi szybkie, mieszanka (~55 km/h)
+  // 50+ km: autostrady/ekspresówki (~60 km/h)
+
+  let avgSpeed: number;
+  if (km <= 10) {
+    avgSpeed = 40;
+  } else if (km <= 30) {
+    avgSpeed = 50;
+  } else if (km <= 50) {
+    avgSpeed = 55;
+  } else {
+    avgSpeed = 60;
+  }
+
+  const hours = km / avgSpeed;
+  const totalMinutes = Math.round(hours * 60);
+
+  if (totalMinutes < 60) {
+    return `~${totalMinutes} min`;
+  } else {
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    if (m === 0) {
+      return `~${h} h`;
+    }
+    return `~${h} h ${m} min`;
+  }
 }

@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { MapPin, Heart, ArrowLeftRight, Navigation } from 'lucide-react';
+import { estimateDriveTime } from '@/src/utils/distance';
 
 interface FacilityCardProps {
   facility: {
@@ -131,7 +132,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               <span>
                 {facility.distance < 1
                   ? `${Math.round(facility.distance * 1000)} m`
-                  : `${facility.distance.toFixed(1)} km`
+                  : `${facility.distance.toFixed(1)} km (${estimateDriveTime(facility.distance)})`
                 }
                 {userLocation ? ' od Ciebie' : ''}
               </span>

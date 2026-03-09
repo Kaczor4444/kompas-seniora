@@ -148,10 +148,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       const countIn50km = facilitiesWithDistance.filter(f => f.distance <= DEFAULT_RADIUS_KM).length;
 
+      // Funkcja do poprawnej odmiany słowa "placówka"
+      const getPlacowkaForm = (count: number): string => {
+        if (count === 1) return 'placówkę';
+        const lastDigit = count % 10;
+        const lastTwoDigits = count % 100;
+        if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return 'placówek';
+        if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
+        return 'placówek';
+      };
+
       if (countIn50km === 0) {
-        message = `W promieniu ${DEFAULT_RADIUS_KM} km nie znaleźliśmy żadnych placówek. Pokazujemy ${nearbyFacilities.length} placówek w promieniu ${EXTENDED_RADIUS_KM} km.`;
+        message = `W promieniu ${DEFAULT_RADIUS_KM} km nie znaleźliśmy żadnych placówek. Pokazujemy ${nearbyFacilities.length} ${getPlacowkaForm(nearbyFacilities.length)} w promieniu ${EXTENDED_RADIUS_KM} km.`;
       } else {
-        message = `Znaleźliśmy tylko ${countIn50km} ${countIn50km === 1 ? 'placówkę' : 'placówki'} w promieniu ${DEFAULT_RADIUS_KM} km. Pokazujemy także ${nearbyFacilities.length - countIn50km} placówek w promieniu ${EXTENDED_RADIUS_KM} km.`;
+        message = `Znaleźliśmy tylko ${countIn50km} ${getPlacowkaForm(countIn50km)} w promieniu ${DEFAULT_RADIUS_KM} km. Pokazujemy także ${nearbyFacilities.length - countIn50km} ${getPlacowkaForm(nearbyFacilities.length - countIn50km)} w promieniu ${EXTENDED_RADIUS_KM} km.`;
       }
     } else {
       // Reverse geocoding - pobierz nazwę miasta użytkownika
@@ -171,9 +181,22 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         };
         return genitiveCases[city] || city;
       };
-      const locationInfo = userLocationName ? ` (w okolicy ${getCityGenitive(userLocationName)})` : '';
+      const locationInfo = userLocationName ? ` w okolicy ${getCityGenitive(userLocationName)}` : '';
 
-      message = `Znaleźliśmy ${nearbyFacilities.length} ${nearbyFacilities.length === 1 ? 'placówkę' : nearbyFacilities.length < 5 ? 'placówki' : 'placówek'} w promieniu ${DEFAULT_RADIUS_KM} km${locationInfo}.`;
+      // Funkcja do poprawnej odmiany słowa "placówka"
+      const getPlacowkaForm = (count: number): string => {
+        if (count === 1) return 'placówkę';
+        const lastDigit = count % 10;
+        const lastTwoDigits = count % 100;
+        // 12-14 to wyjątek (placówek, nie placówki)
+        if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return 'placówek';
+        // 2,3,4 na końcu → placówki
+        if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
+        // reszta → placówek
+        return 'placówek';
+      };
+
+      message = `Znaleźliśmy ${nearbyFacilities.length} ${getPlacowkaForm(nearbyFacilities.length)} w promieniu ${DEFAULT_RADIUS_KM} km${locationInfo}.`;
     }
 
     results = nearbyFacilities;
