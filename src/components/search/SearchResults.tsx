@@ -1138,33 +1138,62 @@ export default function SearchResults({
           </div>
 
           {/* Content Area */}
-          <div className="h-[calc(100%-80px)] flex">
-            {/* Sliding Filters Sidebar */}
-            <aside
-              className={`bg-white border-r border-stone-200 shadow-lg transition-all duration-300 ease-in-out overflow-y-auto ${
-                showMapFilters ? 'w-80' : 'w-0'
-              }`}
-            >
-              {showMapFilters && (
-                <div className="p-6 space-y-5 w-80">
+          <div className="h-[calc(100%-80px)] relative">
+
+            {/* Map */}
+            <div className="w-full h-full">
+              <FacilityMap
+                facilities={facilities}
+                userLocation={userLocation}
+                searchCenter={searchCenter}
+                powiatBreakdown={powiatBreakdown}
+                powiatSearchCenters={powiatSearchCenters}
+                selectedPowiat={selectedPowiat}
+                onPowiatClick={handlePowiatChange}
+              />
+            </div>
+
+            {/* Floating Filters Modal */}
+            {showMapFilters && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className="absolute inset-0 bg-black/20 backdrop-blur-sm z-10"
+                  onClick={() => setShowMapFilters(false)}
+                />
+
+                {/* Modal Card */}
+                <div className="absolute top-4 left-4 z-20 bg-white rounded-2xl shadow-2xl w-80 max-h-[calc(100%-2rem)] overflow-y-auto">
+                  <div className="p-6 space-y-5">
                   {/* Filters Header */}
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-black text-slate-900 tracking-tight">Filtry</h2>
-                    <button
-                      onClick={resetFilters}
-                      className={`text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 ${
-                        activeChips.length > 0
-                          ? 'text-emerald-600 hover:text-emerald-700'
-                          : 'text-slate-400 hover:text-emerald-600'
-                      }`}
-                    >
-                      Wyczyść
-                      {activeChips.length > 0 && (
-                        <span className="bg-emerald-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                          {activeChips.length}
-                        </span>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={resetFilters}
+                        className={`text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 ${
+                          activeChips.length > 0
+                            ? 'text-emerald-600 hover:text-emerald-700'
+                            : 'text-slate-400 hover:text-emerald-600'
+                        }`}
+                      >
+                        Wyczyść
+                        {activeChips.length > 0 && (
+                          <span className="bg-emerald-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                            {activeChips.length}
+                          </span>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setShowMapFilters(false)}
+                        className="text-slate-400 hover:text-slate-900 transition-colors p-1"
+                        aria-label="Zamknij filtry"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Type Filter */}
@@ -1269,21 +1298,8 @@ export default function SearchResults({
                     </div>
                   )}
                 </div>
-              )}
-            </aside>
-
-            {/* Map */}
-            <div className="flex-1">
-              <FacilityMap
-                facilities={facilities}
-                userLocation={userLocation}
-                searchCenter={searchCenter}
-                powiatBreakdown={powiatBreakdown}
-                powiatSearchCenters={powiatSearchCenters}
-                selectedPowiat={selectedPowiat}
-                onPowiatClick={handlePowiatChange}
-              />
-            </div>
+              </>
+            )}
           </div>
         </div>
       )}
