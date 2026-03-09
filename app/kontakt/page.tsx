@@ -8,7 +8,7 @@ export default function KontaktPage() {
   const [copied, setCopied] = useState(false);
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText('kontakt@kompaseniora.pl');
+    navigator.clipboard.writeText('kontakt@kompas-seniora.pl');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -60,7 +60,7 @@ export default function KontaktPage() {
 
             <div className="flex flex-col gap-3 w-full md:w-auto">
                <a
-                 href="mailto:kontakt@kompaseniora.pl"
+                 href="mailto:kontakt@kompas-seniora.pl"
                  className="flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-black py-4 px-8 rounded-xl shadow-lg shadow-emerald-600/20 transition-all transform active:scale-95 uppercase tracking-[0.05em]"
                >
                  <Mail size={20} />
@@ -83,7 +83,7 @@ export default function KontaktPage() {
           
           {/* Card 1: Add Facility */}
           <a
-            href="mailto:kontakt@kompaseniora.pl?subject=Dodanie%20nowej%20placówki"
+            href="mailto:kontakt@kompas-seniora.pl?subject=Dodanie%20nowej%20placówki"
             className="group bg-white hover:bg-emerald-50 p-6 rounded-2xl border border-slate-200 hover:border-emerald-200 shadow-sm hover:shadow-lg transition-all text-left flex items-start gap-4"
           >
             <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -99,7 +99,7 @@ export default function KontaktPage() {
 
           {/* Card 2: Report Error */}
           <a
-            href="mailto:kontakt@kompaseniora.pl?subject=Błąd%20na%20stronie"
+            href="mailto:kontakt@kompas-seniora.pl?subject=Błąd%20na%20stronie"
             className="group bg-white hover:bg-red-50 p-6 rounded-2xl border border-slate-200 hover:border-red-200 shadow-sm hover:shadow-lg transition-all text-left flex items-start gap-4"
           >
             <div className="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -115,7 +115,7 @@ export default function KontaktPage() {
 
           {/* Card 3: Correct Data */}
           <a
-            href="mailto:kontakt@kompaseniora.pl?subject=Poprawka%20danych%20placówki"
+            href="mailto:kontakt@kompas-seniora.pl?subject=Poprawka%20danych%20placówki"
             className="group bg-white hover:bg-blue-50 p-6 rounded-2xl border border-slate-200 hover:border-blue-200 shadow-sm hover:shadow-lg transition-all text-left flex items-start gap-4"
           >
             <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -131,7 +131,7 @@ export default function KontaktPage() {
 
           {/* Card 4: General Contact */}
           <a
-            href="mailto:kontakt@kompaseniora.pl?subject=Kontakt%20ogólny"
+            href="mailto:kontakt@kompas-seniora.pl?subject=Kontakt%20ogólny"
             className="group bg-white hover:bg-slate-50 p-6 rounded-2xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-lg transition-all text-left flex items-start gap-4"
           >
             <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">

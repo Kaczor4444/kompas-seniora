@@ -209,7 +209,7 @@ export default function PolitykaPrywatnosciClient() {
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0" />
-                        <span><strong>Email:</strong> <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
+                        <span><strong>Email:</strong> <a href="mailto:kontakt@kompas-seniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompas-seniora.pl</a></span>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0" />
@@ -501,7 +501,7 @@ export default function PolitykaPrywatnosciClient() {
                   <ul className="space-y-2 text-slate-600 text-sm mb-6">
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-500">•</span>
-                      <span>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
+                      <span>Email: <a href="mailto:kontakt@kompas-seniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompas-seniora.pl</a></span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-500">•</span>
@@ -604,7 +604,7 @@ export default function PolitykaPrywatnosciClient() {
                   <ul className="space-y-2 text-slate-600 text-sm">
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-500">•</span>
-                      <span>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
+                      <span>Email: <a href="mailto:kontakt@kompas-seniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompas-seniora.pl</a></span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-500">•</span>

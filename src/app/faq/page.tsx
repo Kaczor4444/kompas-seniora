@@ -63,7 +63,7 @@ export default function FAQPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
-              href="mailto:kontakt@kompaseniora.pl"
+              href="mailto:kontakt@kompas-seniora.pl"
               className="inline-flex items-center justify-center gap-2 bg-white text-accent-700 px-8 py-3 rounded-lg font-semibold hover:bg-neutral-50 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -166,11 +166,11 @@ export default function MisjaClient() {
                   </div>
                   <div className="mt-8">
                     <a
-                      href="mailto:kontakt@kompaseniora.pl"
+                      href="mailto:kontakt@kompas-seniora.pl"
                       className="inline-flex items-center justify-center gap-3 bg-slate-950 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-primary-600 transition-all shadow-lg active:scale-95"
                     >
                       <Mail size={16} />
-                      kontakt@kompaseniora.pl
+                      kontakt@kompas-seniora.pl
                     </a>
                   </div>
                 </div>

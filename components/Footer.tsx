@@ -35,12 +35,12 @@ export default function Footer() {
                 Twój rzetelny przewodnik po systemie opieki senioralnej. Łączymy sprawdzone dane z ludzkim podejściem, aby ułatwić rodzinom najtrudniejsze decyzje.
               </p>
 
-              <a 
-                href="mailto:kontakt@kompaseniora.pl" 
+              <a
+                href="mailto:kontakt@kompas-seniora.pl"
                 className="inline-flex items-center gap-2 text-white hover:text-primary-400 transition-colors text-sm font-bold"
               >
                 <Mail size={16} />
-                kontakt@kompaseniora.pl
+                kontakt@kompas-seniora.pl
               </a>
             </div>
 

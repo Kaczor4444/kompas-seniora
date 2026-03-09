@@ -395,7 +395,7 @@ export default function PolitykaCookiesClient() {
                   <ul className="space-y-2 text-slate-600 text-sm mb-6">
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-500">•</span>
-                      <span>Email: <a href="mailto:kontakt@kompaseniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompaseniora.pl</a></span>
+                      <span>Email: <a href="mailto:kontakt@kompas-seniora.pl" className="text-emerald-700 underline underline-offset-4 font-bold">kontakt@kompas-seniora.pl</a></span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-500">•</span>
