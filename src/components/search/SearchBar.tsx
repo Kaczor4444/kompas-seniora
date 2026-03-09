@@ -321,9 +321,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
     if (TEST_MODE) {
       setIsGeoLoading(true);
-      // Kraków: 50.0647°N, 19.9450°E (centrum Małopolski)
-      const latitude = 50.0647;
-      const longitude = 19.9450;
+      // Olkusz: 50.2833°N, 19.5667°E (mniejsze miasto - do testów)
+      const latitude = 50.2833;
+      const longitude = 19.5667;
       setTimeout(() => {
         window.location.href = `/search?lat=${latitude}&lng=${longitude}&near=true`;
       }, 500); // Symuluj małe opóźnienie jak przy prawdziwym GPS

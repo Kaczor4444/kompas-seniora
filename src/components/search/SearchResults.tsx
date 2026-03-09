@@ -217,6 +217,16 @@ export default function SearchResults({
     return [...codes].sort();
   }, [results]);
 
+  // Oblicz maksymalną odległość z wyników (server limit)
+  const maxDistanceFromServer = useMemo(() => {
+    if (results.length === 0) return 100;
+    const distances = results
+      .map(f => f.distance || f.distanceFromCity || 0)
+      .filter(d => d > 0);
+    if (distances.length === 0) return 100;
+    return Math.ceil(Math.max(...distances) / 5) * 5; // Zaokrąglij w górę do najbliższej 5
+  }, [results]);
+
   const activeChips = useMemo(() => {
     const chips = [];
     if (cityInput && cityInput !== query) {
@@ -250,20 +260,20 @@ export default function SearchResults({
         clear: () => setPriceLimit(10000)
       });
     }
-    if (userLocation && maxDistance < 30) {
+    if (userLocation && maxDistance < maxDistanceFromServer) {
       chips.push({
         label: `Do: ${maxDistance} km`,
-        clear: () => setMaxDistance(30)
+        clear: () => setMaxDistance(maxDistanceFromServer)
       });
     }
-    if (searchCenter && maxDistanceFromCity < 30) {
+    if (searchCenter && maxDistanceFromCity < maxDistanceFromServer) {
       chips.push({
         label: `Od ${searchCenter.name}: ${maxDistanceFromCity} km`,
-        clear: () => setMaxDistanceFromCity(30)
+        clear: () => setMaxDistanceFromCity(maxDistanceFromServer)
       });
     }
     return chips;
-  }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter]);
+  }, [cityInput, query, selectedType, type, selectedVoivodeship, selectedPowiat, selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, maxDistanceFromServer]);
 
 
   // Sync filter state when activeFilters prop changes (e.g. after router.push navigation)
@@ -308,10 +318,10 @@ export default function SearchResults({
       setSelectedPowiat('Wszystkie');
       setSelectedProfiles([]);
       setPriceLimit(10000);
-      setMaxDistance(30);
-      setMaxDistanceFromCity(30);
+      setMaxDistance(maxDistanceFromServer);
+      setMaxDistanceFromCity(maxDistanceFromServer);
     }
-  }, [currentQuery]);
+  }, [currentQuery, maxDistanceFromServer]);
 
   // Load favorites on mount
   useEffect(() => {
@@ -508,11 +518,11 @@ export default function SearchResults({
       setSelectedPowiat("Wszystkie");
       setSelectedProfiles([]);
       setPriceLimit(10000);
-      setMaxDistance(30);
-      setMaxDistanceFromCity(30);
+      setMaxDistance(maxDistanceFromServer);
+      setMaxDistanceFromCity(maxDistanceFromServer);
     }
     prevCityInputRef.current = cityInput;
-  }, [cityInput]);
+  }, [cityInput, maxDistanceFromServer]);
 
   // ===== HANDLERS =====
   const resetFilters = () => {
@@ -526,8 +536,8 @@ export default function SearchResults({
     setSelectedPowiat("Wszystkie");
     setSelectedProfiles([]);
     setPriceLimit(10000);
-    setMaxDistance(30);
-    setMaxDistanceFromCity(30);
+    setMaxDistance(maxDistanceFromServer);
+    setMaxDistanceFromCity(maxDistanceFromServer);
   };
 
   const normPowiat = (s: string) =>
@@ -836,7 +846,7 @@ export default function SearchResults({
                 <input
                   type="range"
                   min="5"
-                  max="100"
+                  max={maxDistanceFromServer}
                   step="5"
                   value={userLocation ? maxDistance : maxDistanceFromCity}
                   onChange={(e) => {
@@ -850,7 +860,7 @@ export default function SearchResults({
                 />
                 <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
                   <span>5 km</span>
-                  <span>100 km</span>
+                  <span>{maxDistanceFromServer} km</span>
                 </div>
               </div>
 
@@ -958,6 +968,9 @@ export default function SearchResults({
                     return 'placówek';
                   })()}
                 </h2>
+                {message && (
+                  <p className="text-slate-600 text-base mt-2">{message}</p>
+                )}
               </div>
             )}
 
