@@ -149,16 +149,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       const countIn50km = facilitiesWithDistance.filter(f => f.distance <= DEFAULT_RADIUS_KM).length;
 
       if (countIn50km === 0) {
-        message = `W promieniu ${DEFAULT_RADIUS_KM}km nie znaleźliśmy żadnych placówek. Pokazujemy ${nearbyFacilities.length} placówek w promieniu ${EXTENDED_RADIUS_KM}km.`;
+        message = `W promieniu ${DEFAULT_RADIUS_KM} km nie znaleźliśmy żadnych placówek. Pokazujemy ${nearbyFacilities.length} placówek w promieniu ${EXTENDED_RADIUS_KM} km.`;
       } else {
-        message = `Znaleźliśmy tylko ${countIn50km} ${countIn50km === 1 ? 'placówkę' : 'placówki'} w promieniu ${DEFAULT_RADIUS_KM}km. Pokazujemy także ${nearbyFacilities.length - countIn50km} placówek w promieniu ${EXTENDED_RADIUS_KM}km.`;
+        message = `Znaleźliśmy tylko ${countIn50km} ${countIn50km === 1 ? 'placówkę' : 'placówki'} w promieniu ${DEFAULT_RADIUS_KM} km. Pokazujemy także ${nearbyFacilities.length - countIn50km} placówek w promieniu ${EXTENDED_RADIUS_KM} km.`;
       }
     } else {
       // Reverse geocoding - pobierz nazwę miasta użytkownika
       const userLocationName = await reverseGeocode(userLat, userLng);
-      const locationInfo = userLocationName ? ` (okolice ${userLocationName})` : '';
+      // Odmiana nazwy miasta w dopełniaczu (Kraków -> Krakowa, Olkusz -> Olkusza)
+      const getCityGenitive = (city: string) => {
+        const genitiveCases: Record<string, string> = {
+          'Kraków': 'Krakowa',
+          'Olkusz': 'Olkusza',
+          'Tarnów': 'Tarnowa',
+          'Nowy Sącz': 'Nowego Sącza',
+          'Zakopane': 'Zakopanego',
+          'Oświęcim': 'Oświęcimia',
+          'Wieliczka': 'Wieliczki',
+          'Wadowice': 'Wadowic',
+          'Chrzanów': 'Chrzanowa',
+        };
+        return genitiveCases[city] || city;
+      };
+      const locationInfo = userLocationName ? ` (w okolicy ${getCityGenitive(userLocationName)})` : '';
 
-      message = `Znaleźliśmy ${nearbyFacilities.length} ${nearbyFacilities.length === 1 ? 'placówkę' : nearbyFacilities.length < 5 ? 'placówki' : 'placówek'} w promieniu ${DEFAULT_RADIUS_KM}km od Ciebie${locationInfo}.`;
+      message = `Znaleźliśmy ${nearbyFacilities.length} ${nearbyFacilities.length === 1 ? 'placówkę' : nearbyFacilities.length < 5 ? 'placówki' : 'placówek'} w promieniu ${DEFAULT_RADIUS_KM} km${locationInfo}.`;
     }
 
     results = nearbyFacilities;

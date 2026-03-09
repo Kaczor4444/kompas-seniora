@@ -957,19 +957,22 @@ export default function SearchResults({
             {/* Results Count */}
             {facilities.length > 0 && (
               <div className="mb-6">
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                  Znaleziono {facilities.length} {(() => {
-                    const count = facilities.length;
-                    if (count === 1) return 'placówkę';
-                    const lastDigit = count % 10;
-                    const lastTwoDigits = count % 100;
-                    if (lastTwoDigits >= 10 && lastTwoDigits <= 21) return 'placówek';
-                    if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
-                    return 'placówek';
-                  })()}
-                </h2>
-                {message && (
-                  <p className="text-slate-600 text-base mt-2">{message}</p>
+                {message ? (
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                    {message}
+                  </h2>
+                ) : (
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                    Znaleziono {facilities.length} {(() => {
+                      const count = facilities.length;
+                      if (count === 1) return 'placówkę';
+                      const lastDigit = count % 10;
+                      const lastTwoDigits = count % 100;
+                      if (lastTwoDigits >= 10 && lastTwoDigits <= 21) return 'placówek';
+                      if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
+                      return 'placówek';
+                    })()}
+                  </h2>
                 )}
               </div>
             )}
