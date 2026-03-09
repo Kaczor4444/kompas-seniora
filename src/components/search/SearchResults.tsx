@@ -171,7 +171,9 @@ export default function SearchResults({
   const [visibleCount, setVisibleCount] = useState(20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [favoritesState, setFavoritesState] = useState<number[]>([]);
-  const [maxDistance, setMaxDistance] = useState<number>(30); // km (from geolocation)
+  // ⚠️ ZMIENIONE z 30km na 50km aby dopasować do servera (app/search/page.tsx DEFAULT_RADIUS_KM = 50)
+  // Server filtruje do 50km (lub 100km jeśli < 3 wyniki), więc client musi używać tego samego limitu
+  const [maxDistance, setMaxDistance] = useState<number>(50); // km (from geolocation)
   const [maxDistanceFromCity, setMaxDistanceFromCity] = useState<number>(30); // km (from searched city)
 
   // Track current query from SearchBar - when empty, clear results
