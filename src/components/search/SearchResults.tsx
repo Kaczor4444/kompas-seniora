@@ -111,6 +111,7 @@ interface SearchResultsProps {
   terytPowiats?: string[];
   powiatBreakdown?: Record<string, number>;
   powiatSearchCenters?: Record<string, { lat: number; lng: number }>;
+  initialView?: 'list' | 'map';
 }
 
 
@@ -126,6 +127,7 @@ export default function SearchResults({
   terytPowiats,
   powiatBreakdown,
   powiatSearchCenters,
+  initialView = 'list',
 }: SearchResultsProps) {
 
   const router = useRouter();
@@ -161,10 +163,9 @@ export default function SearchResults({
   );
 
   const [showFilters, setShowFilters] = useState(false);
-  const [showMapMobile, setShowMapMobile] = useState(false);
+  const [showMapMobile, setShowMapMobile] = useState(initialView === 'map');
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [selectedForCompare, setSelectedForCompare] = useState<number[]>([]);
-  const [showMapFilters, setShowMapFilters] = useState(false);
 
   const [facilities, setFacilities] = useState<Facility[]>(results);
   const [isLoading, setIsLoading] = useState(false);
@@ -182,6 +183,12 @@ export default function SearchResults({
 
   // Profile filter collapsed by default - manual toggle only
   const [showProfilesExpanded, setShowProfilesExpanded] = useState(false);
+
+  // Left panel visibility (map view)
+  const [showLeftPanel, setShowLeftPanel] = useState(true);
+
+  // Price filter collapsed by default
+  const [showPriceExpanded, setShowPriceExpanded] = useState(false);
 
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
@@ -598,14 +605,28 @@ export default function SearchResults({
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        router.push(`/search?lat=${latitude}&lng=${longitude}&near=true`);
+        // Stay in map view if currently in map view
+        const viewParam = showMapMobile ? '&view=map' : '';
+        router.push(`/search?lat=${latitude}&lng=${longitude}&near=true${viewParam}`);
       },
       (error) => {
         setIsLoadingLocation(false);
         alert('Nie udało się uzyskać Twojej lokalizacji. Sprawdź uprawnienia przeglądarki.');
         console.error('Geolocation error:', error);
-      }
+      },
+      { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
     );
+  };
+
+  // Handler to turn off geolocation
+  const handleTurnOffGeolocation = () => {
+    // Go back to last city search or just show empty state
+    const viewParam = showMapMobile ? '&view=map' : '';
+    if (query && query.trim() !== '') {
+      router.push(`/search?q=${query}${viewParam}`);
+    } else {
+      router.push(`/${viewParam ? '?view=map' : ''}`);
+    }
   };
 
   // ===== RENDER =====
@@ -1087,114 +1108,117 @@ export default function SearchResults({
       {/* MAP VIEW (fullscreen overlay when showMapMobile=true) */}
       {showMapMobile && (
         <div className="fixed inset-0 z-40 top-20 bg-stone-50">
-          {/* Top Bar with SearchBar */}
-          <div className="bg-white border-b border-stone-200 shadow-sm px-4 py-3">
-            <div className="max-w-5xl mx-auto flex items-center gap-4">
-              {/* SearchBar */}
-              <div className="flex-1">
-                <SearchBar
-                  initialQuery={cityInput}
-                  initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
-                  compact={true}
-                  onQueryChange={setCurrentQuery}
-                  disableAutocomplete={true}
-                />
-              </div>
+          {/* Backdrop - kliknięcie zamyka panel */}
+          {showLeftPanel && (
+            <div
+              className="absolute inset-0 bg-slate-900/10 z-10"
+              onClick={() => setShowLeftPanel(false)}
+            />
+          )}
 
-              {/* Action buttons */}
-              <div className="flex gap-2 flex-shrink-0">
-                {/* Toggle Filters */}
-                <button
-                  onClick={() => setShowMapFilters(!showMapFilters)}
-                  className={`px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 ${
-                    showMapFilters
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-white text-slate-900 hover:bg-emerald-600 hover:text-white'
-                  }`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                  </svg>
-                  <span className="hidden md:inline">Filtry</span>
-                  {activeChips.length > 0 && (
-                    <span className="px-2 py-0.5 bg-white text-emerald-600 text-xs rounded-full font-black">
-                      {activeChips.length}
-                    </span>
-                  )}
-                </button>
+          {/* Floating "Filtry" button (when panel is closed) */}
+          {!showLeftPanel && (
+            <button
+              onClick={() => setShowLeftPanel(true)}
+              className="absolute top-4 left-20 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              Filtry
+            </button>
+          )}
 
-                {/* Back to List */}
-                <button
-                  onClick={() => setShowMapMobile(false)}
-                  className="bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                  </svg>
-                  <span className="hidden md:inline">Lista</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Content Area */}
-          <div className="h-[calc(100%-80px)] relative">
-
-            {/* Map */}
-            <div className="w-full h-full">
-              <FacilityMap
-                facilities={facilities}
-                userLocation={userLocation}
-                searchCenter={searchCenter}
-                powiatBreakdown={powiatBreakdown}
-                powiatSearchCenters={powiatSearchCenters}
-                selectedPowiat={selectedPowiat}
-                onPowiatClick={handlePowiatChange}
+          {/* Left Panel Container - only show when showLeftPanel is true */}
+          {showLeftPanel && (
+            <div className="absolute top-20 left-4 z-30 w-80 space-y-3">
+              <SearchBar
+                initialQuery={cityInput}
+                initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
+                compact={true}
+                onQueryChange={setCurrentQuery}
+                disableAutocomplete={true}
+                onSearch={(params) => {
+                  // Stay in map view after search - add view=map parameter
+                  params.append('view', 'map');
+                  router.push(`/search?${params.toString()}`);
+                }}
               />
-            </div>
 
-            {/* Floating Filters Modal */}
-            {showMapFilters && (
-              <>
-                {/* Backdrop */}
-                <div
-                  className="absolute inset-0 bg-black/20 backdrop-blur-sm z-10"
-                  onClick={() => setShowMapFilters(false)}
-                />
-
-                {/* Modal Card */}
-                <div className="absolute top-4 left-4 z-20 bg-white rounded-2xl shadow-2xl w-80 max-h-[calc(100%-2rem)] overflow-y-auto">
-                  <div className="p-6 space-y-5">
-                  {/* Filters Header */}
-                  <div className="flex items-center justify-between mb-4">
+              {/* Floating Filters Modal - Always Visible, below SearchBar */}
+              <div className="bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[calc(100vh-13rem)]">
+              <div className="p-6 space-y-5">
+                {/* Filters Header with Close button */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
                     <h2 className="text-xl font-black text-slate-900 tracking-tight">Filtry</h2>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={resetFilters}
-                        className={`text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 ${
-                          activeChips.length > 0
-                            ? 'text-emerald-600 hover:text-emerald-700'
-                            : 'text-slate-400 hover:text-emerald-600'
-                        }`}
-                      >
-                        Wyczyść
-                        {activeChips.length > 0 && (
-                          <span className="bg-emerald-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                            {activeChips.length}
-                          </span>
-                        )}
-                      </button>
-                      <button
-                        onClick={() => setShowMapFilters(false)}
-                        className="text-slate-400 hover:text-slate-900 transition-colors p-1"
-                        aria-label="Zamknij filtry"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
+                    {activeChips.length > 0 && (
+                      <span className="bg-emerald-600 text-white text-xs font-black px-2 py-0.5 rounded-full">
+                        {activeChips.length}
+                      </span>
+                    )}
                   </div>
+                  <button
+                    onClick={() => setShowLeftPanel(false)}
+                    className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                    title="Zamknij panel"
+                  >
+                    <svg className="w-5 h-5 text-slate-400 hover:text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Geolocation Section */}
+                <div className="pb-5 border-b border-slate-200">
+                  {/* Geolocation info when active */}
+                  {userLocation && (
+                    <div className="bg-emerald-50 border border-emerald-200 px-3 py-2.5 rounded-lg mb-3">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <p className="text-xs font-bold text-emerald-900">
+                          W promieniu {maxDistance}km od Ciebie
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Geolocation toggle button */}
+                  <button
+                    onClick={userLocation ? handleTurnOffGeolocation : handleGeolocation}
+                    disabled={isLoadingLocation}
+                    className={`w-full px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      userLocation
+                        ? 'bg-slate-600 hover:bg-slate-700 text-white'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    }`}
+                  >
+                    {isLoadingLocation ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                        <span>Wyszukiwanie...</span>
+                      </>
+                    ) : userLocation ? (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Wyłącz geolokalizację</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Szukaj blisko mnie</span>
+                      </>
+                    )}
+                  </button>
+                </div>
 
                   {/* Type Filter */}
                   <div>
@@ -1276,31 +1300,122 @@ export default function SearchResults({
                     </div>
                   )}
 
-                  {/* Price Filter */}
-                  {selectedType !== 'ŚDS' && (
+                  {/* Distance Filter - pokazuj zawsze (dla geolokalizacji lub searched city) */}
+                  {(userLocation || searchCenter) && (
                     <div>
                       <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                        Cena do: <span className="text-slate-900">{priceLimit} zł</span>
+                        {userLocation ? (
+                          <>Odległość: <span className="text-slate-900">do {maxDistance} km</span></>
+                        ) : searchCenter ? (
+                          <>Od {searchCenter.name}: <span className="text-slate-900">do {maxDistanceFromCity} km</span></>
+                        ) : (
+                          <>Odległość: <span className="text-slate-900">do {maxDistanceFromCity} km</span></>
+                        )}
                       </label>
                       <input
                         type="range"
-                        min="0"
-                        max="10000"
-                        step="100"
-                        value={priceLimit}
-                        onChange={(e) => setPriceLimit(parseInt(e.target.value))}
+                        min="5"
+                        max={maxDistanceFromServer}
+                        step="5"
+                        value={userLocation ? maxDistance : maxDistanceFromCity}
+                        onChange={(e) => {
+                          if (userLocation) {
+                            setMaxDistance(parseInt(e.target.value));
+                          } else {
+                            setMaxDistanceFromCity(parseInt(e.target.value));
+                          }
+                        }}
                         className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
                       />
                       <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
-                        <span>0 zł</span>
-                        <span>10000 zł</span>
+                        <span>5 km</span>
+                        <span>{maxDistanceFromServer} km</span>
                       </div>
                     </div>
                   )}
+
+                {/* Price Filter - Collapsible */}
+                {selectedType !== 'ŚDS' && (
+                  <div>
+                    <button
+                      onClick={() => setShowPriceExpanded(!showPriceExpanded)}
+                      className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
+                    >
+                      <span>Cena {priceLimit < 10000 && `(do ${priceLimit} zł)`}</span>
+                      <svg
+                        className={`w-4 h-4 transition-transform ${showPriceExpanded ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {showPriceExpanded && (
+                      <div>
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                          Cena do: <span className="text-slate-900">{priceLimit} zł</span>
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10000"
+                          step="100"
+                          value={priceLimit}
+                          onChange={(e) => setPriceLimit(parseInt(e.target.value))}
+                          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+                        />
+                        <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+                          <span>0 zł</span>
+                          <span>10000 zł</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
+                )}
+
+                {/* Reset filters button */}
+                <div className="pt-4 border-t border-slate-200">
+                  <button
+                    onClick={resetFilters}
+                    className="w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Wyczyść wszystkie filtry
+                  </button>
                 </div>
-              </>
-            )}
+              </div>
+            </div>
+            </div>
+          )}
+
+          {/* Back to List button - right side */}
+          <button
+            onClick={() => setShowMapMobile(false)}
+            className="absolute top-4 right-4 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            <span className="hidden md:inline">Lista</span>
+          </button>
+
+          {/* Content Area */}
+          <div className="h-full relative">
+            {/* Map */}
+            <div className="w-full h-full">
+              <FacilityMap
+                facilities={facilities}
+                userLocation={userLocation}
+                searchCenter={searchCenter}
+                powiatBreakdown={powiatBreakdown}
+                powiatSearchCenters={powiatSearchCenters}
+                selectedPowiat={selectedPowiat}
+                onPowiatClick={handlePowiatChange}
+              />
+            </div>
           </div>
         </div>
       )}
