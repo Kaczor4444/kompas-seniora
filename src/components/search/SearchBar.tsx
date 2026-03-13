@@ -25,6 +25,7 @@ interface SearchBarProps {
   compact?: boolean; // dla wersji na stronie wyników
   onQueryChange?: (query: string) => void; // callback when query changes
   disableAutocomplete?: boolean; // wyłącz dropdown na stronie wyników
+  onSearch?: (params: URLSearchParams) => void; // callback for search in map view
 }
 
 // Autocomplete Dropdown Component
@@ -114,6 +115,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   compact = false,
   onQueryChange,
   disableAutocomplete = false,
+  onSearch,
 }) => {
   const [cityInput, setCityInput] = useState(initialQuery);
   const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>(initialType);
@@ -213,7 +215,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     if (selectedType !== 'Wszystkie') {
       params.append('type', selectedType === 'DPS' ? 'dps' : 'sds');
     }
-    window.location.href = `/search?${params.toString()}`;
+
+    // Use callback if provided (map view), otherwise navigate
+    if (onSearch) {
+      onSearch(params);
+    } else {
+      window.location.href = `/search?${params.toString()}`;
+    }
   };
 
   const handleShowAllClick = () => {
@@ -269,7 +277,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     if (selectedType !== 'Wszystkie') {
       params.append('type', selectedType === 'DPS' ? 'dps' : 'sds');
     }
-    window.location.href = `/search?${params.toString()}`;
+
+    // Use callback if provided (map view), otherwise navigate
+    if (onSearch) {
+      onSearch(params);
+    } else {
+      window.location.href = `/search?${params.toString()}`;
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -371,7 +385,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       )}
 
       {/* Search bar */}
-      <div className="bg-slate-50 border border-slate-200 p-1.5 rounded-xl shadow-sm">
+      <div className={`${compact ? 'bg-white shadow-lg p-1' : 'bg-slate-50 border border-slate-200 shadow-sm p-1.5'} rounded-xl`}>
         <div className="bg-white border border-slate-200 rounded-lg flex items-stretch">
           {/* City input */}
           <div className="relative flex-1 group">
@@ -389,7 +403,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               enterKeyHint="search"
               autoComplete="off"
               spellCheck="false"
-              className="w-full bg-transparent py-4 pl-11 pr-4 text-sm font-bold text-slate-900 outline-none placeholder:text-slate-400 placeholder:font-medium"
+              className={`w-full bg-transparent ${compact ? 'py-2.5' : 'py-4'} pl-11 pr-4 text-sm font-bold text-slate-900 outline-none placeholder:text-slate-400 placeholder:font-medium`}
             />
             {isLoading && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -412,8 +426,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           {/* Search button */}
           <button
             onClick={handleSearchClick}
-            disabled={cityInput.length < 2 || validationState !== 'valid'}
-            className="bg-slate-900 hover:bg-emerald-700 text-white m-1.5 px-6 rounded-lg font-black text-[11px] uppercase tracking-[0.15em] transition-colors active:scale-95 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-900"
+            disabled={cityInput.length < 2 || (!disableAutocomplete && validationState !== 'valid')}
+            className={`bg-slate-900 hover:bg-emerald-700 text-white m-1.5 ${compact ? 'px-4 py-2' : 'px-6'} rounded-lg font-black text-[11px] uppercase tracking-[0.15em] transition-colors active:scale-95 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-900`}
           >
             Szukaj
           </button>

@@ -282,13 +282,8 @@ export default function FacilityMap({
     f => f.latitude && f.longitude
   );
 
-  if (facilitiesWithCoords.length === 0) {
-    return (
-      <div className="bg-gray-100 rounded-lg p-8 text-center">
-        <p className="text-gray-600">Brak danych geolokalizacyjnych dla tej placówki</p>
-      </div>
-    );
-  }
+  // Nie pokazuj komunikatu błędu - pozwól mapie być pustą
+  // (użytkownik może wpisać nowe miasto i zobaczyć wyniki)
 
   // Tryb wielu powiatów: pokazuj tylko punkty miejscowości (jeden per powiat)
   // ALE tylko gdy user NIE wybrał konkretnego powiatu z filtra
