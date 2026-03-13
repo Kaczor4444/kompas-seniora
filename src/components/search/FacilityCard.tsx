@@ -1,8 +1,7 @@
 // src/components/search/FacilityCard.tsx
-// ✅ FULLY RESPONSIVE - Mobile/Tablet/Desktop
+// ✅ SIMPLIFIED & FLATTENED - No image, compact layout
 import React from 'react';
-import Image from 'next/image';
-import { MapPin, Heart, ArrowLeftRight, Navigation } from 'lucide-react';
+import { MapPin, Heart, Navigation, ChevronRight, ArrowLeftRight } from 'lucide-react';
 import { estimateDriveTime } from '@/src/utils/distance';
 
 interface FacilityCardProps {
@@ -48,163 +47,147 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
       onMouseLeave={() => onHover(null)}
       onClick={onClick}
       className={`
-        group relative z-40
-        bg-white rounded-2xl sm:rounded-3xl
-        border-2 transition-all duration-200
+        group relative
+        bg-white rounded-xl
+        border transition-all duration-200
         cursor-pointer
-        flex flex-col sm:flex-row gap-4 sm:gap-6
-        p-4 sm:p-4
+        p-4
         ${isHovered
-          ? 'border-emerald-400 shadow-xl'
-          : 'border-gray-200 shadow-sm hover:shadow-lg hover:border-gray-300'
+          ? 'border-emerald-400 shadow-lg -translate-y-0.5'
+          : 'border-stone-200 shadow-sm hover:shadow-md hover:border-stone-300'
         }
       `}
     >
 
-      {/* Image - RESPONSIVE */}
-      <div className="relative w-full sm:w-[245px] h-48 sm:h-[195px] flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden bg-gray-100">
-        {/* Check if placeholder - show gradient + icon, otherwise show image */}
-        {facility.image.includes('placeholder') ? (
-          <div className={`
-            w-full h-full flex items-center justify-center transition-all duration-500
-            ${facility.type === 'DPS'
-              ? 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600'
-              : 'bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600'
-            }
-          `}>
-            <Image
-              src={facility.type === 'DPS' ? '/images/ikonka_dps.png' : '/images/ikonka_sds.png'}
-              alt={facility.type}
-              width={96}
-              height={96}
-              className="w-20 h-20 sm:w-24 sm:h-24 object-contain group-hover:scale-110 transition-transform duration-500"
-            />
-          </div>
-        ) : (
-          <img
-            src={facility.image}
-            alt={facility.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        )}
+      {/* Single compact layout - 2 rows max */}
+      <div className="space-y-2">
 
-        {/* Type Badge on Image */}
-        <div className="absolute bottom-3 right-3">
-          <span className={`
-            px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-bold backdrop-blur-sm
-            ${facility.type === 'DPS'
-              ? 'bg-emerald-500/90 text-white'
-              : 'bg-blue-500/90 text-white'
-            }
-          `}>
-            {facility.type}
-          </span>
-        </div>
-      </div>
+        {/* Row 1: Badge + Name + Price + Actions */}
+        <div className="flex items-start justify-between gap-4">
 
-      {/* Content */}
-      <div className="flex-1 min-w-0 flex flex-col justify-between py-1 sm:py-2">
-        
-        {/* Top Section */}
-        <div>
-          {/* Category Label */}
-          <div className="text-[10px] sm:text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1.5 sm:mb-2">
-            {facility.category}
-          </div>
-
-          {/* Title */}
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1.5 sm:mb-2 leading-tight group-hover:text-emerald-600 transition-colors line-clamp-2">
-            {facility.name}
-          </h3>
-
-          {/* Location */}
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-3">
-            <MapPin size={14} className="text-gray-400 flex-shrink-0" />
-            <span className="truncate">
-              {facility.street ? `${facility.street}, ` : ''}{facility.city}
+          {/* Left: Badge + Name */}
+          <div className="flex items-start gap-3 min-w-0 flex-1">
+            {/* Type Badge */}
+            <span className={`
+              flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider
+              ${facility.type === 'DPS'
+                ? 'bg-emerald-100 text-emerald-700'
+                : 'bg-blue-100 text-blue-700'
+              }
+            `}>
+              {facility.type}
             </span>
+
+            {/* Name */}
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight group-hover:text-emerald-600 transition-colors line-clamp-2 flex-1">
+              {facility.name}
+            </h3>
           </div>
 
-          {/* Distance Badge */}
-          {facility.distance !== null && facility.distance !== undefined && (
-            <div className="flex items-center gap-1.5 text-xs text-slate-700 font-semibold mb-3">
-              <Navigation size={14} className="flex-shrink-0" />
-              <span>
-                {facility.distance < 1
-                  ? `${Math.round(facility.distance * 1000)} m`
-                  : `${facility.distance.toFixed(1)} km (${estimateDriveTime(facility.distance)})`
-                }
-                {userLocation ? ' od Ciebie' : ''}
-              </span>
-            </div>
-          )}
-
-          {/* Profile Badges */}
-          {facility.profileLabels && facility.profileLabels.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {facility.profileLabels.map((label, idx) => (
-                <span
-                  key={idx}
-                  className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-slate-100 text-slate-700 text-[10px] sm:text-xs font-medium rounded-full"
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Bottom Section */}
-        <div className="flex flex-wrap items-end justify-between gap-3 min-w-0 pt-3 border-t border-gray-100">
-          
-          {/* Price */}
-          <div>
-            <div className="text-[9px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1 uppercase tracking-wide">Cena pobytu</div>
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">
-              {facility.price > 0 ? (
-                <>
-                  {facility.price} <span className="text-sm sm:text-base font-normal text-gray-500">zł</span>
-                </>
-              ) : (
-                <span className="text-emerald-600">NFZ</span>
+          {/* Right: Price + Actions */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {/* Price */}
+            <div className="text-right">
+              <div className="text-xl sm:text-2xl font-black text-slate-900">
+                {facility.price > 0 ? (
+                  <>
+                    {facility.price} <span className="text-sm font-medium text-slate-500">zł</span>
+                  </>
+                ) : (
+                  <span className="text-emerald-600">NFZ</span>
+                )}
+              </div>
+              {facility.price > 0 && (
+                <div className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">miesięcznie</div>
               )}
             </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2">
 
             {/* Compare Button */}
             <button
               onClick={onToggleCompare}
               className={`
-                p-2 sm:p-2.5 rounded-full transition-all
+                p-2 rounded-lg transition-all
                 ${isCompared
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-stone-100 text-slate-400 hover:bg-stone-200 hover:text-slate-600'
                 }
               `}
               aria-label={isCompared ? "Usuń z porównania" : "Dodaj do porównania"}
             >
-              <ArrowLeftRight size={18} className="sm:w-5 sm:h-5" />
+              <ArrowLeftRight size={18} />
             </button>
 
             {/* Save Button */}
             <button
               onClick={onToggleSave}
               className={`
-                p-2 sm:p-2.5 rounded-full transition-all
+                p-2 rounded-lg transition-all
                 ${isSaved
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-stone-100 text-slate-400 hover:bg-stone-200 hover:text-slate-600'
                 }
               `}
               aria-label={isSaved ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
             >
-              <Heart size={18} className={`sm:w-5 sm:h-5 ${isSaved ? 'fill-current' : ''}`} />
+              <Heart size={18} className={isSaved ? 'fill-current' : ''} />
             </button>
+
+            {/* Arrow indicator */}
+            <div className="text-slate-300 group-hover:text-emerald-600 transition-all group-hover:translate-x-1">
+              <ChevronRight size={24} strokeWidth={3} />
+            </div>
           </div>
         </div>
+
+        {/* Row 2: Address + Distance */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
+          {/* Address */}
+          <div className="flex items-center gap-1.5">
+            <MapPin size={14} className="text-slate-400 flex-shrink-0" />
+            <span className="font-medium">
+              {facility.street && `${facility.street}, `}{facility.city}
+            </span>
+          </div>
+
+          {/* Distance */}
+          {facility.distance !== null && facility.distance !== undefined && (
+            <>
+              <div className="text-slate-300">•</div>
+              <div className="flex items-center gap-1.5">
+                <Navigation size={14} className="text-slate-400 flex-shrink-0" />
+                <span className="font-semibold text-slate-700">
+                  {facility.distance < 1
+                    ? `${Math.round(facility.distance * 1000)} m`
+                    : `${facility.distance.toFixed(1)} km`
+                  }
+                  <span className="text-slate-500 font-normal">
+                    {facility.distance >= 1 && ` (${estimateDriveTime(facility.distance)})`}
+                  </span>
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Row 3: Profile Badges */}
+        {facility.profileLabels && facility.profileLabels.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {facility.profileLabels.slice(0, 3).map((label, idx) => (
+              <span
+                key={idx}
+                className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs font-medium rounded-md"
+              >
+                {label}
+              </span>
+            ))}
+            {facility.profileLabels.length > 3 && (
+              <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-medium rounded-md">
+                +{facility.profileLabels.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+
       </div>
     </div>
   );

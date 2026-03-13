@@ -48,6 +48,7 @@ interface SearchPageProps {
     type?: string;
     woj?: string;
     powiat?: string;
+    view?: 'list' | 'map';
     partial?: string;
     min?: string;
     max?: string;
@@ -75,6 +76,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params.q || '';
   const type = params.type || 'all';
+  const initialView = params.view || 'list';
 
   // Apply wojewodztwo mapping IMMEDIATELY (before any logic)
   const wojewodztwoRaw = params.woj || 'all';
@@ -317,13 +319,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // NOWA LOGIKA: Rozróżniamy czy user wybrał z dropdownu czy kliknął "Szukaj"
       let uniquePowiaty: string[];
 
-      // DEBUG
-      console.log('🔍 SERVER DEBUG:', {
-        query,
-        normalizedQuery,
-        powiatParam,
-        terytPowiats: terytPowiats.length,
-      });
 
       // Wstępne załadowanie placówek
       const allFacilities = await prisma.placowka.findMany({
@@ -376,59 +371,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         uniquePowiaty = [...new Set(mappedPowiaty.map(p => normalizePolish(p)))];
       }
 
-      // Filtruj placówki według wybranych powiatów
-      if (uniquePowiaty.length > 0) {
-        results = allFacilities.filter(facility => {
-          // ✅ MAPUJ nazwę powiatu z bazy (obsługa "Kraków" → "krakowski")
-          let facilityPowiat = facility.powiat;
-          const normFacilityPowiat = normalizePolish(facilityPowiat);
+      // ⚠️ NOWA LOGIKA: Zawsze zwracaj wszystkie z województwa gdy jest query
+      // Client-side będzie filtrował po powiecie i odległości slider
+      // To pozwala userowi dynamicznie zmieniać filtry bez re-fetchu
 
-          // Zmapuj miasta na prawach powiatu z BAZY na powiaty ziemskie
-          if (normFacilityPowiat === 'krakow') {
-            facilityPowiat = 'krakowski';
-          } else if (normFacilityPowiat === 'nowy sacz') {
-            facilityPowiat = 'nowosądecki';
-          } else if (normFacilityPowiat === 'tarnow') {
-            facilityPowiat = 'tarnowski';
-          }
-
-          const normalizedFacilityPowiat = normalizePolish(facilityPowiat);
-          const powiatMatches = uniquePowiaty.some(powiat => {
-            return normalizedFacilityPowiat.includes(powiat) || powiat.includes(normalizedFacilityPowiat);
-          });
-
-          // ✅ Nie pasuje do powiatu? Odrzuć
-          if (!powiatMatches) return false;
-
-          // ✅ Filtruj po miejscowości TYLKO gdy:
-          // 1. User wybrał konkretny powiat z autocomplete (powiatParam), LUB
-          // 2. Szukana miejscowość NIE jest miastem na prawach powiatu (Kraków, Nowy Sącz, Tarnów)
-
-          // Rozpoznaj miasta na prawach powiatu
-          const isCityCounty = ['krakow', 'nowy sacz', 'tarnow'].includes(normalizedQuery);
-
-          // DEBUG
-          if (normalizedQuery === 'krakow' && !powiatParam) {
-            console.log('🔍 DEBUG Kraków facility:', {
-              nazwa: facility.nazwa,
-              miejscowosc: facility.miejscowosc,
-              powiat: facility.powiat,
-              isCityCounty,
-              powiatParam,
-              willShow: isCityCounty
-            });
-          }
-
-          // Jeśli to miasto na prawach powiatu i user NIE wybrał konkretnej lokalizacji z dropdown,
-          // pokaż cały powiat (nie filtruj po miejscowości)
-          if (isCityCounty && !powiatParam) {
-            return true; // Pokaż wszystkie placówki z powiatu
-          }
-
-          // W pozostałych przypadkach filtruj po miejscowości
-          const normalizedFacilityCity = normalizePolish(facility.miejscowosc || '');
-          return normalizedFacilityCity.includes(normalizedQuery) || normalizedQuery.includes(normalizedFacilityCity);
-        });
+      // Zwróć wszystkie placówki z województwa
+      results = allFacilities.filter(facility => {
+        if (wojewodztwo !== 'all') {
+          const normalizedFacilityWoj = normalizePolish(facility.wojewodztwo);
+          const normalizedTargetWoj = normalizePolish(wojewodztwo);
+          return normalizedFacilityWoj === normalizedTargetWoj;
+        }
+        return true;
+      });
 
         // Policz rozkład placówek per powiat (dla banneru informacyjnego)
         if (!powiatParam && uniquePowiaty.length > 1) {
@@ -504,13 +459,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         } else {
           message = '';
         }
-      } else {
-        // Brak dopasowań TERYT
-        const searchType = isPartialSearch ? 'zawierających' : 'o nazwie';
-        const wojewodztwoInfo = wojewodztwo === 'all' ? 'w naszej bazie' : `w ${wojewodztwoName}`;
-        message = `Nie znaleźliśmy miejscowości ${searchType} "${query}" ${wojewodztwoInfo}. Spróbuj wpisać inną nazwę.`;
-      }
-
       } // koniec else (hasExactNameMatch)
     }
     // BEZ TERYT (fallback dla województw bez danych TERYT)
@@ -699,6 +647,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         maxPrice,
         showFree: showFree || undefined,
       }}
+      initialView={initialView}
     />
   );
 }

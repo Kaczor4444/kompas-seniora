@@ -345,31 +345,22 @@ export default function SearchResults({
     }
   }, []);
 
-  // Calculate distance from searched city for all facilities
+  // ===== FILTERING LOGIC (with distance calculation) =====
   useEffect(() => {
-    if (!searchCenter) return;
-
-    const resultsWithCityDistance = results.map(facility => {
-      if (!facility.latitude || !facility.longitude) {
-        return { ...facility, distanceFromCity: null };
+    // Step 1: Calculate distance from searched city for all facilities
+    let filtered = results.map(facility => {
+      // Add distanceFromCity if we have searchCenter
+      if (searchCenter && facility.latitude && facility.longitude) {
+        const dist = calculateDistance(
+          searchCenter.lat,
+          searchCenter.lng,
+          parseFloat(facility.latitude as any),
+          parseFloat(facility.longitude as any)
+        );
+        return { ...facility, distanceFromCity: dist };
       }
-
-      const dist = calculateDistance(
-        searchCenter.lat,
-        searchCenter.lng,
-        parseFloat(facility.latitude as any),
-        parseFloat(facility.longitude as any)
-      );
-
-      return { ...facility, distanceFromCity: dist };
+      return { ...facility, distanceFromCity: null };
     });
-
-    setFacilities(resultsWithCityDistance);
-  }, [searchCenter, results]);
-
-  // ===== FILTERING LOGIC =====
-  useEffect(() => {
-    let filtered = results;
 
     // ✅ If cityInput is completely empty (user cleared it), show no results
     // EXCEPT when using geolocation (userLocation is set)
@@ -470,15 +461,12 @@ export default function SearchResults({
     }
 
     // Distance from searched city filter (only when searchCenter exists)
-    // ✅ WYŁĄCZ dla miast na prawach powiatu (pokazujemy cały powiat)
-    const isCityCounty = ['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
-      query.toLowerCase().includes(city)
-    );
-
-    if (searchCenter && !userLocation && !isCityCounty) {
+    if (searchCenter && !userLocation) {
       filtered = filtered.filter(f => {
-        // Jeśli placówka nie ma współrzędnych, nie filtruj po odległości (pokaż ją)
-        if (f.distanceFromCity === null || f.distanceFromCity === undefined) return true;
+        // Jeśli placówka nie ma współrzędnych LUB distanceFromCity nie jest obliczony, ukryj ją
+        if (f.distanceFromCity === null || f.distanceFromCity === undefined) {
+          return false; // Ukryj placówki bez dystansu
+        }
         return f.distanceFromCity <= maxDistanceFromCity;
       });
     }
@@ -551,21 +539,26 @@ export default function SearchResults({
     s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'l');
 
   const handlePowiatChange = (powiat: string) => {
+    // ⚠️ NOWA LOGIKA: Server zawsze zwraca wszystkie z województwa gdy jest query
+    // Więc NIE TRZEBA nawigować - po prostu zmieniamy filtr client-side!
+
     if (powiat !== "Wszystkie") {
       const targetPowiat = normPowiat(powiat);
       const hasResults = results.some(f => normPowiat(f.powiat ?? '') === targetPowiat);
-      if (!hasResults) {
-        // Powiat not in current server results — navigate with BOTH query and powiat
-        // ✅ Zachowujemy query żeby dostać odpowiedni komunikat o braku wyników
+
+      // Jeśli NIE MA tego powiatu w results I NIE mamy query (np. tylko filtr powiat),
+      // to znaczy że trzeba fetchować
+      if (!hasResults && (!query || query.trim() === '')) {
         const params = new URLSearchParams();
-        if (query && query.trim() !== '') {
-          params.set('q', query);
-        }
         params.set('powiat', powiat);
         router.push(`/search?${params.toString()}`);
         return;
       }
+
+      // W przeciwnym razie - mamy już wszystkie placówki z województwa,
+      // więc po prostu filtrujemy client-side
     }
+
     setSelectedPowiat(powiat);
   };
 
