@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-03-09 (sesja #7 - geolokalizacja + test mode)
+> Ostatnia aktualizacja: 2026-03-16 (sesja #8 - weryfikacja z oficjalnym wykazem DPS)
 
 ---
 
@@ -53,6 +53,52 @@ const DEFAULT_RADIUS_KM = 50;    // Domyślny promień
 const MIN_RESULTS = 3;            // Próg auto-rozszerzenia
 const EXTENDED_RADIUS_KM = 100;  // Rozszerzony promień
 ```
+
+---
+
+### ✅ Weryfikacja z oficjalnym wykazem województwa (2026-03-16)
+
+**Problem:** Brak weryfikacji czy placówki w bazie są zgodne z oficjalnym rejestrem województwa.
+
+**Rozwiązanie:** Dodano pola weryfikacyjne do modelu `Placowka`:
+
+```prisma
+model Placowka {
+  // ...
+  oficjalne_id      Int?        // l.p. z oficjalnego wykazu wojewódzkiego
+  nazwa_oficjalna   String?     // Pełna nazwa z PDF (nazwa + adres)
+  // ...
+  @@index([oficjalne_id])
+}
+```
+
+**Źródło danych:** Wykaz DPS województwa małopolskiego (PDF z 18.02.2026)
+
+**Workflow:**
+1. ✅ Dodano pola `oficjalne_id` i `nazwa_oficjalna` do schematu
+2. ✅ Integracja w panelu admina (`/admin/placowki`)
+   - Formularz dodawania/edycji - zielona sekcja "Weryfikacja z oficjalnym wykazem"
+   - Kolumna "ID PDF" w tabeli (druga kolumna)
+   - Klikalne nagłówki do sortowania (ID bazy ↕ ID oficjalne)
+3. ✅ Automatyczne wypełnienie (skrypt `scripts/fill-dps-official-data.js`)
+   - 31 DPS auto-matched (pewne dopasowania po powiecie + ulicy)
+4. 🔄 Ręczne wypełnienie pozostałych (~49 DPS) - **W TRAKCIE**
+
+**Progress weryfikacji DPS:**
+- **36/85 DPS** wypełnione (42%)
+  - 31 automatycznie (skrypt)
+  - 5 ręcznie (l.p. 1-5)
+- **49/85 DPS** do uzupełnienia (58%)
+
+**Kluczowa koncepcja:**
+- `oficjalne_id` = **numer rejestru wojewódzkiego** (stały identyfikator)
+- `nazwa_oficjalna` = **pełna nazwa z adresem** (do weryfikacji zmian)
+- Ten sam `oficjalne_id` łączy dane z różnych źródeł (wykaz placówek, cennik, strony www)
+
+**Plany:**
+- [ ] Dokończyć weryfikację DPS (49 placówek)
+- [ ] Powtórzyć proces dla ŚDS (95 placówek)
+- [ ] Skrypt porównujący nowe wykazy z bazą (automatyczna detekcja zmian)
 
 ---
 

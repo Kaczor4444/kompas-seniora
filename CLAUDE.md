@@ -99,6 +99,15 @@ Główna tabela z placówkami opieki.
 - `profil_opieki` - CSV string (A, B, C...)
 - `latitude`, `longitude` - geolokalizacja (100% pokrycie)
 
+**Weryfikacja z oficjalnym wykazem (NEW - 2026-03-16):**
+- `oficjalne_id` - numer l.p. z oficjalnego wykazu wojewódzkiego (Int?)
+- `nazwa_oficjalna` - pełna nazwa z PDF (nazwa + adres + kod pocztowy) (String?)
+- **Status weryfikacji DPS**: 36/85 wypełnione (42%)
+  - Skrypt auto-fill: 31 DPS
+  - Ręcznie: 5 DPS (l.p. 1-5)
+  - Do uzupełnienia: 49 DPS
+- **Status weryfikacji ŚDS**: 0/95 wypełnione (0%) - planowane
+
 **Znane problemy danych:**
 - ⚠️ Możliwe trailing spaces w `powiat` i `miejscowosc`
 - ⚠️ Możliwe Unicode encoding issues (NFD vs NFC)
@@ -227,6 +236,47 @@ const mapCityCountyToPowiat = (powiat: string): string => {
 
 ---
 
+## 👨‍💼 PANEL ADMINA
+
+### Dostęp:
+- **URL**: `/admin/placowki`
+- **Auth**: Cookie-based (ADMIN_PASSWORD z .env)
+
+### Funkcje:
+1. **Lista placówek** z filtrowaniem:
+   - Wyszukiwanie (nazwa, miejscowość, ulica)
+   - Filtry: typ (DPS/ŚDS), województwo, status weryfikacji
+   - Geolokalizacja (tylko z GPS)
+   - **Sortowanie** (klikalne nagłówki):
+     - ID bazy danych ↕
+     - ID oficjalne (PDF) ↕
+
+2. **Dodawanie placówki** (`/admin/placowki/dodaj`)
+   - Pełny formularz z walidacją Zod
+   - Sekcja weryfikacji (oficjalne_id + nazwa_oficjalna)
+
+3. **Edycja placówki** (`/admin/placowki/[id]/edytuj`)
+   - Edycja wszystkich pól
+   - Zielona sekcja "Weryfikacja z oficjalnym wykazem województwa"
+
+4. **Eksport**:
+   - CSV (wszystkie dane)
+   - Template CSV (pusty szablon)
+
+### Kolumny tabeli:
+- ID (baza) - klikalne sortowanie
+- **ID PDF** (oficjalne_id) - klikalne sortowanie, zielony gdy wypełnione
+- Nazwa
+- Typ (DPS/ŚDS)
+- Ulica
+- Miejscowość
+- Powiat
+- Geo (ikona mapy)
+- Verified (ikona checkmark)
+- Akcje (edytuj/usuń)
+
+---
+
 ## 🚀 KOMENDY
 
 ```bash
@@ -262,7 +312,7 @@ cat .env | grep DATABASE_URL
 ### Ile rekordów w produkcji?
 ```bash
 npx prisma studio
-# Otwórz model "Placowka" → powinno być ~147
+# Otwórz model "Placowka" → powinno być 184 (89 DPS + 95 ŚDS)
 ```
 
 ### Test wyszukiwania
@@ -275,6 +325,12 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **4530199** (2026-03-16): feat: Weryfikacja z oficjalnym wykazem DPS i sortowanie w panelu admina
+  - Dodano `oficjalne_id` i `nazwa_oficjalna` do modelu Placowka
+  - Panel admina: kolumna "ID PDF", klikalne nagłówki sortowania
+  - Auto-fill: 31/85 DPS (skrypt `scripts/fill-dps-official-data.js`)
+  - Filtrowanie województw: frontend pokazuje tylko Małopolskie
+  - Poprawki cen: 2026→2025, ŚDS NULL=bezpłatnie
 - **bf33d05**: feat: Auto-select miejscowości (client + server fallback)
 - **b571c85**: fix: Czyszczenie SQLite (❌ TO BYŁA POMYŁKA - nie wpływa na aplikację!)
 - **4d3f973**: fix: Liczby placówek i filtry dla miast na prawach powiatu
@@ -291,4 +347,4 @@ npx prisma studio
 
 ---
 
-Ostatnia aktualizacja: 2026-03-01
+Ostatnia aktualizacja: 2026-03-16
