@@ -17,6 +17,8 @@ interface Placowka {
   longitude: number | null;
   verified: boolean;
   data_weryfikacji: string | null;
+  oficjalne_id: number | null;
+  nazwa_oficjalna: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -107,6 +109,10 @@ export default function ListaPlacowekPage() {
   const [verifiedFilter, setVerifiedFilter] = useState('');
   const [geoFilter, setGeoFilter] = useState(false);
 
+  // SORTING STATE
+  const [sortBy, setSortBy] = useState<'id' | 'oficjalne_id'>('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
   // Get unique wojewodztwa for dropdown
   const [wojewodztwa, setWojewodztwa] = useState<string[]>([]);
 
@@ -117,7 +123,7 @@ export default function ListaPlacowekPage() {
 
   useEffect(() => {
     fetchPlacowki();
-  }, [page, limit, search, typFilter, wojewodztwoFilter, verifiedFilter, geoFilter]);
+  }, [page, limit, search, typFilter, wojewodztwoFilter, verifiedFilter, geoFilter, sortBy, sortOrder]);
 
   const fetchWojewodztwa = async () => {
     try {
@@ -141,6 +147,8 @@ export default function ListaPlacowekPage() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
+        sortBy: sortBy,
+        sortOrder: sortOrder,
       });
 
       if (search) params.append('search', search);
@@ -203,9 +211,28 @@ export default function ListaPlacowekPage() {
   const activeFiltersCount = [search, typFilter, wojewodztwoFilter, verifiedFilter, geoFilter].filter(Boolean).length;
 
   // Apply geo filter client-side
-  const filteredPlacowki = geoFilter 
+  const filteredPlacowki = geoFilter
     ? placowki.filter(p => p.latitude && p.longitude)
     : placowki;
+
+  // Handle column header click for sorting
+  const handleSort = (field: 'id' | 'oficjalne_id') => {
+    if (sortBy === field) {
+      // Toggle sort order if clicking the same column
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new sort field and default to ascending
+      setSortBy(field);
+      setSortOrder('asc');
+    }
+    setPage(1);
+  };
+
+  // Render sort indicator
+  const SortIcon = ({ field }: { field: 'id' | 'oficjalne_id' }) => {
+    if (sortBy !== field) return <span className="text-gray-400 ml-1">↕</span>;
+    return <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>;
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -243,7 +270,7 @@ export default function ListaPlacowekPage() {
       </div>
 
       {/* SEARCH & FILTERS */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+      <div className="bg-white rounded-lg shadow-md p-4 mb-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div className="lg:col-span-2">
@@ -382,7 +409,24 @@ export default function ListaPlacowekPage() {
               <table className="min-w-max w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-16">ID</th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-16 cursor-pointer hover:bg-gray-100 select-none"
+                    onClick={() => handleSort('id')}
+                  >
+                    <div className="flex items-center">
+                      ID
+                      <SortIcon field="id" />
+                    </div>
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-20 cursor-pointer hover:bg-gray-100 select-none"
+                    onClick={() => handleSort('oficjalne_id')}
+                  >
+                    <div className="flex items-center">
+                      ID PDF
+                      <SortIcon field="oficjalne_id" />
+                    </div>
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase min-w-[250px]">Nazwa</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-24">Typ</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase min-w-[200px]">Ulica</th>
@@ -397,6 +441,13 @@ export default function ListaPlacowekPage() {
                 {filteredPlacowki.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50 group">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{p.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {p.oficjalne_id ? (
+                        <span className="text-emerald-700 font-medium">{p.oficjalne_id}</span>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-900">{p.nazwa}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs rounded-full ${

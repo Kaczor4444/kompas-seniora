@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 import SearchResults from '@/components/SearchResults';
 import { calculateDistance } from '@/src/utils/distance';
 
@@ -114,6 +115,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
     // Pobierz wszystkie placówki
     const allFacilities = await prisma.placowka.findMany({
+      where: getVoivodeshipFilter(),
       orderBy: { nazwa: 'asc' },
     });
 
@@ -206,6 +208,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   // TRYB 5: POWIAT ONLY (klik z mapy Małopolski)
   else if (!query && powiatParam && wojewodztwo === 'all') {
     const allFacilities = await prisma.placowka.findMany({
+      where: getVoivodeshipFilter(),
       orderBy: { nazwa: 'asc' },
     });
 
@@ -230,6 +233,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   // TRYB 4: WOJEWÓDZTWO ONLY (RegionModal)
   else if (!query && wojewodztwo !== 'all') {
     const allFacilities = await prisma.placowka.findMany({
+      where: getVoivodeshipFilter(),
       orderBy: { nazwa: 'asc' },
     });
 
@@ -322,6 +326,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       // Wstępne załadowanie placówek
       const allFacilities = await prisma.placowka.findMany({
+        where: getVoivodeshipFilter(),
         orderBy: { nazwa: 'asc' },
       });
 
@@ -465,6 +470,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     else {
       const wojewodztwoDbName = wojewodztwo;
       const allFacilities = await prisma.placowka.findMany({
+        where: getVoivodeshipFilter(),
         orderBy: { nazwa: 'asc' },
       });
 

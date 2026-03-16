@@ -1,6 +1,7 @@
 // app/api/teryt/suggest/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 
 // Funkcja normalizacji polskich znaków
 function normalizePolish(str: string): string {
@@ -149,6 +150,7 @@ export async function GET(request: NextRequest) {
 
           // Pobierz placówki TYLKO z daną miejscowością + powiatem
           const allFacilities = await prisma.placowka.findMany({
+            where: getVoivodeshipFilter(),
             select: { miejscowosc: true, powiat: true, typ_placowki: true }
           });
 
@@ -254,15 +256,15 @@ export async function GET(request: NextRequest) {
       console.log('  Mode: DIRECT (no TERYT)');
 
       // Pobierz wszystkie placówki
-      const where: any = {};
+      const typeFilter: any = {};
 
       // Filtr typu
       if (typ) {
-        where.typ_placowki = typ === 'DPS' ? 'DPS' : 'ŚDS';
+        typeFilter.typ_placowki = typ === 'DPS' ? 'DPS' : 'ŚDS';
       }
 
       const allFacilities = await prisma.placowka.findMany({
-        where,
+        where: getVoivodeshipFilter(typeFilter),
         select: {
           miejscowosc: true,
           wojewodztwo: true,

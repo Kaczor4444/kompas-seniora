@@ -71,7 +71,11 @@ const placowkaUpdateSchema = z.object({
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   profil_opieki: z.string().optional(),
-  
+
+  // Weryfikacja z oficjalnym wykazem PDF
+  oficjalne_id: z.number().int().positive().optional().nullable(),
+  nazwa_oficjalna: z.string().optional(),
+
   // Źródła
   zrodlo_dane: z.string().url().optional().or(z.literal('')),
   zrodlo_cena: z.string().url().optional().or(z.literal('')),
@@ -137,6 +141,10 @@ export async function PUT(
       latitude: placowkaData.latitude || null,
       longitude: placowkaData.longitude || null,
       profil_opieki: placowkaData.profil_opieki || null,
+
+      // ✨ Weryfikacja z oficjalnym wykazem PDF
+      oficjalne_id: placowkaData.oficjalne_id ?? null,
+      nazwa_oficjalna: placowkaData.nazwa_oficjalna || null,
 
       // Źródła - konwersja dat
       zrodlo_dane: placowkaData.zrodlo_dane || null,

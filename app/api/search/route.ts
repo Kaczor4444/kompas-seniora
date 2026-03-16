@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculateMatchScore } from '@/lib/teryt';
+import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 
 
 export async function GET(request: NextRequest) {
@@ -10,14 +11,14 @@ export async function GET(request: NextRequest) {
     const typ = searchParams.get('typ') || 'all';
 
     // Build type filter
-    const whereClause: any = {};
+    const typeFilter: any = {};
     if (typ !== 'all' && typ !== 'WSZYSTKIE') {
-      whereClause.typ_placowki = { contains: typ };
+      typeFilter.typ_placowki = { contains: typ };
     }
 
-    // Get all matching placówki
+    // Get all matching placówki (filtered by enabled voivodeships + type)
     const allPlacowki = await prisma.placowka.findMany({
-      where: whereClause,
+      where: getVoivodeshipFilter(typeFilter),
       select: {
         id: true,
         nazwa: true,
@@ -82,10 +83,10 @@ export async function GET(request: NextRequest) {
         const powiatsWithPlacowki = await Promise.all(
           matchedPowiaty.map(async (powiat) => {
             const count = await prisma.placowka.count({
-              where: {
-                ...whereClause,
+              where: getVoivodeshipFilter({
+                ...typeFilter,
                 powiat
-              }
+              })
             });
             return { powiat, count };
           })
@@ -96,10 +97,10 @@ export async function GET(request: NextRequest) {
         // If found placówki in ANY matching powiat, return those
         if (availablePowiaty.length > 0) {
           const placowkiInMatchedPowiaty = await prisma.placowka.findMany({
-            where: {
-              ...whereClause,
+            where: getVoivodeshipFilter({
+              ...typeFilter,
               powiat: { in: availablePowiaty.map(p => p.powiat) }
-            },
+            }),
             select: {
               id: true,
               nazwa: true,
@@ -138,7 +139,7 @@ export async function GET(request: NextRequest) {
         // No placówki in any matched powiat - suggest nearby powiaty
         const allPowiatsWithCounts = await prisma.placowka.groupBy({
           by: ['powiat'],
-          where: whereClause,
+          where: getVoivodeshipFilter(typeFilter),
           _count: { id: true }
         });
 

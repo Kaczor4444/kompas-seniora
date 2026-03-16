@@ -167,7 +167,13 @@ const EXTENDED_RADIUS_KM = 100;  // Rozszerzony promień
 - `gmina`, `powiat`, `wojewodztwo`
 - `rodzaj_miejscowosci` (RM): 01=wieś, 96=miasto na prawach powiatu, 98=miasto, 00=część/dzielnica
 - `teryt_sym`, `teryt_sympod` - identyfikatory TERYT
-- **Import:** Tylko główne miejscowości (RM=01,96,98) - 1,901 lokalizacji, pominięto 11,932 części (RM=00)
+- **⚠️ AKTUALNY STAN:** 13,831 lokalizacji (WSZYSTKIE miejscowości włącznie z RM=00)
+  - RM=00 (część/dzielnica): 10,606 (77%)
+  - RM=01 (wieś): 1,832
+  - RM=03 (osada): 1,179
+  - RM=96 (miasto PP): 63
+  - RM=98 (miasto): 4
+- **UWAGA:** Sesja #5 planowała filtrowanie do głównych miejscowości, ale to NIE zostało wykonane
 
 **`SharedList`** - udostępnione listy placówek przez token URL
 - `token` (unique), `ids` (string z przecinkami), `views`
@@ -275,7 +281,7 @@ Server Component - pobiera `totalFacilities` z Prisma (revalidacja co godzinę),
 
 - **"Doradca"**: CTA → `/asystent?start=true`
 
-**Trust Bar:** "Oficjalne dane BIP" | "36 Placówek Małopolski" | "Brak opłat i reklam" (grayscale → kolor na hover)
+**Trust Bar:** "Oficjalne dane BIP" | "180 Placówek Małopolski" (⚠️ hardcoded - trzeba zaktualizować) | "Brak opłat i reklam" (grayscale → kolor na hover)
 
 ---
 
@@ -549,7 +555,7 @@ Chroniony przez:
 - `/narzedzia/ocena-potrzeb` - "wkrótce"
 - Wiele artykułów MDX - "w przygotowaniu"
 - TERYT dla pozostałych województw
-- Trust Bar: hardkodowane "36 Placówek Małopolski"
+- Trust Bar: hardkodowane "180 Placówek Małopolski" (było "36" - nieaktualne)
 
 ### Znane problemy / technical debt
 - `typescript.ignoreBuildErrors: true` w next.config.mjs
@@ -558,6 +564,7 @@ Chroniony przez:
 - Pliki `.backup`, `.backup2` w repo
 - `typeFilter` potencjalnie niezdefiniowany w search/page.tsx fallback
 - Zdjęcia placówek: placeholder Unsplash, brak prawdziwych
+- **TERYT: 13,831 lokalizacji zamiast ~1,901** - baza zawiera WSZYSTKIE miejscowości (77% to RM=00 części/dzielnice), dokumentacja sesji #5 wspominała filtrowanie, ale nie zostało wykonane
 
 ---
 
@@ -592,6 +599,9 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 ## 16. HISTORIA ZMIAN (changelog sesji)
 
 ### Sesja #5 — 2026-02-20
+
+**⚠️ UWAGA:** Ta sesja opisuje planowane zmiany, ale **filtrowanie TERYT NIE zostało wykonane w produkcji**.
+Aktualnie baza zawiera 13,831 lokalizacji (wszystkie RM).
 
 **Temat:** Reimport TERYT z filtrowaniem RM (rodzaj miejscowości) - usunięcie "części" miejscowości z bazy TERYT.
 
@@ -830,6 +840,45 @@ Po wprowadzeniu poprawek, wszystkie następujące wyszukiwania powinny dawać te
 - `/search?powiat=m.+Kraków` (bez query) ✅
 - `/search?powiat=Kraków` (bez query) ✅
 - `/search?powiat=krakowski` (bez query) ✅
+
+---
+
+## 22. AKTUALNY STAN BAZY DANYCH (MARZEC 2026)
+
+### 📊 Podsumowanie statystyk
+
+**Placówki: 184 (wszystkie DPS i ŚDS z Małopolski)**
+- DPS: 89
+- ŚDS: 95
+- Województwa: Małopolskie (180), Śląskie (4)
+- Powiaty w Małopolsce: 21
+- Z ceną: 90 (49%)
+- Z geolokalizacją: 184 (100%)
+
+**Top 5 powiatów (Małopolska):**
+1. krakowski - 44 placówki
+2. tarnowski - 16 placówek
+3. wielicki - 11 placówek
+4. wadowicki - 10 placówek
+5. miechowski - 10 placówek
+
+**TERYT: 13,831 lokalizacji (WSZYSTKIE miejscowości Małopolski)**
+- RM=00 (część/dzielnica): 10,606 (77%)
+- RM=01 (wieś): 1,832
+- RM=03 (osada): 1,179
+- RM=96 (miasto na prawach powiatu): 63
+- RM=98 (miasto): 4
+- Inne: 147
+
+### ⚠️ Różnice z dokumentacją
+
+1. **Liczba placówek:** 184 (↑ z 147) - dodano wszystkie placówki z Małopolski
+2. **TERYT nie przefiltrowany:** Sesja #5 planowała filtrowanie do ~1,901 głównych miejscowości, ale to NIE zostało wykonane - baza ma WSZYSTKIE 13,831 lokalizacji
+3. **Trust Bar nieaktualny:** UI pokazuje "36 Placówek" - powinno być 180+
+
+### 🔄 Zaktualizowane pliki dokumentacji
+- `CLAUDE.md` - zaktualizowano statystyki
+- `PROJEKT_DOKUMENTACJA.md` - ten plik (sekcja 22 dodana marzec 2026)
 
 ---
 

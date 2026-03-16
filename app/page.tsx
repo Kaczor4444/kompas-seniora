@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 import HomeClient from '@/src/components/HomeClient';
 
 // 🔄 Revalidate every hour to keep data fresh
@@ -7,8 +8,11 @@ export const revalidate = 3600;
 export default async function Home() {
   // 📊 Fetch real-time facility count and per-powiat breakdown
   const [totalFacilities, allFacilities] = await Promise.all([
-    prisma.placowka.count(),
+    prisma.placowka.count({
+      where: getVoivodeshipFilter()
+    }),
     prisma.placowka.findMany({
+      where: getVoivodeshipFilter(),
       select: { powiat: true, miejscowosc: true }
     }),
   ]);

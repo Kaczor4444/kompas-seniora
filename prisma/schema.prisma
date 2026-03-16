@@ -38,6 +38,11 @@ model Placowka {
   notatki           String?
   zrodlo_cena       String?
   zrodlo_dane       String?
+
+  // ✨ WERYFIKACJA Z OFICJALNYM WYKAZEM PDF:
+  oficjalne_id      Int?               // l.p. z wykazu województwa (np. 1-91 dla DPS Małopolska)
+  nazwa_oficjalna   String?            // Dokładna nazwa z oficjalnego dokumentu
+
   analytics         PlacowkaAnalytics?
   events            PlacowkaEvent[]
   snapshots         PlacowkaSnapshot[]
@@ -46,6 +51,7 @@ model Placowka {
   @@index([powiat])
   @@index([wojewodztwo])
   @@index([typ_placowki])
+  @@index([oficjalne_id])
 }
 
 model TerytLocation {

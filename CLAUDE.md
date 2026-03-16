@@ -7,7 +7,13 @@
 
 - **Provider**: PostgreSQL (Neon)
 - **Połączenie**: `.env` → `DATABASE_URL`
-- **Total rekordów**: ~147 placówek (produkcja)
+- **Total rekordów**: **184 placówki** (produkcja, stan: marzec 2026)
+  - DPS: 89
+  - ŚDS: 95
+  - Małopolskie: 180
+  - Śląskie: 4
+  - Z ceną: 90 (49%)
+  - Z geolokalizacją: 184 (100%)
 - **SQLite (`prisma/dev.db`)**: NIEUŻYWANY - tylko stare testowe dane (36 rekordów)
 
 **Aby zmodyfikować dane produkcyjne:**
@@ -81,33 +87,42 @@ kompas-seniora/
 
 ### Główne tabele:
 
-#### `Placowka` (147 rekordów)
+#### `Placowka` (184 rekordy - wszystkie DPS i ŚDS z Małopolski)
 Główna tabela z placówkami opieki.
 
 **Kluczowe pola:**
 - `miejscowosc` - nazwa miasta/wsi
-- `powiat` - nazwa powiatu
+- `powiat` - nazwa powiatu (21 powiatów w Małopolsce)
 - `wojewodztwo` - województwo
 - `typ_placowki` - "DPS" lub "ŚDS"
-- `koszt_pobytu` - cena miesięczna
+- `koszt_pobytu` - cena miesięczna (49% ma cenę)
 - `profil_opieki` - CSV string (A, B, C...)
-- `latitude`, `longitude` - geolokalizacja
+- `latitude`, `longitude` - geolokalizacja (100% pokrycie)
 
 **Znane problemy danych:**
 - ⚠️ Możliwe trailing spaces w `powiat` i `miejscowosc`
 - ⚠️ Możliwe Unicode encoding issues (NFD vs NFC)
 - ⚠️ Niespójność nazw powiatów: "Kraków" vs "krakowski" vs "m. Kraków"
 
-#### `TerytLocation`
+#### `TerytLocation` (13,831 lokalizacji - WSZYSTKIE miejscowości Małopolski)
 Baza TERYT - miejscowości dla Małopolski i Śląskiego.
+
+**⚠️ UWAGA:** Baza zawiera WSZYSTKIE rodzaje miejscowości (również części/dzielnice RM=00).
+Dokumentacja wspominała filtrowanie do ~1,901 głównych miejscowości, ale **to NIE zostało wykonane**.
+
+**Statystyki:**
+- Wszystkie lokalizacje: 13,831
+- RM=00 (część/dzielnica): 10,606 (77%)
+- RM=01 (wieś): 1,832
+- RM=03 (osada): 1,179
+- RM=96 (miasto na prawach powiatu): 63
+- RM=98 (miasto): 4
+- Inne (02,04,05,07): 147
 
 **Pola:**
 - `nazwa_normalized` - bez polskich znaków
-- `rodzaj_miejscowosci` (RM):
-  - `01` = wieś
-  - `96` = miasto na prawach powiatu
-  - `98` = miasto
-  - `00` = część/dzielnica
+- `rodzaj_miejscowosci` (RM) - kluczowe dla filtrowania
+- `teryt_sym`, `teryt_sympod` - hierarchia TERYT
 
 #### Inne tabele:
 - `PlacowkaAnalytics` - statystyki wyświetleń

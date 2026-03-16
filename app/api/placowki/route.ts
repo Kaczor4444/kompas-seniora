@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma';
+import { ENABLED_VOIVODESHIPS, getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 
 // Funkcja normalizująca polskie znaki
 function normalizePolish(str: string): string {
@@ -31,9 +32,11 @@ export async function GET(request: NextRequest) {
 
     // Kombinacja search + type
     if (searchNormalized && type && type !== 'WSZYSTKIE') {
+      const wojewodztwaList = ENABLED_VOIVODESHIPS.map(w => `'${w}'`).join(',');
       placowki = await prisma.$queryRawUnsafe(`
-        SELECT * FROM Placowka 
-        WHERE (
+        SELECT * FROM "Placowka"
+        WHERE wojewodztwo IN (${wojewodztwaList})
+        AND (
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(miejscowosc, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(gmina, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(powiat, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
@@ -44,27 +47,33 @@ export async function GET(request: NextRequest) {
     } 
     // Tylko search, bez typu
     else if (searchNormalized) {
+      const wojewodztwaList = ENABLED_VOIVODESHIPS.map(w => `'${w}'`).join(',');
       placowki = await prisma.$queryRawUnsafe(`
-        SELECT * FROM Placowka
-        WHERE 
+        SELECT * FROM "Placowka"
+        WHERE wojewodztwo IN (${wojewodztwaList})
+        AND (
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(miejscowosc, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(gmina, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(powiat, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%' OR
           LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(nazwa, 'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z')) LIKE '%${searchNormalized}%'
+        )
         ORDER BY nazwa ASC
       `)
     } 
     // Tylko typ, bez search
     else if (type && type !== 'WSZYSTKIE') {
+      const wojewodztwaList = ENABLED_VOIVODESHIPS.map(w => `'${w}'`).join(',');
       placowki = await prisma.$queryRawUnsafe(`
-        SELECT * FROM Placowka 
-        WHERE typ_placowki = '${type}'
+        SELECT * FROM "Placowka"
+        WHERE wojewodztwo IN (${wojewodztwaList})
+        AND typ_placowki = '${type}'
         ORDER BY nazwa ASC
       `)
     }
     // Wszystkie
     else {
       placowki = await prisma.placowka.findMany({
+        where: getVoivodeshipFilter(),
         orderBy: { nazwa: 'asc' }
       })
     }

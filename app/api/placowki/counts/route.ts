@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 
 export async function GET() {
   try {
-    // Get all facilities
+    // Get all facilities (filtered by enabled voivodeships)
     const allFacilities = await prisma.placowka.findMany({
+      where: getVoivodeshipFilter(),
       select: {
         wojewodztwo: true,
       },

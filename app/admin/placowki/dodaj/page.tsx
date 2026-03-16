@@ -36,7 +36,11 @@ const placowkaSchema = z.object({
   latitude: z.coerce.number().nullable().optional(),
   longitude: z.coerce.number().nullable().optional(),
   profil_opieki: z.string().optional(),
-  
+
+  // Weryfikacja z oficjalnym wykazem PDF
+  oficjalne_id: z.coerce.number().int().positive().optional().nullable(),
+  nazwa_oficjalna: z.string().optional(),
+
   // Źródła
   zrodlo_dane: z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
   zrodlo_cena: z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
@@ -721,6 +725,51 @@ export default function DodajPlacowkePage() {
             Źródła danych i weryfikacja
           </h2>
           <div className="space-y-4">
+            {/* 🆕 Weryfikacja z oficjalnym wykazem PDF */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+              <h3 className="text-sm font-bold text-emerald-900 mb-3">
+                📄 Weryfikacja z oficjalnym wykazem województwa
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Oficjalne ID (l.p. z wykazu PDF)
+                  </label>
+                  <input
+                    type="number"
+                    {...register('oficjalne_id')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="np. 1, 2, 3..."
+                    min="1"
+                  />
+                  {errors.oficjalne_id && (
+                    <p className="mt-1 text-sm text-red-600">{errors.oficjalne_id.message}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    Numer z kolumny "l.p." w oficjalnym wykazie DPS/ŚDS
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Oficjalna nazwa (z wykazu PDF)
+                  </label>
+                  <input
+                    type="text"
+                    {...register('nazwa_oficjalna')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Dokładna nazwa z oficjalnego dokumentu"
+                  />
+                  {errors.nazwa_oficjalna && (
+                    <p className="mt-1 text-sm text-red-600">{errors.nazwa_oficjalna.message}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    Nazwa 1:1 z wykazu województwa (np. "Dom Pomocy Społecznej w...")
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

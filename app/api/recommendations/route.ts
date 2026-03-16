@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,13 +32,13 @@ export async function POST(req: NextRequest) {
 
     // Query 1: Try exact city match
     let facilities = await prisma.placowka.findMany({
-      where: {
+      where: getVoivodeshipFilter({
         typ_placowki: facilityType,
         miejscowosc: {
           contains: location,
           mode: 'insensitive'
         }
-      },
+      }),
       take: 10,
       orderBy: { koszt_pobytu: 'asc' }
     });
@@ -47,13 +48,13 @@ export async function POST(req: NextRequest) {
     // Query 2: If not found, try powiat match
     if (facilities.length === 0) {
       facilities = await prisma.placowka.findMany({
-        where: {
+        where: getVoivodeshipFilter({
           typ_placowki: facilityType,
           powiat: {
             contains: location,
             mode: 'insensitive'
           }
-        },
+        }),
         take: 10,
         orderBy: { koszt_pobytu: 'asc' }
       });
@@ -64,9 +65,9 @@ export async function POST(req: NextRequest) {
     // Query 3: If still not found, fallback to all facilities of this type
     if (facilities.length === 0) {
       facilities = await prisma.placowka.findMany({
-        where: {
+        where: getVoivodeshipFilter({
           typ_placowki: facilityType
-        },
+        }),
         take: 10,
         orderBy: { koszt_pobytu: 'asc' }
       });

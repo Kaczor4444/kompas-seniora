@@ -18,12 +18,17 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "25");
-    const sort = searchParams.get("sort") || "id";
-    const order = searchParams.get("order") || "desc";
+    const sortBy = searchParams.get("sortBy") || "id";
+    const sortOrder = searchParams.get("sortOrder") || "desc";
     const typ = searchParams.get("typ") || "";
     const wojewodztwo = searchParams.get("wojewodztwo") || "";
     const verified = searchParams.get("verified") || "";
     const search = searchParams.get("search") || "";
+
+    // Validate sortBy field
+    const validSortFields = ['id', 'oficjalne_id'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'id';
+    const sortDirection = (sortOrder === 'asc' || sortOrder === 'desc') ? sortOrder : 'desc';
 
     const skip = (page - 1) * limit;
 
@@ -50,7 +55,7 @@ export async function GET(request: NextRequest) {
       where,
       skip,
       take: limit,
-      orderBy: { [sort]: order },
+      orderBy: { [sortField]: sortDirection },
       select: {
         id: true,
         nazwa: true,
@@ -63,6 +68,8 @@ export async function GET(request: NextRequest) {
         longitude: true,
         verified: true,
         data_weryfikacji: true,
+        oficjalne_id: true,
+        nazwa_oficjalna: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -108,7 +115,11 @@ const placowkaSchema = z.object({
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   profil_opieki: z.string().optional(),
-  
+
+  // Weryfikacja z oficjalnym wykazem PDF
+  oficjalne_id: z.number().int().positive().optional().nullable(),
+  nazwa_oficjalna: z.string().optional(),
+
   // Źródła
   zrodlo_dane: z.string().url().optional().or(z.literal('')),
   zrodlo_cena: z.string().url().optional().or(z.literal('')),
@@ -176,6 +187,10 @@ export async function POST(request: NextRequest) {
       latitude: placowkaData.latitude || null,
       longitude: placowkaData.longitude || null,
       profil_opieki: placowkaData.profil_opieki || null,
+
+      // ✨ Weryfikacja z oficjalnym wykazem PDF
+      oficjalne_id: placowkaData.oficjalne_id ?? null,
+      nazwa_oficjalna: placowkaData.nazwa_oficjalna || null,
 
       // Źródła - konwersja dat
       zrodlo_dane: placowkaData.zrodlo_dane || null,

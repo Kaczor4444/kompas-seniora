@@ -245,9 +245,11 @@ export default function Navbar() {
                 {isOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
 
-              {/* Desktop logo */}
-              <Link href="/" className="hidden md:flex flex-shrink-0 items-center mr-4 group">
-                <NavbarLogo />
+              {/* Desktop logo - ze skalowaniem */}
+              <Link href="/" className="hidden md:flex flex-shrink-0 items-center md:mr-2 lg:mr-4 group">
+                <div className="md:scale-75 lg:scale-100 origin-left transition-transform">
+                  <NavbarLogo />
+                </div>
               </Link>
             </div>
 
@@ -256,8 +258,8 @@ export default function Navbar() {
               <NavbarLogo />
             </Link>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-1 lg:space-x-3 items-center mx-auto h-full">
+            {/* Desktop Menu - z responsywnym spacingiem */}
+            <div className="hidden md:flex md:space-x-0.5 lg:space-x-1 xl:space-x-3 items-center mx-auto h-full">
               <Link href="/search">
                 <NavLink isHighContrast={isHighContrast} icon={<Search size={18} />} text="Wyszukiwarka" isActive={isActive('/search')} />
               </Link>
@@ -288,14 +290,14 @@ export default function Navbar() {
               >
                 <Link
                   href="/poradniki"
-                  className={`flex items-center gap-2 font-bold transition-all px-4 py-2.5 rounded-xl relative z-10 group
+                  className={`flex items-center md:gap-1.5 lg:gap-2 font-bold transition-all md:px-2 lg:px-3 xl:px-4 md:py-1.5 lg:py-2 xl:py-2.5 rounded-xl relative z-10 group whitespace-nowrap
                   ${isHighContrast
                       ? (isActive('/poradniki') ? 'bg-yellow-400 text-black font-bold' : 'text-white hover:text-yellow-400')
                       : (isActive('/poradniki') ? 'bg-primary-100 text-primary-700 shadow-sm' : 'text-slate-600 hover:text-primary-700 hover:bg-stone-100')
                   }`}
                 >
                   <BookOpen size={18} className={`${isHighContrast ? '' : (isActive('/poradniki') ? 'text-primary-600' : 'text-primary-500')}`} />
-                  <span className="text-sm">Poradniki</span>
+                  <span className="md:text-xs lg:text-sm">Poradniki</span>
                   <ChevronDown size={14} className={`transition-transform duration-300 ${isGuidesHovered ? 'rotate-180' : ''}`} />
                 </Link>
 
@@ -341,15 +343,15 @@ export default function Navbar() {
 
               <Link
                 href="/kontakt"
-                className={`hidden md:flex items-center gap-2 transition-all rounded-xl
-                  px-4 py-2.5
+                className={`hidden md:flex items-center md:gap-1.5 lg:gap-2 transition-all rounded-xl
+                  md:px-2 lg:px-3 xl:px-4 md:py-1.5 lg:py-2 xl:py-2.5 whitespace-nowrap
                   ${isHighContrast
                     ? (isActive('/kontakt') ? 'bg-yellow-400 text-black' : 'text-yellow-400 hover:underline')
                     : (isActive('/kontakt') ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:text-primary-600 hover:bg-stone-50')
                   }`}
               >
-                <span className="flex items-center gap-2 font-black uppercase tracking-widest text-[11px]">
-                  <Mail size={16} />
+                <span className="flex items-center md:gap-1 lg:gap-2 font-black uppercase md:tracking-wider lg:tracking-widest md:text-[9px] lg:text-[11px]">
+                  <Mail size={16} className="md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
                   Kontakt
                 </span>
               </Link>
@@ -479,7 +481,7 @@ export default function Navbar() {
 }
 
 const NavLink = ({ icon, text, badge, isHighContrast, isActive }: { icon: React.ReactNode; text: string; badge?: string; isHighContrast: boolean; isActive?: boolean }) => (
-  <div className={`flex items-center gap-2.5 font-bold transition-all relative group px-4 py-2.5 rounded-xl text-sm
+  <div className={`flex items-center md:gap-1.5 lg:gap-2.5 font-bold transition-all relative group md:px-2 lg:px-3 xl:px-4 md:py-1.5 lg:py-2 xl:py-2.5 rounded-xl md:text-xs lg:text-sm whitespace-nowrap
     ${isHighContrast
       ? (isActive ? 'bg-yellow-400 text-black' : 'text-white hover:text-yellow-400')
       : (isActive ? 'bg-primary-100 text-primary-700 shadow-sm' : 'text-slate-600 hover:text-primary-700 hover:bg-stone-100')

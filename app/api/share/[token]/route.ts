@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 
 export async function GET(
   request: NextRequest,
@@ -27,9 +28,9 @@ export async function GET(
     const ids = sharedList.ids.split(',').map(id => parseInt(id, 10));
 
     const facilities = await prisma.placowka.findMany({
-      where: {
+      where: getVoivodeshipFilter({
         id: { in: ids }
-      }
+      })
     });
 
     return NextResponse.json({

@@ -31,17 +31,17 @@ Nie wpisane
 65 - dodany
 66 - dodany
 67 - dodano
-68-70 -  wszystko z Tarnowem od ulicy robotniczej doodad ten tez tar now - od tego zaczynamy
-71 .  Niema Tuchów 
-72- Żabno  jest powiat Dąbrowski a pownienn być tarnowski 
-73 Zakliczyn  jest pow myślenicki a powniene być tarnowski
-74 - Tuchów  brak w wyszukiwarce
-75 - brak Wietrzychowice  pow tarnowski
-76 -  Zakliczyn  jest pow myślenicki a powniene być tarnowski
-77 -  brak Mokre  pow tarnowski
-78- Tarnowiec  pow. Tarnowski - brak
-79 - Zakopane  niema powiatu Tatrzański 
-80 -  brak Białka Tatrzańska. Pow Tatrzański
+68-70 -  dodane
+71 . Dodane
+72- dodane
+73 dodane
+74 - dodane
+75 - dodane
+76 -  Zakliczyn  dodane ale brak w drop down
+77 -  dodane
+78- dodane
+79 - dodane
+80 -  dodane
 81  - dodane 
 82 -  dodana
 83 -  dodana
