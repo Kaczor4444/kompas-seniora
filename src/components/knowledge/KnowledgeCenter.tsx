@@ -15,6 +15,7 @@ type Article = {
   isPlaceholder: boolean
   isActive: boolean
   readingTime: string
+  imageUrl?: string
 }
 
 export default function KnowledgeCenter() {
@@ -34,9 +35,10 @@ export default function KnowledgeCenter() {
       category: 'Wybór opieki',
       badge: 'POLECAMY',
       href: '/poradniki/wybor-opieki/wybor-placowki',
-      isPlaceholder: true,
+      isPlaceholder: false,
       isActive: true,
-      readingTime: '7 min'
+      readingTime: '7 min',
+      imageUrl: '/images/senior_opiekunka.webp'
     },
     {
       id: 2,
@@ -47,7 +49,8 @@ export default function KnowledgeCenter() {
       href: '/poradniki/wybor-opieki/typy-dps',
       isPlaceholder: false,
       isActive: true,
-      readingTime: '6 min'
+      readingTime: '6 min',
+      imageUrl: '/images/seniorzy_puzle.webp'
     },
     {
       id: 3,
@@ -56,9 +59,10 @@ export default function KnowledgeCenter() {
       category: 'Wybór opieki',
       badge: 'NOWY ARTYKUŁ',
       href: '/poradniki/wybor-opieki/proces-przyjecia-dps',
-      isPlaceholder: true,
+      isPlaceholder: false,
       isActive: true,
-      readingTime: '10 min'
+      readingTime: '10 min',
+      imageUrl: '/images/seniorzy_ciasto.png'
     },
     {
       id: 4,
@@ -69,7 +73,8 @@ export default function KnowledgeCenter() {
       href: '/poradniki/finanse-prawne/koszty-opieki',
       isPlaceholder: false,
       isActive: false,
-      readingTime: '5 min'
+      readingTime: '5 min',
+      imageUrl: '/images/senior_obliczenia.webp'
     },
     {
       id: 5,
@@ -340,7 +345,7 @@ export default function KnowledgeCenter() {
                   ) : (
                     <div className="relative h-36 overflow-hidden">
                       <img
-                        src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
+                        src={article.imageUrl || "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"}
                         alt={article.title}
                         className="w-full h-full object-cover"
                       />
