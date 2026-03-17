@@ -297,11 +297,12 @@ export default function FacilityMap({
       }).filter(Boolean) as Array<{ powiat: string; count: number; facility: Facility }>
     : [];
 
-  // Gdy user wybrał konkretny powiat, użyj geolokalizacji miejscowości dla tego powiatu
-  const effectiveSearchCenter = selectedPowiat !== "Wszystkie" && powiatSearchCenters && searchCenter
-    ? (powiatSearchCenters[selectedPowiat]
-        ? { ...powiatSearchCenters[selectedPowiat], name: searchCenter.name }
-        : searchCenter)
+  // ✅ Logika wyboru searchCenter:
+  // 1. Jeśli powiatSearchCenters[selectedPowiat] istnieje → miejscowość w wielu powiatach → używaj go
+  //    (umożliwia client-side zmianę powiatu bez reload)
+  // 2. W przeciwnym razie użyj searchCenter z servera (geokodowany dokładnie dla URL powiatu)
+  const effectiveSearchCenter = selectedPowiat !== "Wszystkie" && powiatSearchCenters?.[selectedPowiat]
+    ? { ...powiatSearchCenters[selectedPowiat], name: searchCenter?.name || selectedPowiat }
     : searchCenter;
 
   const center: [number, number] = [50.0647, 19.9450];

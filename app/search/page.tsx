@@ -341,23 +341,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           }
         }
 
-        // 2. Współrzędne dla wszystkich powiatów - ZAWSZE gdy miejscowość w wielu powiatach
+        // 2. Współrzędne dla wszystkich powiatów - GEOKODUJ miejscowość w każdym powiecie
         // To pozwala client-side dynamicznie zmieniać pulsujący punkt gdy user zmienia filtr powiatu
+        // Używamy geocodeCity() zamiast współrzędnych pierwszej placówki (bo Zarzecze to nie placówka!)
         if (terytPowiats && terytPowiats.length > 1) {
-          for (const terytPowiat of terytPowiats) {
+          // Geokoduj równolegle dla wszystkich powiatów (cache przez Next.js revalidate)
+          const geocodePromises = terytPowiats.map(async (terytPowiat) => {
             const mappedPowiat = mapCityCountyToPowiat(terytPowiat);
-            const normalizedPowiat = normalizePolish(mappedPowiat);
+            const coords = await geocodeCity(
+              query,
+              mappedPowiat,
+              wojewodztwo !== 'all' ? wojewodztwo : undefined
+            );
+            return { powiat: mappedPowiat, coords };
+          });
 
-            const firstFacilityInPowiat = results.find(f => {
-              const facilityPowiat = normalizePolish(mapCityCountyToPowiat(f.powiat));
-              return facilityPowiat === normalizedPowiat && f.latitude && f.longitude;
-            });
+          const geocodedPowiats = await Promise.all(geocodePromises);
 
-            if (firstFacilityInPowiat) {
-              powiatSearchCenters[mappedPowiat] = {
-                lat: parseFloat(firstFacilityInPowiat.latitude),
-                lng: parseFloat(firstFacilityInPowiat.longitude)
-              };
+          for (const { powiat, coords } of geocodedPowiats) {
+            if (coords) {
+              powiatSearchCenters[powiat] = coords;
             }
           }
         }
