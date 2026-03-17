@@ -1136,6 +1136,13 @@ export default function SearchResults({
                 onSearch={(params) => {
                   // Stay in map view after search - add view=map parameter
                   params.append('view', 'map');
+
+                  // CRITICAL FIX: Przekaż aktualnie wybrany powiat do URL
+                  // Aby server geokodował właściwą miejscowość w wybranym powiecie
+                  if (selectedPowiat !== "Wszystkie") {
+                    params.append('powiat', selectedPowiat);
+                  }
+
                   router.push(`/search?${params.toString()}`);
                 }}
               />
