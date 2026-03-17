@@ -329,16 +329,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         return true;
       });
 
-        // ✅ ZAWSZE twórz powiatSearchCenters gdy miejscowość istnieje w wielu powiatach
-        // To pozwala client-side zmieniać pulsujący punkt gdy user zmienia powiat z filtra
-        if (terytPowiats && terytPowiats.length > 1) {
-          // Policz rozkład placówek per powiat
+        // ✅ ROZDZIELENIE LOGIKI:
+        // 1. powiatBreakdown - TYLKO gdy user NIE wybrał konkretnego powiatu (dla banneru informacyjnego)
+        // 2. powiatSearchCenters - ZAWSZE gdy miejscowość w wielu powiatach (dla client-side zmiany powiatu)
+
+        // 1. Banner informacyjny - tylko gdy user nie wybrał konkretnego powiatu
+        if (!powiatParam && uniquePowiaty.length > 1) {
           for (const facility of results) {
             const powiat = facility.powiat;
             powiatBreakdown[powiat] = (powiatBreakdown[powiat] || 0) + 1;
           }
+        }
 
-          // Dla każdego powiatu z TERYT - znajdź współrzędne pierwszej placówki
+        // 2. Współrzędne dla wszystkich powiatów - ZAWSZE gdy miejscowość w wielu powiatach
+        // To pozwala client-side dynamicznie zmieniać pulsujący punkt gdy user zmienia filtr powiatu
+        if (terytPowiats && terytPowiats.length > 1) {
           for (const terytPowiat of terytPowiats) {
             const mappedPowiat = mapCityCountyToPowiat(terytPowiat);
             const normalizedPowiat = normalizePolish(mappedPowiat);
