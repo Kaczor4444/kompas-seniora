@@ -327,13 +327,20 @@ export default function SearchResults({
 
   // ===== FILTERING LOGIC (with distance calculation) =====
   useEffect(() => {
+    // ✅ Calculate effectiveSearchCenter - same logic as FacilityMap.tsx
+    // When user changes county dropdown (selectedPowiat), use geocoded coordinates for that county
+    // This ensures distance calculations match the pulsating point on the map
+    const effectiveSearchCenter = selectedPowiat !== "Wszystkie" && powiatSearchCenters?.[selectedPowiat]
+      ? { ...powiatSearchCenters[selectedPowiat], name: searchCenter?.name || selectedPowiat }
+      : searchCenter;
+
     // Step 1: Calculate distance from searched city for all facilities
     let filtered = results.map(facility => {
-      // Add distanceFromCity if we have searchCenter
-      if (searchCenter && facility.latitude && facility.longitude) {
+      // Add distanceFromCity if we have effectiveSearchCenter
+      if (effectiveSearchCenter && facility.latitude && facility.longitude) {
         const dist = calculateDistance(
-          searchCenter.lat,
-          searchCenter.lng,
+          effectiveSearchCenter.lat,  // ✅ Use effectiveSearchCenter instead of searchCenter
+          effectiveSearchCenter.lng,
           parseFloat(facility.latitude as any),
           parseFloat(facility.longitude as any)
         );
@@ -495,7 +502,7 @@ export default function SearchResults({
     }
   }, [
     results, selectedType, cityInput, selectedVoivodeship, selectedPowiat,
-    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, sortParam, trackEmptyResults, trackFilterApplied
+    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, powiatSearchCenters, sortParam, trackEmptyResults, trackFilterApplied
   ]);
 
   // Scroll depth tracking
