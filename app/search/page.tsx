@@ -1,11 +1,19 @@
 import { prisma } from '@/lib/prisma';
-import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { getVoivodeshipFilter, ENABLED_VOIVODESHIPS } from '@/lib/voivodeship-filter';
 import { normalizePolish } from '@/lib/normalize-polish';
 import { mapCityCountyToPowiat } from '@/lib/city-county-mapping';
 import SearchResults from '@/components/SearchResults';
 import { calculateDistance } from '@/src/utils/distance';
 
-async function geocodeCity(cityName: string, powiat?: string, woj?: string): Promise<{ lat: number; lng: number } | null> {
+// Geocoding result with out-of-region detection
+interface GeocodingResult {
+  lat: number;
+  lng: number;
+  state?: string; // Nominatim address.state (województwo)
+  outOfRegion?: boolean; // true jeśli miasto poza obsługiwanymi województwami
+}
+
+async function geocodeCity(cityName: string, powiat?: string, woj?: string): Promise<GeocodingResult | null> {
   try {
     // Buduj zapytanie z kontekstem powiatu/województwa żeby Nominatim znalazł właściwą miejscowość
     let queryParts = [cityName];
@@ -15,13 +23,30 @@ async function geocodeCity(cityName: string, powiat?: string, woj?: string): Pro
 
     const encoded = encodeURIComponent(queryParts.join(', '));
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encoded}&countrycodes=pl&limit=1&format=json`,
+      `https://nominatim.openstreetmap.org/search?q=${encoded}&countrycodes=pl&limit=1&format=json&addressdetails=1`,
       { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 } }
     );
     if (!res.ok) return null;
     const data = await res.json();
     if (!data.length) return null;
-    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+
+    const result = data[0];
+    const state = result.address?.state; // Województwo (np. "Małopolskie", "Mazowieckie")
+
+    // Sprawdź czy województwo jest w ENABLED_VOIVODESHIPS
+    let outOfRegion = false;
+    if (state) {
+      const normalizedState = normalizePolish(state).toLowerCase();
+      const enabledNormalized = ENABLED_VOIVODESHIPS.map(v => normalizePolish(v).toLowerCase());
+      outOfRegion = !enabledNormalized.includes(normalizedState);
+    }
+
+    return {
+      lat: parseFloat(result.lat),
+      lng: parseFloat(result.lon),
+      state,
+      outOfRegion
+    };
   } catch {
     return null;
   }

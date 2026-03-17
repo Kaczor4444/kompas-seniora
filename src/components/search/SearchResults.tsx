@@ -84,7 +84,13 @@ interface SearchResultsProps {
   message: string;
   activeFilters?: ActiveFilters;
   userLocation?: { lat: number; lng: number };
-  searchCenter?: { lat: number; lng: number; name: string };
+  searchCenter?: {
+    lat: number;
+    lng: number;
+    name: string;
+    state?: string; // Województwo z Nominatim
+    outOfRegion?: boolean; // true jeśli miasto poza obsługiwanymi województwami
+  };
   terytPowiats?: string[];
   powiatBreakdown?: Record<string, number>;
   powiatSearchCenters?: Record<string, { lat: number; lng: number }>;
@@ -1025,7 +1031,12 @@ export default function SearchResults({
                   <p className="text-slate-400 text-sm">Przykłady: Kraków, Tarnów, Nowy Sącz, Zakopane</p>
                 </div>
               ) : facilities.length === 0 ? (
-                <EmptyState onResetFilters={resetFilters} cityInput={cityInput} />
+                <EmptyState
+                  onResetFilters={resetFilters}
+                  cityInput={cityInput}
+                  outOfRegion={searchCenter?.outOfRegion}
+                  outOfRegionCityName={searchCenter?.name}
+                />
               ) : (
                 <>
                   {facilities.slice(0, visibleCount).map(fac => (
