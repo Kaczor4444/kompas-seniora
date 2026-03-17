@@ -307,8 +307,18 @@ export default function SearchResults({
       setPriceLimit(10000);
       setMaxDistance(maxDistanceFromServer);
       setMaxDistanceFromCity(maxDistanceFromServer);
+
+      // ✅ Navigate to clear searchCenter and reset map (hide pulsating point)
+      const viewParam = showMapMobile ? 'view=map' : '';
+      if (userLocation) {
+        // Keep geolocation active, just remove city search
+        router.push(`/search?lat=${userLocation.lat}&lng=${userLocation.lng}&near=true${viewParam ? '&' + viewParam : ''}`);
+      } else {
+        // Go back to empty search (no pulsating point, default map center)
+        router.push(`/search${viewParam ? '?' + viewParam : ''}`);
+      }
     }
-  }, [currentQuery, maxDistanceFromServer]);
+  }, [currentQuery, maxDistanceFromServer, showMapMobile, userLocation, router]);
 
   // Load favorites on mount
   useEffect(() => {
