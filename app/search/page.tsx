@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { normalizePolish } from '@/lib/normalize-polish';
+import { mapCityCountyToPowiat } from '@/lib/city-county-mapping';
 import SearchResults from '@/components/SearchResults';
 import { calculateDistance } from '@/src/utils/distance';
 
@@ -62,17 +64,6 @@ interface SearchPageProps {
   }>;
 }
 
-// Normalizacja polskich znaków
-function normalizePolish(str: string): string {
-  return str
-    .trim()
-    .toLowerCase()
-    .replace(/ł/g, 'l')
-    .replace(/Ł/g, 'l')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
-
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params.q || '';
@@ -105,6 +96,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   let powiatBreakdown: Record<string, number> = {};
   let powiatSearchCenters: Record<string, { lat: number; lng: number }> = {};
 
+  // 🔧 OPTYMALIZACJA: Pobierz wszystkie placówki RAZ (zamiast 5x w różnych trybach)
+  const allFacilities = await prisma.placowka.findMany({
+    where: getVoivodeshipFilter(),
+    orderBy: { nazwa: 'asc' },
+  });
+
   // TRYB 3: GEOLOCATION SEARCH
   if (isNearSearch && userLat && userLng && !query) {
     // ⚠️ ZMIENIONO: 50km → 30km (50km dawało 60 placówek dla Krakowa = za dużo)
@@ -112,12 +109,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const DEFAULT_RADIUS_KM = 30;
     const MIN_RESULTS = 3;
     const EXTENDED_RADIUS_KM = 50; // Zmniejszono też extended: 100km → 50km
-
-    // Pobierz wszystkie placówki
-    const allFacilities = await prisma.placowka.findMany({
-      where: getVoivodeshipFilter(),
-      orderBy: { nazwa: 'asc' },
-    });
 
     // Oblicz dystanse dla wszystkich placówek
     const facilitiesWithDistance = allFacilities.map(facility => {
@@ -207,22 +198,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   }
   // TRYB 5: POWIAT ONLY (klik z mapy Małopolski)
   else if (!query && powiatParam && wojewodztwo === 'all') {
-    const allFacilities = await prisma.placowka.findMany({
-      where: getVoivodeshipFilter(),
-      orderBy: { nazwa: 'asc' },
-    });
-
     // Apply city county mapping before filtering
-    let mappedPowiat = powiatParam;
-    const normalized = normalizePolish(powiatParam);
-    if (normalized === 'm. krakow' || normalized === 'krakow') {
-      mappedPowiat = 'krakowski';
-    } else if (normalized === 'm. nowy sacz' || normalized === 'nowy sacz') {
-      mappedPowiat = 'nowosądecki';
-    } else if (normalized === 'm. tarnow' || normalized === 'tarnow') {
-      mappedPowiat = 'tarnowski';
-    }
-
+    const mappedPowiat = mapCityCountyToPowiat(powiatParam);
     const normalizedTarget = normalizePolish(mappedPowiat);
     results = allFacilities.filter(facility => {
       const normalizedFacilityPowiat = normalizePolish(facility.powiat);
@@ -232,11 +209,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   }
   // TRYB 4: WOJEWÓDZTWO ONLY (RegionModal)
   else if (!query && wojewodztwo !== 'all') {
-    const allFacilities = await prisma.placowka.findMany({
-      where: getVoivodeshipFilter(),
-      orderBy: { nazwa: 'asc' },
-    });
-
     results = allFacilities.filter(facility => {
       const normalizedFacilityWoj = normalizePolish(facility.wojewodztwo);
       const normalizedTargetWoj = normalizePolish(wojewodztwo);
@@ -323,33 +295,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // NOWA LOGIKA: Rozróżniamy czy user wybrał z dropdownu czy kliknął "Szukaj"
       let uniquePowiaty: string[];
 
-
-      // Wstępne załadowanie placówek
-      const allFacilities = await prisma.placowka.findMany({
-        where: getVoivodeshipFilter(),
-        orderBy: { nazwa: 'asc' },
-      });
-
       if (powiatParam) {
         // User WYBRAŁ konkretny powiat z dropdownu → użyj tylko tego
         // MAPOWANIE: "m. Kraków" / "Kraków" (TERYT/dropdown) → "krakowski" (baza placówek)
         // Analogicznie dla innych miast na prawach powiatu
-        let mappedPowiat = powiatParam;
-        const normalized = normalizePolish(powiatParam);
-
-        // Kraków: "m. Kraków", "Kraków", "krakowski" → "krakowski"
-        if (normalized === 'm. krakow' || normalized === 'krakow' || normalized === 'krakowski') {
-          mappedPowiat = 'krakowski';
-        }
-        // Nowy Sącz: "m. Nowy Sącz", "Nowy Sącz" → "nowosądecki"
-        else if (normalized === 'm. nowy sacz' || normalized === 'nowy sacz') {
-          mappedPowiat = 'nowosądecki';
-        }
-        // Tarnów: "m. Tarnów", "Tarnów" → "tarnowski"
-        else if (normalized === 'm. tarnow' || normalized === 'tarnow') {
-          mappedPowiat = 'tarnowski';
-        }
-
+        const mappedPowiat = mapCityCountyToPowiat(powiatParam);
         uniquePowiaty = [normalizePolish(mappedPowiat)];
       } else {
         // ✅ OPCJA 1b: User WPISAŁ i kliknął "Szukaj" bez wyboru → pokaż TYLKO powiaty z GŁÓWNYCH miejscowości
@@ -360,18 +310,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         // Mapuj powiaty z TERYT na powiaty w bazie placówek (miasta na prawach powiatu)
         const terytPowiaty = [...new Set(mainTerytMatches.map((t: any) => t.powiat))];
-        const mappedPowiaty = terytPowiaty.map(powiat => {
-          const normalized = normalizePolish(powiat);
-
-          // Kraków: "m. Kraków" lub "Miasto Kraków" → "krakowski"
-          if (normalized === 'm. krakow' || normalized === 'miasto krakow') return 'krakowski';
-          // Nowy Sącz: "m. Nowy Sącz" lub "Miasto Nowy Sącz" → "nowosądecki"
-          if (normalized === 'm. nowy sacz' || normalized === 'miasto nowy sacz') return 'nowosądecki';
-          // Tarnów: "m. Tarnów" lub "Miasto Tarnów" → "tarnowski"
-          if (normalized === 'm. tarnow' || normalized === 'miasto tarnow') return 'tarnowski';
-
-          return powiat; // bez zmian dla innych powiatów
-        });
+        const mappedPowiaty = terytPowiaty.map(mapCityCountyToPowiat);
 
         uniquePowiaty = [...new Set(mappedPowiaty.map(p => normalizePolish(p)))];
       }
@@ -469,10 +408,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     // BEZ TERYT (fallback dla województw bez danych TERYT)
     else {
       const wojewodztwoDbName = wojewodztwo;
-      const allFacilities = await prisma.placowka.findMany({
-        where: getVoivodeshipFilter(),
-        orderBy: { nazwa: 'asc' },
-      });
 
       results = allFacilities.filter(facility => {
         if (wojewodztwo !== 'all') {

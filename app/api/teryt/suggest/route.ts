@@ -2,17 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
-
-// Funkcja normalizacji polskich znaków
-function normalizePolish(str: string): string {
-  return str
-    .trim() // 🆕 Usuń trailing/leading spaces
-    .toLowerCase()
-    .replace(/ł/g, 'l')
-    .replace(/Ł/g, 'l')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
+import { normalizePolish } from '@/lib/normalize-polish';
+import { mapCityCountyToPowiat } from '@/lib/city-county-mapping';
 
 export async function GET(request: NextRequest) {
   try {
@@ -129,83 +120,79 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      // 2. Dla każdej lokalizacji TERYT - sprawdź liczbę placówek
-      const suggestionsWithCount = await Promise.all(
-        terytMatches.map(async (loc) => {
-          const normalizedMiejscowosc = normalizePolish(loc.nazwa);
+      // 🔧 FIX N+1: Pobierz wszystkie placówki RAZ (przed pętlą)
+      const allFacilities = await prisma.placowka.findMany({
+        where: getVoivodeshipFilter(),
+        select: { miejscowosc: true, powiat: true, typ_placowki: true }
+      });
 
-          // 🔧 Mapowanie powiatów TERYT → baza placówek
-          // Miasta na prawach powiatu: "m. Kraków" → "krakowski", etc.
-          const mapTerytPowiatToDb = (terytPowiat: string): string => {
-            const normalized = normalizePolish(terytPowiat);
-            // Obsługa wariantów: "m. Kraków", "Miasto Kraków" → "krakowski"
-            if (normalized === 'm. krakow' || normalized === 'miasto krakow') return 'krakowski';
-            if (normalized === 'm. nowy sacz' || normalized === 'miasto nowy sacz') return 'nowosądecki';
-            if (normalized === 'm. tarnow' || normalized === 'miasto tarnow') return 'tarnowski';
-            return terytPowiat;
-          };
+      // 🔧 FIX N+1: Dla RM=00 - pobierz wszystkie parent locations RAZ
+      const sympodIds = terytMatches
+        .filter(loc => loc.rodzaj_miejscowosci === '00' && loc.teryt_sympod)
+        .map(loc => loc.teryt_sympod!);
 
-          const dbPowiat = mapTerytPowiatToDb(loc.powiat);
-          const normalizedPowiat = normalizePolish(dbPowiat);
+      const parentLocations = sympodIds.length > 0
+        ? await prisma.terytLocation.findMany({
+            where: { teryt_sym: { in: sympodIds } },
+            select: { teryt_sym: true, nazwa: true }
+          })
+        : [];
 
-          // Pobierz placówki TYLKO z daną miejscowością + powiatem
-          const allFacilities = await prisma.placowka.findMany({
-            where: getVoivodeshipFilter(),
-            select: { miejscowosc: true, powiat: true, typ_placowki: true }
-          });
-
-          // 🔧 FIX: Filtruj po MIEJSCOWOŚCI + POWIECIE (nie tylko powiat!)
-          const matchingFacilities = allFacilities.filter(f => {
-            // 1. Musi być ta sama miejscowość (exact match, normalized)
-            const normalizedFacilityMiejscowosc = normalizePolish(f.miejscowosc);
-            if (normalizedFacilityMiejscowosc !== normalizedMiejscowosc) {
-              return false;
-            }
-
-            // 2. Musi być ten sam powiat (with contains dla elastyczności)
-            const normalizedFacilityPowiat = normalizePolish(f.powiat);
-            const powiatMatch = normalizedFacilityPowiat.includes(normalizedPowiat) ||
-                               normalizedPowiat.includes(normalizedFacilityPowiat);
-
-            if (!powiatMatch) {
-              return false;
-            }
-
-            // 3. Filtr typu
-            if (typ) {
-              if (typ === 'DPS' && f.typ_placowki !== 'DPS') return false;
-              if (typ === 'ŚDS' && f.typ_placowki !== 'ŚDS') return false;
-            }
-
-            return true;
-          });
-
-          // ✅ Dla części (RM=00) znajdź nazwę nadrzędnej miejscowości
-          let parentLocationName: string | null = null;
-          if (loc.rodzaj_miejscowosci === '00' && loc.teryt_sympod) {
-            const parent = await prisma.terytLocation.findFirst({
-              where: { teryt_sym: loc.teryt_sympod },
-              select: { nazwa: true }
-            });
-            parentLocationName = parent?.nazwa || null;
-          }
-
-          return {
-            nazwa: loc.nazwa,
-            powiat: loc.powiat,
-            wojewodztwo: loc.wojewodztwo,
-            facilitiesCount: matchingFacilities.length,
-            rodzaj_miejscowosci: loc.rodzaj_miejscowosci, // ✅ OPCJA 1b: przekaż RM do UI
-            parentLocationName // ✅ Nazwa nadrzędnej miejscowości dla części
-          };
-        })
+      const parentLocationMap = new Map(
+        parentLocations.map(p => [p.teryt_sym, p.nazwa])
       );
 
-      // 3. Filtruj tylko te które mają placówki + sortuj po liczbie
+      // 2. Dla każdej lokalizacji TERYT - sprawdź liczbę placówek (filtrowanie w memory)
+      const suggestionsWithCount = terytMatches.map((loc) => {
+        const normalizedMiejscowosc = normalizePolish(loc.nazwa);
+        const dbPowiat = mapCityCountyToPowiat(loc.powiat);
+        const normalizedPowiat = normalizePolish(dbPowiat);
+
+        // 🔧 FIX: Filtruj po MIEJSCOWOŚCI + POWIECIE (nie tylko powiat!)
+        const matchingFacilities = allFacilities.filter(f => {
+          // 1. Musi być ta sama miejscowość (exact match, normalized)
+          const normalizedFacilityMiejscowosc = normalizePolish(f.miejscowosc);
+          if (normalizedFacilityMiejscowosc !== normalizedMiejscowosc) {
+            return false;
+          }
+
+          // 2. Musi być ten sam powiat (with contains dla elastyczności)
+          const normalizedFacilityPowiat = normalizePolish(f.powiat);
+          const powiatMatch = normalizedFacilityPowiat.includes(normalizedPowiat) ||
+                             normalizedPowiat.includes(normalizedFacilityPowiat);
+
+          if (!powiatMatch) {
+            return false;
+          }
+
+          // 3. Filtr typu
+          if (typ) {
+            if (typ === 'DPS' && f.typ_placowki !== 'DPS') return false;
+            if (typ === 'ŚDS' && f.typ_placowki !== 'ŚDS') return false;
+          }
+
+          return true;
+        });
+
+        // ✅ Dla części (RM=00) znajdź nazwę nadrzędnej miejscowości z Map (no query!)
+        const parentLocationName = loc.rodzaj_miejscowosci === '00' && loc.teryt_sympod
+          ? parentLocationMap.get(loc.teryt_sympod) || null
+          : null;
+
+        return {
+          nazwa: loc.nazwa,
+          powiat: loc.powiat,
+          wojewodztwo: loc.wojewodztwo,
+          facilitiesCount: matchingFacilities.length,
+          rodzaj_miejscowosci: loc.rodzaj_miejscowosci, // ✅ OPCJA 1b: przekaż RM do UI
+          parentLocationName // ✅ Nazwa nadrzędnej miejscowości dla części
+        };
+      });
+
+      // 3. Sortuj miejscowości (pokazuj WSZYSTKIE, nawet bez placówek)
       // ✅ OPCJA 1b: Priorytetyzacja głównych (RM=01,96,98) nad częściami (RM=00)
-      // 🆕 W trybie admin - pokazuj WSZYSTKIE miejscowości (nawet bez placówek)
-      let withFacilities = suggestionsWithCount
-        .filter(s => isAdmin || s.facilitiesCount > 0)
+      // ✅ User może wybrać miejscowość i zobaczyć placówki w okolicy (30km default)
+      let allSuggestions = suggestionsWithCount
         .sort((a, b) => {
           // 1. BOOST: Exact match goes first
           const aExact = normalizePolish(a.nazwa).toLowerCase() === normalizedQuery;
@@ -225,12 +212,12 @@ export async function GET(request: NextRequest) {
           return b.facilitiesCount - a.facilitiesCount;
         });
 
-      console.log('  Suggestions with facilities:', withFacilities.length);
-      
+      console.log('  All suggestions (sorted):', allSuggestions.length);
+
       // 🐛 DEBUG: Show what we're returning
-      if (withFacilities.length > 0) {
+      if (allSuggestions.length > 0) {
         console.log('  📋 Top suggestions (sorted):');
-        withFacilities.slice(0, 10).forEach((s, i) => {
+        allSuggestions.slice(0, 10).forEach((s, i) => {
           const isExact = normalizePolish(s.nazwa).toLowerCase() === normalizedQuery;
           const isMain = ['01', '96', '98'].includes(s.rodzaj_miejscowosci || '');
           const rmLabel = isMain ? '⭐' : '🟡';
@@ -239,8 +226,8 @@ export async function GET(request: NextRequest) {
       }
 
       // 4. Zwróć top 10 + totalCount (zwiększono z 5 żeby pokazać więcej opcji)
-      const topSuggestions = withFacilities.slice(0, 10);
-      const totalCount = withFacilities.length;
+      const topSuggestions = allSuggestions.slice(0, 10);
+      const totalCount = allSuggestions.length;
 
       return NextResponse.json({
         suggestions: topSuggestions,

@@ -9,6 +9,8 @@ import { getShortProfileLabels } from '@/src/lib/profileLabels';
 import { useAppAnalytics } from '@/src/hooks/useAppAnalytics';
 import { useScrollTracking } from '@/src/hooks/useScrollTracking';
 import { calculateDistance } from '@/src/utils/distance';
+import { normalizePolish } from '@/lib/normalize-polish';
+import { mapCityCountyToPowiat } from '@/lib/city-county-mapping';
 
 // Import modular components
 import { SearchHeader } from './SearchHeader';
@@ -41,31 +43,6 @@ const getProfileName = (code: string): string => {
     'I': 'Niepełnosprawnić fizyczna',
   };
   return mapping[code] || code;
-};
-
-// Normalizacja polskich znaków (konsystentne z app/search/page.tsx)
-const normalizePolish = (str: string): string => {
-  return str
-    .trim()
-    .toLowerCase()
-    .replace(/ł/g, 'l')
-    .replace(/Ł/g, 'l')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-};
-
-// Mapowanie miast na prawach powiatu (TERYT) → powiaty ziemskie (baza placówek)
-const mapCityCountyToPowiat = (powiat: string): string => {
-  const normalized = normalizePolish(powiat);
-
-  // Kraków: "m. Kraków" lub "Miasto Kraków" → "krakowski"
-  if (normalized === 'm. krakow' || normalized === 'miasto krakow') return 'krakowski';
-  // Nowy Sącz: "m. Nowy Sącz" lub "Miasto Nowy Sącz" → "nowosądecki"
-  if (normalized === 'm. nowy sacz' || normalized === 'miasto nowy sacz') return 'nowosądecki';
-  // Tarnów: "m. Tarnów" lub "Miasto Tarnów" → "tarnowski"
-  if (normalized === 'm. tarnow' || normalized === 'miasto tarnow') return 'tarnowski';
-
-  return powiat; // bez zmian dla innych powiatów
 };
 
 // ===== TYPES (from your existing structure) =====
@@ -189,6 +166,9 @@ export default function SearchResults({
 
   // Price filter collapsed by default
   const [showPriceExpanded, setShowPriceExpanded] = useState(false);
+
+  // Sort parameter
+  const [sortParam, setSortParam] = useState<string>('recommended');
 
   // ===== COMPUTED =====
   // Lista powiatów do filtra — dynamiczna (tylko powiaty gdzie istnieje szukana miejscowość)
@@ -406,33 +386,14 @@ export default function SearchResults({
 
     // Powiat filter (normalizacja: trim, lowercase, polskie znaki → ASCII)
     if (selectedPowiat !== "Wszystkie") {
-      const norm = (s: string) =>
-        s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'l');
-
       // MAPOWANIE: "m. Kraków" (TERYT) → "krakowski" (baza placówek)
-      let mappedPowiat = selectedPowiat;
-      const normalizedSelected = norm(selectedPowiat);
+      const mappedPowiat = mapCityCountyToPowiat(selectedPowiat);
+      const targetPowiat = normalizePolish(mappedPowiat);
 
-      if (normalizedSelected === 'm. krakow') {
-        mappedPowiat = 'krakowski';
-      }
-
-      const targetPowiat = norm(mappedPowiat);
       filtered = filtered.filter(f => {
         // ✅ MAPUJ także powiat z FACILITIES (tak jak w app/search/page.tsx)
-        let facilityPowiat = f.powiat ?? '';
-        const normFacilityPowiat = norm(facilityPowiat);
-
-        // Zmapuj miasta na prawach powiatu
-        if (normFacilityPowiat === 'krakow') {
-          facilityPowiat = 'krakowski';
-        } else if (normFacilityPowiat === 'nowy sacz') {
-          facilityPowiat = 'nowosądecki';
-        } else if (normFacilityPowiat === 'tarnow') {
-          facilityPowiat = 'tarnowski';
-        }
-
-        return norm(facilityPowiat) === targetPowiat;
+        const facilityPowiat = mapCityCountyToPowiat(f.powiat ?? '');
+        return normalizePolish(facilityPowiat) === targetPowiat;
       });
     }
 
@@ -471,6 +432,43 @@ export default function SearchResults({
       });
     }
 
+    // ===== SORTING LOGIC =====
+    switch (sortParam) {
+      case 'distance':
+        // Sort by distance (closest first)
+        filtered = filtered.sort((a, b) => {
+          const distA = a.distance ?? a.distanceFromCity ?? Infinity;
+          const distB = b.distance ?? b.distanceFromCity ?? Infinity;
+          return distA - distB;
+        });
+        break;
+
+      case 'price_asc':
+        // Sort by price ascending (null at the end)
+        filtered = filtered.sort((a, b) => {
+          if (a.koszt_pobytu === null && b.koszt_pobytu === null) return 0;
+          if (a.koszt_pobytu === null) return 1;
+          if (b.koszt_pobytu === null) return -1;
+          return a.koszt_pobytu - b.koszt_pobytu;
+        });
+        break;
+
+      case 'price_desc':
+        // Sort by price descending (null at the end)
+        filtered = filtered.sort((a, b) => {
+          if (a.koszt_pobytu === null && b.koszt_pobytu === null) return 0;
+          if (a.koszt_pobytu === null) return 1;
+          if (b.koszt_pobytu === null) return -1;
+          return b.koszt_pobytu - a.koszt_pobytu;
+        });
+        break;
+
+      case 'recommended':
+      default:
+        // Keep default order (by name from server, or by priority)
+        break;
+    }
+
     setFacilities(filtered);
 
     // Track empty results
@@ -497,7 +495,7 @@ export default function SearchResults({
     }
   }, [
     results, selectedType, cityInput, selectedVoivodeship, selectedPowiat,
-    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, trackEmptyResults, trackFilterApplied
+    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, sortParam, trackEmptyResults, trackFilterApplied
   ]);
 
   // Scroll depth tracking
@@ -928,11 +926,15 @@ export default function SearchResults({
                 {/* Sortowanie */}
                 <div className="flex items-center gap-2">
                   <span className="text-slate-500 text-sm font-bold">Sortuj:</span>
-                  <select className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    <option>Rekomendowane</option>
-                    <option>Odległość</option>
-                    <option>Cena: rosnąco</option>
-                    <option>Cena: malejąco</option>
+                  <select
+                    value={sortParam}
+                    onChange={(e) => setSortParam(e.target.value)}
+                    className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="recommended">Rekomendowane</option>
+                    <option value="distance">Odległość</option>
+                    <option value="price_asc">Cena: rosnąco</option>
+                    <option value="price_desc">Cena: malejąco</option>
                   </select>
                 </div>
 
