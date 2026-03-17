@@ -60,23 +60,32 @@ kompas-seniora/
 │   ├── placowka/[id]/     # Szczegóły placówki
 │   ├── admin/             # Panel admina
 │   ├── kalkulator/        # Kalkulator kosztów
+│   ├── poradniki/         # System artykułów MDX
 │   └── api/               # API endpoints
 │
 ├── components/            # Główne komponenty (re-exports)
+│   ├── articles/          # Komponenty artykułów (Layout, TOC, etc.)
+│   └── poradniki/         # PoradnikiContent
 ├── src/
 │   ├── components/        # Prawdziwe komponenty
-│   │   └── search/        # Komponenty wyszukiwania
+│   │   ├── search/        # Komponenty wyszukiwania
+│   │   └── knowledge/     # KnowledgeCenter (karuzela artykułów)
 │   ├── hooks/             # Custom hooks
 │   ├── utils/             # Utility functions
+│   ├── data/              # articles.ts - organizacja artykułów
 │   └── lib/               # Libraries
 │
 ├── prisma/
 │   ├── schema.prisma      # Model bazy danych
 │   └── dev.db             # ❌ NIEUŻYWANY SQLite
 │
+├── lib/                   # Serverside utilities
+│   └── articleHelpers.ts  # Wzbogacanie artykułów metadanymi z MDX
+├── types/
+│   └── article.ts         # Typy Article, Section, ArticleWithMetadata
+├── content/articles/      # Pliki MDX artykułów (5 sekcji)
 ├── scripts/               # Import/migracja danych
 ├── public/                # Statyczne pliki
-├── content/               # MDX content
 └── data/                  # Dane pomocnicze
 
 ```
@@ -337,6 +346,79 @@ npx prisma studio
 
 ---
 
+## 📰 SYSTEM ARTYKUŁÓW (HYBRID MDX)
+
+### Architektura
+System używa **hybrydowego podejścia**:
+- **Organizacja** (slug, kategoria, sekcja) → `src/data/articles.ts`
+- **Treść** (title, excerpt, readTime) → pliki `.mdx` w `content/articles/`
+
+### Pliki kluczowe:
+- **`src/data/articles.ts`** - lista wszystkich artykułów z metadanymi organizacyjnymi
+- **`lib/articleHelpers.ts`** - funkcje do wzbogacania artykułów o dane z MDX
+- **`types/article.ts`** - typy TypeScript
+- **`content/articles/[section]/[slug].mdx`** - treść artykułów
+
+### Nowy system wyświetlania (2026-03-17):
+Artykuły używają **systemu badge + featuredOrder + isActive**:
+
+```typescript
+{
+  slug: 'wybor-placowki',
+  sectionId: 'wybor-opieki',
+  category: 'Wybór opieki',
+  badge: 'POLECAMY',                    // Badge wyświetlany na karcie
+  thumbnail: '/images/senior_opiekunka.webp',  // Opcjonalny thumbnail
+  featuredOrder: 1,                     // Kolejność na stronie głównej (niższe = pierwsze)
+  isActive: true                        // false = pokazuje "WKRÓTCE"
+}
+```
+
+**Typy badge:**
+- `POLECAMY` - zielony z animacją pulse
+- `NOWE` - niebieski
+- `NOWY ARTYKUŁ` - zielony z animacją pulse
+- `WKRÓTCE` - szary (automatyczny gdy isActive=false)
+
+**⚠️ WAŻNE:** Stara właściwość `featured: boolean` została usunięta (commit 01b1d4a, 2026-03-17).
+
+### Komponenty:
+1. **`KnowledgeCenter.tsx`** - karuzela na stronie głównej (pokazuje artykuły z `badge`)
+2. **`PoradnikiContent.tsx`** - pełna strona `/poradniki` (grid wszystkich artykułów)
+3. **`ArticleLayout.tsx`** - layout pojedynczego artykułu
+4. **`app/poradniki/[section]/[slug]/page.tsx`** - dynamiczny routing artykułów
+
+### Dodawanie nowego artykułu:
+1. Dodaj wpis do `src/data/articles.ts`:
+   ```typescript
+   {
+     slug: 'nowy-artykul',
+     sectionId: 'wybor-opieki',
+     category: 'Wybór opieki',
+     badge: 'NOWE',           // opcjonalne
+     featuredOrder: 5,        // opcjonalne
+   }
+   ```
+2. Utwórz plik MDX: `content/articles/wybor-opieki/nowy-artykul.mdx`
+3. Dodaj frontmatter:
+   ```yaml
+   ---
+   title: "Tytuł artykułu"
+   excerpt: "Krótki opis..."
+   category: "Wybór opieki"
+   readTime: 8
+   publishedAt: "2026-03-17"
+   ---
+   ```
+
+### Sekcje artykułów:
+- `wybor-opieki` - Wybór opieki (Building2 icon)
+- `dla-opiekuna` - Dla opiekuna (Heart icon)
+- `dla-seniora` - Dla seniora (Users icon)
+- `finanse-prawne` - Finanse i prawo (Wallet + Scale icon)
+
+---
+
 ## 🆘 GDY COŚ NIE DZIAŁA
 
 1. **Sprawdź którą bazę używasz** - powinien być PostgreSQL!
@@ -347,4 +429,4 @@ npx prisma studio
 
 ---
 
-Ostatnia aktualizacja: 2026-03-16
+Ostatnia aktualizacja: 2026-03-17

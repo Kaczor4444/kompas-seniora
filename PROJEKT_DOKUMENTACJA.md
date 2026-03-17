@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-03-16 (sesja #8 - weryfikacja z oficjalnym wykazem DPS)
+> Ostatnia aktualizacja: 2026-03-17 (sesja #9 - unifikacja systemu artykułów)
 
 ---
 
@@ -99,6 +99,61 @@ model Placowka {
 - [ ] Dokończyć weryfikację DPS (49 placówek)
 - [ ] Powtórzyć proces dla ŚDS (95 placówek)
 - [ ] Skrypt porównujący nowe wykazy z bazą (automatyczna detekcja zmian)
+
+---
+
+## ✅ Unifikacja systemu artykułów - badge zamiast featured (2026-03-17)
+
+**Problem:** System wyświetlania artykułów był niespójny między stroną główną a stroną `/poradniki`:
+- Strona główna (`KnowledgeCenter.tsx`) używała nowego systemu: `badge`, `featuredOrder`, `isActive`
+- Strona poradników (`PoradnikiContent.tsx`) używała starego systemu: `featured: boolean`
+- Niektóre artykuły w `articles.ts` miały `featured: true`, inne `badge: 'POLECAMY'`
+
+**Rozwiązanie:** Kompletna unifikacja na nowy system `badge` + `featuredOrder` + `isActive`.
+
+**Zmiany:**
+1. ✅ Usunięto `featured?: boolean` z typu `Article` (`types/article.ts`)
+2. ✅ Usunięto `featured?: boolean` z `ArticleMetadata` (`lib/articleHelpers.ts`)
+3. ✅ Usunięto `featured: true` z 15 artykułów w `src/data/articles.ts`
+4. ✅ Zaktualizowano `PoradnikiContent.tsx`:
+   - Sortowanie popularnych artykułów: priorytet `badge`, potem `featuredOrder`
+   - Wyświetlanie badge: wspiera wszystkie typy (POLECAMY, NOWE, NOWY ARTYKUŁ, WKRÓTCE)
+   - Animacja pulse dla POLECAMY i NOWY ARTYKUŁ
+
+**Nowy system (jedyny):**
+```typescript
+{
+  slug: 'wybor-placowki',
+  sectionId: 'wybor-opieki',
+  category: 'Wybór opieki',
+  badge: 'POLECAMY',           // Opcjonalny badge
+  thumbnail: '/images/...',     // Opcjonalny custom thumbnail
+  featuredOrder: 1,            // Kolejność na stronie głównej (niższe = pierwsze)
+  isActive: true               // false = pokazuje "WKRÓTCE"
+}
+```
+
+**Typy badge:**
+- `POLECAMY` - zielony bg, animacja pulse
+- `NOWE` - niebieski bg
+- `NOWY ARTYKUŁ` - zielony bg, animacja pulse
+- `WKRÓTCE` - szary bg (automatyczny gdy `isActive: false`)
+
+**Commit:** `01b1d4a` - "feat: Unifikacja systemu wyświetlania artykułów (badge zamiast featured)"
+
+**Zmienione pliki (9):**
+- `types/article.ts` - usunięto `featured` z `Article`
+- `lib/articleHelpers.ts` - usunięto `featured` z `ArticleMetadata`
+- `src/data/articles.ts` - usunięto `featured: true` z 15 artykułów
+- `components/poradniki/PoradnikiContent.tsx` - nowa logika sortowania i wyświetlania
+- `app/page.tsx`, `src/components/HomeClient.tsx`, `src/components/knowledge/KnowledgeCenter.tsx` - integracja
+- `components/articles/ArticleLayout.tsx`, `next.config.mjs` - korekty
+
+**Wynik:**
+- ✅ System spójny między stroną główną a stroną poradników
+- ✅ Jeden system wyświetlania badge'y
+- ✅ Wszystkie typy zgodne
+- ✅ Build przechodzi bez błędów
 
 ---
 
@@ -643,6 +698,71 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 ---
 
 ## 16. HISTORIA ZMIAN (changelog sesji)
+
+### Sesja #9 — 2026-03-17
+
+**Temat:** Unifikacja systemu wyświetlania artykułów - przejście z `featured: boolean` na system `badge` + `featuredOrder` + `isActive`.
+
+**Problem:**
+Projekt miał dwa różne systemy wyświetlania artykułów:
+- **KnowledgeCenter.tsx** (strona główna) - używał nowego systemu z `badge`, `featuredOrder`, `isActive`
+- **PoradnikiContent.tsx** (strona `/poradniki`) - używał starego systemu z `featured: boolean`
+- W `articles.ts` część artykułów miała `featured: true`, część miała `badge: 'POLECAMY'`
+
+To powodowało niezgodności w wyświetlaniu i sortowaniu artykułów.
+
+**Rozwiązanie:**
+Kompletna unifikacja na nowy system - usunięto całkowicie `featured` i wszędzie zastosowano `badge` + `featuredOrder`.
+
+**Zmienione pliki:**
+1. **`types/article.ts`** - usunięto `featured?: boolean` z typu `Article`
+2. **`lib/articleHelpers.ts`** - usunięto `featured` z `ArticleMetadata` i `getPlaceholderMetadata()`
+3. **`src/data/articles.ts`** - usunięto `featured: true` z 15 artykułów:
+   - `wybor-opieki`: rodzaje-opieki, wybor-placowki, typy-dps, proces-przyjecia-dps, zgoda-seniora
+   - `dla-opiekuna`: organizacja-opieki, wsparcie-demencja, udogodnienia-dom
+   - `dla-seniora`: internet-bezpieczenstwo, zdrowie-po-70
+   - `finanse-prawne`: dodatek-pielegnacyjny, zasilek-opiekunczy, dofinansowania-2025, prawa-mieszkancow, umowy-placowki
+4. **`components/poradniki/PoradnikiContent.tsx`**:
+   - Zaktualizowano sortowanie popularnych artykułów (linia 96-107): priorytet `badge`, potem `featuredOrder`
+   - Zaktualizowano wyświetlanie badge (linia 236-249): wspiera wszystkie typy badge z odpowiednimi kolorami i animacją
+
+**Nowy system (jedyny poprawny):**
+```typescript
+{
+  slug: 'wybor-placowki',
+  sectionId: 'wybor-opieki',
+  category: 'Wybór opieki',
+  badge: 'POLECAMY',                    // Opcjonalny badge (POLECAMY|NOWE|NOWY ARTYKUŁ|WKRÓTCE)
+  thumbnail: '/images/senior_opiekunka.webp',  // Opcjonalny custom thumbnail
+  featuredOrder: 1,                     // Kolejność na stronie głównej (niższe = pierwsze)
+  isActive: true                        // false = automatyczny badge "WKRÓTCE"
+}
+```
+
+**Typy badge:**
+- `POLECAMY` - zielony bg (`bg-green-500`), animacja `animate-pulse`
+- `NOWE` - niebieski bg (`bg-blue-500`)
+- `NOWY ARTYKUŁ` - zielony bg (`bg-green-500`), animacja `animate-pulse`
+- `WKRÓTCE` - szary bg (`bg-gray-500` lub `bg-blue-500`), automatyczny gdy `isActive: false`
+
+**Wynik:**
+- ✅ System spójny między KnowledgeCenter (strona główna) a PoradnikiContent (strona `/poradniki`)
+- ✅ Jeden sposób definiowania priorytetów artykułów
+- ✅ Wszystkie typy TypeScript zgodne
+- ✅ Build przechodzi bez błędów
+- ✅ Badge'y wyświetlają się poprawnie z animacjami
+
+**Commit:** `01b1d4a` - "feat: Unifikacja systemu wyświetlania artykułów (badge zamiast featured)"
+
+---
+
+### Sesja #8 — 2026-03-16
+
+**Temat:** Weryfikacja z oficjalnym wykazem DPS województwa małopolskiego.
+
+*[Zawartość sesji #8 bez zmian]*
+
+---
 
 ### Sesja #5 — 2026-02-20
 
