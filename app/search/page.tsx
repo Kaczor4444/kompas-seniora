@@ -34,7 +34,8 @@ async function geocodeCity(cityName: string, powiat?: string, woj?: string): Pro
     const state = result.address?.state; // Województwo (np. "Małopolskie", "Mazowieckie")
 
     // Sprawdź czy województwo jest w ENABLED_VOIVODESHIPS
-    let outOfRegion = false;
+    // Domyślnie true (bezpieczniejsze - jeśli brak state, zakładamy że poza regionem)
+    let outOfRegion = true;
     if (state) {
       const normalizedState = normalizePolish(state).toLowerCase();
       const enabledNormalized = ENABLED_VOIVODESHIPS.map(v => normalizePolish(v).toLowerCase());
@@ -448,10 +449,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     }
     // BEZ TERYT (fallback dla województw bez danych TERYT)
     else {
-      const wojewodztwoDbName = wojewodztwo;
+      // FIX: Jeśli brak województwa ALE jest query tekstowy → domyślnie Małopolska
+      // Zapobiega znalezieniu miast poza obsługiwanym regionem (np. Olsztyn na mapie)
+      const effectiveWojewodztwo = wojewodztwo === 'all' && query ? 'małopolskie' : wojewodztwo;
+      const wojewodztwoDbName = effectiveWojewodztwo;
 
       results = allFacilities.filter(facility => {
-        if (wojewodztwo !== 'all') {
+        if (effectiveWojewodztwo !== 'all') {
           const normalizedFacilityWoj = normalizePolish(facility.wojewodztwo);
           const normalizedTargetWoj = normalizePolish(wojewodztwoDbName);
           if (normalizedFacilityWoj !== normalizedTargetWoj) return false;

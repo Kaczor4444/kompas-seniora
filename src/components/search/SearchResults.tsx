@@ -1165,6 +1165,12 @@ export default function SearchResults({
                   // Stay in map view after search - add view=map parameter
                   params.append('view', 'map');
 
+                  // FIX: Zawsze wysyłaj województwo (domyślnie małopolskie)
+                  // Zapobiega szukaniu miast poza obsługiwanym regionem (np. Olsztyn)
+                  if (!params.has('woj')) {
+                    params.append('woj', 'malopolskie');
+                  }
+
                   // CRITICAL FIX: Przekaż aktualnie wybrany powiat do URL
                   // Aby server geokodował właściwą miejscowość w wybranym powiecie
                   if (selectedPowiat !== "Wszystkie") {
