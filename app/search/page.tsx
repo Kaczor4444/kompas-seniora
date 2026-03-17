@@ -329,19 +329,27 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         return true;
       });
 
-        // Policz rozkład placówek per powiat (dla banneru informacyjnego)
-        if (!powiatParam && uniquePowiaty.length > 1) {
-          // User kliknął "Szukaj" bez wyboru i mamy wiele powiatów
+        // ✅ ZAWSZE twórz powiatSearchCenters gdy miejscowość istnieje w wielu powiatach
+        // To pozwala client-side zmieniać pulsujący punkt gdy user zmienia powiat z filtra
+        if (terytPowiats && terytPowiats.length > 1) {
+          // Policz rozkład placówek per powiat
           for (const facility of results) {
             const powiat = facility.powiat;
             powiatBreakdown[powiat] = (powiatBreakdown[powiat] || 0) + 1;
           }
 
-          // Użyj współrzędnych pierwszej placówki w każdym powiecie (zamiast Nominatim)
-          for (const powiat of Object.keys(powiatBreakdown)) {
-            const firstFacilityInPowiat = results.find(f => f.powiat === powiat && f.latitude && f.longitude);
+          // Dla każdego powiatu z TERYT - znajdź współrzędne pierwszej placówki
+          for (const terytPowiat of terytPowiats) {
+            const mappedPowiat = mapCityCountyToPowiat(terytPowiat);
+            const normalizedPowiat = normalizePolish(mappedPowiat);
+
+            const firstFacilityInPowiat = results.find(f => {
+              const facilityPowiat = normalizePolish(mapCityCountyToPowiat(f.powiat));
+              return facilityPowiat === normalizedPowiat && f.latitude && f.longitude;
+            });
+
             if (firstFacilityInPowiat) {
-              powiatSearchCenters[powiat] = {
+              powiatSearchCenters[mappedPowiat] = {
                 lat: parseFloat(firstFacilityInPowiat.latitude),
                 lng: parseFloat(firstFacilityInPowiat.longitude)
               };
