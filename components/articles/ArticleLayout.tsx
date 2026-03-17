@@ -19,9 +19,7 @@ const categoryMap: Record<string, { name: string; slug: string }> = {
   'wybor-opieki': { name: 'Wybór opieki', slug: 'wybor-opieki' },
   'dla-opiekuna': { name: 'Dla opiekuna', slug: 'dla-opiekuna' },
   'dla-seniora': { name: 'Dla seniora', slug: 'dla-seniora' },
-  'finanse-i-swiadczenia': { name: 'Finanse i świadczenia', slug: 'finanse-i-swiadczenia' },
-  'prawne-aspekty': { name: 'Prawne aspekty', slug: 'prawne-aspekty' },
-  'finanse-prawne': { name: 'Finanse i prawne', slug: 'finanse-prawne' },
+  'finanse-prawne': { name: 'Finanse i prawo', slug: 'finanse-prawne' },
 }
 
 export default function ArticleLayout({

@@ -92,9 +92,19 @@ export default function PoradnikiContent({
   // Display subset if not full page
   const displayArticles = isFullPage ? filteredArticles : filteredArticles.slice(0, 3)
 
-  // Popular articles for sidebar (top 5 by featured or first 5)
+  // Popular articles for sidebar (top 5 by badge/featuredOrder or first 5)
   const popularArticles = [...initialArticles]
-    .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
+    .sort((a, b) => {
+      // Prioritize articles with badges
+      const aHasBadge = a.badge ? 1 : 0
+      const bHasBadge = b.badge ? 1 : 0
+      if (aHasBadge !== bHasBadge) return bHasBadge - aHasBadge
+
+      // Then by featuredOrder (lower = first)
+      const aOrder = a.featuredOrder ?? 999
+      const bOrder = b.featuredOrder ?? 999
+      return aOrder - bOrder
+    })
     .slice(0, 5)
 
   return (
@@ -235,9 +245,14 @@ export default function PoradnikiContent({
 
                     {/* Badges (Top Left) - V2 STYLE */}
                     <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 items-start pointer-events-none">
-                      {article.featured && !isPlaceholder && (
-                        <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                          POLECAMY
+                      {article.badge && !isPlaceholder && (
+                        <span className={`text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg ${
+                          article.badge === 'POLECAMY' ? 'bg-green-500 animate-pulse' :
+                          article.badge === 'NOWE' ? 'bg-blue-500' :
+                          article.badge === 'NOWY ARTYKUŁ' ? 'bg-green-500 animate-pulse' :
+                          'bg-gray-500'
+                        }`}>
+                          {article.badge}
                         </span>
                       )}
                       {isPlaceholder && (

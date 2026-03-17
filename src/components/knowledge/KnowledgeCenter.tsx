@@ -3,10 +3,11 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Building2, UserCheck, User, TrendingUp, Scale, Bookmark } from 'lucide-react'
+import type { ArticleWithMetadata } from '@/lib/articleHelpers'
 
-// Article type
-type Article = {
-  id: number
+// Article type for KnowledgeCenter display
+type KnowledgeCenterArticle = {
+  id: string
   title: string
   excerpt: string
   category: string
@@ -18,109 +19,37 @@ type Article = {
   imageUrl?: string
 }
 
-export default function KnowledgeCenter() {
+interface KnowledgeCenterProps {
+  articles: ArticleWithMetadata[]
+}
+
+export default function KnowledgeCenter({ articles: featuredArticles }: KnowledgeCenterProps) {
   const [scrollPosition, setScrollPosition] = useState(0)
   const [activeFilter, setActiveFilter] = useState('Wszystkie')
-  const [savedArticles, setSavedArticles] = useState<number[]>([])
+  const [savedArticles, setSavedArticles] = useState<string[]>([])  // Changed to string[] for articleId
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // Articles data
-  const articles: Article[] = [
-    {
-      id: 1,
-      title: 'Jak wybrać odpowiednią placówkę dla seniora?',
-      excerpt: 'Poznaj kryteria wyboru. Dowiedz się na co zwrócić uwagę.',
-      category: 'Wybór opieki',
-      badge: 'POLECAMY',
-      href: '/poradniki/wybor-opieki/wybor-placowki',
-      isPlaceholder: false,
-      isActive: true,
-      readingTime: '7 min',
-      imageUrl: '/images/senior_opiekunka.webp'
-    },
-    {
-      id: 2,
-      title: '6 Typów DPS w Polsce - który wybrać?',
-      excerpt: 'Poznaj rodzaje DPS zgodnie z Art. 54 i sprawdź który typ pasuje do potrzeb Twojego bliskiego',
-      category: 'Wybór opieki',
-      badge: 'NOWE',
-      href: '/poradniki/wybor-opieki/typy-dps',
-      isPlaceholder: false,
-      isActive: true,
-      readingTime: '6 min',
-      imageUrl: '/images/seniorzy_puzle.webp'
-    },
-    {
-      id: 3,
-      title: 'Proces Przyjęcia do DPS: Krok po Kroku',
-      excerpt: 'Pełny przewodnik od wniosku w MOPS po dzień przyjęcia. Z oficjalnymi danymi o czasach oczekiwania z 2 województw.',
-      category: 'Wybór opieki',
-      badge: 'NOWY ARTYKUŁ',
-      href: '/poradniki/wybor-opieki/proces-przyjecia-dps',
-      isPlaceholder: false,
-      isActive: true,
-      readingTime: '10 min',
-      imageUrl: '/images/seniorzy_ciasto.png'
-    },
-    {
-      id: 4,
-      title: 'Ile kosztuje dom opieki?',
-      excerpt: 'Koszty pobytu i możliwości dofinansowania z MOPS',
-      category: 'Finanse',
-      badge: 'WKRÓTCE',
-      href: '/poradniki/finanse-prawne/koszty-opieki',
-      isPlaceholder: false,
-      isActive: false,
-      readingTime: '5 min',
-      imageUrl: '/images/senior_obliczenia.webp'
-    },
-    {
-      id: 5,
-      title: 'Czym różni się DPS od ŚDS?',
-      excerpt: 'Zrozum różnice i wybierz właściwą formę opieki',
-      category: 'Wybór opieki',
-      badge: 'WKRÓTCE',
-      href: '/poradniki/wybor-opieki/dps-vs-sds',
-      isPlaceholder: false,
-      isActive: false,
-      readingTime: '4 min'
-    },
-    {
-      id: 6,
-      title: 'Jak przygotować seniora do przeprowadzki do DPS?',
-      excerpt: 'Praktyczne porady jak pomóc bliskiemu zaakceptować zmianę i przygotować się emocjonalnie',
-      category: 'Dla seniora',
-      badge: 'WKRÓTCE',
-      href: '/poradniki/wsparcie-emocjonalne/przygotowanie-seniora',
-      isPlaceholder: false,
-      isActive: false,
-      readingTime: '8 min'
-    },
-    {
-      id: 7,
-      title: 'Jakie dokumenty potrzebne do złożenia wniosku do DPS?',
-      excerpt: 'Kompletna lista dokumentów i krok po kroku jak przygotować wniosek do MOPS',
-      category: 'Prawne',
-      badge: 'WKRÓTCE',
-      href: '/poradniki/finanse-prawne/dokumenty-wniosek',
-      isPlaceholder: false,
-      isActive: false,
-      readingTime: '6 min'
-    },
-    {
-      id: 8,
-      title: 'Prawa mieszkańca domu pomocy społecznej',
-      excerpt: 'Poznaj prawa seniora w DPS - od prywatności po możliwość odwiedzin rodziny',
-      category: 'Prawne',
-      badge: 'WKRÓTCE',
-      href: '/poradniki/finanse-prawne/prawa-mieszkanca',
-      isPlaceholder: false,
-      isActive: false,
-      readingTime: '5 min'
+  // Map featured articles to KnowledgeCenter format
+  const articles: KnowledgeCenterArticle[] = featuredArticles.map((article) => {
+    const articleId = `${article.sectionId}-${article.slug}`
+    const href = `/poradniki/${article.sectionId}/${article.slug}`
+    const isPlaceholder = article.excerpt === 'Artykuł w przygotowaniu...'
+
+    return {
+      id: articleId,
+      title: article.title.replace('[Placeholder] ', ''),
+      excerpt: article.excerpt,
+      category: article.category,
+      badge: article.badge || 'WKRÓTCE',
+      href,
+      isPlaceholder,
+      isActive: article.isActive !== false,  // Default true
+      readingTime: `${article.readTime} min`,
+      imageUrl: article.thumbnail
     }
-  ]
+  })
 
   const scrollLeft = () => {
     if (!scrollContainerRef.current) return
@@ -139,7 +68,7 @@ export default function KnowledgeCenter() {
     setScrollPosition(scrollContainerRef.current.scrollLeft)
   }
 
-  const toggleSave = (id: number, title: string) => {
+  const toggleSave = (id: string, title: string) => {
     const isAdding = !savedArticles.includes(id)
 
     setSavedArticles(prev =>
@@ -320,7 +249,7 @@ export default function KnowledgeCenter() {
                   </div>
 
                   {/* Image or Placeholder */}
-                  {article.isPlaceholder ? (
+                  {article.isPlaceholder && !article.imageUrl ? (
                     <div className="relative h-36 bg-slate-200 flex items-center justify-center">
                       <h3 className="text-2xl font-black text-slate-600 tracking-tight">Poradnik Seniora</h3>
 

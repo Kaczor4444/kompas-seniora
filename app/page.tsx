@@ -1,13 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { getFeaturedArticlesForHome } from '@/lib/articleHelpers';
 import HomeClient from '@/src/components/HomeClient';
 
 // 🔄 Revalidate every hour to keep data fresh
 export const revalidate = 3600;
 
 export default async function Home() {
-  // 📊 Fetch real-time facility count and per-powiat breakdown
-  const [totalFacilities, allFacilities] = await Promise.all([
+  // 📊 Fetch real-time facility count, per-powiat breakdown, and featured articles
+  const [totalFacilities, allFacilities, featuredArticles] = await Promise.all([
     prisma.placowka.count({
       where: getVoivodeshipFilter()
     }),
@@ -15,6 +16,7 @@ export default async function Home() {
       where: getVoivodeshipFilter(),
       select: { powiat: true, miejscowosc: true }
     }),
+    getFeaturedArticlesForHome(),
   ]);
 
   const powiatCounts: Record<string, number> = {};
@@ -53,5 +55,5 @@ export default async function Home() {
     powiatCounts['Tarnów'] = tarnowCity;
   }
 
-  return <HomeClient totalFacilities={totalFacilities} powiatCounts={powiatCounts} />;
+  return <HomeClient totalFacilities={totalFacilities} powiatCounts={powiatCounts} featuredArticles={featuredArticles} />;
 }

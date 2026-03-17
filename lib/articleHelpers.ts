@@ -10,7 +10,6 @@ export interface ArticleMetadata {
   readTime: number
   publishedAt: string
   updatedAt?: string
-  featured?: boolean
   thumbnail?: string
   downloads?: Array<{ title: string; url: string; icon?: string }>
 }
@@ -147,7 +146,41 @@ export function getPlaceholderMetadata(slug: string, category: string): ArticleM
     category,
     readTime: 5,
     publishedAt: '2025-12-03',
-    featured: false,
     thumbnail: getCategoryThumbnail(category),
   }
+}
+
+/**
+ * Get featured articles for home page Knowledge Center
+ * Returns articles that have a badge (for display in carousel)
+ * Enriched with metadata from MDX frontmatter
+ */
+export async function getFeaturedArticlesForHome(): Promise<ArticleWithMetadata[]> {
+  const { sections } = await import('@/data/articles')
+
+  // Get all articles with badge (featured for home page)
+  const featuredArticles = sections.flatMap(section =>
+    section.articles
+      .filter(article => article.badge !== undefined)
+      .map(article => ({
+        ...article,
+        sectionId: section.id
+      }))
+  )
+
+  // Sort by featuredOrder (if specified), otherwise keep original order
+  featuredArticles.sort((a, b) => {
+    const orderA = a.featuredOrder ?? 999
+    const orderB = b.featuredOrder ?? 999
+    return orderA - orderB
+  })
+
+  // Enrich with MDX metadata
+  const enriched = await enrichArticlesWithMetadata(featuredArticles)
+
+  // Override thumbnail if article has custom thumbnail in articles.ts
+  return enriched.map((article, index) => ({
+    ...article,
+    thumbnail: featuredArticles[index].thumbnail || article.thumbnail
+  }))
 }

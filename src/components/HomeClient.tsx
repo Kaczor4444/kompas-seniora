@@ -9,13 +9,15 @@ import KnowledgeCenter from './knowledge/KnowledgeCenter';
 import HeroSection from './hero/HeroSection';
 import RegionalMap from './home/RegionalMap';
 import PopularLocationsSection from './home/PopularLocationsSection';
+import type { ArticleWithMetadata } from '@/lib/articleHelpers';
 
 interface HomeClientProps {
   totalFacilities: number;
   powiatCounts: Record<string, number>;
+  featuredArticles: ArticleWithMetadata[];
 }
 
-export default function HomeClient({ totalFacilities, powiatCounts }: HomeClientProps) {
+export default function HomeClient({ totalFacilities, powiatCounts, featuredArticles }: HomeClientProps) {
   // ✅ State management for active tab
   const [activeTab, setActiveTab] = useState<'DPS' | 'SDS' | 'Wszystkie'>('Wszystkie');
 
@@ -147,7 +149,7 @@ export default function HomeClient({ totalFacilities, powiatCounts }: HomeClient
 
             {/* Right 2/3 — Poradniki (KnowledgeCenter) */}
             <div className="lg:col-span-2 rounded-2xl border border-slate-200 overflow-hidden">
-              <KnowledgeCenter />
+              <KnowledgeCenter articles={featuredArticles} />
             </div>
 
           </div>

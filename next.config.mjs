@@ -57,6 +57,20 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/poradniki/finanse-i-swiadczenia/:slug',
+        destination: '/poradniki/finanse-prawne/:slug',
+        permanent: true,
+      },
+      {
+        source: '/poradniki/prawne-aspekty/:slug',
+        destination: '/poradniki/finanse-prawne/:slug',
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
