@@ -104,7 +104,7 @@ interface FacilityMapProps {
   mode?: 'single' | 'multiple';
   showDirections?: boolean;
   userLocation?: { lat: number; lng: number };
-  searchCenter?: { lat: number; lng: number; name: string };
+  searchCenter?: { lat: number; lng: number; name: string; isPartOfVillage?: boolean };
   powiatBreakdown?: Record<string, number>;
   powiatSearchCenters?: Record<string, { lat: number; lng: number }>;
   selectedPowiat?: string;
@@ -113,7 +113,9 @@ interface FacilityMapProps {
 
 // Ikona "tu szukasz" — pulsujący marker z etykietą nazwy miasta
 // Animacja sc-pulse jest zdefiniowana w globalnych stylach komponentu (nie w divIcon)
-function createSearchCenterIcon(cityName: string) {
+function createSearchCenterIcon(cityName: string, isPartOfVillage?: boolean) {
+  const label = isPartOfVillage ? `${cityName}<br/><span style="font-size:8px;color:#92400e">(część wsi)</span>` : cityName;
+
   return L.divIcon({
     html: `
       <div style="position:relative;display:flex;align-items:center;justify-content:center;width:56px;height:56px">
@@ -147,7 +149,8 @@ function createSearchCenterIcon(cityName: string) {
             white-space:nowrap;
             box-shadow:0 1px 4px rgba(0,0,0,0.2);
             line-height:1.3;
-          ">${cityName}</div>
+            text-align:center;
+          ">${label}</div>
         </div>
       </div>
     `,
@@ -302,7 +305,7 @@ export default function FacilityMap({
   //    (umożliwia client-side zmianę powiatu bez reload)
   // 2. W przeciwnym razie użyj searchCenter z servera (geokodowany dokładnie dla URL powiatu)
   const effectiveSearchCenter = selectedPowiat !== "Wszystkie" && powiatSearchCenters?.[selectedPowiat]
-    ? { ...powiatSearchCenters[selectedPowiat], name: searchCenter?.name || selectedPowiat }
+    ? { ...powiatSearchCenters[selectedPowiat], name: searchCenter?.name || selectedPowiat, isPartOfVillage: searchCenter?.isPartOfVillage }
     : searchCenter;
 
   const center: [number, number] = [50.0647, 19.9450];
@@ -362,7 +365,7 @@ export default function FacilityMap({
           {effectiveSearchCenter && !isMultiPowiatMode && (
             <Marker
               position={[effectiveSearchCenter.lat, effectiveSearchCenter.lng]}
-              icon={createSearchCenterIcon(effectiveSearchCenter.name)}
+              icon={createSearchCenterIcon(effectiveSearchCenter.name, effectiveSearchCenter.isPartOfVillage)}
               zIndexOffset={-100}
               interactive={false}
             />

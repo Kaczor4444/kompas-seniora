@@ -90,11 +90,16 @@ interface SearchResultsProps {
     name: string;
     state?: string; // Województwo z Nominatim
     outOfRegion?: boolean; // true jeśli miasto poza obsługiwanymi województwami
+    isPartOfVillage?: boolean; // true jeśli to część wsi o nazwie stolicy
   };
   terytPowiats?: string[];
   powiatBreakdown?: Record<string, number>;
   powiatSearchCenters?: Record<string, { lat: number; lng: number }>;
   initialView?: 'list' | 'map';
+  capitalCityWarning?: {
+    cityName: string;
+    powiat: string;
+  };
 }
 
 
@@ -111,6 +116,7 @@ export default function SearchResults({
   powiatBreakdown,
   powiatSearchCenters,
   initialView = 'list',
+  capitalCityWarning,
 }: SearchResultsProps) {
 
   const router = useRouter();
@@ -1013,6 +1019,28 @@ export default function SearchResults({
                     })()}
                   </h2>
                 )}
+              </div>
+            )}
+
+            {/* ⚠️ OSTRZEŻENIE: User szukał stolicę Polski ale pokazujemy część wsi */}
+            {capitalCityWarning && facilities.length > 0 && (
+              <div className="mb-6 bg-amber-50 border-2 border-amber-300 rounded-2xl p-5 flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-black text-amber-900 text-base mb-1 tracking-tight">
+                    To nie stolica, tylko część wsi!
+                  </h3>
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    Szukana miejscowość <strong>"{capitalCityWarning.cityName}"</strong> to <strong>część wsi w powiecie {capitalCityWarning.powiat}</strong>, nie stolica Polski.
+                    {' '}Stolica {capitalCityWarning.cityName} nie znajduje się w obsługiwanym regionie (Małopolska).
+                  </p>
+                </div>
               </div>
             )}
 

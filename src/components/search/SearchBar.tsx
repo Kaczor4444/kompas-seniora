@@ -69,12 +69,18 @@ const AutocompleteDropdown: React.FC<AutocompleteDropdownProps> = ({
               <div className="min-w-0 flex-1">
                 <p className="font-bold text-slate-900 text-sm truncate">
                   {suggestion.nazwa}
-                  {suggestion.parentLocationName && (
-                    <span className="text-slate-500 font-normal"> (część wsi {suggestion.parentLocationName})</span>
+                  {suggestion.rodzaj_miejscowosci === '00' && (
+                    <span className="text-slate-500 font-normal">
+                      {suggestion.parentLocationName
+                        ? ` (część wsi ${suggestion.parentLocationName})`
+                        : ' (część wsi)'}
+                    </span>
                   )}
                 </p>
                 <p className="text-xs text-slate-400 truncate">
                   Powiat {suggestion.powiat}
+                  {suggestion.rodzaj_miejscowosci === '96' && <span className="ml-1 text-emerald-600 font-semibold">★ miasto</span>}
+                  {suggestion.rodzaj_miejscowosci === '98' && <span className="ml-1 text-emerald-600 font-semibold">★ miasto</span>}
                 </p>
               </div>
             </div>

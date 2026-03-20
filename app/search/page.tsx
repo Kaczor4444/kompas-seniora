@@ -5,6 +5,19 @@ import { mapCityCountyToPowiat } from '@/lib/city-county-mapping';
 import SearchResults from '@/components/SearchResults';
 import { calculateDistance } from '@/src/utils/distance';
 
+// 🚫 BLACKLISTA STOLIC POLSKI (zawsze poza obsługiwanym regionem)
+// Małopolska ma tylko wioski o tych nazwach - user na pewno szuka stolicy!
+const CAPITAL_CITIES_BLACKLIST = [
+  'warszawa', 'lodz', 'wroclaw', 'poznan', 'gdansk', 'szczecin',
+  'bydgoszcz', 'lublin', 'katowice', 'bialystok', 'gdynia',
+  'czestochowa', 'radom', 'sosnowiec', 'torun', 'kielce',
+  'gliwice', 'zabrze', 'bytom', 'olsztyn', 'bielsko-biala',
+  'rzeszow', 'ruda slaska', 'rybnik', 'tychy', 'dabrowa gornicza',
+  'plock', 'elblag', 'opole', 'gorzow wielkopolski', 'wloclawek',
+  'zielona gora', 'tarnobrzeg', 'chorzow', 'koszalin', 'kalisz',
+  'legnica', 'grudziadz', 'slupsk', 'jaworzno', 'jastrzebie zdroj'
+];
+
 // Geocoding result with out-of-region detection
 interface GeocodingResult {
   lat: number;
@@ -15,6 +28,19 @@ interface GeocodingResult {
 
 async function geocodeCity(cityName: string, powiat?: string, woj?: string): Promise<GeocodingResult | null> {
   try {
+    // 🚫 BLACKLISTA: Jeśli to stolica Polski BEZ kontekstu powiatu - natychmiast zwróć outOfRegion=true
+    // Jeśli user wybrał z autocomplete (powiat jest znany) - geokoduj normalnie (może być wieś o tej samej nazwie)
+    const normalizedCity = normalizePolish(cityName).toLowerCase();
+    if (CAPITAL_CITIES_BLACKLIST.includes(normalizedCity) && !powiat) {
+      console.log(`🚫 BLACKLIST HIT: "${cityName}" jest stolicą Polski (bez kontekstu powiatu) - outOfRegion=true`);
+      return {
+        lat: 0,
+        lng: 0,
+        state: undefined,
+        outOfRegion: true
+      };
+    }
+
     // Buduj zapytanie z kontekstem powiatu/województwa żeby Nominatim znalazł właściwą miejscowość
     let queryParts = [cityName];
     if (powiat) queryParts.push(powiat);
@@ -22,24 +48,48 @@ async function geocodeCity(cityName: string, powiat?: string, woj?: string): Pro
     queryParts.push('Polska');
 
     const encoded = encodeURIComponent(queryParts.join(', '));
+    console.log(`🌍 GEOCODING: "${cityName}" (powiat: ${powiat || 'brak'}, woj: ${woj || 'brak'})`);
+
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encoded}&countrycodes=pl&limit=1&format=json&addressdetails=1`,
       { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 } }
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.log(`❌ Nominatim API error: ${res.status}`);
+      return null;
+    }
     const data = await res.json();
-    if (!data.length) return null;
+    if (!data.length) {
+      console.log(`❌ Nominatim: brak wyników dla "${queryParts.join(', ')}"`);
+      return null;
+    }
 
     const result = data[0];
     const state = result.address?.state; // Województwo (np. "Małopolskie", "Mazowieckie")
+
+    console.log(`📍 Nominatim result:`, {
+      display_name: result.display_name,
+      lat: result.lat,
+      lon: result.lon,
+      state: state,
+      county: result.address?.county,
+      city: result.address?.city,
+      town: result.address?.town,
+      village: result.address?.village
+    });
 
     // Sprawdź czy województwo jest w ENABLED_VOIVODESHIPS
     // Domyślnie true (bezpieczniejsze - jeśli brak state, zakładamy że poza regionem)
     let outOfRegion = true;
     if (state) {
-      const normalizedState = normalizePolish(state).toLowerCase();
+      // Nominatim zwraca "województwo małopolskie" - wytnij prefix "województwo"
+      let stateName = state.toLowerCase().replace(/^województwo\s+/, '');
+      const normalizedState = normalizePolish(stateName);
       const enabledNormalized = ENABLED_VOIVODESHIPS.map(v => normalizePolish(v).toLowerCase());
       outOfRegion = !enabledNormalized.includes(normalizedState);
+      console.log(`🔍 State check: "${state}" → wytnij prefix → "${stateName}" → normalized: "${normalizedState}" → outOfRegion: ${outOfRegion}`);
+    } else {
+      console.log(`⚠️ Brak 'state' w odpowiedzi Nominatim - domyślnie outOfRegion=true`);
     }
 
     return {
@@ -48,7 +98,8 @@ async function geocodeCity(cityName: string, powiat?: string, woj?: string): Pro
       state,
       outOfRegion
     };
-  } catch {
+  } catch (error) {
+    console.log(`❌ geocodeCity() error:`, error);
     return null;
   }
 }
@@ -142,8 +193,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         ? calculateDistance(
             userLat,
             userLng,
-            parseFloat(facility.latitude),
-            parseFloat(facility.longitude)
+            parseFloat(facility.latitude.toString()),
+            parseFloat(facility.longitude.toString())
           )
         : 999999; // Placówki bez koordynatów na końcu
 
@@ -613,6 +664,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     wojewodztwo !== 'all' ? wojewodztwo : undefined
   ) : null;
 
+  // 🚫 NIE pokazuj searchCenter jeśli miasto jest poza obsługiwanym regionem
+  const validSearchCenter = searchCenter && !searchCenter.outOfRegion ? searchCenter : null;
+
+  // ⚠️ WYKRYJ: user szukał stolicę Polski ALE wybrał z autocomplete (powiat znany)
+  // Pokazujemy ostrzeżenie "to część wsi, nie stolica!"
+  const normalizedQuery = normalizePolish(query).toLowerCase();
+  const isCapitalCity = CAPITAL_CITIES_BLACKLIST.includes(normalizedQuery);
+  const capitalCityWarning = isCapitalCity && powiatParam && sortedResults.length > 0
+    ? { cityName: query, powiat: powiatParam }
+    : undefined;
+
   return (
     <SearchResults
       query={query}
@@ -620,7 +682,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       results={sortedResults}
       message={message}
       terytPowiats={terytPowiats.length > 0 ? terytPowiats : undefined}
-      searchCenter={searchCenter ? { ...searchCenter, name: query } : undefined}
+      searchCenter={validSearchCenter ? {
+        ...validSearchCenter,
+        name: query,
+        isPartOfVillage: isCapitalCity && !!powiatParam // Flaguj że to część wsi o nazwie stolicy
+      } : undefined}
+      capitalCityWarning={capitalCityWarning}
       userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined}
       powiatBreakdown={Object.keys(powiatBreakdown).length > 0 ? powiatBreakdown : undefined}
       powiatSearchCenters={Object.keys(powiatSearchCenters).length > 0 ? powiatSearchCenters : undefined}

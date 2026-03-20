@@ -180,6 +180,37 @@ Dokumentacja wspominała filtrowanie do ~1,901 głównych miejscowości, ale **t
 "m. Tarnów" → "tarnowski"
 ```
 
+### ⚠️ Out-of-region detection (NEW - 2026-03-18):
+
+**Problem:** Users wpisują stolice Polski (Warszawa, Olsztyn...) i dostają błędne wyniki.
+
+**Rozwiązanie - 3 warstwy ochrony:**
+
+1. **Blacklista stolic Polski** (`app/search/page.tsx:8-17`)
+   - 40+ największych miast Polski
+   - Blokuje gdy user wpisał SAM TEKST (bez wyboru z autocomplete)
+   - Jeśli user wybrał z autocomplete (powiat znany) → dozwolone (może być wieś o tej samej nazwie)
+
+2. **Geocoding z Nominatim** (`app/search/page.tsx:30-101`)
+   - Sprawdza `address.state` (województwo)
+   - **WAŻNE:** Nominatim zwraca "województwo małopolskie" (z prefixem!) - trzeba wyciąć prefix przed porównaniem
+   - Zwraca `outOfRegion: true/false`
+
+3. **UI komunikaty:**
+   - **EmptyState** - komunikat "Miejscowość poza obsługiwanym regionem"
+   - **Żółty banner** - gdy user szukał stolicę ALE wybrał z autocomplete część wsi o tej nazwie:
+     ```
+     ⚠️ To nie stolica, tylko część wsi!
+     Szukana miejscowość "Warszawa" to część wsi w powiecie olkuskim,
+     nie stolica Polski.
+     ```
+   - **Etykieta na mapie** - pulsujący punkt pokazuje "(część wsi)" pod nazwą
+
+**Oznaczenia RM=00 (części wsi):**
+- Autocomplete: "Warszawa (część wsi)" - `SearchBar.tsx:72-79`
+- ★ dla miast (RM=96/98) - zielona gwiazdka
+- Mapa: dwuliniowa etykieta "Warszawa<br/>(część wsi)" - `FacilityMap.tsx:116-159`
+
 ---
 
 ## 🎯 ZNANE PROBLEMY I TODO
