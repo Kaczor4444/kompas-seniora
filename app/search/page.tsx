@@ -370,7 +370,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       // Pobierz UNIKALNE powiaty gdzie szukana miejscowość istnieje
       // Używamy Set aby usunąć duplikaty z bazy TERYT
-      terytPowiats = [...new Set(terytMatches.map((t: any) => t.powiat))].sort();
+      // 🔧 FILTR: Tylko główne miejscowości (RM=01,96,98,03) - eliminuje części wsi (RM=00)
+      const mainLocations = terytMatches.filter((t: any) =>
+        ['01', '96', '98', '03'].includes(t.rodzaj_miejscowosci || '')
+      );
+      terytPowiats = [...new Set(mainLocations.map((t: any) => t.powiat))].sort();
 
       // AUTO-ASSIGN powiat gdy exact match (Opcja 1 - fallback dla szybkich userów)
       // Jeśli user wpisał np. "Olkusz" i kliknął Enter zanim załadowały się sugestie,
