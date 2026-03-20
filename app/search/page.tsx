@@ -26,6 +26,17 @@ interface GeocodingResult {
   outOfRegion?: boolean; // true jeśli miasto poza obsługiwanymi województwami
 }
 
+// 🎯 HARDCODED współrzędne dla głównych miast Małopolski (centrum miasta!)
+// Gdy rozszerzamy na inne województwa - Nominatim automatycznie zadziała
+const CITY_CENTER_COORDS: Record<string, { lat: number; lng: number; wojewodztwo: string }> = {
+  'krakow': { lat: 50.0647, lng: 19.9450, wojewodztwo: 'małopolskie' },      // Rynek Główny
+  'tarnow': { lat: 50.0121, lng: 20.9877, wojewodztwo: 'małopolskie' },      // Rynek
+  'nowy sacz': { lat: 49.6247, lng: 20.6931, wojewodztwo: 'małopolskie' },   // Centrum
+  'oswiecim': { lat: 50.0374, lng: 19.2114, wojewodztwo: 'małopolskie' },    // Centrum
+  'wieliczka': { lat: 49.9836, lng: 20.0643, wojewodztwo: 'małopolskie' },   // Centrum
+  'olkusz': { lat: 50.2812, lng: 19.5608, wojewodztwo: 'małopolskie' },      // Rynek
+};
+
 async function geocodeCity(cityName: string, powiat?: string, woj?: string): Promise<GeocodingResult | null> {
   try {
     // 🚫 BLACKLISTA: Jeśli to stolica Polski BEZ kontekstu powiatu - natychmiast zwróć outOfRegion=true
@@ -41,17 +52,32 @@ async function geocodeCity(cityName: string, powiat?: string, woj?: string): Pro
       };
     }
 
+    // 🎯 HARDCODED: Użyj dokładnych współrzędnych dla głównych miast Małopolski
+    if (CITY_CENTER_COORDS[normalizedCity]) {
+      const coords = CITY_CENTER_COORDS[normalizedCity];
+      console.log(`🎯 Używam hardcoded współrzędnych dla "${cityName}" (centrum miasta)`);
+      return {
+        lat: coords.lat,
+        lng: coords.lng,
+        state: coords.wojewodztwo,
+        outOfRegion: false,
+      };
+    }
+
     // Buduj zapytanie z kontekstem powiatu/województwa żeby Nominatim znalazł właściwą miejscowość
-    let queryParts = [cityName];
-    if (powiat) queryParts.push(powiat);
+    // 🔧 ULEPSZONE: Dla miast na prawach powiatu (m. Tarnów) dodaj słowo "miasto" żeby Nominatim
+    // zwrócił centrum miasta zamiast punktu administracyjnego gminy
+    const isCityCounty = powiat?.startsWith('m. ');
+    let queryParts = [isCityCounty ? `${cityName} miasto` : cityName];
+    if (powiat && !isCityCounty) queryParts.push(powiat); // Nie dodawaj "m. Tarnów" bo już mamy "Tarnów miasto"
     if (woj) queryParts.push(woj);
     queryParts.push('Polska');
 
     const encoded = encodeURIComponent(queryParts.join(', '));
-    console.log(`🌍 GEOCODING: "${cityName}" (powiat: ${powiat || 'brak'}, woj: ${woj || 'brak'})`);
+    console.log(`🌍 GEOCODING: "${cityName}" (powiat: ${powiat || 'brak'}, woj: ${woj || 'brak'})${isCityCounty ? ' [+miasto]' : ''}`);
 
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encoded}&countrycodes=pl&limit=1&format=json&addressdetails=1`,
+      `https://nominatim.openstreetmap.org/search?q=${encoded}&countrycodes=pl&limit=1&format=json&addressdetails=1&featuretype=settlement`,
       { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 } }
     );
     if (!res.ok) {
@@ -658,11 +684,34 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   // Geokoduj szukane miasto żeby pokazać pin "tu szukasz" na mapie
   // Tylko gdy jest query tekstowy (nie geoloc, nie województwo)
-  const searchCenter = query ? await geocodeCity(
+  let searchCenter = query ? await geocodeCity(
     query,
     powiatParam || undefined,
     wojewodztwo !== 'all' ? wojewodztwo : undefined
   ) : null;
+
+  // 🎯 OPTYMALIZACJA: Jeśli są placówki w wynikach - użyj współrzędnych pierwszej placówki
+  // zamiast Nominatim (bardziej precyzyjny punkt, zawsze w centrum miasta!)
+  // ⚠️ ALE: tylko jeśli pierwsza placówka jest w TYM SAMYM mieście co query
+  // (żeby nie nadpisać hardcoded współrzędnych miasta współrzędnymi placówki z innego miasta!)
+  if (sortedResults.length > 0 && sortedResults[0].latitude && sortedResults[0].longitude) {
+    const firstFacility = sortedResults[0];
+    const normalizedFacilityCity = normalizePolish(firstFacility.miejscowosc).toLowerCase();
+    const normalizedQueryCity = normalizePolish(query).toLowerCase();
+
+    // Użyj współrzędnych placówki TYLKO gdy jest w tym samym mieście co query
+    if (normalizedFacilityCity === normalizedQueryCity) {
+      console.log(`🎯 Używam współrzędnych pierwszej placówki jako searchCenter: "${firstFacility.nazwa}" (${firstFacility.miejscowosc})`);
+      searchCenter = {
+        lat: parseFloat(firstFacility.latitude.toString()),
+        lng: parseFloat(firstFacility.longitude.toString()),
+        state: firstFacility.wojewodztwo,
+        outOfRegion: false, // Jeśli placówka jest w wynikach, to na pewno w regionie
+      };
+    } else {
+      console.log(`⏭️ Pierwsza placówka jest w innym mieście (${firstFacility.miejscowosc} ≠ ${query}) - zostawiam searchCenter z geocodingu`);
+    }
+  }
 
   // 🚫 NIE pokazuj searchCenter jeśli miasto jest poza obsługiwanym regionem
   const validSearchCenter = searchCenter && !searchCenter.outOfRegion ? searchCenter : null;

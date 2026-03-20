@@ -183,6 +183,22 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         setShowDropdown(sugg.length > 0);
         setValidationState(sugg.length > 0 ? 'valid' : 'invalid');
         setHighlightedIndex(-1);
+
+        // 📊 Analytics: Track when autocomplete returns no results
+        if (sugg.length === 0 && cityInput.length >= 2) {
+          fetch('/api/analytics/app-track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              eventType: 'autocomplete_no_results',
+              metadata: {
+                query: cityInput,
+                queryLength: cityInput.length,
+                selectedType: selectedType,
+              },
+            }),
+          }).catch(err => console.error('Analytics tracking error:', err));
+        }
       } catch (error) {
         console.error('Autocomplete error:', error);
         setSuggestions([]);

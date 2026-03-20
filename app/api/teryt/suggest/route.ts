@@ -53,6 +53,12 @@ export async function GET(request: NextRequest) {
       const terytWhere: any = {
         nazwa_normalized: {
           contains: normalizedQuery
+        },
+        // ✅ FILTR: Tylko główne miejscowości (wsie + miasta)
+        // Eliminujemy 77% szumu (RM=00 części wsi) dla lepszego UX autocomplete
+        // Proximity search backend dalej działa dla WSZYSTKICH lokalizacji
+        rodzaj_miejscowosci: {
+          in: ['01', '96', '98', '03'] // wieś, miasto PP, miasto, osada
         }
       };
 

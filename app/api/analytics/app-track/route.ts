@@ -14,6 +14,7 @@ const ALLOWED_EVENTS = [
   'advisor_step',
   'advisor_completed',
   'advisor_abandoned',
+  'autocomplete_no_results',
 ] as const;
 
 export async function POST(request: NextRequest) {
