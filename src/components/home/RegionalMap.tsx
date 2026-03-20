@@ -44,8 +44,20 @@ export default function RegionalMap({ powiatCounts, totalFacilities }: RegionalM
     : null;
 
   const handleCountyClick = (county: typeof MALOPOLSKIE_COUNTIES[0]) => {
-    const normalized = normalizePowiatName(county.name);
-    router.push(`/search?powiat=${encodeURIComponent(normalized)}`);
+    // Miasta na prawach powiatu (id >= 1261): szukaj po MIEJSCOWOŚCI z flagą city=true
+    // To zapobiega pokazywaniu całego powiatu - backend powinien filtrować tylko do miasta
+    // Powiaty ziemskie (id < 1261): szukaj po POWIECIE (powiat=...)
+    const isCityCounty = parseInt(county.id) >= 1261;
+
+    if (isCityCounty) {
+      // Dla miast: q=Kraków&city=true
+      // Flaga city=true mówi backendowi żeby filtrował tylko placówki z miejscowosc=Kraków
+      router.push(`/search?q=${encodeURIComponent(county.name)}&city=true`);
+    } else {
+      // Dla powiatów: powiat=krakowski
+      const normalized = normalizePowiatName(county.name);
+      router.push(`/search?powiat=${encodeURIComponent(normalized)}`);
+    }
   };
 
   return (

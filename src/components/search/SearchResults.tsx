@@ -148,7 +148,7 @@ export default function SearchResults({
   const [selectedPowiat, setSelectedPowiat] = useState(getInitialPowiat());
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
   const [priceLimit, setPriceLimit] = useState(
-    activeFilters?.maxPrice || 10000
+    activeFilters?.maxPrice || 12000  // Zwiększono z 10000 do 12000 (max cena w bazie: 11300 zł)
   );
 
   const [showFilters, setShowFilters] = useState(false);
@@ -312,6 +312,15 @@ export default function SearchResults({
     setCityInput(currentQuery);
 
     if (currentQuery.trim() === '') {
+      // 🔧 FIX: NIE czyść facilities gdy:
+      // - Jest aktywny filtr powiatu (TRYB 5 - klik z mapy)
+      // - Mamy wyniki z servera (results.length > 0)
+      // To oznacza że query jest puste BO user kliknął powiat, a nie bo wyczyścił pole
+      if (activeFilters?.powiat && results.length > 0) {
+        console.log('⏭️ NIE czyścimy facilities - TRYB 5 (powiat z mapy)');
+        return;
+      }
+
       // Clear everything when search is empty
       setFacilities([]);
       setSelectedPowiat('Wszystkie');
@@ -330,7 +339,7 @@ export default function SearchResults({
         router.push(`/search${viewParam ? '?' + viewParam : ''}`);
       }
     }
-  }, [currentQuery, maxDistanceFromServer, showMapMobile, userLocation, router]);
+  }, [currentQuery, maxDistanceFromServer, showMapMobile, userLocation, router, activeFilters, results]);
 
   // Load favorites on mount
   useEffect(() => {
@@ -372,8 +381,10 @@ export default function SearchResults({
     });
 
     // ✅ If cityInput is completely empty (user cleared it), show no results
-    // EXCEPT when using geolocation (userLocation is set)
-    if ((!cityInput || cityInput.trim() === '') && !userLocation) {
+    // EXCEPT when:
+    // - using geolocation (userLocation is set)
+    // - powiat filter is active (TRYB 5 - klik z mapy regionowej)
+    if ((!cityInput || cityInput.trim() === '') && !userLocation && !activeFilters?.powiat) {
       setFacilities([]);
       return;
     }

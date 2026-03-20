@@ -164,6 +164,7 @@ interface SearchPageProps {
     lat?: string;
     lng?: string;
     near?: string;
+    city?: string;  // true when searching for city-only (miasta na prawach powiatu)
   }>;
 }
 
@@ -187,10 +188,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   let powiatParam = params.powiat || ''; // let zamiast const - może być auto-assigned przez exact match detection
   const isPartialSearch = params.partial === 'true';
+  const cityOnly = params.city === 'true';  // true = szukaj tylko w miejscowości (miasta na prawach powiatu)
 
   const userLat = params.lat ? parseFloat(params.lat) : null;
   const userLng = params.lng ? parseFloat(params.lng) : null;
   const isNearSearch = params.near === 'true';
+
+  console.log('🔍 SEARCH PAGE - Search params:', {
+    query: query || '(empty)',
+    type,
+    wojewodztwo,
+    powiatParam: powiatParam || '(empty)',
+    isNearSearch,
+  });
 
   let results: any[] = [];
   let terytMatches: any[] = [];
@@ -301,13 +311,32 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   }
   // TRYB 5: POWIAT ONLY (klik z mapy Małopolski)
   else if (!query && powiatParam && wojewodztwo === 'all') {
+    console.log('🗺️ TRYB 5: POWIAT ONLY (klik z mapy)');
+    console.log('  powiatParam:', powiatParam);
+    console.log('  wojewodztwo:', wojewodztwo);
+    console.log('  allFacilities count:', allFacilities.length);
+
     // Apply city county mapping before filtering
     const mappedPowiat = mapCityCountyToPowiat(powiatParam);
     const normalizedTarget = normalizePolish(mappedPowiat);
+
+    console.log('  mappedPowiat:', mappedPowiat);
+    console.log('  normalizedTarget:', normalizedTarget);
+
     results = allFacilities.filter(facility => {
       const normalizedFacilityPowiat = normalizePolish(facility.powiat);
       return normalizedFacilityPowiat === normalizedTarget || normalizedFacilityPowiat.includes(normalizedTarget);
     });
+
+    console.log('  ✅ Results after filter:', results.length);
+    if (results.length === 0) {
+      // Debug: Show all unique powiat values in DB
+      const uniquePowiats = [...new Set(allFacilities.map(f => f.powiat))].sort();
+      console.log('  📋 All unique powiats in DB:', uniquePowiats);
+      console.log('  📋 Normalized powiats:');
+      uniquePowiats.forEach(p => console.log(`      "${p}" → "${normalizePolish(p)}"`));
+    }
+
     message = '';
   }
   // TRYB 4: WOJEWÓDZTWO ONLY (RegionModal)
@@ -380,9 +409,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // Jeśli user wpisał np. "Olkusz" i kliknął Enter zanim załadowały się sugestie,
       // automatycznie przypisz powiat z TERYT exact match
       // ✅ WYŁĄCZ dla miast na prawach powiatu (Kraków, Nowy Sącz, Tarnów)
+      // ✅ WYŁĄCZ gdy cityOnly=true (klik na miasto z mapy homepage)
       const isCityCountyQuery = ['krakow', 'nowy sacz', 'tarnow'].includes(normalizedQuery);
 
-      if (!powiatParam && terytMatches.length > 0 && !isCityCountyQuery) {
+      if (!powiatParam && terytMatches.length > 0 && !isCityCountyQuery && !cityOnly) {
         const exactMatches = terytMatches.filter((t: any) =>
           normalizePolish(t.nazwa) === normalizedQuery
         );
@@ -435,6 +465,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         }
         return true;
       });
+
+      // ✅ CITY ONLY MODE: Filtruj tylko placówki w tej miejscowości (miasta na prawach powiatu)
+      // Gdy klikamy na miasto Kraków na mapie, pokazuj tylko placówki gdzie miejscowosc="Kraków"
+      if (cityOnly && query) {
+        results = results.filter(facility => {
+          return facility.miejscowosc === query;
+        });
+        console.log(`🏙️ CITY ONLY MODE: "${query}" → ${results.length} placówek`);
+      }
 
         // ✅ ROZDZIELENIE LOGIKI:
         // 1. powiatBreakdown - TYLKO gdy user NIE wybrał konkretnego powiatu (dla banneru informacyjnego)
@@ -727,6 +766,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const capitalCityWarning = isCapitalCity && powiatParam && sortedResults.length > 0
     ? { cityName: query, powiat: powiatParam }
     : undefined;
+
+  console.log('📤 Passing to SearchResults:', {
+    query: query || '(empty)',
+    resultsCount: sortedResults.length,
+    message,
+    searchCenter: validSearchCenter ? 'yes' : 'undefined',
+    powiatParam: powiatParam || '(empty)',
+  });
 
   return (
     <SearchResults

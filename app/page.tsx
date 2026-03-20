@@ -38,8 +38,9 @@ export default async function Home() {
   }
 
   // Nowy Sącz (miasto) - tylko placówki w mieście Nowy Sącz
+  // ⚠️ UWAGA: W bazie są DWA powiaty: "m. Nowy Sącz" i "nowosądecki"
+  // Liczymy placówki z OBOK powiatów gdzie miejscowosc="Nowy Sącz"
   const nowySaczCity = allFacilities.filter(f =>
-    (f.powiat?.toLowerCase().includes('nowosądecki') || f.powiat?.toLowerCase().includes('nowosadecki')) &&
     f.miejscowosc === 'Nowy Sącz'
   ).length;
   if (nowySaczCity > 0) {
@@ -47,8 +48,9 @@ export default async function Home() {
   }
 
   // Tarnów (miasto) - tylko placówki w mieście Tarnów
+  // ⚠️ UWAGA: W bazie są DWA powiaty: "m. Tarnów" i "tarnowski"
+  // Liczymy placówki z OBOK powiatów gdzie miejscowosc="Tarnów"
   const tarnowCity = allFacilities.filter(f =>
-    f.powiat?.toLowerCase().includes('tarnowski') &&
     f.miejscowosc === 'Tarnów'
   ).length;
   if (tarnowCity > 0) {
