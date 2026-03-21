@@ -310,6 +310,12 @@ export default function FacilityMap({
 
   const center: [number, number] = [50.0647, 19.9450];
 
+  // Granice Polski - ograniczenie przesuwania mapy
+  const polandBounds: L.LatLngBoundsExpression = [
+    [48.9, 14.1],  // Południowy zachód (Tatry)
+    [54.9, 24.2]   // Północny wschód (Bałtyk)
+  ];
+
   return (
     <div className="w-full h-full">
       <style jsx global>{`
@@ -338,7 +344,7 @@ export default function FacilityMap({
           filter: brightness(1.15) contrast(0.8) saturate(0.65) hue-rotate(5deg);
         }
       `}</style>
-      
+
       <div className="h-full rounded-lg overflow-hidden border border-gray-200">
         <MapContainer
 
@@ -347,6 +353,9 @@ export default function FacilityMap({
           style={{ height: '100%', width: '100%' }}
           scrollWheelZoom={false}
           zoomControl={true}
+          minZoom={6}
+          maxBounds={polandBounds}
+          maxBoundsViscosity={1.0}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

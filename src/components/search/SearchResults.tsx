@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { isFavorite, addFavorite, removeFavorite } from '@/src/utils/favorites';
 import { getShortProfileLabels } from '@/src/lib/profileLabels';
 import { useAppAnalytics } from '@/src/hooks/useAppAnalytics';
@@ -120,6 +120,8 @@ export default function SearchResults({
 }: SearchResultsProps) {
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const showAll = searchParams.get('showAll') === 'true';
   const { trackEmptyResults, trackFilterApplied, trackCrossPowiatView } = useAppAnalytics();
   const filterTrackedRef = useRef<string>('');
 
@@ -315,9 +317,10 @@ export default function SearchResults({
       // 🔧 FIX: NIE czyść facilities gdy:
       // - Jest aktywny filtr powiatu (TRYB 5 - klik z mapy)
       // - Mamy wyniki z servera (results.length > 0)
-      // To oznacza że query jest puste BO user kliknął powiat, a nie bo wyczyścił pole
-      if (activeFilters?.powiat && results.length > 0) {
-        console.log('⏭️ NIE czyścimy facilities - TRYB 5 (powiat z mapy)');
+      // - showAll flag jest ustawiony (pokazuj wszystkie placówki)
+      // To oznacza że query jest puste BO user kliknął powiat/showAll, a nie bo wyczyścił pole
+      if ((activeFilters?.powiat && results.length > 0) || showAll) {
+        console.log('⏭️ NIE czyścimy facilities - TRYB 5 (powiat z mapy) lub showAll');
         return;
       }
 
@@ -339,7 +342,7 @@ export default function SearchResults({
         router.push(`/search${viewParam ? '?' + viewParam : ''}`);
       }
     }
-  }, [currentQuery, maxDistanceFromServer, showMapMobile, userLocation, router, activeFilters, results]);
+  }, [currentQuery, maxDistanceFromServer, showMapMobile, userLocation, router, activeFilters, results, showAll]);
 
   // Load favorites on mount
   useEffect(() => {
@@ -384,7 +387,8 @@ export default function SearchResults({
     // EXCEPT when:
     // - using geolocation (userLocation is set)
     // - powiat filter is active (TRYB 5 - klik z mapy regionowej)
-    if ((!cityInput || cityInput.trim() === '') && !userLocation && !activeFilters?.powiat) {
+    // - showAll flag is true (pokazuj wszystkie placówki z województwa)
+    if ((!cityInput || cityInput.trim() === '') && !userLocation && !activeFilters?.powiat && !showAll) {
       setFacilities([]);
       return;
     }
@@ -535,7 +539,7 @@ export default function SearchResults({
     }
   }, [
     results, selectedType, cityInput, selectedVoivodeship, selectedPowiat,
-    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, powiatSearchCenters, sortParam, trackEmptyResults, trackFilterApplied
+    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, powiatSearchCenters, sortParam, trackEmptyResults, trackFilterApplied, showAll
   ]);
 
   // Scroll depth tracking

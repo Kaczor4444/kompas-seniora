@@ -111,7 +111,7 @@ export default function RegionalMap({ powiatCounts, totalFacilities }: RegionalM
             {/* CTA BUTTON — DESKTOP */}
             <div className="hidden lg:flex pt-2">
               <button
-                onClick={() => router.push('/search')}
+                onClick={() => router.push('/search?woj=malopolskie&showAll=true')}
                 className="bg-slate-900 text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.15)] hover:bg-emerald-600 hover:-translate-y-1 transition-all active:scale-95 group"
               >
                 Wszystkie placówki Małopolski <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
@@ -187,7 +187,7 @@ export default function RegionalMap({ powiatCounts, totalFacilities }: RegionalM
       {/* CTA BUTTON — MOBILE */}
       <div className="lg:hidden mt-10 px-4 flex justify-center">
         <button
-          onClick={() => router.push('/search')}
+          onClick={() => router.push('/search?woj=malopolskie&showAll=true')}
           className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl hover:bg-emerald-600 transition-all active:scale-95 group text-sm w-full sm:w-auto justify-center"
         >
           Wszystkie placówki Małopolski <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
