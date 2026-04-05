@@ -68,8 +68,9 @@ export const sections: Section[] = [
         slug: 'dps-vs-sds',
         sectionId: 'wybor-opieki',
         category: 'Wybór opieki',
-        badge: 'WKRÓTCE',
-        isActive: false,
+        badge: 'NOWY ARTYKUŁ',
+        thumbnail: '/images/babcia_dom_opieki.webp',
+        isActive: true,
       },
       {
         slug: 'opieka-dzienna-calodobowa',
@@ -121,6 +122,8 @@ export const sections: Section[] = [
         slug: 'aktywnosc-fizyczna',
         sectionId: 'dla-seniora',
         category: 'Dla seniora',
+        badge: 'NOWE',
+        thumbnail: '/images/aktywnosc_seniora.webp',
       },
       {
         slug: 'internet-bezpieczenstwo',
@@ -136,6 +139,8 @@ export const sections: Section[] = [
         slug: 'zdrowie-po-70',
         sectionId: 'dla-seniora',
         category: 'Dla seniora',
+        badge: 'NOWE',
+        thumbnail: '/images/senior_cwiczenia.webp',
       },
       {
         slug: 'planowanie-dnia',
