@@ -286,3 +286,4 @@ searchCenter: validSearchCenter ? {
 - **Branch:** main
 - **Ostatni commit:** (pending)
 - **Status:** Out-of-region detection w pełni działa ✅
+1

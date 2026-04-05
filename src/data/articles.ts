@@ -102,6 +102,8 @@ export const sections: Section[] = [
         slug: 'wsparcie-demencja',
         sectionId: 'dla-opiekuna',
         category: 'Dla opiekuna',
+        badge: 'NOWE',
+        thumbnail: '/images/demencja.webp',
       },
       {
         slug: 'udogodnienia-dom',
