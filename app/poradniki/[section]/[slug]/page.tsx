@@ -183,7 +183,7 @@ export default async function ArticlePage({
         updatedAt={article.frontmatter.updatedAt}
         headings={headings}
         downloads={article.frontmatter.downloads}
-        thumbnail={article.frontmatter.thumbnail}
+        heroImage={article.frontmatter.heroImage}
       >
         <MDXRemote source={article.content} components={components} />
       </ArticleLayout>

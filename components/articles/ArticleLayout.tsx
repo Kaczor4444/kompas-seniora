@@ -13,7 +13,7 @@ interface ArticleLayoutProps {
   updatedAt?: string
   headings?: Array<{ id: string; text: string; level: number }>
   downloads?: Array<{ title: string; url: string; icon?: string }>
-  thumbnail?: string
+  heroImage?: string
 }
 
 const categoryMap: Record<string, { name: string; slug: string }> = {
@@ -32,7 +32,7 @@ export default function ArticleLayout({
   updatedAt,
   headings = [],
   downloads = [],
-  thumbnail,
+  heroImage,
 }: ArticleLayoutProps) {
   const categoryInfo = categoryMap[category] || { name: category, slug: category }
 
@@ -147,10 +147,10 @@ export default function ArticleLayout({
             </header>
 
             {/* Hero Image */}
-            {thumbnail && (
+            {heroImage && (
               <div className="mb-8 md:mb-12 -mx-4 md:mx-0">
                 <img
-                  src={thumbnail}
+                  src={heroImage}
                   alt={title}
                   className="w-full h-auto rounded-none md:rounded-xl object-cover shadow-lg"
                 />
