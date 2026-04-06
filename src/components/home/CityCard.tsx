@@ -6,30 +6,16 @@ import { MapPin, ChevronRight } from 'lucide-react';
 
 interface CityCardProps {
   name: string;
-  slug: string;
+  slug: string; // Still needed by parent component
   count: number;
 }
 
-const CityCard = memo(({ name, slug, count }: CityCardProps) => {
-  // ✅ Dla miast na prawach powiatu dodaj parametr powiat
+const CityCard = memo(({ name, count }: CityCardProps) => {
+  // ✅ Szukaj tylko w mieście (nie w całym powiecie) - używamy parametru city=true
   const getCitySearchUrl = () => {
-    const nameLower = name.toLowerCase();
-
-    // Kraków → powiat krakowski (35 placówek w mieście)
-    if (nameLower === 'kraków') {
-      return `/search?q=${slug}&powiat=krakowski`;
-    }
-    // Nowy Sącz → powiat nowosądecki
-    if (nameLower === 'nowy sącz') {
-      return `/search?q=${slug}&powiat=nowosądecki`;
-    }
-    // Tarnów → powiat tarnowski
-    if (nameLower === 'tarnów') {
-      return `/search?q=${slug}&powiat=tarnowski`;
-    }
-
-    // Dla innych miast - tylko query
-    return `/search?q=${slug}`;
+    // Przekazujemy name (z wielką literą) żeby pasowało do pola miejscowosc w bazie
+    // city=true aktywuje CITY ONLY MODE w search/page.tsx (linie 469-476)
+    return `/search?q=${encodeURIComponent(name)}&city=true`;
   };
 
   return (

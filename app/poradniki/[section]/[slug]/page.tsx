@@ -49,6 +49,7 @@ interface ArticleFrontmatter {
   publishedAt: string
   updatedAt?: string
   featured?: boolean
+  heroImage?: string
   downloads?: Array<{ title: string; url: string; icon?: string }>
 }
 

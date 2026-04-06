@@ -80,10 +80,10 @@ export default function PopularLocationsSection() {
               Dostępność lokalna
             </div>
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight tracking-tighter">
-              Szukaj w <span className="text-emerald-600">Twoim mieście</span>
+              <span className="text-emerald-600">Największe</span> ośrodki opieki
             </h2>
             <p className="mt-4 text-slate-500 text-base md:text-lg font-medium">
-              Placówki w najpopularniejszych miastach Małopolski.
+              Miasta z najszerszą ofertą placówek DPS i ŚDS w Małopolsce.
             </p>
           </div>
           <Link

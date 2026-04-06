@@ -2,13 +2,12 @@ import { getFacilityStats, type CityStats } from './facility-stats';
 
 export const POPULAR_CITIES_CONFIG = [
   { name: 'Kraków', slug: 'krakow', voivodeship: 'małopolskie' },
-  { name: 'Nowy Sącz', slug: 'nowy+sacz', voivodeship: 'małopolskie' },
   { name: 'Tarnów', slug: 'tarnow', voivodeship: 'małopolskie' },
-  { name: 'Nowy Targ', slug: 'nowy+targ', voivodeship: 'małopolskie' },
-  { name: 'Oświęcim', slug: 'oswiecim', voivodeship: 'małopolskie' },
+  { name: 'Wieliczka', slug: 'wieliczka', voivodeship: 'małopolskie' },
   { name: 'Wadowice', slug: 'wadowice', voivodeship: 'małopolskie' },
-  { name: 'Zakopane', slug: 'zakopane', voivodeship: 'małopolskie' },
-  { name: 'Myślenice', slug: 'myslenice', voivodeship: 'małopolskie' },
+  { name: 'Nowy Sącz', slug: 'nowy+sacz', voivodeship: 'małopolskie' },
+  { name: 'Miechów', slug: 'miechow', voivodeship: 'małopolskie' },
+  { name: 'Gorlice', slug: 'gorlice', voivodeship: 'małopolskie' },
 ] as const;
 
 export type PopularCity = CityStats;

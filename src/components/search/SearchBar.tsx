@@ -140,9 +140,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   // Refs for click outside detection
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isFirstRender = useRef(true);
 
-  // Notify parent of query changes
+  // Notify parent of query changes (skip first render to avoid clearing results on mount)
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     if (onQueryChange) {
       onQueryChange(cityInput);
     }

@@ -595,6 +595,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       }
     }
   }
+  // TRYB 6: BRAK PARAMETRÓW (przycisk "Wszystkie miasta")
+  else {
+    console.log('📋 TRYB 6: WSZYSTKIE PLACÓWKI (brak parametrów)');
+    results = allFacilities;
+    message = '';
+  }
 
   // FILTROWANIE PO TYPIE (DPS / ŚDS)
   // ⚠️ UWAGA: W bazie wartości to "DPS" i "ŚDS" (z polskim znakiem Ś!)

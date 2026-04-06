@@ -297,6 +297,7 @@ export default function SearchResults({
 
   // Set initial facilities from server
   useEffect(() => {
+    console.log('🔄 Setting facilities from results:', results.length);
     setFacilities(results);
   }, [results]);
 
@@ -315,16 +316,22 @@ export default function SearchResults({
 
     if (currentQuery.trim() === '') {
       // 🔧 FIX: NIE czyść facilities gdy:
-      // - Jest aktywny filtr powiatu (TRYB 5 - klik z mapy)
-      // - Mamy wyniki z servera (results.length > 0)
-      // - showAll flag jest ustawiony (pokazuj wszystkie placówki)
-      // To oznacza że query jest puste BO user kliknął powiat/showAll, a nie bo wyczyścił pole
-      if ((activeFilters?.powiat && results.length > 0) || showAll) {
-        console.log('⏭️ NIE czyścimy facilities - TRYB 5 (powiat z mapy) lub showAll');
+      // 1. Jest aktywny filtr powiatu (TRYB 5 - klik z mapy)
+      // 2. showAll flag jest ustawiony (pokazuj wszystkie placówki)
+      // 3. Server przesłał puste query (query === '') I mamy wyniki (TRYB 6 - wszystkie placówki)
+      //    To znaczy że to NIE jest sytuacja gdzie user wyczyścił pole, tylko SearchBar się inicjalizuje
+      if ((activeFilters?.powiat && results.length > 0) || showAll || (query === '' && results.length > 0)) {
+        console.log('⏭️ NIE czyścimy facilities - mamy wyniki z servera (TRYB 5/6 lub showAll)', {
+          powiatFilter: activeFilters?.powiat,
+          resultsLength: results.length,
+          showAll,
+          query
+        });
         return;
       }
 
       // Clear everything when search is empty
+      console.log('🗑️ CZYSZCZENIE facilities - currentQuery jest puste i nie ma wyników z servera');
       setFacilities([]);
       setSelectedPowiat('Wszystkie');
       setSelectedProfiles([]);
@@ -388,7 +395,9 @@ export default function SearchResults({
     // - using geolocation (userLocation is set)
     // - powiat filter is active (TRYB 5 - klik z mapy regionowej)
     // - showAll flag is true (pokazuj wszystkie placówki z województwa)
-    if ((!cityInput || cityInput.trim() === '') && !userLocation && !activeFilters?.powiat && !showAll) {
+    // - TRYB 6: server przesłał wszystkie placówki (query === '' && results.length > 0)
+    if ((!cityInput || cityInput.trim() === '') && !userLocation && !activeFilters?.powiat && !showAll && !(query === '' && results.length > 0)) {
+      console.log('🗑️ Czyszczenie facilities - brak inputu i specjalnych trybów');
       setFacilities([]);
       return;
     }
@@ -465,8 +474,9 @@ export default function SearchResults({
       });
     }
 
-    // Distance from searched city filter (only when searchCenter exists)
-    if (searchCenter && !userLocation) {
+    // Distance from searched city filter (only when searchCenter exists AND not TRYB 6)
+    // TRYB 6: gdy query='' i serwer wysłał wszystkie wyniki - nie filtruj po odległości
+    if (searchCenter && !userLocation && !(query === '' && results.length > 0)) {
       filtered = filtered.filter(f => {
         // Jeśli placówka nie ma współrzędnych LUB distanceFromCity nie jest obliczony, ukryj ją
         if (f.distanceFromCity === null || f.distanceFromCity === undefined) {
@@ -1074,12 +1084,16 @@ export default function SearchResults({
                   <p className="text-slate-400 text-sm">Przykłady: Kraków, Tarnów, Nowy Sącz, Zakopane</p>
                 </div>
               ) : facilities.length === 0 ? (
-                <EmptyState
-                  onResetFilters={resetFilters}
-                  cityInput={cityInput}
-                  outOfRegion={searchCenter?.outOfRegion}
-                  outOfRegionCityName={searchCenter?.name}
-                />
+                // Nie pokazuj EmptyState gdy query jest puste ALE mamy wyniki z servera
+                // (TRYB 6 - wszystkie placówki bez wyszukiwania)
+                query === '' && results.length > 0 ? null : (
+                  <EmptyState
+                    onResetFilters={resetFilters}
+                    cityInput={cityInput}
+                    outOfRegion={searchCenter?.outOfRegion}
+                    outOfRegionCityName={searchCenter?.name}
+                  />
+                )
               ) : (
                 <>
                   {facilities.slice(0, visibleCount).map(fac => (

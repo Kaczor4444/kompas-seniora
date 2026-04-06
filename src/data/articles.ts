@@ -30,11 +30,12 @@ export const sections: Section[] = [
     title: 'Wybór opieki',
     icon: 'Building2',
     articles: [
-      {
-        slug: 'rodzaje-opieki',
-        sectionId: 'wybor-opieki',
-        category: 'Wybór opieki',
-      },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'rodzaje-opieki',
+      //   sectionId: 'wybor-opieki',
+      //   category: 'Wybór opieki',
+      // },
       {
         slug: 'wybor-placowki',
         sectionId: 'wybor-opieki',
@@ -59,11 +60,12 @@ export const sections: Section[] = [
         thumbnail: '/images/seniorzy_ciasto.png',
         featuredOrder: 3,
       },
-      {
-        slug: 'zgoda-seniora',
-        sectionId: 'wybor-opieki',
-        category: 'Wybór opieki',
-      },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'zgoda-seniora',
+      //   sectionId: 'wybor-opieki',
+      //   category: 'Wybór opieki',
+      // },
       {
         slug: 'dps-vs-sds',
         sectionId: 'wybor-opieki',
@@ -72,11 +74,12 @@ export const sections: Section[] = [
         thumbnail: '/images/babcia_dom_opieki.webp',
         isActive: true,
       },
-      {
-        slug: 'opieka-dzienna-calodobowa',
-        sectionId: 'wybor-opieki',
-        category: 'Wybór opieki',
-      },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'opieka-dzienna-calodobowa',
+      //   sectionId: 'wybor-opieki',
+      //   category: 'Wybór opieki',
+      // },
     ],
   },
   {
@@ -84,21 +87,22 @@ export const sections: Section[] = [
     title: 'Dla opiekuna',
     icon: 'Heart',
     articles: [
-      {
-        slug: 'organizacja-opieki',
-        sectionId: 'dla-opiekuna',
-        category: 'Dla opiekuna',
-      },
-      {
-        slug: 'komunikacja-senior',
-        sectionId: 'dla-opiekuna',
-        category: 'Dla opiekuna',
-      },
-      {
-        slug: 'higiena-pielegnacja',
-        sectionId: 'dla-opiekuna',
-        category: 'Dla opiekuna',
-      },
+      // WKRÓTCE - odkomentuj gdy artykuły będą gotowe
+      // {
+      //   slug: 'organizacja-opieki',
+      //   sectionId: 'dla-opiekuna',
+      //   category: 'Dla opiekuna',
+      // },
+      // {
+      //   slug: 'komunikacja-senior',
+      //   sectionId: 'dla-opiekuna',
+      //   category: 'Dla opiekuna',
+      // },
+      // {
+      //   slug: 'higiena-pielegnacja',
+      //   sectionId: 'dla-opiekuna',
+      //   category: 'Dla opiekuna',
+      // },
       {
         slug: 'wsparcie-demencja',
         sectionId: 'dla-opiekuna',
@@ -106,11 +110,12 @@ export const sections: Section[] = [
         badge: 'NOWE',
         thumbnail: '/images/demencja.webp',
       },
-      {
-        slug: 'udogodnienia-dom',
-        sectionId: 'dla-opiekuna',
-        category: 'Dla opiekuna',
-      },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'udogodnienia-dom',
+      //   sectionId: 'dla-opiekuna',
+      //   category: 'Dla opiekuna',
+      // },
     ],
   },
   {
@@ -125,16 +130,17 @@ export const sections: Section[] = [
         badge: 'NOWE',
         thumbnail: '/images/aktywnosc_seniora.webp',
       },
-      {
-        slug: 'internet-bezpieczenstwo',
-        sectionId: 'dla-seniora',
-        category: 'Dla seniora',
-      },
-      {
-        slug: 'emerytura-plan',
-        sectionId: 'dla-seniora',
-        category: 'Dla seniora',
-      },
+      // WKRÓTCE - odkomentuj gdy artykuły będą gotowe
+      // {
+      //   slug: 'internet-bezpieczenstwo',
+      //   sectionId: 'dla-seniora',
+      //   category: 'Dla seniora',
+      // },
+      // {
+      //   slug: 'emerytura-plan',
+      //   sectionId: 'dla-seniora',
+      //   category: 'Dla seniora',
+      // },
       {
         slug: 'zdrowie-po-70',
         sectionId: 'dla-seniora',
@@ -142,18 +148,20 @@ export const sections: Section[] = [
         badge: 'NOWE',
         thumbnail: '/images/senior_cwiczenia.webp',
       },
-      {
-        slug: 'planowanie-dnia',
-        sectionId: 'dla-seniora',
-        category: 'Dla seniora',
-      },
-      {
-        slug: 'przygotowanie-seniora',
-        sectionId: 'dla-seniora',
-        category: 'Dla seniora',
-        badge: 'WKRÓTCE',
-        isActive: false,
-      },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'planowanie-dnia',
+      //   sectionId: 'dla-seniora',
+      //   category: 'Dla seniora',
+      // },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'przygotowanie-seniora',
+      //   sectionId: 'dla-seniora',
+      //   category: 'Dla seniora',
+      //   badge: 'WKRÓTCE',
+      //   isActive: false,
+      // },
     ],
   },
   {
@@ -162,80 +170,85 @@ export const sections: Section[] = [
     icon: 'Wallet',
     articles: [
       // Finanse
-      {
-        slug: 'dodatek-pielegnacyjny',
-        sectionId: 'finanse-prawne',
-        category: 'Finanse',
-      },
-      {
-        slug: 'zasilek-opiekunczy',
-        sectionId: 'finanse-prawne',
-        category: 'Finanse',
-      },
-      {
-        slug: 'swiadczenia-mops',
-        sectionId: 'finanse-prawne',
-        category: 'Finanse',
-      },
-      {
-        slug: 'dofinansowania-2025',
-        sectionId: 'finanse-prawne',
-        category: 'Finanse',
-      },
-      {
-        slug: 'ulgi-podatkowe',
-        sectionId: 'finanse-prawne',
-        category: 'Finanse',
-      },
-      {
-        slug: 'koszty-opieki',
-        sectionId: 'finanse-prawne',
-        category: 'Finanse',
-        badge: 'WKRÓTCE',
-        thumbnail: '/images/senior_obliczenia.webp',
-        isActive: false,
-        featuredOrder: 4,
-      },
+      // WKRÓTCE - odkomentuj gdy artykuły będą gotowe
+      // {
+      //   slug: 'dodatek-pielegnacyjny',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Finanse',
+      // },
+      // {
+      //   slug: 'zasilek-opiekunczy',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Finanse',
+      // },
+      // {
+      //   slug: 'swiadczenia-mops',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Finanse',
+      // },
+      // {
+      //   slug: 'dofinansowania-2025',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Finanse',
+      // },
+      // {
+      //   slug: 'ulgi-podatkowe',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Finanse',
+      // },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'koszty-opieki',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Finanse',
+      //   badge: 'WKRÓTCE',
+      //   thumbnail: '/images/senior_obliczenia.webp',
+      //   isActive: false,
+      //   featuredOrder: 4,
+      // },
       // Prawne
-      {
-        slug: 'prawa-mieszkancow',
-        sectionId: 'finanse-prawne',
-        category: 'Prawne',
-      },
-      {
-        slug: 'zgoda-na-opieke',
-        sectionId: 'finanse-prawne',
-        category: 'Prawne',
-      },
-      {
-        slug: 'ubezwlasnowolnienie',
-        sectionId: 'finanse-prawne',
-        category: 'Prawne',
-      },
-      {
-        slug: 'prawa-opiekunow',
-        sectionId: 'finanse-prawne',
-        category: 'Prawne',
-      },
-      {
-        slug: 'umowy-placowki',
-        sectionId: 'finanse-prawne',
-        category: 'Prawne',
-      },
-      {
-        slug: 'dokumenty-wniosek',
-        sectionId: 'finanse-prawne',
-        category: 'Prawne',
-        badge: 'WKRÓTCE',
-        isActive: false,
-      },
-      {
-        slug: 'prawa-mieszkanca',
-        sectionId: 'finanse-prawne',
-        category: 'Prawne',
-        badge: 'WKRÓTCE',
-        isActive: false,
-      },
+      // WKRÓTCE - odkomentuj gdy artykuły będą gotowe
+      // {
+      //   slug: 'prawa-mieszkancow',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Prawne',
+      // },
+      // {
+      //   slug: 'zgoda-na-opieke',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Prawne',
+      // },
+      // {
+      //   slug: 'ubezwlasnowolnienie',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Prawne',
+      // },
+      // {
+      //   slug: 'prawa-opiekunow',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Prawne',
+      // },
+      // {
+      //   slug: 'umowy-placowki',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Prawne',
+      // },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'dokumenty-wniosek',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Prawne',
+      //   badge: 'WKRÓTCE',
+      //   isActive: false,
+      // },
+      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
+      // {
+      //   slug: 'prawa-mieszkanca',
+      //   sectionId: 'finanse-prawne',
+      //   category: 'Prawne',
+      //   badge: 'WKRÓTCE',
+      //   isActive: false,
+      // },
     ],
   },
 ];
