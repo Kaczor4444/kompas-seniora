@@ -81,12 +81,12 @@ export default function KnowledgeCenter({ articles: featuredArticles }: Knowledg
     setTimeout(() => setShowToast(false), 3000)
   }
 
-  // Filter articles
+  // Filter articles - hide inactive (WKRÓTCE) articles
   const filteredArticles = activeFilter === 'Zakładki'
-    ? articles.filter(a => savedArticles.includes(a.id))
+    ? articles.filter(a => savedArticles.includes(a.id) && a.isActive)
     : activeFilter === 'Wszystkie'
-      ? articles
-      : articles.filter(a => a.category === activeFilter)
+      ? articles.filter(a => a.isActive)
+      : articles.filter(a => a.category === activeFilter && a.isActive)
 
   // Keyboard navigation
   useEffect(() => {
@@ -340,7 +340,7 @@ export default function KnowledgeCenter({ articles: featuredArticles }: Knowledg
         {/* CTA dla więcej artykułów */}
         <div className="text-center mt-4">
           <Link href="/poradniki" className="bg-slate-900 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-[0.15em] transition-all active:scale-95 inline-flex items-center gap-2">
-            Zobacz wszystkie poradniki ({articles.length})
+            Zobacz wszystkie poradniki ({articles.filter(a => a.isActive).length})
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
