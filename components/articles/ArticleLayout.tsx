@@ -148,11 +148,11 @@ export default function ArticleLayout({
 
             {/* Hero Image */}
             {heroImage && (
-              <div className="mb-8 md:mb-12 -mx-4 md:mx-0">
+              <div className="mb-8 md:mb-12 -mx-4 md:mx-0 overflow-hidden rounded-none md:rounded-xl shadow-lg">
                 <img
                   src={heroImage}
                   alt={title}
-                  className="w-full h-auto rounded-none md:rounded-xl object-cover shadow-lg"
+                  className="w-full h-auto max-h-[400px] md:max-h-[500px] object-cover"
                 />
               </div>
             )}
