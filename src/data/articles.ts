@@ -130,12 +130,14 @@ export const sections: Section[] = [
         badge: 'NOWE',
         thumbnail: '/images/aktywnosc_seniora.webp',
       },
-      // WKRÓTCE - odkomentuj gdy artykuły będą gotowe
-      // {
-      //   slug: 'internet-bezpieczenstwo',
-      //   sectionId: 'dla-seniora',
-      //   category: 'Dla seniora',
-      // },
+      {
+        slug: 'internet-bezpieczenstwo',
+        sectionId: 'dla-seniora',
+        category: 'Dla seniora',
+        badge: 'WKRÓTCE',
+        thumbnail: '/images/babcia_tablet.webp',
+        isActive: false,
+      },
       // {
       //   slug: 'emerytura-plan',
       //   sectionId: 'dla-seniora',

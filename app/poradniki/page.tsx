@@ -17,13 +17,19 @@ export default async function PoradnikiPage({ searchParams }: PageProps) {
 
   const enrichedArticles = await enrichArticlesWithMetadata(allArticlesFlat)
 
+  // Override thumbnail if article has custom thumbnail in articles.ts
+  const articlesWithCustomThumbnails = enrichedArticles.map((article, index) => ({
+    ...article,
+    thumbnail: allArticlesFlat[index].thumbnail || article.thumbnail
+  }))
+
   // Get category from search params (server-side)
   const params = await searchParams
   const initialCategory = params.category || 'Wszystkie'
 
   return (
     <PoradnikiContent
-      initialArticles={enrichedArticles}
+      initialArticles={articlesWithCustomThumbnails}
       isFullPage={true}
       showHero={true}
       initialCategory={initialCategory}
