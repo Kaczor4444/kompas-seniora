@@ -393,10 +393,25 @@ export default function Navbar() {
           />
         )}
 
-        {/* Mobile Dropdown */}
-        {isOpen && (
-          <div className={`md:hidden border-t absolute w-full shadow-2xl h-[calc(100vh-80px)] overflow-y-auto ${isHighContrast ? 'bg-black border-yellow-400' : 'bg-white border-stone-100'}`}>
-            <div className="px-4 pt-6 pb-12 space-y-3">
+        {/* Mobile Sidebar - slides from left */}
+        <div className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
+
+          {/* Header with close button */}
+          <div className={`p-6 border-b flex justify-between items-center ${isHighContrast ? 'border-yellow-400' : 'border-stone-200'}`}>
+            <h2 className={`text-xl font-black ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
+              Menu
+            </h2>
+            <button
+              onClick={() => setIsOpen(false)}
+              className={`p-2 rounded-full transition-colors ${isHighContrast ? 'hover:bg-yellow-400 hover:text-black text-yellow-400' : 'hover:bg-stone-100 text-slate-500'}`}
+              aria-label="Zamknij menu"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* Content - scrollable */}
+          <div className="flex-1 overflow-y-auto px-4 pt-6 pb-12 space-y-3">
               <Link href="/search" onClick={() => setIsOpen(false)} className="w-full block">
                 <MobileNavLink isHighContrast={isHighContrast} icon={<Search size={20} />} text="Wyszukiwarka" isActive={isActive('/search')} />
               </Link>
@@ -469,7 +484,7 @@ export default function Navbar() {
                 <span className="font-bold">Kontakt bezpośredni</span>
               </Link>
 
-              <div className="mt-8 pt-8 border-t border-stone-100">
+              <div className={`mt-8 pt-8 border-t ${isHighContrast ? 'border-yellow-400' : 'border-stone-100'}`}>
                 <button
                   onClick={() => { setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen); setIsOpen(false); }}
                   className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
@@ -478,9 +493,8 @@ export default function Navbar() {
                 </button>
               </div>
 
-            </div>
           </div>
-        )}
+        </div>
       </nav>
 
       {/* Progress Bar with shadow */}
