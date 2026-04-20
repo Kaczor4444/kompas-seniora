@@ -274,41 +274,43 @@ export default function TableOfContents({ headings, downloads = [], variant = 'd
   }
 
   return (
-    <aside className="hidden lg:block space-y-6">
-      {/* Action Buttons - sticky, zawsze widoczne */}
-      <div className="sticky top-24 bg-white rounded-xl border-2 border-gray-200 p-4 shadow-sm z-20">
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            onClick={handlePrint}
-            className="flex flex-col items-center gap-1.5 px-3 py-3 bg-gray-50 hover:bg-emerald-50 rounded-lg transition-colors group"
-            aria-label="Drukuj artykuł"
-          >
-            <Printer className="w-5 h-5 text-gray-600 group-hover:text-emerald-600" />
-            <span className="text-xs font-medium text-gray-700 group-hover:text-emerald-700">Drukuj</span>
-          </button>
+    <aside className="hidden lg:block">
+      {/* Jeden sticky kontener z obiema sekcjami */}
+      <div className="sticky top-24 space-y-6">
+        {/* Action Buttons */}
+        <div className="bg-white rounded-xl border-2 border-gray-200 p-4 shadow-sm">
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={handlePrint}
+              className="flex flex-col items-center gap-1.5 px-3 py-3 bg-gray-50 hover:bg-emerald-50 rounded-lg transition-colors group"
+              aria-label="Drukuj artykuł"
+            >
+              <Printer className="w-5 h-5 text-gray-600 group-hover:text-emerald-600" />
+              <span className="text-xs font-medium text-gray-700 group-hover:text-emerald-700">Drukuj</span>
+            </button>
 
-          <button
-            onClick={handleBookmark}
-            className="flex flex-col items-center gap-1.5 px-3 py-3 bg-gray-50 hover:bg-emerald-50 rounded-lg transition-colors group"
-            aria-label={isBookmarked ? 'Usuń z zakładek' : 'Dodaj do zakładek'}
-          >
-            <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-emerald-600 text-emerald-600' : 'text-gray-600 group-hover:text-emerald-600'}`} />
-            <span className="text-xs font-medium text-gray-700 group-hover:text-emerald-700">Zapisz</span>
-          </button>
+            <button
+              onClick={handleBookmark}
+              className="flex flex-col items-center gap-1.5 px-3 py-3 bg-gray-50 hover:bg-emerald-50 rounded-lg transition-colors group"
+              aria-label={isBookmarked ? 'Usuń z zakładek' : 'Dodaj do zakładek'}
+            >
+              <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-emerald-600 text-emerald-600' : 'text-gray-600 group-hover:text-emerald-600'}`} />
+              <span className="text-xs font-medium text-gray-700 group-hover:text-emerald-700">Zapisz</span>
+            </button>
 
-          <button
-            onClick={handleShare}
-            className="flex flex-col items-center gap-1.5 px-3 py-3 bg-gray-50 hover:bg-emerald-50 rounded-lg transition-colors group"
-            aria-label="Udostępnij artykuł"
-          >
-            <Share2 className="w-5 h-5 text-gray-600 group-hover:text-emerald-600" />
-            <span className="text-xs font-medium text-gray-700 group-hover:text-emerald-700">Udostępnij</span>
-          </button>
+            <button
+              onClick={handleShare}
+              className="flex flex-col items-center gap-1.5 px-3 py-3 bg-gray-50 hover:bg-emerald-50 rounded-lg transition-colors group"
+              aria-label="Udostępnij artykuł"
+            >
+              <Share2 className="w-5 h-5 text-gray-600 group-hover:text-emerald-600" />
+              <span className="text-xs font-medium text-gray-700 group-hover:text-emerald-700">Udostępnij</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* TOC - osobny sticky box */}
-      <div className="sticky top-[132px] max-h-[calc(100vh-140px)] bg-white rounded-xl border-2 border-gray-200 shadow-sm overflow-hidden">
+        {/* TOC */}
+        <div className="max-h-[calc(100vh-200px)] bg-white rounded-xl border-2 border-gray-200 shadow-sm overflow-hidden">
         {/* Sticky header z białym tłem */}
         <h3 className="sticky top-0 bg-white z-10 px-6 pt-6 pb-3 border-b-2 border-gray-200 font-bold text-lg text-gray-900 flex items-center gap-2">
           <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -369,6 +371,7 @@ export default function TableOfContents({ headings, downloads = [], variant = 'd
             </div>
           )}
         </nav>
+        </div>
       </div>
     </aside>
   )
