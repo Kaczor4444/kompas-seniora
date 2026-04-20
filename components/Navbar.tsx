@@ -33,7 +33,6 @@ export default function Navbar() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isGuidesHovered, setIsGuidesHovered] = useState(false);
-  const [isMobileGuidesExpanded, setIsMobileGuidesExpanded] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -394,10 +393,10 @@ export default function Navbar() {
         )}
 
         {/* Mobile Sidebar - slides from left */}
-        <div className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
+        <div className={`fixed top-0 left-0 h-screen w-[85vw] max-w-md shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
 
           {/* Header with close button */}
-          <div className={`p-6 border-b flex justify-between items-center ${isHighContrast ? 'border-yellow-400 bg-black' : 'border-stone-200 bg-white'}`}>
+          <div className={`p-4 border-b flex justify-between items-center ${isHighContrast ? 'border-yellow-400 bg-black' : 'border-stone-200 bg-white'}`}>
             <h2 className={`text-xl font-black ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
               Menu
             </h2>
@@ -411,7 +410,7 @@ export default function Navbar() {
           </div>
 
           {/* Content - scrollable */}
-          <div className={`flex-1 overflow-y-auto px-4 pt-6 pb-12 space-y-3 ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
+          <div className={`flex-1 overflow-y-auto px-4 pt-4 pb-6 space-y-2 ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
               <Link href="/search" onClick={() => setIsOpen(false)} className="w-full block">
                 <MobileNavLink isHighContrast={isHighContrast} icon={<Search size={20} />} text="Wyszukiwarka" isActive={isActive('/search')} />
               </Link>
@@ -437,39 +436,30 @@ export default function Navbar() {
                 <MobileNavLink isHighContrast={isHighContrast} icon={<Heart size={20} />} text="Ulubione" badge={favoritesCount > 0 ? favoritesCount.toString() : undefined} isActive={isActive('/ulubione')} />
               </Link>
 
-              <div className={`rounded-xl overflow-hidden transition-all border ${isMobileGuidesExpanded ? 'bg-stone-50 border-stone-200' : 'border-transparent'}`}>
-                <button
-                  onClick={() => setIsMobileGuidesExpanded(!isMobileGuidesExpanded)}
-                  className={`w-full flex items-center justify-between px-4 py-4 rounded-xl transition-all ${
-                    isHighContrast
-                      ? 'text-white hover:bg-yellow-400 hover:text-black'
-                      : (isActive('/poradniki') ? 'text-primary-700 font-bold bg-primary-50' : 'text-slate-600 hover:text-primary-600')
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <BookOpen size={20} />
-                    <span className="font-bold">Poradniki</span>
-                  </div>
-                  <ChevronDown size={18} className={`transition-transform duration-300 ${isMobileGuidesExpanded ? 'rotate-180' : ''}`} />
-                </button>
+              {/* Poradniki - główny link */}
+              <Link href="/poradniki" onClick={() => setIsOpen(false)} className="w-full block">
+                <MobileNavLink isHighContrast={isHighContrast} icon={<BookOpen size={20} />} text="Poradniki" isActive={isActive('/poradniki')} />
+              </Link>
 
-                {isMobileGuidesExpanded && (
-                  <div className={`pl-12 pr-4 pb-4 space-y-2 mt-2 border-l-2 ml-7 ${isHighContrast ? 'border-yellow-400' : 'border-primary-200'}`}>
-                    {guideCategories.map((cat, idx) => (
-                      <Link
-                        key={idx}
-                        href={`/poradniki?category=${encodeURIComponent(cat)}#filtry`}
-                        onClick={() => setIsOpen(false)}
-                        className={`w-full text-left py-2.5 px-3 text-sm font-bold rounded-xl block ${isHighContrast ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:bg-white hover:shadow-sm'}`}
-                      >
-                        {cat}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+              {/* Subkategorie poradników - wcięte małe linki */}
+              <div className={`pl-8 space-y-1 ${isHighContrast ? 'border-l-2 border-yellow-400 ml-2' : 'border-l-2 border-stone-200 ml-2'}`}>
+                {guideCategories.map((cat, idx) => (
+                  <Link
+                    key={idx}
+                    href={`/poradniki?category=${encodeURIComponent(cat)}#filtry`}
+                    onClick={() => setIsOpen(false)}
+                    className={`block py-1.5 px-3 text-sm rounded-lg transition-colors ${
+                      isHighContrast
+                        ? 'text-yellow-400 hover:bg-yellow-400 hover:text-black'
+                        : 'text-slate-600 hover:bg-stone-50 hover:text-primary-600'
+                    }`}
+                  >
+                    • {cat}
+                  </Link>
+                ))}
               </div>
 
-              <div className="my-6 border-t border-stone-100"></div>
+              <div className={`my-3 border-t ${isHighContrast ? 'border-yellow-400' : 'border-stone-100'}`}></div>
 
               <Link
                 href="/kontakt"
@@ -483,15 +473,6 @@ export default function Navbar() {
                 <Mail size={20} />
                 <span className="font-bold">Kontakt bezpośredni</span>
               </Link>
-
-              <div className={`mt-8 pt-8 border-t ${isHighContrast ? 'border-yellow-400' : 'border-stone-100'}`}>
-                <button
-                  onClick={() => { setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen); setIsOpen(false); }}
-                  className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl border-2 font-black uppercase text-[11px] tracking-widest ${isHighContrast ? 'bg-black text-yellow-400 border-yellow-400' : 'bg-primary-50 border-primary-100 text-primary-700 shadow-sm'}`}
-                >
-                  <AccessibilityIcon className="w-[24px] h-[24px]" /> <span>Ułatwienia dostępu</span>
-                </button>
-              </div>
 
           </div>
         </div>
@@ -545,7 +526,7 @@ const NavLink = ({ icon, text, badge, isHighContrast, isActive }: { icon: React.
 );
 
 const MobileNavLink = ({ icon, text, badge, isHighContrast, isActive }: { icon: React.ReactNode; text: string; badge?: string; isHighContrast: boolean; isActive?: boolean }) => (
-  <div className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${
+  <div className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
     isHighContrast
       ? (isActive ? 'bg-yellow-400 text-black' : 'text-white hover:bg-yellow-400 hover:text-black')
       : (isActive ? 'bg-primary-100 text-primary-700 font-bold border border-primary-200 shadow-sm' : 'text-slate-700 hover:bg-stone-100 hover:text-primary-600 border border-transparent')
