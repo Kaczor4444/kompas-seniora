@@ -19,13 +19,34 @@ interface TableOfContentsProps {
   headings: TOCHeading[]
   downloads?: Download[]
   variant?: 'mobile' | 'desktop'
+  articleSlug?: string
+  sectionId?: string
+  title?: string
 }
 
-export default function TableOfContents({ headings, downloads = [], variant = 'desktop' }: TableOfContentsProps) {
+export default function TableOfContents({ headings, downloads = [], variant = 'desktop', articleSlug, sectionId, title }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('')
   const [isOpen, setIsOpen] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [isUserScrolling, setIsUserScrolling] = useState(false)
+
+  // Generate article ID for localStorage
+  const articleId = articleSlug && sectionId ? `${sectionId}-${articleSlug}` : null
+
+  // Load bookmark state from localStorage on mount
+  useEffect(() => {
+    if (!articleId) return
+
+    try {
+      const saved = localStorage.getItem('savedArticles')
+      if (saved) {
+        const savedIds = JSON.parse(saved) as string[]
+        setIsBookmarked(savedIds.includes(articleId))
+      }
+    } catch (error) {
+      console.error('Error loading bookmarks:', error)
+    }
+  }, [articleId])
 
   // Action button handlers
   const handlePrint = () => {
@@ -33,11 +54,29 @@ export default function TableOfContents({ headings, downloads = [], variant = 'd
   }
 
   const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked)
-    // Could save to localStorage here if needed
-    if (!isBookmarked) {
-      // Show toast or notification
-      console.log('Dodano do zakładek')
+    if (!articleId) return
+
+    try {
+      const saved = localStorage.getItem('savedArticles')
+      const savedIds = saved ? (JSON.parse(saved) as string[]) : []
+
+      const isAdding = !isBookmarked
+      const newSavedIds = isAdding
+        ? [...savedIds, articleId]
+        : savedIds.filter(id => id !== articleId)
+
+      localStorage.setItem('savedArticles', JSON.stringify(newSavedIds))
+      setIsBookmarked(isAdding)
+
+      // Show notification
+      if (isAdding) {
+        alert('✓ Dodano do zakładek')
+      } else {
+        alert('✗ Usunięto z zakładek')
+      }
+    } catch (error) {
+      console.error('Error saving bookmark:', error)
+      alert('Nie udało się zapisać zakładki')
     }
   }
 

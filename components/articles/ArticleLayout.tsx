@@ -14,6 +14,8 @@ interface ArticleLayoutProps {
   headings?: Array<{ id: string; text: string; level: number }>
   downloads?: Array<{ title: string; url: string; icon?: string }>
   heroImage?: string
+  slug?: string
+  sectionId?: string
 }
 
 const categoryMap: Record<string, { name: string; slug: string }> = {
@@ -33,6 +35,8 @@ export default function ArticleLayout({
   headings = [],
   downloads = [],
   heroImage,
+  slug,
+  sectionId,
 }: ArticleLayoutProps) {
   const categoryInfo = categoryMap[category] || { name: category, slug: category }
 
@@ -94,7 +98,7 @@ export default function ArticleLayout({
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16">
 
         {/* Mobile TOC (above content) */}
-        {headings.length > 0 && <TableOfContents headings={headings} downloads={downloads} variant="mobile" />}
+        {headings.length > 0 && <TableOfContents headings={headings} downloads={downloads} variant="mobile" articleSlug={slug} sectionId={sectionId} title={title} />}
 
         {/* Two-column layout: Content + Desktop TOC */}
         <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-12 lg:items-start">
@@ -215,7 +219,7 @@ export default function ArticleLayout({
 
           {/* Desktop TOC sidebar */}
           {headings.length > 0 && (
-            <TableOfContents headings={headings} downloads={downloads} variant="desktop" />
+            <TableOfContents headings={headings} downloads={downloads} variant="desktop" articleSlug={slug} sectionId={sectionId} title={title} />
           )}
 
         </div>

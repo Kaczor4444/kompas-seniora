@@ -185,6 +185,8 @@ export default async function ArticlePage({
         headings={headings}
         downloads={article.frontmatter.downloads}
         heroImage={article.frontmatter.heroImage}
+        slug={slug}
+        sectionId={section}
       >
         <MDXRemote source={article.content} components={components} />
       </ArticleLayout>

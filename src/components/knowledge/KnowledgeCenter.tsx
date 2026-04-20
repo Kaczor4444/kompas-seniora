@@ -31,6 +31,18 @@ export default function KnowledgeCenter({ articles: featuredArticles }: Knowledg
   const [toastMessage, setToastMessage] = useState('')
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
+  // Load saved articles from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('savedArticles')
+      if (saved) {
+        setSavedArticles(JSON.parse(saved))
+      }
+    } catch (error) {
+      console.error('Error loading saved articles:', error)
+    }
+  }, [])
+
   // Map featured articles to KnowledgeCenter format
   const articles: KnowledgeCenterArticle[] = featuredArticles.map((article) => {
     const articleId = `${article.sectionId}-${article.slug}`
@@ -71,9 +83,18 @@ export default function KnowledgeCenter({ articles: featuredArticles }: Knowledg
   const toggleSave = (id: string, title: string) => {
     const isAdding = !savedArticles.includes(id)
 
-    setSavedArticles(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    )
+    const newSavedArticles = isAdding
+      ? [...savedArticles, id]
+      : savedArticles.filter(x => x !== id)
+
+    setSavedArticles(newSavedArticles)
+
+    // Save to localStorage
+    try {
+      localStorage.setItem('savedArticles', JSON.stringify(newSavedArticles))
+    } catch (error) {
+      console.error('Error saving to localStorage:', error)
+    }
 
     setToastMessage(isAdding ? '✓ Dodano do zakładek' : '✗ Usunięto z zakładek')
     setShowToast(true)
