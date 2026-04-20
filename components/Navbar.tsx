@@ -397,7 +397,7 @@ export default function Navbar() {
         <div className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
 
           {/* Header with close button */}
-          <div className={`p-6 border-b flex justify-between items-center ${isHighContrast ? 'border-yellow-400' : 'border-stone-200'}`}>
+          <div className={`p-6 border-b flex justify-between items-center ${isHighContrast ? 'border-yellow-400 bg-black' : 'border-stone-200 bg-white'}`}>
             <h2 className={`text-xl font-black ${isHighContrast ? 'text-yellow-400' : 'text-slate-900'}`}>
               Menu
             </h2>
@@ -411,7 +411,7 @@ export default function Navbar() {
           </div>
 
           {/* Content - scrollable */}
-          <div className="flex-1 overflow-y-auto px-4 pt-6 pb-12 space-y-3">
+          <div className={`flex-1 overflow-y-auto px-4 pt-6 pb-12 space-y-3 ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
               <Link href="/search" onClick={() => setIsOpen(false)} className="w-full block">
                 <MobileNavLink isHighContrast={isHighContrast} icon={<Search size={20} />} text="Wyszukiwarka" isActive={isActive('/search')} />
               </Link>
