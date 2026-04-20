@@ -142,6 +142,31 @@ export default function Navbar() {
     };
   }, []);
 
+  // Block body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  // Close menu on ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
   const isNavbarVisible = isOpen || isVisible;
 
   const guideCategories = [
@@ -358,6 +383,15 @@ export default function Navbar() {
             </div>
           </div>
         </div>
+
+        {/* Backdrop overlay for mobile menu */}
+        {isOpen && (
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+        )}
 
         {/* Mobile Dropdown */}
         {isOpen && (
