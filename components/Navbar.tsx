@@ -260,7 +260,7 @@ export default function Navbar() {
       <nav
         className={`fixed top-0 left-0 w-full z-50 backdrop-blur-md border-b shadow-sm transition-transform duration-300 ease-in-out
         ${isHighContrast ? 'bg-black border-yellow-400' : 'bg-white/95 border-stone-100'}
-        ${isNavbarVisible ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}
+        ${isNavbarVisible ? 'translate-y-0' : '-translate-y-[calc(100%-0.25rem)] md:translate-y-0'}
         `}
         onMouseLeave={() => setIsGuidesHovered(false)}
       >
