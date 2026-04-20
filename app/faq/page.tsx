@@ -52,11 +52,10 @@ export default function FAQPage() {
           
           <div className="relative max-w-4xl mx-auto px-4 py-20 md:py-28 text-center">
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tighter">
-              Pytania o Kompas Seniora?
+              Najczęściej zadawane pytania
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              System pomocy społecznej ma swoje reguły. 
-              Zebraliśmy odpowiedzi na wszystkie najważniejsze pytania.
+              Odpowiedzi na najważniejsze pytania o placówki opieki dla seniorów, koszty, procedury i wyszukiwarkę.
             </p>
           </div>
         </section>
