@@ -1079,9 +1079,10 @@ export default function SearchResults({
                   <p className="text-slate-400 text-sm">Przykłady: Kraków, Tarnów, Nowy Sącz, Zakopane</p>
                 </div>
               ) : facilities.length === 0 ? (
-                // Nie pokazuj EmptyState gdy query jest puste ALE mamy wyniki z servera
-                // (TRYB 6 - wszystkie placówki bez wyszukiwania)
-                query === '' && results.length > 0 ? null : (
+                // Nie pokazuj EmptyState gdy:
+                // 1. Query puste (user dopiero zaczyna wyszukiwanie)
+                // 2. TRYB 6 - wszystkie placówki bez wyszukiwania (query === '' && results.length > 0)
+                query === '' ? null : (
                   <EmptyState
                     onResetFilters={resetFilters}
                     cityInput={cityInput}
