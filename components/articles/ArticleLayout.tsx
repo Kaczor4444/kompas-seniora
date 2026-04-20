@@ -97,7 +97,7 @@ export default function ArticleLayout({
         {headings.length > 0 && <TableOfContents headings={headings} downloads={downloads} variant="mobile" />}
 
         {/* Two-column layout: Content + Desktop TOC */}
-        <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-12">
+        <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-12 lg:items-start">
 
           {/* Main content */}
           <article className="max-w-4xl">
