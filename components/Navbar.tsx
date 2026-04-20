@@ -486,26 +486,25 @@ export default function Navbar() {
 
           </div>
         </div>
-      </nav>
 
-      {/* Progress Bar with shadow */}
-      {/* Desktop: UKRYTY (w artykułach jest ReadingProgressBar) */}
-      {/* Mobile: Widoczny podczas scrollu WSZĘDZIE (jeden uniwersalny pasek) */}
-      <div
-        className={`fixed left-0 w-full h-1 z-[45] transition-all duration-300 ease-in-out
-        ${isHighContrast ? 'bg-slate-800' : 'bg-stone-100'}
-        ${isNavbarVisible ? 'top-20' : 'top-0'}
-        md:hidden ${isScrolling ? 'block' : 'hidden'}`}
-      >
+        {/* Progress Bar - wewnątrz navbara, podróżuje razem z nim */}
+        {/* Desktop: UKRYTY (w artykułach jest ReadingProgressBar) */}
+        {/* Mobile: Widoczny podczas scrollu WSZĘDZIE (jeden uniwersalny pasek) */}
         <div
-          className={`h-full transition-all duration-150 ease-linear shadow-[0_0_12px_rgba(5,150,105,0.4)] ${
-            isHighContrast
-              ? 'bg-yellow-400'
-              : 'bg-primary-600'
-          }`}
-          style={{ width: `${scrollProgress * 100}%` }}
-        ></div>
-      </div>
+          className={`absolute bottom-0 left-0 w-full h-1
+          ${isHighContrast ? 'bg-slate-800' : 'bg-stone-100'}
+          md:hidden ${isScrolling ? 'block' : 'hidden'}`}
+        >
+          <div
+            className={`h-full transition-all duration-150 ease-linear shadow-[0_0_12px_rgba(5,150,105,0.4)] ${
+              isHighContrast
+                ? 'bg-yellow-400'
+                : 'bg-primary-600'
+            }`}
+            style={{ width: `${scrollProgress * 100}%` }}
+          ></div>
+        </div>
+      </nav>
 
       {/* Full Accessibility Panel */}
       <AccessibilityPanel
