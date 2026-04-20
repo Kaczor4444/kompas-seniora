@@ -1533,13 +1533,15 @@ export default function SearchResults({
         onGeolocation={handleGeolocation}
       /> */}
 
-      {/* Comparison Bar */}
-      <ComparisonBar
-        selectedIds={selectedForCompare}
-        facilities={facilities}
-        onRemove={(id) => setSelectedForCompare(prev => prev.filter(fid => fid !== id))}
-        onClear={() => setSelectedForCompare([])}
-      />
+      {/* Comparison Bar - tylko desktop (≥640px) */}
+      <div className="hidden sm:block">
+        <ComparisonBar
+          selectedIds={selectedForCompare}
+          facilities={facilities}
+          onRemove={(id) => setSelectedForCompare(prev => prev.filter(fid => fid !== id))}
+          onClear={() => setSelectedForCompare([])}
+        />
+      </div>
     </section>
   );
 }

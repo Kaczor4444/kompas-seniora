@@ -102,11 +102,12 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               )}
             </div>
 
-            {/* Compare Checkbox - subtelny */}
+            {/* Compare Checkbox - tylko desktop (≥640px) */}
             <button
               onClick={onToggleCompare}
               className={`
-                w-7 h-7 rounded-md transition-all flex items-center justify-center
+                hidden sm:flex
+                w-7 h-7 rounded-md transition-all items-center justify-center
                 ${isCompared
                   ? 'bg-blue-600 text-white border-2 border-blue-600'
                   : 'bg-white text-slate-400 border-2 border-slate-300 hover:border-blue-400 hover:text-blue-600'
