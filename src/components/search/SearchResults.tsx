@@ -175,8 +175,8 @@ export default function SearchResults({
   // Profile filter collapsed by default - manual toggle only
   const [showProfilesExpanded, setShowProfilesExpanded] = useState(false);
 
-  // Left panel visibility (map view)
-  const [showLeftPanel, setShowLeftPanel] = useState(true);
+  // Left panel visibility (map view) - domyślnie schowany dla lepszego widoku mapy
+  const [showLeftPanel, setShowLeftPanel] = useState(false);
 
   // Price filter collapsed by default
   const [showPriceExpanded, setShowPriceExpanded] = useState(false);
