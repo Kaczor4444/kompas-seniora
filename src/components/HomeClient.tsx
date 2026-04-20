@@ -39,7 +39,7 @@ export default function HomeClient({ totalFacilities, powiatCounts, featuredArti
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 md:mb-20">
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-0 tracking-tighter">
-              System opieki to labirynt.<br className="hidden md:block" /> Pomożemy Ci skrócić drogę do znalezienia godnego miejsca dla bliskiej osoby.
+              Znajdź odpowiednią placówkę dla bliskiej osoby w trzech prostych krokach.
             </h2>
           </div>
 
