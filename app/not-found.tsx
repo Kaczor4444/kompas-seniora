@@ -27,13 +27,13 @@ export default function NotFound() {
 
             {/* Heading */}
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 text-center tracking-tighter">
-              Ojej! Zgubiliśmy się
+              Strona nie została znaleziona
             </h1>
 
             {/* Subheading with underline decoration */}
             <div className="text-center mb-8">
               <p className="text-xl text-slate-600 mb-2">
-                Strona, której szukasz nie istnieje
+                Szukana strona nie istnieje
               </p>
               <div className="flex justify-center">
                 <div className="w-24 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent rounded-full"></div>
@@ -42,8 +42,7 @@ export default function NotFound() {
 
             {/* Description */}
             <p className="text-slate-500 text-center leading-relaxed max-w-2xl mx-auto mb-12">
-              Możliwe, że strona została przeniesiona, usunięta lub po prostu wpisano błędny adres.
-              Nie martw się – pomożemy Ci wrócić na właściwą ścieżkę.
+              Możliwe, że strona została przeniesiona, usunięta lub wpisano błędny adres.
             </p>
 
             {/* Action Buttons Grid */}
