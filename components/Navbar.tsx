@@ -387,14 +387,14 @@ export default function Navbar() {
         {/* Backdrop overlay for mobile menu */}
         {isOpen && (
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[55] md:hidden"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
         )}
 
         {/* Mobile Sidebar - slides from left */}
-        <div className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
+        <div className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
 
           {/* Header with close button */}
           <div className={`p-6 border-b flex justify-between items-center ${isHighContrast ? 'border-yellow-400 bg-black' : 'border-stone-200 bg-white'}`}>
