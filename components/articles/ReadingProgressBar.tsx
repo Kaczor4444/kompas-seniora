@@ -43,7 +43,7 @@ export default function ReadingProgressBar() {
 
   return (
     <div
-      className={`fixed top-20 left-0 right-0 h-1 z-[51] pointer-events-none shadow-sm hidden md:block ${
+      className={`fixed top-20 left-0 right-0 h-1.5 z-[51] pointer-events-none shadow-sm hidden md:block ${
         isHighContrast ? 'bg-slate-800' : 'bg-stone-100'
       }`}
       role="progressbar"
