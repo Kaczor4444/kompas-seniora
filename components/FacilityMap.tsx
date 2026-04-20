@@ -337,6 +337,24 @@ export default function FacilityMap({
         .leaflet-container {
           z-index: 0 !important;
         }
+
+        /* Custom popup styling - jak FacilityCard */
+        .facility-card-popup .leaflet-popup-content-wrapper {
+          padding: 0 !important;
+          border-radius: 12px !important;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+          border: 1px solid #e2e8f0 !important;
+        }
+        .facility-card-popup .leaflet-popup-content {
+          margin: 0 !important;
+          width: auto !important;
+        }
+        .facility-card-popup .leaflet-popup-tip {
+          background: white !important;
+          border: 1px solid #e2e8f0 !important;
+          border-top: none !important;
+          border-right: none !important;
+        }
         .leaflet-pane {
           z-index: 1 !important;
         }
@@ -415,61 +433,154 @@ export default function FacilityMap({
                   position={[facility.latitude!, facility.longitude!]}
                   icon={facility.typ_placowki === 'DPS' ? dpsIcon : sdsIcon}
                 >
-                  <Popup>
-                    <div style={{ minWidth: '170px', maxWidth: '220px', padding: '6px 8px' }}>
-                      <p style={{
-                        fontSize: '10px',
-                        fontWeight: 600,
-                        letterSpacing: '0.05em',
-                        textTransform: 'uppercase',
-                        color: facility.typ_placowki === 'DPS' ? '#059669' : '#1e3a8a',
-                        margin: '0 0 2px',
+                  <Popup maxWidth={350} className="facility-card-popup">
+                    <div style={{
+                      minWidth: '300px',
+                      maxWidth: '350px',
+                      padding: '16px',
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }}>
+                      {/* Row 1: Badge + Name + Price */}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '12px' }}>
+                        {/* Left: Badge + Name */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: 0, flex: 1 }}>
+                          {/* Type Badge */}
+                          <span style={{
+                            flexShrink: 0,
+                            padding: '4px 10px',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            fontWeight: 800,
+                            letterSpacing: '0.05em',
+                            textTransform: 'uppercase',
+                            background: facility.typ_placowki === 'DPS' ? '#d1fae5' : '#dbeafe',
+                            color: facility.typ_placowki === 'DPS' ? '#065f46' : '#1e40af',
+                          }}>
+                            {facility.typ_placowki}
+                          </span>
+
+                          {/* Name */}
+                          <h3 style={{
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            color: '#0f172a',
+                            margin: 0,
+                            lineHeight: '1.4',
+                            flex: 1
+                          }}>
+                            {facility.nazwa}
+                          </h3>
+                        </div>
+
+                        {/* Right: Price */}
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <div style={{
+                            fontSize: '24px',
+                            fontWeight: 900,
+                            color: '#0f172a',
+                            lineHeight: 1
+                          }}>
+                            {facility.koszt_pobytu && facility.koszt_pobytu > 0 ? (
+                              <>
+                                {Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')}
+                                <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748b', marginLeft: '2px' }}>zł</span>
+                              </>
+                            ) : (
+                              <span style={{ color: '#10b981', fontSize: '20px' }}>NFZ</span>
+                            )}
+                          </div>
+                          {facility.koszt_pobytu && facility.koszt_pobytu > 0 && (
+                            <div style={{
+                              fontSize: '9px',
+                              color: '#94a3b8',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.05em',
+                              fontWeight: 700,
+                              marginTop: '2px'
+                            }}>
+                              miesięcznie
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Row 2: Address */}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '14px',
+                        color: '#475569',
+                        marginBottom: '12px',
+                        fontWeight: 500
                       }}>
-                        {facility.typ_placowki}
-                      </p>
-                      <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#111827', margin: '0 0 5px', lineHeight: '1.25' }}>
-                        {facility.nazwa}
-                      </h3>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                          <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        {facility.miejscowosc}
+                      </div>
+
+                      {/* Row 3: Profile Badges */}
                       {(() => {
                         const profiles = getShortProfileLabels(facility.profil_opieki ?? null, facility.typ_placowki);
                         return profiles.length > 0 ? (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginBottom: '5px' }}>
-                            {profiles.map(p => (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+                            {profiles.slice(0, 3).map(p => (
                               <span key={p} style={{
-                                fontSize: '10px',
-                                padding: '1px 5px',
-                                borderRadius: '999px',
-                                background: facility.typ_placowki === 'DPS' ? '#d1fae5' : '#dbeafe',
-                                color: facility.typ_placowki === 'DPS' ? '#065f46' : '#1e3a8a',
+                                fontSize: '12px',
+                                padding: '2px 8px',
+                                borderRadius: '6px',
+                                background: '#f1f5f9',
+                                color: '#475569',
                                 fontWeight: 500,
                               }}>
                                 {p}
                               </span>
                             ))}
+                            {profiles.length > 3 && (
+                              <span style={{
+                                fontSize: '12px',
+                                padding: '2px 8px',
+                                borderRadius: '6px',
+                                background: '#f1f5f9',
+                                color: '#64748b',
+                                fontWeight: 500,
+                              }}>
+                                +{profiles.length - 3}
+                              </span>
+                            )}
                           </div>
                         ) : null;
                       })()}
-                      {facility.typ_placowki === 'DPS' && (
-                        <p style={{ fontSize: '12px', fontWeight: 700, margin: '0 0 6px', color: facility.koszt_pobytu ? '#111827' : '#059669' }}>
-                          {facility.koszt_pobytu
-                            ? `${Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')} zł/mc`
-                            : 'Bezpłatne'}
-                        </p>
-                      )}
+
+                      {/* CTA Button */}
                       <a
                         href={`/placowka/${facility.id}`}
                         style={{
-                          display: 'inline-block',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          padding: '4px 10px',
-                          borderRadius: '5px',
-                          background: facility.typ_placowki === 'DPS' ? '#10b981' : '#1e3a8a',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          width: '100%',
+                          fontSize: '14px',
+                          fontWeight: 700,
+                          padding: '12px 16px',
+                          borderRadius: '12px',
+                          background: '#0f172a',
                           color: 'white',
                           textDecoration: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
                         }}
+                        onMouseOver={(e) => e.currentTarget.style.background = '#10b981'}
+                        onMouseOut={(e) => e.currentTarget.style.background = '#0f172a'}
                       >
-                        Zobacz szczegóły →
+                        Zobacz szczegóły
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
                       </a>
                     </div>
                   </Popup>
