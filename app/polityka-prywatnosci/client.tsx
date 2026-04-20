@@ -89,7 +89,7 @@ export default function PolitykaPrywatnosciClient() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
 
           {/* TOC Sidebar - Desktop Only */}
-          <aside className="hidden lg:block w-72 sticky top-32 shrink-0">
+          <aside className="hidden lg:block w-72 sticky top-24 shrink-0">
             <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

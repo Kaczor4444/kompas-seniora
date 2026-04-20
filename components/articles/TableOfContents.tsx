@@ -300,7 +300,7 @@ export default function TableOfContents({ headings, downloads = [], variant = 'd
       </div>
 
       {/* TOC - osobny sticky box */}
-      <div className="sticky top-[200px] bg-white rounded-xl border-2 border-gray-200 shadow-sm overflow-hidden">
+      <div className="sticky top-[132px] bg-white rounded-xl border-2 border-gray-200 shadow-sm overflow-hidden">
         {/* Sticky header z białym tłem */}
         <h3 className="sticky top-0 bg-white z-10 px-6 pt-6 pb-3 border-b-2 border-gray-200 font-bold text-lg text-gray-900 flex items-center gap-2">
           <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
