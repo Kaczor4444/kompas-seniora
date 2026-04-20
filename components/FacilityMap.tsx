@@ -344,16 +344,29 @@ export default function FacilityMap({
           border-radius: 12px !important;
           box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
           border: 1px solid #e2e8f0 !important;
+          max-width: 350px !important;
         }
         .facility-card-popup .leaflet-popup-content {
           margin: 0 !important;
           width: auto !important;
+          min-width: 280px !important;
         }
         .facility-card-popup .leaflet-popup-tip {
           background: white !important;
           border: 1px solid #e2e8f0 !important;
           border-top: none !important;
           border-right: none !important;
+        }
+
+        /* Mobile responsive - mniejszy popup */
+        @media (max-width: 640px) {
+          .facility-card-popup .leaflet-popup-content-wrapper {
+            max-width: 280px !important;
+            border-radius: 10px !important;
+          }
+          .facility-card-popup .leaflet-popup-content {
+            min-width: 260px !important;
+          }
         }
         .leaflet-pane {
           z-index: 1 !important;
@@ -433,23 +446,22 @@ export default function FacilityMap({
                   position={[facility.latitude!, facility.longitude!]}
                   icon={facility.typ_placowki === 'DPS' ? dpsIcon : sdsIcon}
                 >
-                  <Popup maxWidth={350} className="facility-card-popup">
+                  <Popup maxWidth={350} minWidth={280} className="facility-card-popup">
                     <div style={{
-                      minWidth: '300px',
-                      maxWidth: '350px',
-                      padding: '16px',
+                      width: '100%',
+                      padding: '12px',
                       fontFamily: 'system-ui, -apple-system, sans-serif'
                     }}>
-                      {/* Row 1: Badge + Name + Price */}
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '12px' }}>
+                      {/* Row 1: Badge + Name + Price + Favorite */}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '10px' }}>
                         {/* Left: Badge + Name */}
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: 0, flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', minWidth: 0, flex: 1 }}>
                           {/* Type Badge */}
                           <span style={{
                             flexShrink: 0,
-                            padding: '4px 10px',
-                            borderRadius: '8px',
-                            fontSize: '12px',
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            fontSize: '11px',
                             fontWeight: 800,
                             letterSpacing: '0.05em',
                             textTransform: 'uppercase',
@@ -461,46 +473,123 @@ export default function FacilityMap({
 
                           {/* Name */}
                           <h3 style={{
-                            fontSize: '16px',
+                            fontSize: '15px',
                             fontWeight: 700,
                             color: '#0f172a',
                             margin: 0,
-                            lineHeight: '1.4',
+                            lineHeight: '1.3',
                             flex: 1
                           }}>
                             {facility.nazwa}
                           </h3>
                         </div>
 
-                        {/* Right: Price */}
-                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{
-                            fontSize: '24px',
-                            fontWeight: 900,
-                            color: '#0f172a',
-                            lineHeight: 1
-                          }}>
-                            {facility.koszt_pobytu && facility.koszt_pobytu > 0 ? (
-                              <>
-                                {Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')}
-                                <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748b', marginLeft: '2px' }}>zł</span>
-                              </>
-                            ) : (
-                              <span style={{ color: '#10b981', fontSize: '20px' }}>NFZ</span>
+                        {/* Right: Price + Favorite Button */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flexShrink: 0 }}>
+                          {/* Price */}
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{
+                              fontSize: '20px',
+                              fontWeight: 900,
+                              color: '#0f172a',
+                              lineHeight: 1
+                            }}>
+                              {facility.koszt_pobytu && facility.koszt_pobytu > 0 ? (
+                                <>
+                                  {Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')}
+                                  <span style={{ fontSize: '12px', fontWeight: 500, color: '#64748b', marginLeft: '2px' }}>zł</span>
+                                </>
+                              ) : (
+                                <span style={{ color: '#10b981', fontSize: '16px' }}>NFZ</span>
+                              )}
+                            </div>
+                            {facility.koszt_pobytu && facility.koszt_pobytu > 0 && (
+                              <div style={{
+                                fontSize: '8px',
+                                color: '#94a3b8',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                                fontWeight: 700,
+                                marginTop: '1px'
+                              }}>
+                                miesięcznie
+                              </div>
                             )}
                           </div>
-                          {facility.koszt_pobytu && facility.koszt_pobytu > 0 && (
-                            <div style={{
-                              fontSize: '9px',
-                              color: '#94a3b8',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.05em',
-                              fontWeight: 700,
-                              marginTop: '2px'
-                            }}>
-                              miesięcznie
-                            </div>
-                          )}
+
+                          {/* Favorite Button */}
+                          <button
+                            data-facility-id="${facility.id}"
+                            data-facility-json="${encodeURIComponent(JSON.stringify({
+                              id: facility.id,
+                              nazwa: facility.nazwa,
+                              miejscowosc: facility.miejscowosc || '',
+                              powiat: facility.powiat || '',
+                              typ_placowki: facility.typ_placowki,
+                              koszt_pobytu: facility.koszt_pobytu || null,
+                              telefon: facility.telefon || null,
+                              ulica: facility.ulica || null,
+                              kod_pocztowy: facility.kod_pocztowy || null,
+                              email: facility.email || null,
+                              www: facility.www || null,
+                              liczba_miejsc: facility.liczba_miejsc || null,
+                              profil_opieki: facility.profil_opieki || null,
+                            }))}"
+                            onclick="(function() {
+                              const facilityData = JSON.parse(decodeURIComponent(this.dataset.facilityJson));
+                              facilityData.addedAt = new Date().toISOString();`}
+                              try {
+                                const saved = localStorage.getItem('kompas-seniora-favorites');
+                                const favorites = saved ? JSON.parse(saved) : [];
+                                const exists = favorites.find(f => f.id === facilityData.id);
+
+                                if (exists) {
+                                  const updated = favorites.filter(f => f.id !== facilityData.id);
+                                  localStorage.setItem('kompas-seniora-favorites', JSON.stringify(updated));
+                                  this.style.background = '#f1f5f9';
+                                  this.style.color = '#64748b';
+                                  this.setAttribute('data-saved', 'false');
+                                  alert('✗ Usunięto z ulubionych');
+                                } else {
+                                  if (favorites.length >= 20) {
+                                    alert('⚠️ Możesz zapisać maksymalnie 20 placówek');
+                                    return;
+                                  }
+                                  favorites.push(facilityData);
+                                  localStorage.setItem('kompas-seniora-favorites', JSON.stringify(favorites));
+                                  this.style.background = '#10b981';
+                                  this.style.color = 'white';
+                                  this.setAttribute('data-saved', 'true');
+                                  alert('✓ Dodano do ulubionych');
+                                }
+                                window.dispatchEvent(new Event('favoritesChanged'));
+                              } catch (e) {
+                                alert('Błąd: ' + e.message);
+                              }
+                            })()"
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              padding: '0',
+                              borderRadius: '8px',
+                              border: 'none',
+                              background: '#f1f5f9',
+                              color: '#64748b',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              transition: 'all 0.2s',
+                              flexShrink: 0
+                            }}
+                            onmouseover="this.style.background='#e2e8f0'"
+                            onmouseout="this.style.background='#f1f5f9'"
+                            title="Dodaj do ulubionych"
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                          </button>
                         </div>
                       </div>
 
