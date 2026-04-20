@@ -136,7 +136,7 @@ export default function Footer() {
         <div className="border-t border-slate-800 pt-8">
           <div className="text-center text-xs md:text-sm text-slate-400">
             <p>
-              © {currentYear} <span className="text-primary-400 font-bold">Kompas Seniora</span> - Wspieramy cyfryzację pomocy społecznej w Polsce
+              © {currentYear} <span className="text-primary-400 font-bold">Kompas Seniora</span>
             </p>
           </div>
         </div>

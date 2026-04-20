@@ -35,10 +35,10 @@ export default function KontaktPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tighter">
-            Jesteśmy tu dla Ciebie
+            Kontakt
           </h1>
           <p className="text-slate-500 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            Masz pytania dotyczące domów opieki? A może chcesz zgłosić poprawkę?
+            Masz pytania? A może chcesz zgłosić poprawkę?
             Wybierz temat, w którym możemy Ci pomóc.
           </p>
         </div>
