@@ -83,7 +83,7 @@ export default function TableOfContents({ headings, downloads = [], variant = 'd
     return () => observer.disconnect()
   }, [headings])
 
-  // Auto-scroll TOC to keep active item visible
+  // Auto-scroll TOC to keep active item visible (tylko wewnątrz TOC, nie cała strona!)
   useEffect(() => {
     if (!activeId || variant === 'mobile' || isUserScrolling) return
 
@@ -94,14 +94,22 @@ export default function TableOfContents({ headings, downloads = [], variant = 'd
       const navRect = tocNav.getBoundingClientRect()
       const linkRect = activeLink.getBoundingClientRect()
 
-      // Check if link is outside viewport
+      // Check if link is outside TOC viewport (not page viewport!)
       const isOutOfView = linkRect.top < navRect.top + 50 || linkRect.bottom > navRect.bottom - 50
 
       if (isOutOfView) {
-        activeLink.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'nearest'
+        // Manual scroll ONLY within TOC container, don't scroll the page!
+        const tocScrollTop = tocNav.scrollTop
+        const linkOffsetTop = (activeLink as HTMLElement).offsetTop
+        const tocHeight = tocNav.clientHeight
+        const linkHeight = (activeLink as HTMLElement).clientHeight
+
+        // Center the link within TOC container
+        const targetScrollTop = linkOffsetTop - (tocHeight / 2) + (linkHeight / 2)
+
+        tocNav.scrollTo({
+          top: targetScrollTop,
+          behavior: 'smooth'
         })
       }
     }
