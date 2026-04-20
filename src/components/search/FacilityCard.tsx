@@ -1,7 +1,7 @@
 // src/components/search/FacilityCard.tsx
 // ✅ SIMPLIFIED & FLATTENED - No image, compact layout
 import React from 'react';
-import { MapPin, Heart, Navigation, ChevronRight } from 'lucide-react';
+import { MapPin, Heart, Navigation, ChevronRight, Check } from 'lucide-react';
 import { estimateDriveTime } from '@/src/utils/distance';
 
 interface FacilityCardProps {
@@ -21,9 +21,11 @@ interface FacilityCardProps {
   };
   isHovered: boolean;
   isSaved: boolean;
+  isCompared: boolean;
   onHover: (id: number | null) => void;
   onClick: () => void;
   onToggleSave: (e: React.MouseEvent) => void;
+  onToggleCompare: (e: React.MouseEvent) => void;
   userLocation?: { lat: number; lng: number };
 }
 
@@ -31,9 +33,11 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
   facility,
   isHovered,
   isSaved,
+  isCompared,
   onHover,
   onClick,
   onToggleSave,
+  onToggleCompare,
   userLocation
 }) => {
   return (
@@ -97,6 +101,22 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
                 <div className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">miesięcznie</div>
               )}
             </div>
+
+            {/* Compare Checkbox - subtelny */}
+            <button
+              onClick={onToggleCompare}
+              className={`
+                w-7 h-7 rounded-md transition-all flex items-center justify-center
+                ${isCompared
+                  ? 'bg-blue-600 text-white border-2 border-blue-600'
+                  : 'bg-white text-slate-400 border-2 border-slate-300 hover:border-blue-400 hover:text-blue-600'
+                }
+              `}
+              aria-label={isCompared ? "Usuń z porównania" : "Dodaj do porównania"}
+              title={isCompared ? "Usuń z porównania" : "Porównaj z innymi"}
+            >
+              {isCompared && <Check size={16} strokeWidth={3} />}
+            </button>
 
             {/* Save Button */}
             <button
