@@ -1,7 +1,7 @@
 // src/components/search/FacilityCard.tsx
 // ✅ SIMPLIFIED & FLATTENED - No image, compact layout
 import React from 'react';
-import { MapPin, Heart, Navigation, ChevronRight, ArrowLeftRight } from 'lucide-react';
+import { MapPin, Heart, Navigation, ChevronRight } from 'lucide-react';
 import { estimateDriveTime } from '@/src/utils/distance';
 
 interface FacilityCardProps {
@@ -21,11 +21,9 @@ interface FacilityCardProps {
   };
   isHovered: boolean;
   isSaved: boolean;
-  isCompared: boolean;
   onHover: (id: number | null) => void;
   onClick: () => void;
   onToggleSave: (e: React.MouseEvent) => void;
-  onToggleCompare: (e: React.MouseEvent) => void;
   userLocation?: { lat: number; lng: number };
 }
 
@@ -33,11 +31,9 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
   facility,
   isHovered,
   isSaved,
-  isCompared,
   onHover,
   onClick,
   onToggleSave,
-  onToggleCompare,
   userLocation
 }) => {
   return (
@@ -101,21 +97,6 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
                 <div className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">miesięcznie</div>
               )}
             </div>
-
-            {/* Compare Button */}
-            <button
-              onClick={onToggleCompare}
-              className={`
-                p-2 rounded-lg transition-all
-                ${isCompared
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-stone-100 text-slate-400 hover:bg-stone-200 hover:text-slate-600'
-                }
-              `}
-              aria-label={isCompared ? "Usuń z porównania" : "Dodaj do porównania"}
-            >
-              <ArrowLeftRight size={18} />
-            </button>
 
             {/* Save Button */}
             <button

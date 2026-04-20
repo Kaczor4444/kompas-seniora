@@ -19,7 +19,6 @@ import { FilterPanel } from './FilterPanel';
 import { FacilityCard } from './FacilityCard';
 import { SkeletonCard } from './SkeletonCard';
 import { EmptyState } from './EmptyState';
-import { ComparisonBar } from './ComparisonBar';
 import MobileBottomBar from './MobileBottomBar';
 import { SearchBar } from './SearchBar';
 
@@ -156,7 +155,6 @@ export default function SearchResults({
   const [showFilters, setShowFilters] = useState(false);
   const [showMapMobile, setShowMapMobile] = useState(initialView === 'map');
   const [hoveredId, setHoveredId] = useState<number | null>(null);
-  const [selectedForCompare, setSelectedForCompare] = useState<number[]>([]);
 
   const [facilities, setFacilities] = useState<Facility[]>(results);
   const [isLoading, setIsLoading] = useState(false);
@@ -616,15 +614,6 @@ export default function SearchResults({
 
   const handleApplyFilters = () => {
     // No-op — powiat navigation is handled live in handlePowiatChange
-  };
-
-  const toggleCompare = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedForCompare(prev => {
-      if (prev.includes(id)) return prev.filter(i => i !== id);
-      if (prev.length >= 3) return prev;
-      return [...prev, id];
-    });
   };
 
   const handleFacilityClick = (id: number, facilityPowiat?: string) => {
@@ -1111,7 +1100,6 @@ export default function SearchResults({
                       userLocation={userLocation}
                       isHovered={hoveredId === fac.id}
                       isSaved={favoritesState.includes(fac.id)}
-                      isCompared={selectedForCompare.includes(fac.id)}
                       onHover={setHoveredId}
                       onClick={() => handleFacilityClick(fac.id, fac.powiat)}
                       onToggleSave={(e) => {
@@ -1138,7 +1126,6 @@ export default function SearchResults({
                         }
                         window.dispatchEvent(new Event("favoritesChanged"));
                       }}
-                      onToggleCompare={(e) => toggleCompare(fac.id, e)}
                     />
                   ))}
 
@@ -1532,14 +1519,6 @@ export default function SearchResults({
         hasUserLocation={!!userLocation}
         onGeolocation={handleGeolocation}
       /> */}
-
-      {/* Comparison Bar */}
-      <ComparisonBar
-        selectedIds={selectedForCompare}
-        facilities={facilities}
-        onRemove={(id) => setSelectedForCompare(prev => prev.filter(fid => fid !== id))}
-        onClear={() => setSelectedForCompare([])}
-      />
     </section>
   );
 }
