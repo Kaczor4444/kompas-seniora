@@ -274,9 +274,9 @@ export default function TableOfContents({ headings, downloads = [], variant = 'd
   }
 
   return (
-    <aside className="hidden lg:block">
-      {/* Jeden sticky kontener z obiema sekcjami */}
-      <div className="sticky top-24 space-y-6">
+    <aside className="hidden lg:block sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
+      {/* Kontener z obiema sekcjami */}
+      <div className="space-y-4">
         {/* Action Buttons */}
         <div className="bg-white rounded-xl border-2 border-gray-200 p-4 shadow-sm">
           <div className="grid grid-cols-3 gap-2">
