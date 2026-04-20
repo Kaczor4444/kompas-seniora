@@ -975,8 +975,11 @@ export default function SearchResults({
             )}
 
             {/* Sort + Toggle Controls - tylko gdy są wyniki */}
+            {/* NOTE: Na chwilę obecną używamy prostego toggle widocznego na wszystkich ekranach.
+                 MobileBottomBar (zakomentowany poniżej) to bardziej zaawansowany bottom bar z dodatkowymi funkcjami
+                 (filtry, sortuj, ulubione, geolokalizacja), ale obecnie nie jest aktywny. */}
             {facilities.length > 0 && (
-              <div className="hidden md:flex items-center justify-between gap-4 mb-6">
+              <div className="flex items-center justify-between gap-4 mb-6">
                 {/* Sortowanie */}
                 <div className="flex items-center gap-2">
                   <span className="text-slate-500 text-sm font-bold">Sortuj:</span>
@@ -1513,15 +1516,30 @@ export default function SearchResults({
         </div>
       )}
 
-      {/* Mobile Bottom Bar */}
-      <MobileBottomBar
+      {/* Mobile Bottom Bar - ZAKOMENTOWANY */}
+      {/*
+        MobileBottomBar to zaawansowany bottom bar dla mobile z wieloma funkcjami:
+        - Toggle Lista/Mapa
+        - Przycisk Filtry z licznikiem aktywnych filtrów
+        - Przycisk Sortuj (otwiera modal z opcjami sortowania)
+        - Przycisk Ulubione (tylko jeśli są zapisane placówki)
+        - Przycisk Geolokalizacji
+
+        DLACZEGO ZAKOMENTOWANY:
+        - Na chwilę obecną używamy prostszego rozwiązania - toggle w głównej sekcji (widoczny wszędzie)
+        - MobileBottomBar może kolidować z innymi elementami UI (np. comparison bar)
+        - Do przyszłego użycia gdy będziemy chcieli bardziej zaawansowany mobile UX
+
+        Aby aktywować: odkomentuj poniższy kod i ukryj desktop toggle dodając "hidden md:flex" do linii ~979
+      */}
+      {/* <MobileBottomBar
         showMap={showMapMobile}
         onToggleMap={setShowMapMobile}
         activeFiltersCount={Object.keys(activeFilters).length}
         onOpenFilters={() => setShowFilters(true)}
         hasUserLocation={!!userLocation}
         onGeolocation={handleGeolocation}
-      />
+      /> */}
 
       {/* Comparison Bar */}
       <ComparisonBar
