@@ -976,7 +976,7 @@ export default function SearchResults({
 
             {/* Sort + Toggle Controls - tylko gdy są wyniki */}
             {facilities.length > 0 && (
-              <div className="flex items-center justify-between gap-4 mb-6">
+              <div className="hidden md:flex items-center justify-between gap-4 mb-6">
                 {/* Sortowanie */}
                 <div className="flex items-center gap-2">
                   <span className="text-slate-500 text-sm font-bold">Sortuj:</span>
@@ -1512,6 +1512,16 @@ export default function SearchResults({
           </div>
         </div>
       )}
+
+      {/* Mobile Bottom Bar */}
+      <MobileBottomBar
+        showMap={showMapMobile}
+        onToggleMap={setShowMapMobile}
+        activeFiltersCount={Object.keys(activeFilters).length}
+        onOpenFilters={() => setShowFilters(true)}
+        hasUserLocation={!!userLocation}
+        onGeolocation={handleGeolocation}
+      />
 
       {/* Comparison Bar */}
       <ComparisonBar
