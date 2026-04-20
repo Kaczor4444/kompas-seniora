@@ -98,7 +98,6 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-lato), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  overflow-x: hidden;
 }
 
 /* Leaflet popup button override */
@@ -119,7 +118,6 @@ body {
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
 }
 
 /* Professional focus states (accessibility) */
