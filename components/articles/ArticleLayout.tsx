@@ -50,7 +50,7 @@ export default function ArticleLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 overflow-x-clip">
       {/* Mobile reading progress bar */}
       <ReadingProgressBar />
 
