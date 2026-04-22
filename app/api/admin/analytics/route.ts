@@ -402,6 +402,64 @@ export async function GET(request: NextRequest) {
           percent: total > 0 ? Math.round((r._count.language / total) * 100) : 0,
         }));
       }).catch(() => []),
+      botStats: await (async () => {
+        try {
+          // Get bot visits from AppEvent
+          const botEvents = await prisma.appEvent.findMany({
+            where: {
+              timestamp: { gte: startDate },
+              eventType: {
+                in: ['bot_visit_ai_bot', 'bot_visit_search_bot']
+              }
+            },
+          });
+
+          // Count AI bots vs Search bots
+          const aiBotVisits = botEvents.filter(e => e.eventType === 'bot_visit_ai_bot');
+          const searchBotVisits = botEvents.filter(e => e.eventType === 'bot_visit_search_bot');
+
+          // Get unique bot names
+          const botsByName = botEvents.reduce((acc: Record<string, number>, e) => {
+            const botName = (e.metadata as any)?.botName || 'unknown';
+            acc[botName] = (acc[botName] || 0) + 1;
+            return acc;
+          }, {});
+
+          const topBots = Object.entries(botsByName)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 10)
+            .map(([name, count]) => ({ name, count }));
+
+          // Get most visited pages by bots
+          const pagesByBots = botEvents.reduce((acc: Record<string, number>, e) => {
+            const path = (e.metadata as any)?.path || 'unknown';
+            acc[path] = (acc[path] || 0) + 1;
+            return acc;
+          }, {});
+
+          const topPages = Object.entries(pagesByBots)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 10)
+            .map(([path, count]) => ({ path, count }));
+
+          return {
+            totalBotVisits: botEvents.length,
+            aiBotVisits: aiBotVisits.length,
+            searchBotVisits: searchBotVisits.length,
+            topBots,
+            topPages,
+          };
+        } catch (error) {
+          console.error('Error fetching bot stats:', error);
+          return {
+            totalBotVisits: 0,
+            aiBotVisits: 0,
+            searchBotVisits: 0,
+            topBots: [],
+            topPages: [],
+          };
+        }
+      })(),
       localInsights: await (async () => {
         const appEvents = await prisma.appEvent.findMany({
           where: { timestamp: { gte: startDate } },

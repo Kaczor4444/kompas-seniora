@@ -83,17 +83,72 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Organization structured data for SEO and AI crawlers
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Kompas Seniora",
+    "url": "https://kompas-seniora.vercel.app",
+    "logo": "https://kompas-seniora.vercel.app/logo.png",
+    "description": "Wyszukiwarka publicznych placówek opieki dla seniorów (DPS, ŚDS) w Polsce. Przejrzyste ceny z oficjalnych źródeł MOPS.",
+    "areaServed": {
+      "@type": "State",
+      "name": "Małopolskie",
+      "containedIn": {
+        "@type": "Country",
+        "name": "Polska"
+      }
+    },
+    "serviceType": ["Wyszukiwarka domów opieki", "Informacje o placówkach dla seniorów", "Porównanie DPS i ŚDS"],
+    "keywords": "dom opieki, senior, DPS, ŚDS, opieka nad seniorem, MOPS, Kraków, Małopolska, dom pomocy społecznej, środowiskowy dom samopomocy"
+  };
+
+  // LocalBusiness schema for regional SEO
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Kompas Seniora",
+    "description": "Kompleksowa wyszukiwarka placówek opieki dla seniorów w Małopolsce - DPS i ŚDS z przejrzystymi cenami",
+    "url": "https://kompas-seniora.vercel.app",
+    "areaServed": [
+      {
+        "@type": "AdministrativeArea",
+        "name": "Województwo Małopolskie"
+      }
+    ],
+    "knowsAbout": [
+      "Dom Pomocy Społecznej (DPS)",
+      "Środowiskowy Dom Samopomocy (ŚDS)",
+      "Opieka nad seniorami",
+      "MOPS",
+      "Ceny domów opieki",
+      "Publiczne placówki opieki"
+    ]
+  };
+
   return (
     <html lang="pl">
       <head>
         {/* Preconnect dla lepszej wydajności */}
         <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
-        
+
         {/* Viewport dla mobile */}
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-        
+
         {/* Theme color */}
         <meta name="theme-color" content="#10b981" />
+
+        {/* Structured Data - Organization Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+
+        {/* Structured Data - LocalBusiness Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${quicksand.variable} ${openSans.variable} ${lato.variable} ${inter.variable} antialiased flex flex-col min-h-screen`}

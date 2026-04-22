@@ -17,6 +17,7 @@ import GeographicInsights from './_components/GeographicInsights';
 import TimePatterns from './_components/TimePatterns';
 import LanguageStats from './_components/LanguageStats';
 import LocalInsights from './_components/LocalInsights';
+import BotStats from './_components/BotStats';
 
 interface AnalyticsData {
   overview: {
@@ -129,6 +130,13 @@ interface AnalyticsData {
     count: number;
     percent: number;
   }>;
+  botStats: {
+    totalBotVisits: number;
+    aiBotVisits: number;
+    searchBotVisits: number;
+    topBots: Array<{ name: string; count: number }>;
+    topPages: Array<{ path: string; count: number }>;
+  } | null;
   localInsights: {
     emptyResults: { topCombos: Array<{ combo: string; count: number }>; total: number };
     filterCombos: { topCombos: Array<{ combo: string; count: number }> };
@@ -305,6 +313,9 @@ export default function AnalyticsDashboardPage() {
 
       {/* 🌍 LANGUAGE STATS */}
       <LanguageStats data={data.languageStats || []} />
+
+      {/* 🤖 BOT STATS - AI & Search Crawlers */}
+      <BotStats data={data.botStats || null} />
 
       {/* 📍 LOCAL INSIGHTS */}
       <LocalInsights data={data.localInsights || null} />
