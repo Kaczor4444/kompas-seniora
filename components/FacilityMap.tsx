@@ -317,7 +317,7 @@ export default function FacilityMap({
   ];
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full" style={{ position: 'relative', transform: 'translateZ(0)', willChange: 'transform' }}>
       <style jsx global>{`
         @keyframes sc-pulse {
           0%   { transform: scale(0.5); opacity: 0.8; }
@@ -335,7 +335,7 @@ export default function FacilityMap({
           border: none !important;
         }
         .leaflet-container {
-          z-index: 0 !important;
+          z-index: 10 !important;
         }
 
         /* Custom popup styling - jak FacilityCard */
@@ -376,12 +376,12 @@ export default function FacilityMap({
         }
       `}</style>
 
-      <div className="h-full rounded-lg overflow-hidden border border-gray-200">
+      <div className="h-full rounded-lg overflow-hidden border border-gray-200" style={{ position: 'relative', zIndex: 10 }}>
         <MapContainer
 
           center={center}
           zoom={9}
-          style={{ height: '100%', width: '100%' }}
+          style={{ height: '100%', width: '100%', zIndex: 10 }}
           scrollWheelZoom={false}
           zoomControl={true}
           minZoom={6}

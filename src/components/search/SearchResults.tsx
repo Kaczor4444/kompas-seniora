@@ -1183,7 +1183,7 @@ export default function SearchResults({
 
       {/* MAP VIEW (fullscreen overlay when showMapMobile=true) */}
       {showMapMobile && (
-        <div className="fixed inset-0 z-40 top-20 bg-stone-50">
+        <div className="fixed inset-0 z-40 top-20 bg-stone-50" style={{ willChange: 'transform' }}>
           {/* Backdrop - kliknięcie zamyka panel */}
           {showLeftPanel && (
             <div
