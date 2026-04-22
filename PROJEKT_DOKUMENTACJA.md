@@ -1,7 +1,190 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-03-17 (sesja #9 - unifikacja systemu artykułów)
+> Ostatnia aktualizacja: 2026-04-22 (sesja #10 - SEO audit i AI bot tracking)
+
+---
+
+## 🚨 KRYTYCZNE - DO NAPRAWY W NASTĘPNEJ SESJI (2026-04-22)
+
+### ❌ PODWÓJNA BLOKADA CRAWLERÓW - STRONA NIEWIDOCZNA!
+
+**Problem:** Strona jest **całkowicie zablokowana** dla wszystkich crawlerów (Google, Bing, ChatGPT, Claude, Perplexity). Nawet dodany dzisiaj tracking botów AI działa, ale boty **nie mają dostępu do treści**.
+
+**Dwie warstwy blokady:**
+
+1. **robots.txt** (`/public/robots.txt`):
+```
+User-agent: *
+Disallow: /   ← BLOKUJE CAŁĄ STRONĘ!
+```
+
+2. **Metadata w layout.tsx** (`/app/layout.tsx:65-72`):
+```typescript
+robots: {
+  index: false,    // ❌ BLOKUJE INDEKSOWANIE
+  follow: false,   // ❌ BLOKUJE PODĄŻANIE ZA LINKAMI
+}
+```
+
+**Efekt:**
+- Zero ruchu organicznego z Google
+- Boty AI (ChatGPT, Perplexity) nie mogą czytać artykułów
+- Strona nie pojawi się w wynikach wyszukiwania
+- 184 placówki + 30 artykułów = niewidoczne
+
+---
+
+### 🎯 PLAN NAPRAWY (następna sesja - 30-40 minut roboty):
+
+#### 1. **FIX robots.txt** (5 minut)
+```
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://kompas-seniora.vercel.app/sitemap.xml
+```
+
+#### 2. **FIX layout.tsx robots meta** (2 minuty)
+Zmienić linijki 65-72 na:
+```typescript
+robots: {
+  index: true,
+  follow: true,
+  googleBot: {
+    index: true,
+    follow: true,
+  },
+},
+```
+
+#### 3. **Dodać dynamiczny sitemap.ts** (30 minut)
+Utworzyć `/app/sitemap.ts`:
+- 184 placówki (z `updatedAt`, priority: 0.7)
+- ~30 artykułów MDX (z `publishedAt`, priority: 0.8)
+- ~15 static pages (priority: 0.5-0.9)
+- Strona główna (priority: 1.0)
+
+**Po tych 3 krokach:** Strona będzie widoczna dla crawlerów! 🚀
+
+---
+
+### 📋 INNE PRIORYTETY (do zrobienia później):
+
+**HIGH (tydzień):**
+- [ ] Unique metadata dla 184 placówek - `generateMetadata()` w `/app/placowka/[id]/page.tsx`
+- [ ] Canonical URLs (meta alternates)
+- [ ] Open Graph images (default + per-page)
+- [ ] Metadata dla static pages (`/search`, `/kontakt`, `/ulubione`, etc.)
+
+**MEDIUM (miesiąc):**
+- [ ] LocalBusiness schema dla każdej placówki (rich snippets w Google Maps)
+- [ ] Breadcrumb schema (rich snippets w wynikach wyszukiwania)
+- [ ] Image alt text audit
+- [ ] Performance audit (Core Web Vitals)
+
+**Status weryfikacji:** Pełny raport SEO znajduje się w podsumowaniu sesji #10 (kontekst dla claude-code).
+
+---
+
+## ✅ Organization Schema i AI Bot Tracking (2026-04-22)
+
+### 🏢 Structured Data dla SEO
+
+**Lokalizacja:** `/app/layout.tsx` (linijki 87-127)
+
+**Dodano dwa JSON-LD schemas:**
+
+1. **Organization schema:**
+```typescript
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Kompas Seniora",
+  "url": "https://kompas-seniora.vercel.app",
+  "logo": "https://kompas-seniora.vercel.app/logo.png",
+  "description": "Wyszukiwarka publicznych placówek opieki dla seniorów...",
+  "areaServed": {
+    "@type": "State",
+    "name": "Małopolskie",
+    "containedIn": { "@type": "Country", "name": "Polska" }
+  },
+  "serviceType": ["Wyszukiwarka domów opieki", "Informacje o placówkach..."],
+  "keywords": "dom opieki, senior, DPS, ŚDS, MOPS, Kraków, Małopolska"
+}
+```
+
+2. **LocalBusiness schema:**
+```typescript
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Kompas Seniora",
+  "description": "Kompleksowa wyszukiwarka placówek opieki dla seniorów...",
+  "areaServed": [
+    { "@type": "AdministrativeArea", "name": "Województwo Małopolskie" }
+  ],
+  "knowsAbout": ["Dom Pomocy Społecznej (DPS)", "Środowiskowy Dom Samopomocy (ŚDS)", ...]
+}
+```
+
+**Korzyści:**
+- Lepsze zrozumienie przez wyszukiwarki czym jest strona
+- Rich snippets w wynikach Google
+- AI crawlery (ChatGPT, Claude) łatwiej ekstraktują informacje
+- Pojawienie się w knowledge panels
+
+---
+
+### 🤖 AI Bot Tracking System
+
+**Architektura:**
+
+**1. Middleware detekcja** (`/middleware.ts`):
+- Wykrywa AI boty: ChatGPT, GPTBot, Claude, Perplexity, Google-Extended, Bard, Bytespider, CCBot
+- Wykrywa search boty: Googlebot, Bingbot, DuckDuckBot, Baiduspider, YandexBot
+- Fire-and-forget tracking (nie spowalnia requestów)
+- **Zachowano:** Oryginalną ochronę admin panel (`ADMIN_ENABLED` env var)
+
+**2. API Endpoint** (`/app/api/analytics/bot-track/route.ts`):
+- POST endpoint do logowania wizyt botów
+- Zapisuje do `AppEvent` table:
+  - `eventType`: `bot_visit_ai_bot` lub `bot_visit_search_bot`
+  - `metadata`: `{ botName, userAgent, path, referer }`
+
+**3. Admin Dashboard** (`/app/admin/analytics`):
+- Nowy komponent: `BotStats.tsx`
+- Zaktualizowano: `page.tsx` (dodano import i wyświetlanie)
+- Zaktualizowano: `app/api/admin/analytics/route.ts` (query dla botStats)
+
+**Dashboard pokazuje:**
+- **Overview cards:**
+  - Total bot visits (wszystkie)
+  - AI bots visits (% z total)
+  - Search bots visits (% z total)
+- **Top 10 najczęściej odwiedzających botów** (z nazwami: ChatGPT, Googlebot, etc.)
+- **Top 10 najczęściej indeksowanych stron** (które URL-e boty oglądają)
+- **Info box** z wyjaśnieniem co trackujemy
+
+**Korzyści:**
+- Monitoring jak strona jest indeksowana przez AI i tradycyjne wyszukiwarki
+- Rozróżnienie AI bots (ChatGPT, Claude) vs search bots (Googlebot)
+- Data-driven decyzje: które strony są crawlowane, które nie
+- Gotowość na AI-powered search (Perplexity, ChatGPT search mode)
+
+**Commit:** `d48e3ec` - "feat: Dodano Organization schema i AI bot tracking"
+
+**Zmienione pliki (6):**
+- `app/layout.tsx` - dodano Organization + LocalBusiness JSON-LD
+- `middleware.ts` - detekcja botów + tracking (zachowano admin protection)
+- `app/api/analytics/bot-track/route.ts` - NEW endpoint
+- `app/admin/analytics/_components/BotStats.tsx` - NEW komponent
+- `app/admin/analytics/page.tsx` - integracja BotStats
+- `app/api/admin/analytics/route.ts` - query dla botStats
+
+**⚠️ UWAGA:** Bot tracking działa, ale **boty są blokowane przez robots.txt i robots meta** - nie mają dostępu do contentu! Po naprawie blokad w następnej sesji, tracking pokaże rzeczywiste wizyty z dostępem do treści.
 
 ---
 

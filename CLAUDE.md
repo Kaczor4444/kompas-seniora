@@ -365,6 +365,14 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **d48e3ec** (2026-04-22): feat: Dodano Organization schema i AI bot tracking
+  - **Organization + LocalBusiness JSON-LD** w `app/layout.tsx` (SEO structured data)
+  - **AI Bot Tracking System:**
+    - Middleware detekcja: ChatGPT, Claude, Perplexity, Google-Extended, Googlebot, Bingbot
+    - API endpoint: `/api/analytics/bot-track` (zapisuje do AppEvent table)
+    - Admin dashboard: nowy komponent `BotStats.tsx` - wyświetla bot statistics
+    - Zachowano admin panel protection
+  - **⚠️ UWAGA:** Boty są trackowane ALE zablokowane przez robots.txt + robots meta!
 - **4530199** (2026-03-16): feat: Weryfikacja z oficjalnym wykazem DPS i sortowanie w panelu admina
   - Dodano `oficjalne_id` i `nazwa_oficjalna` do modelu Placowka
   - Panel admina: kolumna "ID PDF", klikalne nagłówki sortowania
@@ -460,4 +468,23 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ---
 
-Ostatnia aktualizacja: 2026-03-17
+## 🚨 KRYTYCZNE TODO - NASTĘPNA SESJA (2026-04-22)
+
+**PROBLEM:** Strona jest **całkowicie zablokowana** dla crawlerów!
+
+### Podwójna blokada:
+1. **`public/robots.txt`** → `Disallow: /` (blokuje wszystko)
+2. **`app/layout.tsx:65-72`** → `robots: { index: false, follow: false }` (druga blokada)
+
+### Quick fix (30 min):
+1. Naprawić robots.txt → `Allow: /`, `Disallow: /admin/`
+2. Zmienić robots meta → `index: true, follow: true`
+3. Dodać dynamiczny sitemap.ts (184 placówki + 30 artykułów)
+
+**Po naprawie:** Strona widoczna dla Google i AI botów! 🚀
+
+**Pełny raport SEO:** Zobacz `PROJEKT_DOKUMENTACJA.md` sekcja "KRYTYCZNE - DO NAPRAWY W NASTĘPNEJ SESJI"
+
+---
+
+Ostatnia aktualizacja: 2026-04-22
