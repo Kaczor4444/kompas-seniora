@@ -64,7 +64,8 @@ export default function WelcomeWidget() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionStart, setSessionStart] = useState<number | null>(null)
-  const [waveAnimation, setWaveAnimation] = useState(false)
+  const [bounceAnimation, setBounceAnimation] = useState(false)
+  const [handWaveAnimation, setHandWaveAnimation] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -131,14 +132,25 @@ export default function WelcomeWidget() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, sessionStart, analytics])
 
-  // Start wave animation on mount, stop after 3 bounces
+  // Bounce button on mount (1 time)
   useEffect(() => {
-    setWaveAnimation(true)
+    setBounceAnimation(true)
     const timer = setTimeout(() => {
-      setWaveAnimation(false)
-    }, 4500) // 1.5s × 3 repetitions
+      setBounceAnimation(false)
+    }, 800) // 0.8s × 1 repetition
     return () => clearTimeout(timer)
   }, [])
+
+  // Hand wave when chatbot opens
+  useEffect(() => {
+    if (isOpen) {
+      setHandWaveAnimation(true)
+      const timer = setTimeout(() => {
+        setHandWaveAnimation(false)
+      }, 1200) // 0.6s × 2 repetitions
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen])
 
   // Setup Web Speech API
   useEffect(() => {
@@ -683,7 +695,7 @@ export default function WelcomeWidget() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`w-14 h-14 rounded-full shadow-xl hover:scale-105 transition-all active:scale-95 overflow-hidden flex items-center justify-center bg-white ${
-          waveAnimation ? 'animate-wave' : ''
+          bounceAnimation ? 'animate-bounce-button' : ''
         }`}
         aria-label="Pomoc w wyborze placówki"
       >
@@ -692,7 +704,11 @@ export default function WelcomeWidget() {
             <X size={20} className="text-slate-700" />
           </div>
         ) : (
-          <img src="/images/advisor-sm.webp" alt="Doradca" className="w-full h-full object-cover" />
+          <img
+            src="/images/advisor-sm.webp"
+            alt="Doradca"
+            className={`w-full h-full object-cover ${handWaveAnimation ? 'animate-hand-wave' : ''}`}
+          />
         )}
       </button>
     </div>
