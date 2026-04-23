@@ -155,6 +155,14 @@ export default function SearchResults({
 
   const [showFilters, setShowFilters] = useState(false);
   const [showMapMobile, setShowMapMobile] = useState(initialView === 'map');
+
+  // Force map view when URL has view=map parameter (client-side sync)
+  useEffect(() => {
+    const viewParam = searchParams.get('view');
+    if (viewParam === 'map' && !showMapMobile) {
+      setShowMapMobile(true);
+    }
+  }, [searchParams]);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [selectedForCompare, setSelectedForCompare] = useState<number[]>([]);
 
