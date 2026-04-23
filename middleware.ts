@@ -48,14 +48,22 @@ export async function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const pathname = request.nextUrl.pathname;
 
-  // Skip middleware for static files, API routes (except placowka), and admin
+  // 1. ADMIN PANEL PROTECTION - Check if admin is enabled
+  if (pathname.startsWith('/admin')) {
+    const adminEnabled = process.env.ADMIN_ENABLED === 'true';
+    if (!adminEnabled) {
+      // Return 404 (looks like page doesn't exist)
+      return new NextResponse(null, { status: 404 });
+    }
+  }
+
+  // 2. BOT TRACKING - Skip for static files and API routes
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
     pathname.startsWith('/images') ||
     pathname.startsWith('/api/analytics') || // Skip to avoid logging our own tracking
-    pathname.startsWith('/api/admin') ||
-    pathname.startsWith('/admin')
+    pathname.startsWith('/api/admin')
   ) {
     return NextResponse.next();
   }
