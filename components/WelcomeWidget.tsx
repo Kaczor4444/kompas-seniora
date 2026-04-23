@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Mic, MicOff, Volume2, VolumeX } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Mic, MicOff, Volume2, VolumeX, Calculator } from 'lucide-react'
 import { useChatbotAnalytics } from '@/src/hooks/useChatbotAnalytics'
 
 // Type definition for Web Speech API
@@ -25,7 +25,7 @@ interface SpeechRecognitionErrorEvent extends Event {
 }
 
 interface Action {
-  type: 'placowka' | 'mapa' | 'search' | 'artykul'
+  type: 'placowka' | 'mapa' | 'search' | 'artykul' | 'kalkulator'
   id?: number
   powiat?: string
   query?: string
@@ -40,7 +40,7 @@ interface Message {
   feedback?: 'positive' | 'negative' | null
 }
 
-type View = 'main' | 'search-type' | 'info-type' | 'chat'
+type View = 'main' | 'search-type' | 'info-type' | 'chat' | 'budget' | 'location'
 
 const STORAGE_KEY = 'kompasseniora_chat_history'
 const STORAGE_EXPIRY = 24 * 60 * 60 * 1000 // 24h
@@ -70,6 +70,9 @@ export default function WelcomeWidget() {
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null)
+  const [selectedType, setSelectedType] = useState<'dps' | 'śds' | null>(null)
+  const [selectedBudget, setSelectedBudget] = useState<string | null>(null)
+  const [selectedPowiat, setSelectedPowiat] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
   const router = useRouter()
@@ -267,6 +270,8 @@ export default function WelcomeWidget() {
       router.push(`/search?q=${encodeURIComponent(action.query)}`)
     } else if (action.type === 'artykul' && action.href) {
       router.push(action.href)
+    } else if (action.type === 'kalkulator') {
+      router.push('/kalkulator')
     }
   }
 
@@ -276,6 +281,7 @@ export default function WelcomeWidget() {
       case 'mapa': return <MapPin size={11} />
       case 'search': return <Search size={11} />
       case 'artykul': return <BookOpen size={11} />
+      case 'kalkulator': return <Calculator size={11} />
       default: return null
     }
   }
@@ -396,7 +402,19 @@ export default function WelcomeWidget() {
     }
   }
 
-  const showBackButton = view === 'search-type' || view === 'info-type'
+  function finalSearch() {
+    let url = `/search?type=${selectedType}`
+    if (selectedBudget) {
+      url += `&budget=${selectedBudget}`
+    }
+    if (selectedPowiat) {
+      url += `&powiat=${encodeURIComponent(selectedPowiat)}`
+    }
+    router.push(url)
+    setIsOpen(false)
+  }
+
+  const showBackButton = view === 'search-type' || view === 'info-type' || view === 'budget' || view === 'location'
 
   return (
     <div className="fixed bottom-20 right-5 z-40 flex flex-col items-end">
@@ -420,12 +438,16 @@ export default function WelcomeWidget() {
                   {view === 'chat' ? 'Asystent AI 🤖' :
                    view === 'search-type' ? 'Jaki rodzaj? 🏥' :
                    view === 'info-type' ? 'Informacje 📚' :
+                   view === 'budget' ? 'Jaki budżet? 💰' :
+                   view === 'location' ? 'Gdzie szukasz? 📍' :
                    'W czym mogę pomóc? 👋'}
                 </p>
                 <p className="text-slate-400 text-xs mt-0.5 font-medium">
                   {view === 'chat' ? 'Pytaj o placówki w Małopolsce' :
                    view === 'search-type' ? 'Wybierz typ placówki' :
                    view === 'info-type' ? 'Wybierz temat' :
+                   view === 'budget' ? 'Pomożemy dopasować' :
+                   view === 'location' ? 'Wybierz powiat lub region' :
                    'Wybierz opcję poniżej'}
                 </p>
               </div>
@@ -487,9 +509,11 @@ export default function WelcomeWidget() {
           {view === 'search-type' && (
             <>
               <div className="p-3 space-y-2">
-                <Link
-                  href="/search?type=dps"
-                  onClick={() => setIsOpen(false)}
+                <button
+                  onClick={() => {
+                    setSelectedType('dps')
+                    setView('budget')
+                  }}
                   className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3.5 transition-all group"
                 >
                   <div className="min-w-0 mr-2">
@@ -497,11 +521,13 @@ export default function WelcomeWidget() {
                     <p className="text-xs text-slate-600 font-medium">Całodobowa opieka stacjonarna</p>
                   </div>
                   <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                </Link>
+                </button>
 
-                <Link
-                  href="/search?type=śds"
-                  onClick={() => setIsOpen(false)}
+                <button
+                  onClick={() => {
+                    setSelectedType('śds')
+                    setView('budget')
+                  }}
                   className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3.5 transition-all group"
                 >
                   <div className="min-w-0 mr-2">
@@ -509,7 +535,7 @@ export default function WelcomeWidget() {
                     <p className="text-xs text-slate-600 font-medium">Opieka dzienna, wraca na noc</p>
                   </div>
                   <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                </Link>
+                </button>
 
                 <Link
                   href="/asystent?start=true"
@@ -587,7 +613,95 @@ export default function WelcomeWidget() {
             </>
           )}
 
-          {/* EKRAN 3: CHAT - AI Assistant */}
+          {/* EKRAN 3a: BUDGET - Jaki budżet? */}
+          {view === 'budget' && (
+            <>
+              <div className="p-3 space-y-2">
+                <button
+                  onClick={() => {
+                    setSelectedBudget('<3000')
+                    setView('location')
+                  }}
+                  className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group"
+                >
+                  <div className="min-w-0 mr-2">
+                    <p className="text-sm font-black text-slate-900">💵 Do 3000 zł</p>
+                    <p className="text-xs text-slate-600 font-medium">Najtańsze opcje</p>
+                  </div>
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    setSelectedBudget('3000-4000')
+                    setView('location')
+                  }}
+                  className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group"
+                >
+                  <div className="min-w-0 mr-2">
+                    <p className="text-sm font-black text-slate-900">💰 3000-4000 zł</p>
+                    <p className="text-xs text-slate-600 font-medium">Średnia cena</p>
+                  </div>
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    setSelectedBudget('4000+')
+                    setView('location')
+                  }}
+                  className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group"
+                >
+                  <div className="min-w-0 mr-2">
+                    <p className="text-sm font-black text-slate-900">💎 Powyżej 4000 zł</p>
+                    <p className="text-xs text-slate-600 font-medium">Premium</p>
+                  </div>
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </button>
+
+                <button
+                  onClick={() => setView('location')}
+                  className="flex items-center justify-center w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 transition-all text-xs font-bold text-slate-600"
+                >
+                  ⏭️ Pomiń (nie wiem)
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* EKRAN 3b: LOCATION - Gdzie szukasz? */}
+          {view === 'location' && (
+            <>
+              <div className="p-3 space-y-2">
+                <button onClick={() => { setSelectedPowiat('krakowski'); finalSearch() }} className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group">
+                  <span className="text-sm font-black text-slate-900">📍 Kraków</span>
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </button>
+
+                <button onClick={() => { setSelectedPowiat('nowosądecki'); finalSearch() }} className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group">
+                  <span className="text-sm font-black text-slate-900">📍 Nowy Sącz</span>
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </button>
+
+                <button onClick={() => { setSelectedPowiat('tarnowski'); finalSearch() }} className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group">
+                  <span className="text-sm font-black text-slate-900">📍 Tarnów</span>
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </button>
+
+                <button onClick={() => { setSelectedPowiat('olkuski'); finalSearch() }} className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group">
+                  <span className="text-sm font-black text-slate-900">📍 Olkusz</span>
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </button>
+
+                <button onClick={finalSearch} className="flex items-center justify-center w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 transition-all text-xs font-bold text-slate-600">
+                  🔍 Szukaj bez filtra lokalizacji
+                </button>
+              </div>
+              <p className="text-center text-[10px] text-slate-400 pb-3 px-4">lub pomiń i zobacz wszystkie</p>
+            </>
+          )}
+
+          {/* EKRAN 4: CHAT - AI Assistant */}
           {view === 'chat' && (
             <>
               <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0" style={{ maxHeight: '340px' }}>
