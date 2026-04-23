@@ -625,19 +625,17 @@ body.accessibility-tooltips [title]::after {
   font-weight: bold;
 }
 
-/* Wave animation for chatbot button */
+/* Wave animation for chatbot button - bounce effect */
 @keyframes wave {
-  0%, 100% { transform: rotate(0deg); }
-  10% { transform: rotate(14deg); }
-  20% { transform: rotate(-8deg); }
-  30% { transform: rotate(14deg); }
-  40% { transform: rotate(-4deg); }
-  50% { transform: rotate(10deg); }
-  60% { transform: rotate(0deg); }
-  100% { transform: rotate(0deg); }
+  0%, 100% { transform: translateY(0) scale(1); }
+  10% { transform: translateY(-8px) scale(1.05); }
+  20% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-6px) scale(1.03); }
+  40% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+  60% { transform: translateY(0) scale(1); }
 }
 
 .animate-wave {
-  animation: wave 2s ease-in-out 3;
-  transform-origin: 70% 70%;
+  animation: wave 1.5s ease-in-out 3;
 }

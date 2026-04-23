@@ -64,7 +64,7 @@ export default function WelcomeWidget() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionStart, setSessionStart] = useState<number | null>(null)
-  const [waveAnimation, setWaveAnimation] = useState(true)
+  const [waveAnimation, setWaveAnimation] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -131,12 +131,14 @@ export default function WelcomeWidget() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, sessionStart, analytics])
 
-  // Stop wave animation after first open
+  // Start wave animation on mount, stop after 3 bounces
   useEffect(() => {
-    if (isOpen) {
+    setWaveAnimation(true)
+    const timer = setTimeout(() => {
       setWaveAnimation(false)
-    }
-  }, [isOpen])
+    }, 4500) // 1.5s × 3 repetitions
+    return () => clearTimeout(timer)
+  }, [])
 
   // Setup Web Speech API
   useEffect(() => {
