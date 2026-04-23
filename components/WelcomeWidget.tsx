@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Mic, MicOff } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Mic, MicOff, Volume2, VolumeX } from 'lucide-react'
 import { useChatbotAnalytics } from '@/src/hooks/useChatbotAnalytics'
 
 // Type definition for Web Speech API
@@ -68,6 +68,8 @@ export default function WelcomeWidget() {
   const [handWaveAnimation, setHandWaveAnimation] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [voiceSupported, setVoiceSupported] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
   const router = useRouter()
@@ -186,6 +188,9 @@ export default function WelcomeWidget() {
   async function sendMessage() {
     const text = input.trim()
     if (!text || loading) return
+
+    // Mark as interacted (hide quick prompts)
+    setHasInteracted(true)
 
     const sanitized = sanitizeText(text)
     const newMessages: Message[] = [...messages, { role: 'user', content: sanitized }]
@@ -346,6 +351,48 @@ export default function WelcomeWidget() {
     if (recognitionRef.current && isRecording) {
       recognitionRef.current.stop()
       setIsRecording(false)
+    }
+  }
+
+  // Text-to-Speech functions
+  function speakText(text: string, messageIndex: number) {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      alert('Twoja przeglądarka nie obsługuje czytania tekstu. Spróbuj Chrome lub Edge.')
+      return
+    }
+
+    // Stop current speech if any
+    window.speechSynthesis.cancel()
+
+    // Strip HTML tags from text
+    const plainText = text.replace(/<[^>]*>/g, '')
+
+    const utterance = new SpeechSynthesisUtterance(plainText)
+    utterance.lang = 'pl-PL'
+    utterance.rate = 0.9 // Slightly slower for seniors
+    utterance.pitch = 1.0
+    utterance.volume = 1.0
+
+    utterance.onstart = () => {
+      setSpeakingIndex(messageIndex)
+    }
+
+    utterance.onend = () => {
+      setSpeakingIndex(null)
+    }
+
+    utterance.onerror = () => {
+      setSpeakingIndex(null)
+      alert('Nie udało się odczytać tekstu. Spróbuj ponownie.')
+    }
+
+    window.speechSynthesis.speak(utterance)
+  }
+
+  function stopSpeaking() {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+      setSpeakingIndex(null)
     }
   }
 
@@ -554,9 +601,20 @@ export default function WelcomeWidget() {
                       <div dangerouslySetInnerHTML={{ __html: msg.content }} />
                     </div>
 
-                    {/* Thumbs up/down feedback */}
+                    {/* Thumbs up/down feedback + TTS button */}
                     {msg.role === 'assistant' && i > 0 && (
                       <div className="flex gap-1 mt-1">
+                        <button
+                          onClick={() => speakingIndex === i ? stopSpeaking() : speakText(msg.content, i)}
+                          className={`text-xs p-1 rounded transition-colors ${
+                            speakingIndex === i
+                              ? 'bg-blue-100 text-blue-700 animate-pulse'
+                              : 'text-slate-400 hover:text-blue-600'
+                          }`}
+                          title={speakingIndex === i ? "Zatrzymaj czytanie" : "Przeczytaj na głos"}
+                        >
+                          {speakingIndex === i ? <VolumeX size={12} /> : <Volume2 size={12} />}
+                        </button>
                         <button
                           onClick={() => handleFeedback(i, 'positive')}
                           className={`text-xs p-1 rounded transition-colors ${
@@ -617,8 +675,8 @@ export default function WelcomeWidget() {
                 <div ref={bottomRef} />
               </div>
 
-              {/* Quick suggestions (only on initial message) */}
-              {messages.length === 1 && (
+              {/* Quick suggestions (only before first interaction) */}
+              {!hasInteracted && view === 'chat' && (
                 <div className="px-2 pb-2 flex flex-wrap gap-1">
                   {QUICK_PROMPTS.map((prompt, i) => (
                     <button
