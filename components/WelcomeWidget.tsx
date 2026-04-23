@@ -132,14 +132,7 @@ export default function WelcomeWidget() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, sessionStart, analytics])
 
-  // Bounce button on mount (1 time)
-  useEffect(() => {
-    setBounceAnimation(true)
-    const timer = setTimeout(() => {
-      setBounceAnimation(false)
-    }, 800) // 0.8s × 1 repetition
-    return () => clearTimeout(timer)
-  }, [])
+  // No bounce animation - removed per user request
 
   // Hand wave when chatbot opens
   useEffect(() => {
@@ -695,7 +688,7 @@ export default function WelcomeWidget() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`w-14 h-14 rounded-full shadow-xl hover:scale-105 transition-all active:scale-95 overflow-hidden flex items-center justify-center bg-white ${
-          bounceAnimation ? 'animate-bounce-button' : ''
+          isOpen && handWaveAnimation ? 'animate-hand-wave' : ''
         }`}
         aria-label="Pomoc w wyborze placówki"
       >
@@ -707,7 +700,7 @@ export default function WelcomeWidget() {
           <img
             src="/images/advisor-sm.webp"
             alt="Doradca"
-            className={`w-full h-full object-cover ${handWaveAnimation ? 'animate-hand-wave' : ''}`}
+            className="w-full h-full object-cover"
           />
         )}
       </button>
