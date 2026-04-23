@@ -15,6 +15,14 @@ const ALLOWED_EVENTS = [
   'advisor_completed',
   'advisor_abandoned',
   'autocomplete_no_results',
+  // Chatbot events
+  'chatbot_opened',
+  'chatbot_closed',
+  'chatbot_message_sent',
+  'chatbot_action_clicked',
+  'chatbot_error',
+  'chatbot_feedback_positive',
+  'chatbot_feedback_negative',
 ] as const;
 
 export async function POST(request: NextRequest) {

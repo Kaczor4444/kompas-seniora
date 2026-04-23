@@ -7,11 +7,15 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import FloatingCookieButton from "@/components/FloatingCookieButton";
-import WelcomeWidget from "@/components/WelcomeWidget";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Analytics } from "@vercel/analytics/next";
 import ReturnVisitorTracker from "@/components/ReturnVisitorTracker";
 import { Toaster } from "react-hot-toast";
+import dynamic from "next/dynamic";
+
+// Lazy load WelcomeWidget (client-only component, reduces initial bundle)
+// Note: WelcomeWidget is already 'use client', so no need for ssr: false
+const WelcomeWidget = dynamic(() => import("@/components/WelcomeWidget"));
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
