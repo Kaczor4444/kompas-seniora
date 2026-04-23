@@ -96,18 +96,18 @@ export async function POST(request: NextRequest) {
 
     const placowkiTekst = placowki.map(p => {
       const czesci = [
-        `• ${p.nazwa} (${p.typ_placowki})`,
-        `  Lokalizacja: ${p.miejscowosc}${p.ulica ? ', ' + p.ulica : ''}, powiat ${p.powiat}`,
-        p.prowadzacy ? `  Prowadzący: ${p.prowadzacy}` : null,
-        p.profil_opieki ? `  Profil opieki: ${p.profil_opieki}` : null,
-        p.liczba_miejsc ? `  Liczba miejsc: ${p.liczba_miejsc}` : null,
-        p.koszt_pobytu ? `  Koszt pobytu: ${p.koszt_pobytu.toLocaleString('pl-PL')} zł/miesiąc` : null,
-        p.telefon ? `  Telefon: ${p.telefon}` : null,
-        p.email ? `  Email: ${p.email}` : null,
-        `  [Database ID dla akcji: ${p.id}]`, // ID na końcu, tylko dla akcji
+        `[ID: ${p.id}]`,
+        `${p.nazwa} (${p.typ_placowki})`,
+        `Lokalizacja: ${p.miejscowosc}${p.ulica ? ', ' + p.ulica : ''}, powiat ${p.powiat}`,
+        p.prowadzacy ? `Prowadzący: ${p.prowadzacy}` : null,
+        p.profil_opieki ? `Profil opieki: ${p.profil_opieki}` : null,
+        p.liczba_miejsc ? `Liczba miejsc: ${p.liczba_miejsc}` : null,
+        p.koszt_pobytu ? `Koszt: ${p.koszt_pobytu.toLocaleString('pl-PL')} zł/miesiąc` : null,
+        p.telefon ? `Telefon: ${p.telefon}` : null,
+        p.email ? `Email: ${p.email}` : null,
       ].filter(Boolean)
       return czesci.join('\n')
-    }).join('\n\n')
+    }).join('\n\n---\n\n')
 
     const systemPrompt = `Jesteś pomocnym asystentem serwisu KompasSeniora.pl — katalogu placówek opieki dla seniorów w Małopolsce.
 
@@ -119,8 +119,10 @@ TWOJA ROLA:
 ZASADY ODPOWIEDZI:
 - Odpowiadaj tylko na podstawie danych które masz poniżej
 - Pisz po polsku, krótko i rzeczowo (max 3-4 zdania)
-- ⚠️ NIE PODAWAJ ID w tekście odpowiedzi! ID służy tylko do akcji.
-- Wspominaj placówki po nazwie (np. "Dom Pomocy Społecznej w Krakowie")
+- ⚠️⚠️⚠️ ABSOLUTNIE NIE KOPIUJ [ID: XXX] do odpowiedzi! ID jest TYLKO dla akcji!
+- ⚠️ NIGDY nie pisz "[ID:169]" ani "ID:169" ani żadnej innej formy ID w tekście odpowiedzi!
+- Wspominaj placówki TYLKO po nazwie (np. "Dom Pomocy Społecznej w Muszynie")
+- ID używaj TYLKO w akcjach: {"type": "placowka", "id": 169, ...}
 - Gdy pytanie dotyczy konkretnego powiatu/miejscowości, zaproponuj mapę lub listę
 
 RÓŻNICA DPS vs ŚDS:
@@ -220,6 +222,11 @@ Assistant: {
     {"type": "artykul", "href": "/poradniki/finanse-prawne/koszty-dps", "label": "Jak to działa?"}
   ]
 }
+
+WAŻNE O FORMACIE DANYCH:
+- Każda placówka ma [ID: XXX] na początku - to TYLKO dla Ciebie do tworzenia akcji
+- NIGDY nie kopiuj [ID: XXX] do pola "answer"!
+- W odpowiedzi używaj tylko nazw placówek
 
 DANE PLACÓWEK:
 ${placowkiTekst}`
