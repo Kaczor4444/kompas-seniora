@@ -3,8 +3,26 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Mic, MicOff } from 'lucide-react'
 import { useChatbotAnalytics } from '@/src/hooks/useChatbotAnalytics'
+
+// Type definition for Web Speech API
+declare global {
+  interface Window {
+    SpeechRecognition: any
+    webkitSpeechRecognition: any
+  }
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList
+  resultIndex: number
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string
+  message: string
+}
 
 interface Action {
   type: 'placowka' | 'mapa' | 'search' | 'artykul'
@@ -47,7 +65,10 @@ export default function WelcomeWidget() {
   const [loading, setLoading] = useState(false)
   const [sessionStart, setSessionStart] = useState<number | null>(null)
   const [waveAnimation, setWaveAnimation] = useState(true)
+  const [isRecording, setIsRecording] = useState(false)
+  const [voiceSupported, setVoiceSupported] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const recognitionRef = useRef<any>(null)
   const router = useRouter()
   const analytics = useChatbotAnalytics()
 
@@ -116,6 +137,44 @@ export default function WelcomeWidget() {
       setWaveAnimation(false)
     }
   }, [isOpen])
+
+  // Setup Web Speech API
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+      if (SpeechRecognition) {
+        setVoiceSupported(true)
+        const recognition = new SpeechRecognition()
+        recognition.lang = 'pl-PL' // Polish language
+        recognition.continuous = false
+        recognition.interimResults = false
+        recognition.maxAlternatives = 1
+
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+          const transcript = event.results[0][0].transcript
+          setInput(transcript)
+          setIsRecording(false)
+        }
+
+        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+          console.error('Speech recognition error:', event.error)
+          setIsRecording(false)
+
+          // Show user-friendly error
+          if (event.error === 'not-allowed') {
+            alert('Brak dostępu do mikrofonu. Sprawdź uprawnienia przeglądarki.')
+          }
+        }
+
+        recognition.onend = () => {
+          setIsRecording(false)
+        }
+
+        recognitionRef.current = recognition
+      }
+    }
+  }, [])
 
   async function sendMessage() {
     const text = input.trim()
@@ -257,6 +316,30 @@ export default function WelcomeWidget() {
   function useQuickPrompt(prompt: string) {
     setInput(prompt)
     setTimeout(() => sendMessage(), 100)
+  }
+
+  function startVoiceRecording() {
+    if (!voiceSupported || !recognitionRef.current) {
+      alert('Twoja przeglądarka nie obsługuje rozpoznawania mowy. Spróbuj Chrome lub Edge.')
+      return
+    }
+
+    try {
+      setIsRecording(true)
+      recognitionRef.current.start()
+      analytics.trackMessage(0, messages.length) // Track voice usage
+    } catch (error) {
+      console.error('Failed to start recording:', error)
+      setIsRecording(false)
+      alert('Nie można uruchomić mikrofonu. Sprawdź uprawnienia.')
+    }
+  }
+
+  function stopVoiceRecording() {
+    if (recognitionRef.current && isRecording) {
+      recognitionRef.current.stop()
+      setIsRecording(false)
+    }
   }
 
   const showBackButton = view === 'search-type' || view === 'info-type'
@@ -547,21 +630,47 @@ export default function WelcomeWidget() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder="Napisz pytanie..."
+                  placeholder={isRecording ? "Słucham..." : "Napisz pytanie..."}
                   className="flex-1 text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                  disabled={loading}
+                  disabled={loading || isRecording}
                   maxLength={500}
                 />
+
+                {/* Voice Input Button */}
+                {voiceSupported && (
+                  <button
+                    onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+                    disabled={loading}
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                      isRecording
+                        ? 'bg-red-500 hover:bg-red-600 animate-pulse'
+                        : 'bg-blue-500 hover:bg-blue-600 disabled:opacity-40'
+                    }`}
+                    title={isRecording ? "Kliknij aby zatrzymać" : "Kliknij i powiedz pytanie"}
+                  >
+                    {isRecording ? (
+                      <MicOff size={13} className="text-white" />
+                    ) : (
+                      <Mic size={13} className="text-white" />
+                    )}
+                  </button>
+                )}
+
                 <button
                   onClick={sendMessage}
-                  disabled={!input.trim() || loading}
+                  disabled={!input.trim() || loading || isRecording}
                   className="w-8 h-8 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
                 >
                   <Send size={13} className="text-white" />
                 </button>
               </div>
               <p className="text-center text-[9px] text-slate-400 pb-2 px-4">
-                Odpowiada wyłącznie na podstawie danych z bazy ·
+                {voiceSupported && !isRecording && (
+                  <>🎤 Kliknij mikrofon aby podyktować · </>
+                )}
+                {isRecording && (
+                  <>🔴 Nagrywanie... · </>
+                )}
                 <kbd className="text-[8px] px-1 py-0.5 bg-slate-200 rounded ml-1">Esc</kbd> zamknij
               </p>
             </>
