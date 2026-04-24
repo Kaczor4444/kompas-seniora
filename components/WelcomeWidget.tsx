@@ -31,6 +31,7 @@ interface Action {
   query?: string
   href?: string
   label: string
+  facilityType?: 'dps' | 'sds' // Type filter for search actions
 }
 
 interface Message {
@@ -308,8 +309,22 @@ export default function WelcomeWidget() {
       router.push(`/placowka/${action.id}`)
     } else if (action.type === 'mapa' && action.powiat) {
       router.push(`/search?powiat=${encodeURIComponent(action.powiat)}&view=map`)
-    } else if (action.type === 'search' && action.query) {
-      router.push(`/search?q=${encodeURIComponent(action.query)}`)
+    } else if (action.type === 'search') {
+      // Build search URL with filters
+      const params = new URLSearchParams()
+      params.set('view', 'list')
+
+      if (action.facilityType) {
+        params.set('type', action.facilityType)
+      }
+      if (action.powiat) {
+        params.set('powiat', encodeURIComponent(action.powiat))
+      }
+      if (action.query) {
+        params.set('q', encodeURIComponent(action.query))
+      }
+
+      router.push(`/search?${params.toString()}`)
     } else if (action.type === 'artykul' && action.href) {
       router.push(action.href)
     } else if (action.type === 'kalkulator') {

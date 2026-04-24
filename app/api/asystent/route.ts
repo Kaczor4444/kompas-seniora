@@ -146,10 +146,16 @@ FORMAT ODPOWIEDZI:
   "actions": [
     {"type": "placowka", "id": 123, "label": "Zobacz placówkę"},
     {"type": "mapa", "powiat": "olkuski", "label": "Pokaż na mapie"},
-    {"type": "search", "query": "dps krakow", "label": "Szukaj DPS w Krakowie"},
+    {"type": "search", "powiat": "krakowski", "facilityType": "dps", "label": "Szukaj DPS"},
     {"type": "artykul", "href": "/poradniki", "label": "Jak wybrać DPS?"}
   ]
 }
+
+⚠️ AKCJA SEARCH - WAŻNE ZASADY:
+- Gdy user pyta o DPS w konkretnym powiecie → {"type": "search", "powiat": "NAZWA_POWIATU", "facilityType": "dps", "label": "..."}
+- Gdy user pyta o ŚDS w konkretnym powiecie → {"type": "search", "powiat": "NAZWA_POWIATU", "facilityType": "sds", "label": "..."}
+- NIE używaj pola "query" dla nazw powiatów - używaj pola "powiat"
+- Pole "facilityType" może być: "dps" lub "sds"
 
 Pole "actions" może być pustą tablicą [] jeśli nie ma sensownych akcji.
 ⚠️ PAMIĘTAJ: Odpowiedź w polu "answer" powinna być KRÓTKA (3-4 zdania max), bo użytkownik ma małe okno czatu!
@@ -160,8 +166,11 @@ ZASADY TWORZENIA AKCJI:
 Dodawaj akcje gdy:
 - Wspominasz placówkę → dodaj akcję {"type": "placowka", "id": ID_PLACOWKI, "label": "Nazwa placówki"}
 - Wspominasz kilka placówek → dodaj osobną akcję dla KAŻDEJ z nich
-- Pytanie o powiat/miasto → dodaj TYLKO akcję "mapa" (Pokaż na mapie)
-- Pytanie ogólne o DPS/ŚDS → dodaj akcję "search"
+- Pytanie o powiat/miasto → dodaj akcję "mapa" (Pokaż na mapie)
+- Pytanie o DPS w powiecie → {"type": "search", "powiat": "POWIAT", "facilityType": "dps", "label": "Szukaj DPS"}
+- Pytanie o ŚDS w powiecie → {"type": "search", "powiat": "POWIAT", "facilityType": "sds", "label": "Szukaj ŚDS"}
+- Pytanie ogólne o DPS → {"type": "search", "facilityType": "dps", "label": "Zobacz wszystkie DPS"}
+- Pytanie ogólne o ŚDS → {"type": "search", "facilityType": "sds", "label": "Zobacz wszystkie ŚDS"}
 - Pytanie o procedury/formalności → dodaj akcję "artykul"
 - Pytanie o koszty/cenę/emeryturę/dopłatę → dodaj akcję "kalkulator"
 
