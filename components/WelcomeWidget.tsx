@@ -40,16 +40,16 @@ interface Message {
   feedback?: 'positive' | 'negative' | null
 }
 
-type View = 'main' | 'search-type' | 'info-type' | 'chat' | 'budget' | 'location'
+type View = 'main' | 'search-type' | 'info-type' | 'chat' | 'location'
 
 const STORAGE_KEY = 'kompasseniora_chat_history'
 const STORAGE_EXPIRY = 24 * 60 * 60 * 1000 // 24h
 
 const QUICK_PROMPTS = [
-  "Jaki DPS polecacie w Krakowie?",
-  "Ile kosztuje pobyt w DPS?",
-  "Czym różni się DPS od ŚDS?",
-  "Pokaż placówki w powiecie nowosądeckim",
+  { text: "Jak znaleźć DPS?", href: "/poradniki/wybor-opieki/wybor-placowki" },
+  { text: "Ile kosztuje pobyt w DPS?", href: "/kalkulator" },
+  { text: "Czym różni się DPS od ŚDS?", href: "/poradniki/wybor-opieki/dps-vs-sds" },
+  { text: "Pokaż placówki w Krakowie", href: "/search?q=Kraków&powiat=krakowski&view=list" },
 ]
 
 // Sanitize user input (XSS protection)
@@ -59,7 +59,7 @@ function sanitizeText(text: string): string {
 
 export default function WelcomeWidget() {
   const [isOpen, setIsOpen] = useState(false)
-  const [view, setView] = useState<View>('main')
+  const [view, setView] = useState<View>('chat') // Default to chat
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -70,9 +70,10 @@ export default function WelcomeWidget() {
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null)
-  const [selectedType, setSelectedType] = useState<'dps' | 'śds' | null>(null)
-  const [selectedBudget, setSelectedBudget] = useState<string | null>(null)
-  const [selectedPowiat, setSelectedPowiat] = useState<string | null>(null)
+  const [selectedType, setSelectedType] = useState<'dps' | 'sds' | null>(null)
+  const [locationInput, setLocationInput] = useState('')
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{nazwa: string, powiat: string}>>([])
+  const [selectedLocation, setSelectedLocation] = useState<{nazwa: string, powiat: string} | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
   const router = useRouter()
@@ -136,6 +137,47 @@ export default function WelcomeWidget() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, sessionStart, analytics])
+
+  // Auto-open chat when chatbot opens
+  useEffect(() => {
+    if (isOpen && view === 'chat' && messages.length === 0) {
+      openChat()
+    }
+  }, [isOpen])
+
+  // Reset location state when entering location view
+  useEffect(() => {
+    if (view === 'location') {
+      setLocationInput('')
+      setSelectedLocation(null)
+      setLocationSuggestions([])
+    }
+  }, [view])
+
+  // Location autocomplete
+  useEffect(() => {
+    if (locationInput.length < 2) {
+      setLocationSuggestions([])
+      return
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/teryt/suggest?q=${encodeURIComponent(locationInput)}`)
+        const data = await res.json()
+        if (data.suggestions && data.suggestions.length > 0) {
+          setLocationSuggestions(data.suggestions.slice(0, 5)) // max 5 suggestions
+        } else {
+          setLocationSuggestions([])
+        }
+      } catch (err) {
+        console.error('Location autocomplete error:', err)
+        setLocationSuggestions([])
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [locationInput])
 
   // No bounce animation - removed per user request
 
@@ -287,13 +329,15 @@ export default function WelcomeWidget() {
   }
 
   function resetToMain() {
-    setView('main')
+    // No main menu anymore - just close chatbot
+    handleClose()
   }
 
   function resetChat() {
     setMessages([])
-    setView('main')
     localStorage.removeItem(STORAGE_KEY)
+    // Re-initialize chat with welcome message
+    openChat()
   }
 
   function handleClose() {
@@ -315,11 +359,8 @@ export default function WelcomeWidget() {
     if (messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: 'Cześć! Jestem asystentem KompasSeniora. Pomogę Ci znaleźć odpowiednią placówkę opieki dla Twojego bliskiego w Małopolsce. O co chcesz zapytać?',
-        actions: [
-          { type: 'search', query: 'dps', href: '/search?type=dps', label: 'Pokaż wszystkie DPS' },
-          { type: 'artykul', href: '/poradniki', label: 'Poradniki' },
-        ],
+        content: 'Cześć! Jestem Olek 👋\n\nPomogę Ci znaleźć DPS lub ŚDS w Małopolsce i odpowiem na pytania o opiekę nad seniorem.\n\nWybierz temat z listy lub zadaj swoje pytanie:',
+        actions: [],
       }])
     }
   }
@@ -331,9 +372,10 @@ export default function WelcomeWidget() {
     analytics.trackFeedback(messageIndex, type === 'positive')
   }
 
-  function useQuickPrompt(prompt: string) {
-    setInput(prompt)
-    setTimeout(() => sendMessage(), 100)
+  function useQuickPrompt(href: string) {
+    // Close chatbot and redirect to article/page
+    setIsOpen(false)
+    router.push(href)
   }
 
   function startVoiceRecording() {
@@ -403,18 +445,29 @@ export default function WelcomeWidget() {
   }
 
   function finalSearch() {
-    let url = `/search?type=${selectedType}`
-    if (selectedBudget) {
-      url += `&budget=${selectedBudget}`
+    let url = `/search?view=list`
+
+    if (selectedType) {
+      url += `&type=${selectedType}`
     }
-    if (selectedPowiat) {
-      url += `&powiat=${encodeURIComponent(selectedPowiat)}`
+
+    // Only add location if user actually selected something from autocomplete AND input is not empty
+    if (selectedLocation && locationInput.trim() !== '') {
+      url += `&q=${encodeURIComponent(selectedLocation.nazwa)}`
+      url += `&powiat=${encodeURIComponent(selectedLocation.powiat)}`
     }
+
     router.push(url)
     setIsOpen(false)
+
+    // Reset location state for next search
+    setLocationInput('')
+    setSelectedLocation(null)
+    setLocationSuggestions([])
   }
 
-  const showBackButton = view === 'search-type' || view === 'info-type' || view === 'budget' || view === 'location'
+  const showBackButton = false // Disabled - no main menu to go back to
+  // const showBackButton = view === 'search-type' || view === 'info-type' || view === 'location'
 
   return (
     <div className="fixed bottom-20 right-5 z-40 flex flex-col items-end">
@@ -435,19 +488,17 @@ export default function WelcomeWidget() {
               )}
               <div>
                 <p className="text-white font-black text-base">
-                  {view === 'chat' ? 'Asystent AI 🤖' :
+                  {view === 'chat' ? 'W czym mogę pomóc? 👋' :
                    view === 'search-type' ? 'Jaki rodzaj? 🏥' :
                    view === 'info-type' ? 'Informacje 📚' :
-                   view === 'budget' ? 'Jaki budżet? 💰' :
                    view === 'location' ? 'Gdzie szukasz? 📍' :
                    'W czym mogę pomóc? 👋'}
                 </p>
                 <p className="text-slate-400 text-xs mt-0.5 font-medium">
-                  {view === 'chat' ? 'Pytaj o placówki w Małopolsce' :
+                  {view === 'chat' ? 'Asystent KompasSeniora' :
                    view === 'search-type' ? 'Wybierz typ placówki' :
                    view === 'info-type' ? 'Wybierz temat' :
-                   view === 'budget' ? 'Pomożemy dopasować' :
-                   view === 'location' ? 'Wybierz powiat lub region' :
+                   view === 'location' ? 'Wpisz miejscowość' :
                    'Wybierz opcję poniżej'}
                 </p>
               </div>
@@ -465,6 +516,7 @@ export default function WelcomeWidget() {
           </div>
 
           {/* EKRAN 1: MAIN - W czym mogę pomóc? */}
+          {/* TEMPORARILY DISABLED - focusing on chat only
           {view === 'main' && (
             <>
               <div className="p-3 space-y-2">
@@ -504,6 +556,7 @@ export default function WelcomeWidget() {
               <p className="text-center text-[10px] text-slate-400 pb-3 px-4">Małopolska · 184 placówki · Dane z BIP</p>
             </>
           )}
+          */}
 
           {/* EKRAN 2a: SEARCH-TYPE - Jaki rodzaj placówki? */}
           {view === 'search-type' && (
@@ -512,7 +565,7 @@ export default function WelcomeWidget() {
                 <button
                   onClick={() => {
                     setSelectedType('dps')
-                    setView('budget')
+                    setView('location')
                   }}
                   className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3.5 transition-all group"
                 >
@@ -525,8 +578,8 @@ export default function WelcomeWidget() {
 
                 <button
                   onClick={() => {
-                    setSelectedType('śds')
-                    setView('budget')
+                    setSelectedType('sds')
+                    setView('location')
                   }}
                   className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3.5 transition-all group"
                 >
@@ -613,91 +666,73 @@ export default function WelcomeWidget() {
             </>
           )}
 
-          {/* EKRAN 3a: BUDGET - Jaki budżet? */}
-          {view === 'budget' && (
-            <>
-              <div className="p-3 space-y-2">
-                <button
-                  onClick={() => {
-                    setSelectedBudget('<3000')
-                    setView('location')
-                  }}
-                  className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group"
-                >
-                  <div className="min-w-0 mr-2">
-                    <p className="text-sm font-black text-slate-900">💵 Do 3000 zł</p>
-                    <p className="text-xs text-slate-600 font-medium">Najtańsze opcje</p>
-                  </div>
-                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    setSelectedBudget('3000-4000')
-                    setView('location')
-                  }}
-                  className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group"
-                >
-                  <div className="min-w-0 mr-2">
-                    <p className="text-sm font-black text-slate-900">💰 3000-4000 zł</p>
-                    <p className="text-xs text-slate-600 font-medium">Średnia cena</p>
-                  </div>
-                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    setSelectedBudget('4000+')
-                    setView('location')
-                  }}
-                  className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group"
-                >
-                  <div className="min-w-0 mr-2">
-                    <p className="text-sm font-black text-slate-900">💎 Powyżej 4000 zł</p>
-                    <p className="text-xs text-slate-600 font-medium">Premium</p>
-                  </div>
-                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                </button>
-
-                <button
-                  onClick={() => setView('location')}
-                  className="flex items-center justify-center w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 transition-all text-xs font-bold text-slate-600"
-                >
-                  ⏭️ Pomiń (nie wiem)
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* EKRAN 3b: LOCATION - Gdzie szukasz? */}
+          {/* EKRAN 3: LOCATION - Gdzie szukasz? */}
           {view === 'location' && (
             <>
-              <div className="p-3 space-y-2">
-                <button onClick={() => { setSelectedPowiat('krakowski'); finalSearch() }} className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group">
-                  <span className="text-sm font-black text-slate-900">📍 Kraków</span>
-                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+              <div className="p-3 space-y-3">
+                {/* Input field with autocomplete */}
+                <div className="relative">
+                  <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:border-emerald-300 focus-within:bg-white transition-all">
+                    <MapPin size={16} className="text-slate-400 mr-2 flex-shrink-0" />
+                    <input
+                      type="text"
+                      value={locationInput}
+                      onChange={(e) => {
+                        const newValue = e.target.value
+                        setLocationInput(newValue)
+                        // Reset selected location when user modifies text
+                        setSelectedLocation(null)
+                        // If user clears the field completely, also clear suggestions
+                        if (newValue.trim() === '') {
+                          setLocationSuggestions([])
+                        }
+                      }}
+                      placeholder="Wpisz miejscowość..."
+                      className="flex-1 bg-transparent text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Autocomplete suggestions dropdown */}
+                  {locationSuggestions.length > 0 && !selectedLocation && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-10 max-h-48 overflow-y-auto">
+                      {locationSuggestions.map((suggestion, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setSelectedLocation(suggestion)
+                            setLocationInput(suggestion.nazwa)
+                            setLocationSuggestions([])
+                          }}
+                          className="w-full text-left px-4 py-2.5 hover:bg-emerald-50 transition-colors border-b border-slate-100 last:border-b-0"
+                        >
+                          <p className="text-sm font-bold text-slate-900">{suggestion.nazwa}</p>
+                          <p className="text-xs text-slate-500">powiat {suggestion.powiat}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Search button - enabled only when location is actually selected */}
+                <button
+                  onClick={finalSearch}
+                  disabled={!selectedLocation || locationInput.trim() === ''}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-200 disabled:cursor-not-allowed text-white disabled:text-slate-400 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                >
+                  <Search size={16} />
+                  Szukaj
                 </button>
 
-                <button onClick={() => { setSelectedPowiat('nowosądecki'); finalSearch() }} className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group">
-                  <span className="text-sm font-black text-slate-900">📍 Nowy Sącz</span>
-                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                </button>
-
-                <button onClick={() => { setSelectedPowiat('tarnowski'); finalSearch() }} className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group">
-                  <span className="text-sm font-black text-slate-900">📍 Tarnów</span>
-                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                </button>
-
-                <button onClick={() => { setSelectedPowiat('olkuski'); finalSearch() }} className="flex items-center justify-between w-full bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-3 transition-all group">
-                  <span className="text-sm font-black text-slate-900">📍 Olkusz</span>
-                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                </button>
-
-                <button onClick={finalSearch} className="flex items-center justify-center w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 transition-all text-xs font-bold text-slate-600">
-                  🔍 Szukaj bez filtra lokalizacji
+                {/* Skip button */}
+                <button
+                  onClick={finalSearch}
+                  className="w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 transition-all text-xs font-bold text-slate-600"
+                >
+                  ⏭️ Pomiń (pokaż wszystkie)
                 </button>
               </div>
-              <p className="text-center text-[10px] text-slate-400 pb-3 px-4">lub pomiń i zobacz wszystkie</p>
+              <p className="text-center text-[10px] text-slate-400 pb-3 px-4">184 placówki w Małopolsce</p>
             </>
           )}
 
@@ -795,10 +830,10 @@ export default function WelcomeWidget() {
                   {QUICK_PROMPTS.map((prompt, i) => (
                     <button
                       key={i}
-                      onClick={() => useQuickPrompt(prompt)}
+                      onClick={() => useQuickPrompt(prompt.href)}
                       className="text-[10px] px-2 py-1 bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 rounded-full transition-colors border border-slate-200 hover:border-emerald-300"
                     >
-                      {prompt}
+                      {prompt.text}
                     </button>
                   ))}
                 </div>
@@ -809,47 +844,21 @@ export default function WelcomeWidget() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder={isRecording ? "Słucham..." : "Napisz pytanie..."}
+                  placeholder="Napisz pytanie..."
                   className="flex-1 text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                  disabled={loading || isRecording}
+                  disabled={loading}
                   maxLength={500}
                 />
 
-                {/* Voice Input Button */}
-                {voiceSupported && (
-                  <button
-                    onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-                    disabled={loading}
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${
-                      isRecording
-                        ? 'bg-red-500 hover:bg-red-600 animate-pulse'
-                        : 'bg-blue-500 hover:bg-blue-600 disabled:opacity-40'
-                    }`}
-                    title={isRecording ? "Kliknij aby zatrzymać" : "Kliknij i powiedz pytanie"}
-                  >
-                    {isRecording ? (
-                      <MicOff size={13} className="text-white" />
-                    ) : (
-                      <Mic size={13} className="text-white" />
-                    )}
-                  </button>
-                )}
-
                 <button
                   onClick={sendMessage}
-                  disabled={!input.trim() || loading || isRecording}
+                  disabled={!input.trim() || loading}
                   className="w-8 h-8 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
                 >
                   <Send size={13} className="text-white" />
                 </button>
               </div>
               <p className="text-center text-[9px] text-slate-400 pb-2 px-4">
-                {voiceSupported && !isRecording && (
-                  <>🎤 Kliknij mikrofon aby podyktować · </>
-                )}
-                {isRecording && (
-                  <>🔴 Nagrywanie... · </>
-                )}
                 <kbd className="text-[8px] px-1 py-0.5 bg-slate-200 rounded ml-1">Esc</kbd> zamknij
               </p>
             </>
