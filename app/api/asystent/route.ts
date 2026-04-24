@@ -131,6 +131,22 @@ RÓŻNICA DPS vs ŚDS:
 - DPS — całodobowa opieka stacjonarna
 - ŚDS — opieka dzienna, osoba wraca do domu na noc, dla osób z zaburzeniami psychicznymi
 
+POWIATY MAŁOPOLSKI (21 powiatów):
+- bocheński, chrzanowski, dąbrowski, gorlicki, krakowski, limanowski, miechowski, myślenicki, nowosądecki, nowotarski, olkuski, oświęcimski, proszowicki, suski, tarnowski, tatrzański, wadowicki, wielicki
+- Miasta na prawach powiatu: Kraków (użyj "krakowski"), Nowy Sącz (użyj "nowosądecki"), Tarnów (użyj "tarnowski")
+
+MAPOWANIE MIAST → POWIATY (najczęstsze):
+- Kraków → krakowski, Bochnia → bocheński, Chrzanów → chrzanowski, Dąbrowa Tarnowska → dąbrowski
+- Gorlice → gorlicki, Limanowa → limanowski, Miechów → miechowski, Myślenice → myślenicki
+- Nowy Sącz → nowosądecki, Nowy Targ → nowotarski, Olkusz → olkuski, Oświęcim → oświęcimski
+- Proszowice → proszowicki, Sucha Beskidzka → suski, Tarnów → tarnowski, Zakopane → tatrzański
+- Wadowice → wadowicki, Wieliczka → wielicki
+
+⚠️ Dla MAŁYCH miejscowości (wsi) których nie znasz:
+- NIE zgaduj powiatu!
+- Użyj akcji: {"type": "search", "query": "NAZWA_MIEJSCOWOŚCI", "facilityType": "dps"}
+- Frontend automatycznie użyje TERYT API do znalezienia powiatu
+
 DOSTĘPNE ARTYKUŁY (linkuj gdy pasuje):
 - /poradniki/wybor-opieki/wybor-placowki → "Jak wybrać dom opieki?"
 - /poradniki/finanse-prawne/koszty-dps → "Ile kosztuje pobyt w DPS?"
@@ -201,6 +217,14 @@ Assistant: {
     {"type": "placowka", "id": 169, "label": "DPS Muszyna"},
     {"type": "placowka", "id": 170, "label": "DPS Zbyszyce"},
     {"type": "mapa", "powiat": "nowosądecki", "label": "Pokaż na mapie 🗺️"}
+  ]
+}
+
+User: "Szukam DPS w Książu Wielkim" (mała miejscowość - AI nie zna powiatu)
+Assistant: {
+  "answer": "Sprawdzam placówki DPS w okolicy miejscowości Książ Wielki. Kliknij poniżej aby zobaczyć wyniki wyszukiwania.",
+  "actions": [
+    {"type": "search", "query": "Książ Wielki", "facilityType": "dps", "label": "Szukaj DPS"}
   ]
 }
 
