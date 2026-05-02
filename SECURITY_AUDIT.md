@@ -1,0 +1,349 @@
+# Security Audit — Kompas Seniora
+
+**Data audytu:** 2026-05-02  
+**Zakres:** Widget czatu (`WelcomeWidget.tsx`), API chatbota (`/api/asystent`), Redis rate limiting, nagłówki bezpieczeństwa, panel admina, API analityki, API share/TERYT  
+**Commity:** `719a0c5` → `dc06df1`  
+**Rundy:** 5 rund analizy + napraw
+
+---
+
+## Metodologia
+
+Każda runda szukała tego co poprzednia pominęła. Runda 4 wyszła poza pierwotny zakres (widget) i znalazła krytyczne luki w innych API. Lekcja: nigdy nie ograniczaj analizy do jednego pliku.
+
+---
+
+## Znalezione i naprawione luki (29 łącznie)
+
+### 🔴 KRYTYCZNE
+
+---
+
+#### 1. CSP zawierał `unsafe-eval` i `unsafe-inline` — CSP był bezużyteczny
+**Plik:** `next.config.mjs`  
+**Problem:** `script-src 'self' 'unsafe-inline' 'unsafe-eval'` — każda z tych dyrektyw osobno wyłącza ochronę XSS przez CSP. Z obydwoma CSP jest całkowicie martwy.  
+**Fix:** Usunięto `unsafe-eval` (nie potrzebny w buildzie produkcyjnym). `unsafe-inline` pozostaje z TODO na nonce-based CSP — wymaga implementacji Next.js middleware.  
+**Lekcja:** CSP bez nonces i bez usunięcia `unsafe-*` to false security — daje złudzenie ochrony.
+
+---
+
+#### 2. `checkOrigin` — bypass przez `startsWith()` na domenie
+**Plik:** `app/api/asystent/route.ts`  
+**Problem:**
+```typescript
+return allowedOrigins.some(allowed => requestOrigin?.startsWith(allowed))
+```
+`'https://kompaseniora.pl.evil.com'.startsWith('https://kompaseniora.pl')` = **TRUE**  
+Ktoś z domeną `kompaseniora.pl.evil.com` omijał cały CSRF check.  
+**Fix:** Zmieniono na exact match lub `startsWith(allowed + '/')`:
+```typescript
+return allowedOrigins.some(allowed =>
+  requestOrigin === allowed || requestOrigin?.startsWith(allowed + '/')
+)
+```
+**Lekcja:** Nigdy nie używaj `startsWith()` do sprawdzania domen. Zawsze exact match lub parsuj URL.
+
+---
+
+#### 3. `/api/analytics/track` POST — zero autoryzacji, zero walidacji
+**Plik:** `app/api/analytics/track/route.ts`  
+**Problem:** Publiczny endpoint bez autentykacji i rate limitingu zapisujący do bazy:
+- `eventType` — dowolny string
+- `placowkaId: Number(placowkaId)` — `Number('abc') = NaN` → błąd Prismy
+- `metadata` — obiekt dowolnego rozmiaru
+- Możliwe zalanie tabeli milionami fake rekordów (Database DoS)
+
+**Fix:** Allowlist dla `eventType`, walidacja `placowkaId` jako `Number.isInteger() && > 0`, limit metadata do 2000 znaków, limity długości `userAgent`/`referer`.  
+**Lekcja:** Każdy publiczny POST endpoint bez rate limitingu to potencjalny DoS. Analytics to nie wyjątek.
+
+---
+
+#### 4. SSE stream — `clearTimeout` za wcześnie, brak limitu na czytanie streamu
+**Plik:** `components/WelcomeWidget.tsx`  
+**Problem:** `clearTimeout(timeoutId)` był wywoływany tuż po odebraniu nagłówków HTTP. Cała faza czytania streamu (`while(true)` loop) działała BEZ żadnego limitu czasu. Jeden tab mógł trzymać połączenie otwarte w nieskończoność.  
+**Fix:** Przeniesiono `abortController` i `timeoutId` przed blok `try`, `clearTimeout` do `finally` — timeout obejmuje teraz cały czas trwania requestu.  
+**Lekcja:** Timeout na `fetch()` nie oznacza timeout na stream body. To dwie różne fazy.
+
+---
+
+### 🟠 WYSOKIE
+
+---
+
+#### 5. Redis rate limiter — race condition TOCTOU
+**Plik:** `lib/redis.ts`  
+**Problem:** `redis.get()` + `redis.incr()` to dwie nieatomowe operacje. Przy burst requestów (Vercel = multiple instances) wszystkie mogły przejść check jednocześnie, a potem inkrementować — efektywny limit: `limit × liczba_instancji`.  
+**Fix:** Atomiczny `incr-first` pattern:
+```typescript
+const count = await redis.incr(key)
+if (count === 1) await redis.expire(key, windowSeconds)
+if (count > limit) return { allowed: false, remaining: 0 }
+```
+**Lekcja:** Rate limiting musi być atomowy. `get + check + set` to zawsze race condition w środowisku serverless.
+
+---
+
+#### 6. Redis fail — fail-open zamiast fail-closed
+**Plik:** `lib/redis.ts`  
+**Problem:** Gdy Redis był niedostępny, kod zwracał `{ allowed: true }` — wyłączenie Redis = wyłączenie rate limitingu.  
+**Fix:** Fallback na in-memory rate limiter per serverless instancja (nie idealny, ale lepsza niż brak ochrony).  
+**Lekcja:** Security controls muszą mieć bezpieczny fallback. Fail-open w security = brak security.
+
+---
+
+#### 7. IP spoofing przez `X-Forwarded-For` — omijanie rate limitera
+**Pliki:** `app/api/asystent/route.ts`, `app/api/admin/login/route.ts`  
+**Problem:**
+```typescript
+// chatbot — było:
+request.ip || request.headers.get('x-forwarded-for')
+
+// admin login — było:
+request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+```
+`X-Forwarded-For` to nagłówek kontrolowany przez klienta. Rotacja IP → nieskończone próby hasła bez blokady.  
+**Fix:** `x-real-ip` (ustawiany przez Vercel/proxy, nie przez klienta) jako pierwszy. Fallback na ostatni IP z `X-Forwarded-For` (dodawany przez trusted proxy, nie klienta).  
+**Lekcja:** Admin login rate limiting oparty na spoofable IP to brak rate limitingu.
+
+---
+
+#### 8. Admin login — timing attack na porównanie haseł
+**Plik:** `app/api/admin/login/route.ts`  
+**Problem:** `password !== correctPassword` — zwykłe porównanie stringów ujawnia czas zależny od liczby pasujących znaków. Mierząc czas odpowiedzi można odgadnąć hasło znak po znaku.  
+**Fix:**
+```typescript
+timingSafeEqual(Buffer.from(password), Buffer.from(correctPassword))
+```
+**Lekcja:** Wszystkie porównania sekretów (hasła, tokeny, klucze) muszą używać `crypto.timingSafeEqual`.
+
+---
+
+#### 9. Raw AI JSON wysyłany do użytkownika przy błędzie parsowania
+**Plik:** `app/api/asystent/route.ts`  
+**Problem:** Gdy Claude zwrócił odpowiedź nie parsującą się do JSON, kod wysyłał `fullText` (surowa odpowiedź zawierająca `[ID: 123]`, wewnętrzne dane placówek, fragmenty system promptu) bezpośrednio do użytkownika w chacie.  
+**Fix:** Generic error message zamiast raw tekstu.  
+**Lekcja:** Error fallbacks nigdy nie powinny ujawniać wewnętrznych danych.
+
+---
+
+#### 10. `localStorage` — brak walidacji kształtu wczytanych wiadomości
+**Plik:** `components/WelcomeWidget.tsx`  
+**Problem:** Wiadomości wczytane z `localStorage` trafiały bezpośrednio do Claude jako kontekst rozmowy bez sprawdzenia struktury. Złośliwe rozszerzenie przeglądarki mogło zapisać sfabrykowane wiadomości asystenta, które Claude traktował jako prawdziwy kontekst.  
+**Fix:** `isValidStoredMessages()` waliduje role, content length, strukturę actions przed `setMessages`.  
+**Lekcja:** `localStorage` to user-controlled storage. Traktuj go jak zewnętrzne API.
+
+---
+
+#### 11. `streamedActions` bez walidacji po stronie klienta
+**Plik:** `components/WelcomeWidget.tsx`  
+**Problem:** Akcje ze streamu SSE trafiały do React state i `router.push()` bez żadnego sprawdzenia. Serwer waliduje przez Zod, ale klient ufał streamowi bezwarunkowo.  
+**Fix:** `isValidAction()` filtruje każdą akcję — sprawdza typ, długość label, wymaga `href.startsWith('/')`.  
+**Lekcja:** Defense in depth — waliduj na serwerze I na kliencie, szczególnie dane które trafiają do nawigacji.
+
+---
+
+#### 12. `action.href` bez walidacji jako ścieżka względna
+**Plik:** `app/api/asystent/route.ts` (Zod schema)  
+**Problem:** AI mógł zwrócić `href: "javascript:alert(1)"` lub `href: "https://evil.com"`.  
+**Fix:** `z.string().max(500).startsWith('/')` w Zod schema.  
+**Lekcja:** Dane z modelu AI to zewnętrzne dane. Waliduj jak każde inne zewnętrzne API.
+
+---
+
+#### 13. Prompt injection — filtr omijany przez Unicode i język polski
+**Plik:** `app/api/asystent/route.ts`  
+**Problem:** Filtr słów kluczowych (`ignore previous`, `admin`, `database`) był trywialnie omijany:
+- Unicode homoglify: `ıgnore` (dotless i), `sуstem` (cyrylica)
+- Zero-width characters w środku słów
+- Polski: `zignoruj instrukcje` nie był w filtrze
+- False positives: `admin`, `database` blokowały legalne pytania
+
+**Fix:** Usunięto false positives, dodano polskie wzorce. Zrozumienie: filtr jest tylko warstwą pomocniczą — główna ochrona to system prompt.  
+**Lekcja:** Blacklisty słów kluczowych to security theater. Nie polegaj na nich jako jedynej ochronie.
+
+---
+
+#### 14. TTS injection — AI text czytany bez walidacji długości
+**Plik:** `components/WelcomeWidget.tsx`  
+**Problem:** Tekst z AI trafiał do `SpeechSynthesisUtterance` bez sprawdzenia długości. Zdjailbreakowany model mógł odczytać numer telefonu, URL, social engineering script.  
+**Fix:** Limit 1000 znaków przed TTS.
+
+---
+
+#### 15. Host Header Injection w `/api/share`
+**Plik:** `app/api/share/route.ts`  
+**Problem:**
+```typescript
+const host = request.headers.get('host') || 'localhost:3000';
+const shareUrl = `${protocol}://${host}/s/${token}`;
+```
+Żądanie z `Host: evil.com` zwracało `{ url: "https://evil.com/s/token" }` — potencjalne narzędzie do phishingu (URL wyglądał jak z evil.com ale wskazywał na nasze dane).  
+**Fix:** `process.env.NEXT_PUBLIC_BASE_URL` zamiast headera `Host`.  
+**Lekcja:** Nigdy nie buduj URL-i z headerów kontrolowanych przez użytkownika.
+
+---
+
+### 🟡 ŚREDNIE
+
+---
+
+#### 16. CSRF bypass — brak `X-Requested-With` dla requestów bez Origin/Referer
+**Plik:** `app/api/asystent/route.ts`  
+**Problem:** `if (!origin && !referer) return true` — curl/Postman/skrypty omijały CSRF check całkowicie.  
+**Fix:** Wymagany nagłówek `X-Requested-With: XMLHttpRequest` gdy brak Origin/Referer. Klient dodaje go w każdym fetch.
+
+---
+
+#### 17. `logSecurityEvent` logował treść wiadomości użytkownika (GDPR)
+**Plik:** `app/api/asystent/route.ts`  
+**Problem:** Przy wykryciu injection, `details.substring(0, 200)` logował faktyczną wiadomość usera razem z ich IP do Vercel logs.  
+**Fix:** Dla `PROMPT_INJECTION` loguje tylko `[message length: N chars]`, nie treść.  
+**Lekcja:** IP + treść wiadomości = dane osobowe. Logi produkcyjne muszą być GDPR-compliant.
+
+---
+
+#### 18. Pusty placeholder po timeoucie streamu
+**Plik:** `components/WelcomeWidget.tsx`  
+**Problem:** Jeśli timeout odpalał się podczas czytania streamu (po dodaniu placeholder message), w chacie pojawiały się dwa elementy: pusty dymek + komunikat błędu.  
+**Fix:** `placeholderAdded` flag — przy aborcie w trakcie stream reading usuwa pusty placeholder przed dodaniem error message.
+
+---
+
+#### 19. Console.logi produkcyjne ujawniające wewnętrzne dane
+**Pliki:** `app/api/asystent/route.ts`, `app/api/teryt/suggest/route.ts`  
+**Problem:** Kilkanaście `console.log` w produkcji ujawniało wzorce zapytań, wykryte intencje, wyniki filtrowania, IP użytkowników w logach Vercela.  
+**Fix:** Wszystkie logi debugowe za `if (process.env.NODE_ENV === 'development')`.  
+**Lekcja:** Logi produkcyjne to attack surface dla recon. Tylko to co niezbędne.
+
+---
+
+#### 20. Parametr `days` w analytics bez walidacji
+**Plik:** `app/api/analytics/track/route.ts`  
+**Problem:** `parseInt(searchParams.get('days') || '30')` bez górnego limitu. `days=99999999` → zapytanie od roku 1700 → timeout bazy.  
+**Fix:** `Math.min(rawDays, 365)`, min 1, NaN → 30.
+
+---
+
+#### 21. Analytics GET ujawniał błędy Prismy w produkcji
+**Plik:** `app/api/analytics/track/route.ts`  
+**Problem:** `{ error: 'Internal server error', details: error.message }` — error messages Prismy zawierają nazwy kolumn, tabel, SQL constraints.  
+**Fix:** Usunięto `details` z error response.
+
+---
+
+#### 22. `bot-track` POST bez allowlisty dla `botType`
+**Plik:** `app/api/analytics/bot-track/route.ts`  
+**Problem:** `eventType: bot_visit_${botType}` — `botType` był user-controlled, dowolny string trafiał do bazy.  
+**Fix:** Allowlist: `['ai_bot', 'search_bot', 'unknown']`.
+
+---
+
+#### 23. TTS ignorował zmianę języka na angielski
+**Plik:** `components/WelcomeWidget.tsx`  
+**Problem:** `utterance.lang = 'pl-PL'` hardcoded. Tekst angielski był czytany polskim głosem.  
+**Fix:** `utterance.lang = language === 'en' ? 'en-US' : 'pl-PL'` + dobieranie angielskiego głosu dla EN.
+
+---
+
+#### 24. `SpeechRecognition.lang` hardcoded przy inicjalizacji
+**Plik:** `components/WelcomeWidget.tsx` (usunięte w tej samej sesji)  
+**Problem:** Lang ustawiany raz przy `useEffect([])`, nie reagował na zmianę PL↔EN.  
+**Fix:** Usunięto SpeechRecognition całkowicie na życzenie użytkownika.
+
+---
+
+### 🔵 NISKIE
+
+---
+
+#### 25. `sanitizeText` — podwójne HTML-encoding, mylące i zbędne
+**Plik:** `components/WelcomeWidget.tsx`  
+**Problem:** `text.replace(/</g, '&lt;')` na tekście który potem React renderuje jako text node (bezpieczny z definicji). Użytkownik wpisując `<3` widział `&lt;3`. AI dostawał `&lt;script&gt;` zamiast `<script>`.  
+**Fix:** Usunięto `sanitizeText` całkowicie — React text nodes są wystarczające.  
+**Lekcja:** Redundantna sanityzacja może zaszkodzić. Zrozum model bezpieczeństwa frameworka.
+
+---
+
+#### 26. `revalidate = 3600` na POST route
+**Plik:** `app/api/asystent/route.ts`  
+**Problem:** `revalidate` działa tylko na GET routes w Next.js App Router. Na POST jest cicho ignorowane, ale sugeruje że developer myślał że POST odpowiedzi są cachowane.  
+**Fix:** Usunięto.
+
+---
+
+#### 27. `Permissions-Policy: microphone=()` blokował SpeechRecognition, po usunięciu SpeechRecognition zmieniono z powrotem
+**Plik:** `next.config.mjs`  
+**Problem:** Wprowadzono błąd: zmieniono `microphone=()` na `microphone=(self)` dla SpeechRecognition, po czym usunięto SpeechRecognition — pozostało niepotrzebne `microphone=(self)`.  
+**Fix:** Przywrócono `microphone=()`.  
+**Lekcja:** Przy usuwaniu feature, sprawdź czy nie zostawiasz uprawnień które były z nim powiązane.
+
+---
+
+#### 28. Nested `setTimeout` w tooltipie — wyciek przy unmount
+**Plik:** `components/WelcomeWidget.tsx`  
+**Problem:** Inner `setTimeout` nie był czyszczony przy unmount komponentu — `setShowTooltip` i `localStorage.setItem` uruchamiały się na odmontowanym komponencie.  
+**Fix:** Oba timery czyszczone w cleanup funkcji `useEffect`.
+
+---
+
+#### 29. `share` POST — `ids` bez walidacji jako integer i bez limitu liczby
+**Plik:** `app/api/share/route.ts`  
+**Problem:** `ids.join(',')` zapisywało do bazy bez walidacji że każde ID to positive integer. Brak max długości — `ids: [1,2,...,10000]` → bardzo drogi SELECT.  
+**Fix:** `Number.isInteger(id) && id > 0`, max 50 elementów.
+
+---
+
+## Co zostało jako TODO
+
+| # | Problem | Dlaczego nie naprawiony | Jak naprawić |
+|---|---------|------------------------|--------------|
+| 1 | `unsafe-inline` w CSP | Wymaga refactoru całego Next.js setup z nonces | Middleware generujący nonce per request, przekazywany do `<Script>` i headera |
+| 2 | Admin cookie `admin-auth: true` bez podpisu | Wymaga przepisania systemu auth | HMAC podpis wartości cookie lub `iron-session` / NextAuth |
+| 3 | `app-track` POST bez rate limitingu | Wymaga Redisa dla publicznych endpoints | Rozszerzyć `checkRedisRateLimit` na inne publiczne POST endpoints |
+
+---
+
+## Wzorce błędów które się powtarzały
+
+### 1. Zaufanie do client-controlled headers
+Pojawił się w 3 miejscach: `X-Forwarded-For` dla IP, `Host` header dla URL, `Origin` z `startsWith`. **Zasada:** żaden header nie jest zaufany jeśli nie pochodzi od twojego trusted proxy.
+
+### 2. Publiczne POST endpoints bez walidacji i rate limitingu
+`/api/analytics/track`, `/api/analytics/bot-track`, `/api/analytics/app-track` — wszystkie działały jako otwarte zapisy do bazy. **Zasada:** każdy publiczny POST endpoint to potencjalny DoS i data pollution vector.
+
+### 3. `console.log` w kodzie produkcyjnym
+Pojawił się w 4 plikach, łącznie ~20 logów. **Zasada:** logi debugowe za `process.env.NODE_ENV === 'development'` od początku, nie po fakcie.
+
+### 4. Error messages ujawniające wewnętrzne szczegóły
+`details: error.message` w analytics, raw AI JSON w fallbacku chatbota. **Zasada:** production error response = `{ error: 'Internal server error' }`. Nic więcej.
+
+### 5. Timeouty obejmujące tylko pierwszą fazę, nie całą operację
+`clearTimeout` po nagłówkach HTTP, nie po zakończeniu streamu. **Zasada:** timeout musi obejmować całą operację od wysłania requestu do ostatniego bajtu odpowiedzi.
+
+### 6. `startsWith()` do sprawdzania domen
+`requestOrigin.startsWith('https://moja-domena.pl')` to bypass przez `moja-domena.pl.evil.com`. **Zasada:** exact match lub `startsWith(domain + '/')` lub `new URL(origin).host === allowedHost`.
+
+### 7. Dane z AI traktowane jako zaufane
+`fullText` w fallbacku, `streamedActions` bez re-walidacji, `href` bez wymuszenia `/`. **Zasada:** odpowiedź modelu językowego to external input — waliduj jak każde inne zewnętrzne API.
+
+---
+
+## Pliki zmodyfikowane w tym audycie
+
+| Plik | Liczba poprawek | Najważniejsza zmiana |
+|------|----------------|---------------------|
+| `components/WelcomeWidget.tsx` | 12 | Timeout na cały stream, walidacja actions, TTS lang |
+| `app/api/asystent/route.ts` | 8 | startsWith fix, IP spoofing, GDPR logs, SSE fallback |
+| `lib/redis.ts` | 2 | Atomowy incr-first, in-memory fallback |
+| `next.config.mjs` | 3 | unsafe-eval, media-src, microphone policy |
+| `app/api/admin/login/route.ts` | 2 | timingSafeEqual, IP order |
+| `app/api/analytics/track/route.ts` | 3 | Walidacja, days limit, error details |
+| `app/api/analytics/bot-track/route.ts` | 1 | Allowlist botType |
+| `app/api/analytics/app-track/route.ts` | 1 | Metadata limit |
+| `app/api/share/route.ts` | 2 | ID validation, host header injection |
+| `app/api/teryt/suggest/route.ts` | 1 | Console.log za dev flag |
+
+---
+
+*Audyt przeprowadzony: 2026-05-02*  
+*Commits: `719a0c5` do `dc06df1`*
