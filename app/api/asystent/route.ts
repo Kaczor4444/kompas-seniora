@@ -87,7 +87,11 @@ function checkOrigin(request: NextRequest): boolean {
   }
 
   const requestOrigin = origin || referer?.split('/').slice(0, 3).join('/')
-  return allowedOrigins.some(allowed => requestOrigin?.startsWith(allowed))
+  // Use exact match or startsWith(allowed + '/') to prevent domain bypass:
+  // 'https://kompaseniora.pl.evil.com'.startsWith('https://kompaseniora.pl') = TRUE (!)
+  return allowedOrigins.some(allowed =>
+    requestOrigin === allowed || requestOrigin?.startsWith(allowed + '/')
+  )
 }
 
 // Security: Log suspicious activity

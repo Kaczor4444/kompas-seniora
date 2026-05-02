@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { timingSafeEqual } from 'crypto';
 import { logSecurityEvent, checkRateLimit } from '@/lib/admin-security';
 
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json();
     
-    // Get IP address
-    const ipAddress = request.headers.get('x-forwarded-for') || 
-                      request.headers.get('x-real-ip') || 
+    // Use x-real-ip first — it's set by trusted proxy and cannot be spoofed by client
+    // x-forwarded-for is client-controlled and must not be used for rate limiting
+    const ipAddress = request.headers.get('x-real-ip') ||
+                      request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
                       'unknown';
     const userAgent = request.headers.get('user-agent') || undefined;
 
@@ -40,7 +42,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password !== correctPassword) {
+    // Timing-safe comparison prevents timing attacks (measuring char-by-char match time)
+    const passwordMatch = password &&
+      password.length === correctPassword.length &&
+      timingSafeEqual(Buffer.from(password), Buffer.from(correctPassword))
+
+    if (!passwordMatch) {
       // Log failed attempt
       await logSecurityEvent({
         eventType: 'login_failed',

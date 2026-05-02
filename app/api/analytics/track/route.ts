@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') || '30');
+    const rawDays = parseInt(searchParams.get('days') || '30')
+    const days = isNaN(rawDays) || rawDays < 1 ? 30 : Math.min(rawDays, 365)
 
     // Calculate date range
     const startDate = new Date();
@@ -329,43 +330,50 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Analytics API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    console.error('Analytics API error:', error)
+    // Never expose internal error details (schema, column names) in production
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
+const ALLOWED_PLACOWKA_EVENT_TYPES = [
+  'view', 'phone_click', 'email_click', 'website_click', 'map_click', 'share', 'save',
+] as const
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { placowkaId, eventType, metadata, language } = body;
+    const body = await request.json()
+    const { placowkaId, eventType, metadata, language } = body
 
-    if (!placowkaId || !eventType) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    // Validate placowkaId is a positive integer
+    const id = Number(placowkaId)
+    if (!Number.isInteger(id) || id <= 0) {
+      return NextResponse.json({ error: 'Invalid placowkaId' }, { status: 400 })
     }
 
-    const userAgent = request.headers.get('user-agent') || undefined;
-    const referer = request.headers.get('referer') || undefined;
+    // Validate eventType against allowlist
+    if (!eventType || !ALLOWED_PLACOWKA_EVENT_TYPES.includes(eventType)) {
+      return NextResponse.json({ error: 'Invalid event type' }, { status: 400 })
+    }
+
+    const userAgent = (request.headers.get('user-agent') || '').slice(0, 500)
+    const referer = (request.headers.get('referer') || '').slice(0, 500)
 
     const event = await prisma.placowkaEvent.create({
       data: {
-        placowkaId: Number(placowkaId),
+        placowkaId: id,
         eventType,
-        userAgent,
-        referer,
+        userAgent: userAgent || undefined,
+        referer: referer || undefined,
         language: language || null,
-        metadata: metadata || undefined,
+        // Limit metadata size to prevent large object injection
+        metadata: metadata ? JSON.parse(JSON.stringify(metadata).slice(0, 2000)) : undefined,
       },
-    });
+    })
 
-    return NextResponse.json({ success: true, eventId: event.id });
+    return NextResponse.json({ success: true, eventId: event.id })
   } catch (error) {
-    console.error('Analytics track error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('Analytics track error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
