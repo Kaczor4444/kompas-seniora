@@ -8,9 +8,6 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-// Cache dla placówek (1 godzina)
-export const revalidate = 3600
-
 // Validation schema
 const messageSchema = z.object({
   role: z.enum(['user', 'assistant']),
@@ -28,7 +25,7 @@ const actionSchema = z.object({
   id: z.number().int().positive().optional(),
   powiat: z.string().max(50).optional(),
   query: z.string().max(200).optional(),
-  href: z.string().max(500).optional(),
+  href: z.string().max(500).startsWith('/').optional(),
   label: z.string().min(1).max(100),
   facilityType: z.enum(['dps', 'sds']).optional(),
 })
@@ -39,13 +36,25 @@ const aiResponseSchema = z.object({
 })
 
 // Security: Prompt injection detection
+// Focused on genuine injection patterns — no false positives on legitimate queries
+// (removed: 'admin', 'database', 'root' — too many false positives in Polish)
 const DANGEROUS_KEYWORDS = [
-  'ignore previous', 'ignore all', 'ignore instructions', 'system prompt',
-  'database', 'credentials', 'api key', 'api_key', 'password', 'passwd',
-  'drop table', 'delete from', 'truncate', 'update', 'insert into',
+  // English injection patterns
+  'ignore previous', 'ignore all previous', 'ignore instructions',
+  'disregard previous', 'disregard instructions',
+  'you are now', 'new instructions', 'roleplay as', 'pretend you are',
+  'act as if', 'forget everything',
+  // Polish injection patterns
+  'zignoruj poprzednie', 'zignoruj instrukcje', 'zapomnij instrukcje',
+  'zapomnij o wszystkim', 'nowe instrukcje', 'udawaj że jesteś',
+  'wciel się w', 'jesteś teraz',
+  // SQL injection
+  'drop table', 'delete from', 'truncate table', 'insert into',
+  // XSS
   '<script>', 'javascript:', 'eval(', 'onclick=', 'onerror=',
-  'admin', 'root', 'sudo', 'exec(', 'shell', 'cmd',
-  'you are now', 'new instructions', 'roleplay as', 'pretend you are'
+  // Credentials
+  'credentials', 'api key', 'api_key', 'password', 'passwd',
+  'sudo', 'exec(', 'shell',
 ]
 
 function detectPromptInjection(text: string): boolean {
@@ -312,13 +321,11 @@ function detectIntent(userMessage: string): { powiat?: string; type?: 'DPS' | '�
   for (const [city, county] of Object.entries(powiatPatterns)) {
     if (lowerMsg.includes(city)) {
       powiat = county
-      console.log(`🎯 INTENT: Wykryto miasto "${city}" → powiat ${county}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🎯 INTENT: Wykryto miasto "${city}" → powiat ${county}`)
+      }
       break
     }
-  }
-
-  if (!powiat) {
-    console.log(`⚠️ INTENT: Nie wykryto powiatu dla zapytania: "${userMessage}"`)
   }
 
   return { powiat, type }
@@ -326,8 +333,12 @@ function detectIntent(userMessage: string): { powiat?: string; type?: 'DPS' | '�
 
 export async function POST(request: NextRequest) {
   try {
-    // Get client IP
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+    // Get client IP — x-real-ip is set by Vercel/nginx to verified client IP
+    // X-Forwarded-For last entry is proxy-appended; don't trust client-controlled entries
+    const ip =
+      request.headers.get('x-real-ip') ||
+      request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+      'unknown'
 
     // Security: CSRF Protection
     if (!checkOrigin(request)) {
@@ -379,18 +390,21 @@ export async function POST(request: NextRequest) {
 
     if (intent.type) {
       whereClause.typ_placowki = intent.type
-      console.log(`🎯 INTENT: Filtrowanie do typu ${intent.type}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🎯 INTENT: Filtrowanie do typu ${intent.type}`)
+      }
     }
 
     if (intent.powiat) {
       whereClause.powiat = intent.powiat
-      console.log(`🎯 INTENT: Filtrowanie do powiatu ${intent.powiat}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🎯 INTENT: Filtrowanie do powiatu ${intent.powiat}`)
+      }
     }
 
     // Extract city name from user query for AI context
     const cityMatch = lastMessage.content.match(/w\s+([a-zżźćńółęąś]{3,}(?:\s+[a-zżźćńółęąś]+)?)/i)
     const userCity = cityMatch ? cityMatch[1].trim() : null
-    console.log(`📍 User pytał o miejscowość: "${userCity}"`)
 
     const placowki = await prisma.placowka.findMany({
       where: Object.keys(whereClause).length > 0 ? whereClause : undefined,
@@ -413,7 +427,9 @@ export async function POST(request: NextRequest) {
       take: 100, // Reduced from 200 - with filtering we need less
     })
 
-    console.log(`📊 PERFORMANCE: Wysyłam ${placowki.length} placówek do AI (intent: type=${intent.type || 'all'}, powiat=${intent.powiat || 'all'})`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`📊 PERFORMANCE: Wysyłam ${placowki.length} placówek do AI (intent: type=${intent.type || 'all'}, powiat=${intent.powiat || 'all'})`)
+    }
 
     const placowkiTekst = placowki.map(p => {
       const czesci = [
@@ -494,7 +510,9 @@ ${placowkiTekst}`
 
             const { answer, actions = [] } = validation.data
 
-            console.log(`✅ AI Response validated: answer length=${answer.length}, actions=${actions.length}`)
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`✅ AI Response validated: answer length=${answer.length}, actions=${actions.length}`)
+            }
 
             // Stream answer text word-by-word
             const words = answer.split(' ')

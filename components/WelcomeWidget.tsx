@@ -49,9 +49,17 @@ const STORAGE_EXPIRY = 24 * 60 * 60 * 1000 // 24h
 
 // Quick prompts will be loaded dynamically from translations
 
-// Sanitize user input (XSS protection)
-function sanitizeText(text: string): string {
-  return text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+// Validate shape of messages restored from localStorage
+function isValidStoredMessages(data: unknown): data is Message[] {
+  if (!Array.isArray(data)) return false
+  return data.every(m =>
+    m !== null &&
+    typeof m === 'object' &&
+    (m.role === 'user' || m.role === 'assistant') &&
+    typeof m.content === 'string' &&
+    m.content.length <= 2000 &&
+    (!m.actions || Array.isArray(m.actions))
+  )
 }
 
 export default function WelcomeWidget() {
@@ -74,6 +82,7 @@ export default function WelcomeWidget() {
   const [lastUserMessage, setLastUserMessage] = useState<string>('') // For retry
   const [showTooltip, setShowTooltip] = useState(false) // Onboarding tooltip
   const [language, setLanguage] = useState<Language>('pl') // Language (pl/en)
+  const [micConsentGiven, setMicConsentGiven] = useState(false) // GDPR mic consent
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null) // For auto-focus
   const recognitionRef = useRef<any>(null)
@@ -91,8 +100,12 @@ export default function WelcomeWidget() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        const { messages: storedMessages, timestamp } = JSON.parse(stored)
-        if (Date.now() - timestamp < STORAGE_EXPIRY) {
+        const parsed = JSON.parse(stored)
+        const { messages: storedMessages, timestamp } = parsed
+        if (
+          Date.now() - timestamp < STORAGE_EXPIRY &&
+          isValidStoredMessages(storedMessages)
+        ) {
           setMessages(storedMessages)
         } else {
           localStorage.removeItem(STORAGE_KEY)
@@ -100,6 +113,7 @@ export default function WelcomeWidget() {
       }
     } catch (err) {
       console.error('Failed to load chat history:', err)
+      localStorage.removeItem(STORAGE_KEY)
     }
   }, [])
 
@@ -332,20 +346,21 @@ export default function WelcomeWidget() {
     // Mark as interacted (hide quick prompts)
     setHasInteracted(true)
 
-    const sanitized = sanitizeText(text)
-
-    // Save for retry
-    setLastUserMessage(sanitized)
+    // Save for retry (React text nodes are XSS-safe — no sanitization needed)
+    setLastUserMessage(text)
 
     // If retry, remove last error message
     const baseMessages = retryText ? messages.slice(0, -1) : messages
-    const newMessages: Message[] = [...baseMessages, { role: 'user', content: sanitized }]
+    const newMessages: Message[] = [...baseMessages, { role: 'user', content: text }]
     setMessages(newMessages)
     setInput('')
     setLoading(true)
 
     // Track message
     analytics.trackMessage(text.length, newMessages.length - 1)
+
+    // Hoisted so finally block can cancel the stream on error/timeout
+    let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
 
     try {
       // 🔒 SECURITY: Add timeout for streaming (60s max)
@@ -387,7 +402,8 @@ export default function WelcomeWidget() {
       }
 
       // 🎯 STREAMING RESPONSE - Read SSE events
-      const reader = resp.body?.getReader()
+      // reader hoisted so finally block can cancel it on error/timeout
+      reader = resp.body?.getReader()
       const decoder = new TextDecoder()
 
       if (!reader) {
@@ -414,7 +430,12 @@ export default function WelcomeWidget() {
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = JSON.parse(line.slice(6))
+            let data: any
+            try {
+              data = JSON.parse(line.slice(6))
+            } catch {
+              continue // skip malformed SSE lines
+            }
 
             if (data.type === 'text') {
               streamedText += data.content
@@ -453,7 +474,7 @@ export default function WelcomeWidget() {
 
       // Handle timeout/abort
       if (err instanceof Error && err.name === 'AbortError') {
-        analytics.trackError('timeout', 'Request timeout')
+        analytics.trackError('500', 'Request timeout')
         setMessages(prev => [...prev, {
           role: 'assistant',
           content: t(language, 'chatbot.errors.generic') + ' (timeout)',
@@ -469,11 +490,13 @@ export default function WelcomeWidget() {
       }
     } finally {
       setLoading(false)
+      reader?.cancel().catch(() => {})
     }
   }
 
   function handleAction(action: Action) {
-    analytics.trackAction(action.type, action.id || action.query)
+    const trackableType = action.type === 'kalkulator' ? 'search' : action.type
+    analytics.trackAction(trackableType, action.id || action.query)
     setIsOpen(false)
 
     if (action.type === 'placowka' && action.id) {
@@ -526,10 +549,13 @@ export default function WelcomeWidget() {
   }
 
   function resetChat() {
-    setMessages([])
     localStorage.removeItem(STORAGE_KEY)
-    // Re-initialize chat with welcome message
-    openChat()
+    setHasInteracted(false)
+    setMessages([{
+      role: 'assistant',
+      content: t(language, 'chatbot.welcome'),
+      actions: [],
+    }])
   }
 
   function handleClose() {
@@ -576,7 +602,20 @@ export default function WelcomeWidget() {
       return
     }
 
+    // GDPR: inform user that audio is processed by browser's speech service (Google/Apple)
+    if (!micConsentGiven) {
+      const consent = window.confirm(
+        language === 'en'
+          ? 'Voice input sends audio to your browser\'s speech recognition service (e.g. Google). Audio is not stored by KompasSeniora. Continue?'
+          : 'Rozpoznawanie mowy wysyła dźwięk do usługi przeglądarki (np. Google). KompasSeniora nie przechowuje nagrań. Kontynuować?'
+      )
+      if (!consent) return
+      setMicConsentGiven(true)
+    }
+
     try {
+      // Set lang based on current UI language (not hardcoded at init time)
+      recognitionRef.current.lang = language === 'en' ? 'en-US' : 'pl-PL'
       setIsRecording(true)
       recognitionRef.current.start()
       analytics.trackMessage(0, messages.length) // Track voice usage
@@ -601,11 +640,14 @@ export default function WelcomeWidget() {
       return
     }
 
+    // Limit TTS to 1000 chars to prevent abuse via long AI-generated text
+    const safeText = text.length > 1000 ? text.slice(0, 1000) + '...' : text
+
     // Stop current speech if any
     window.speechSynthesis.cancel()
 
     // Strip HTML tags and emoji from text
-    const plainText = text
+    const plainText = safeText
       .replace(/<[^>]*>/g, '') // Remove HTML tags
       .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
       .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Symbols & pictographs
@@ -1160,7 +1202,7 @@ export default function WelcomeWidget() {
                 />
 
                 <button
-                  onClick={sendMessage}
+                  onClick={() => sendMessage()}
                   disabled={!input.trim() || loading}
                   className="w-8 h-8 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
                   aria-label="Wyślij wiadomość"
