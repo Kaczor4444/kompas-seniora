@@ -31,6 +31,21 @@ const STORAGE_EXPIRY = 24 * 60 * 60 * 1000 // 24h
 
 // Quick prompts will be loaded dynamically from translations
 
+// Validate shape of a single action from SSE stream (client-side guard)
+function isValidAction(a: unknown): a is Action {
+  if (!a || typeof a !== 'object') return false
+  const obj = a as Record<string, unknown>
+  const validTypes = ['placowka', 'mapa', 'search', 'artykul', 'kalkulator']
+  return (
+    validTypes.includes(obj.type as string) &&
+    typeof obj.label === 'string' && obj.label.length <= 100 &&
+    (!obj.id || (typeof obj.id === 'number' && obj.id > 0)) &&
+    (!obj.href || (typeof obj.href === 'string' && obj.href.startsWith('/'))) &&
+    (!obj.powiat || typeof obj.powiat === 'string') &&
+    (!obj.query || typeof obj.query === 'string')
+  )
+}
+
 // Validate shape of messages restored from localStorage
 function isValidStoredMessages(data: unknown): data is Message[] {
   if (!Array.isArray(data)) return false
@@ -153,15 +168,18 @@ export default function WelcomeWidget() {
     if (isOpen && view === 'chat' && messages.length === 0) {
       const hasSeenTooltip = localStorage.getItem('chatbot_tooltip_seen')
       if (!hasSeenTooltip) {
+        let innerTimer: ReturnType<typeof setTimeout>
         const timer = setTimeout(() => {
           setShowTooltip(true)
-          // Auto-hide after 8 seconds
-          setTimeout(() => {
+          innerTimer = setTimeout(() => {
             setShowTooltip(false)
             localStorage.setItem('chatbot_tooltip_seen', 'true')
           }, 8000)
         }, 1500)
-        return () => clearTimeout(timer)
+        return () => {
+          clearTimeout(timer)
+          clearTimeout(innerTimer)
+        }
       }
     }
   }, [isOpen, view, messages.length])
@@ -284,25 +302,23 @@ export default function WelcomeWidget() {
     // Track message
     analytics.trackMessage(text.length, newMessages.length - 1)
 
-    // Hoisted so finally block can cancel the stream on error/timeout
+    // Hoisted so finally block can cancel stream and clear timeout
     let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
+    const abortController = new AbortController()
+    const timeoutId = setTimeout(() => abortController.abort(), 60000)
 
     try {
-      // 🔒 SECURITY: Add timeout for streaming (60s max)
-      const abortController = new AbortController()
-      const timeoutId = setTimeout(() => abortController.abort(), 60000)
 
       const resp = await fetch('/api/asystent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
-          language: language, // Send current language to API
+          language: language,
         }),
         signal: abortController.signal,
       })
-
-      clearTimeout(timeoutId) // Clear timeout if request completes
+      // Do NOT clear timeout here — it must cover stream reading too, not just headers
 
       if (!resp.ok) {
         let errorMessage = t(language, 'chatbot.errors.generic')
@@ -375,7 +391,9 @@ export default function WelcomeWidget() {
                 return updated
               })
             } else if (data.type === 'actions') {
-              streamedActions = data.actions
+              streamedActions = Array.isArray(data.actions)
+                ? data.actions.filter(isValidAction)
+                : []
               // Update message with actions
               setMessages(prev => {
                 const updated = [...prev]
@@ -416,6 +434,7 @@ export default function WelcomeWidget() {
     } finally {
       setLoading(false)
       reader?.cancel().catch(() => {})
+      clearTimeout(timeoutId)
     }
   }
 
@@ -524,7 +543,9 @@ export default function WelcomeWidget() {
   // Text-to-Speech functions
   function speakText(text: string, messageIndex: number) {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      alert('Twoja przeglądarka nie obsługuje czytania tekstu. Spróbuj Chrome lub Edge.')
+      alert(language === 'en'
+        ? 'Your browser does not support text reading. Try Chrome or Edge.'
+        : 'Twoja przeglądarka nie obsługuje czytania tekstu. Spróbuj Chrome lub Edge.')
       return
     }
 
@@ -551,19 +572,23 @@ export default function WelcomeWidget() {
     const utterance = new SpeechSynthesisUtterance(plainText)
 
     // 🎯 USE CACHED VOICE (zamiast pobierać getVoices() za każdym razem!)
-    if (cachedVoiceRef.current) {
+    const targetLang = language === 'en' ? 'en-US' : 'pl-PL'
+    // Only use cached Polish voice when language matches
+    if (cachedVoiceRef.current && targetLang === 'pl-PL') {
       utterance.voice = cachedVoiceRef.current
+    } else if (targetLang !== 'pl-PL') {
+      // For English, let the browser pick the best available voice
+      const voices = window.speechSynthesis.getVoices()
+      const enVoice = voices.find(v => v.lang.startsWith('en-') && v.localService) ||
+                      voices.find(v => v.lang.startsWith('en'))
+      if (enVoice) utterance.voice = enVoice
     } else {
       const voices = window.speechSynthesis.getVoices()
-      const plVoice = voices.find(v => v.name.includes('Zofia')) ||
-                      voices.find(v => v.lang === 'pl-PL')
-      if (plVoice) {
-        utterance.voice = plVoice
-        cachedVoiceRef.current = plVoice // Cache for next time
-      }
+      const plVoice = voices.find(v => v.lang === 'pl-PL')
+      if (plVoice) { utterance.voice = plVoice; cachedVoiceRef.current = plVoice }
     }
 
-    utterance.lang = 'pl-PL'
+    utterance.lang = targetLang
     utterance.rate = 0.91 // Natural conversation speed (zwiększone o ~7%)
     utterance.pitch = 1.0
     utterance.volume = 1.0
@@ -578,7 +603,9 @@ export default function WelcomeWidget() {
 
     utterance.onerror = () => {
       setSpeakingIndex(null)
-      alert('Nie udało się odczytać tekstu. Spróbuj ponownie.')
+      alert(language === 'en'
+        ? 'Failed to read text. Please try again.'
+        : 'Nie udało się odczytać tekstu. Spróbuj ponownie.')
     }
 
     window.speechSynthesis.speak(utterance)

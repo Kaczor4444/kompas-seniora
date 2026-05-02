@@ -91,12 +91,13 @@ function checkOrigin(request: NextRequest): boolean {
 }
 
 // Security: Log suspicious activity
+// GDPR note: do NOT log full user message content — log only event type + length
 function logSecurityEvent(ip: string, eventType: string, details: string) {
   const timestamp = new Date().toISOString()
-  console.error(`[SECURITY] ${timestamp} | IP: ${ip} | Event: ${eventType} | Details: ${details.substring(0, 200)}`)
-
-  // TODO: Save to database for audit trail
-  // await prisma.securityEvent.create({ data: { ip, eventType, details } })
+  const safeDetails = eventType === 'PROMPT_INJECTION'
+    ? `[message length: ${details.length} chars]` // user content not logged
+    : details.substring(0, 100)
+  console.error(`[SECURITY] ${timestamp} | IP: ${ip} | Event: ${eventType} | Details: ${safeDetails}`)
 }
 
 // Multi-language: System prompts
@@ -542,9 +543,12 @@ ${placowkiTekst}`
             }
           } catch (err) {
             console.error('❌ Failed to parse AI response:', err)
-            // Fallback: send raw text
+            // Send generic error — never expose raw AI response (contains internal IDs/data)
+            const fallbackMsg = language === 'en'
+              ? 'Sorry, an error occurred. Please try again.'
+              : 'Przepraszam, wystąpił błąd. Spróbuj ponownie.'
             controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: 'text', content: fullText })}\n\n`)
+              encoder.encode(`data: ${JSON.stringify({ type: 'text', content: fallbackMsg })}\n\n`)
             )
           }
 
