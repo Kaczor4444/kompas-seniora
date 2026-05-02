@@ -3,7 +3,8 @@
 **Data audytu:** 2026-05-02  
 **Zakres:** Widget czatu (`WelcomeWidget.tsx`), API chatbota (`/api/asystent`), Redis rate limiting, nagłówki bezpieczeństwa, panel admina, API analityki, API share/TERYT  
 **Commity:** `719a0c5` → `dc06df1`  
-**Rundy:** 5 rund analizy + napraw
+**Rundy:** 5 rund analizy + napraw  
+**Liczba luk:** 31 (4 krytyczne, 11 wysokich, 9 średnich, 7 niskich)
 
 ---
 
@@ -13,7 +14,7 @@ Każda runda szukała tego co poprzednia pominęła. Runda 4 wyszła poza pierwo
 
 ---
 
-## Znalezione i naprawione luki (29 łącznie)
+## Znalezione i naprawione luki (31 łącznie)
 
 ### 🔴 KRYTYCZNE
 
@@ -163,6 +164,14 @@ timingSafeEqual(Buffer.from(password), Buffer.from(correctPassword))
 
 ---
 
+#### 13b. Prompt injection response — plain JSON zamiast SSE (klient nie wyświetlał odpowiedzi)
+**Plik:** `app/api/asystent/route.ts`  
+**Problem:** Gdy wykryto injection, serwer zwracał `NextResponse.json({ answer: ... })` z kodem HTTP 200. Klient sprawdzał `resp.ok` (true), po czym próbował parsować body jako SSE stream. Ponieważ body było plain JSON, klient nie znajdował `data: {...}` linii — użytkownik widział pustą wiadomość zamiast komunikatu o podejrzanym zapytaniu.  
+**Fix:** Endpoint zwraca teraz poprawny format SSE z `Content-Type: text/event-stream`, dokładnie tak jak normalna odpowiedź streamowana.  
+**Lekcja:** Jeden endpoint, jedno oczekiwane format odpowiedzi. Mieszanie SSE z JSON w zależności od ścieżki kodu to ukryty bug.
+
+---
+
 #### 14. TTS injection — AI text czytany bez walidacji długości
 **Plik:** `components/WelcomeWidget.tsx`  
 **Problem:** Tekst z AI trafiał do `SpeechSynthesisUtterance` bez sprawdzenia długości. Zdjailbreakowany model mógł odczytać numer telefonu, URL, social engineering script.  
@@ -210,8 +219,8 @@ const shareUrl = `${protocol}://${host}/s/${token}`;
 ---
 
 #### 19. Console.logi produkcyjne ujawniające wewnętrzne dane
-**Pliki:** `app/api/asystent/route.ts`, `app/api/teryt/suggest/route.ts`  
-**Problem:** Kilkanaście `console.log` w produkcji ujawniało wzorce zapytań, wykryte intencje, wyniki filtrowania, IP użytkowników w logach Vercela.  
+**Pliki:** `app/api/asystent/route.ts`, `app/api/teryt/suggest/route.ts`, `components/WelcomeWidget.tsx`  
+**Problem:** ~25 `console.log` w produkcji ujawniało wzorce zapytań, wykryte intencje, wyniki filtrowania, IP użytkowników, nazwy głosów TTS w logach Vercela i konsoli przeglądarki.  
 **Fix:** Wszystkie logi debugowe za `if (process.env.NODE_ENV === 'development')`.  
 **Lekcja:** Logi produkcyjne to attack surface dla recon. Tylko to co niezbędne.
 
@@ -231,10 +240,13 @@ const shareUrl = `${protocol}://${host}/s/${token}`;
 
 ---
 
-#### 22. `bot-track` POST bez allowlisty dla `botType`
-**Plik:** `app/api/analytics/bot-track/route.ts`  
-**Problem:** `eventType: bot_visit_${botType}` — `botType` był user-controlled, dowolny string trafiał do bazy.  
-**Fix:** Allowlist: `['ai_bot', 'search_bot', 'unknown']`.
+#### 22. `bot-track` i `app-track` POST — brak walidacji danych wejściowych
+**Pliki:** `app/api/analytics/bot-track/route.ts`, `app/api/analytics/app-track/route.ts`  
+**Problem:**
+- `bot-track`: `eventType: bot_visit_${botType}` — `botType` user-controlled, dowolny string trafiał do bazy. Pola `botName`, `userAgent`, `path`, `referer` bez limitów długości.
+- `app-track`: `metadata` przechowywany bez limitu rozmiaru — duży obiekt mógł zaśmiecić bazę.
+
+**Fix:** Allowlist dla `botType`: `['ai_bot', 'search_bot', 'unknown']`. Limity długości wszystkich pól. Metadata truncate do 2000 znaków w obu endpointach.
 
 ---
 
