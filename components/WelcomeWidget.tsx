@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Mic, MicOff, Volume2, VolumeX, Calculator } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Mic, MicOff, Volume2, VolumeX, Calculator, Globe } from 'lucide-react'
 import { useChatbotAnalytics } from '@/src/hooks/useChatbotAnalytics'
+import { translations, t, type Language } from '@/lib/translations'
 
 // Type definition for Web Speech API
 declare global {
@@ -46,12 +47,7 @@ type View = 'main' | 'search-type' | 'info-type' | 'chat' | 'location'
 const STORAGE_KEY = 'kompasseniora_chat_history'
 const STORAGE_EXPIRY = 24 * 60 * 60 * 1000 // 24h
 
-const QUICK_PROMPTS = [
-  { text: "Jak znaleźć DPS?", href: "/poradniki/wybor-opieki/wybor-placowki" },
-  { text: "Ile kosztuje pobyt w DPS?", href: "/kalkulator" },
-  { text: "Czym różni się DPS od ŚDS?", href: "/poradniki/wybor-opieki/dps-vs-sds" },
-  { text: "Pokaż placówki w Krakowie", href: "/search?q=Kraków&powiat=krakowski&view=list" },
-]
+// Quick prompts will be loaded dynamically from translations
 
 // Sanitize user input (XSS protection)
 function sanitizeText(text: string): string {
@@ -75,8 +71,13 @@ export default function WelcomeWidget() {
   const [locationInput, setLocationInput] = useState('')
   const [locationSuggestions, setLocationSuggestions] = useState<Array<{nazwa: string, powiat: string}>>([])
   const [selectedLocation, setSelectedLocation] = useState<{nazwa: string, powiat: string} | null>(null)
+  const [lastUserMessage, setLastUserMessage] = useState<string>('') // For retry
+  const [showTooltip, setShowTooltip] = useState(false) // Onboarding tooltip
+  const [language, setLanguage] = useState<Language>('pl') // Language (pl/en)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null) // For auto-focus
   const recognitionRef = useRef<any>(null)
+  const cachedVoiceRef = useRef<SpeechSynthesisVoice | null>(null) // Cache best voice
   const router = useRouter()
   const analytics = useChatbotAnalytics()
 
@@ -145,6 +146,45 @@ export default function WelcomeWidget() {
       openChat()
     }
   }, [isOpen])
+
+  // Auto-focus on input when chat opens
+  useEffect(() => {
+    if (isOpen && view === 'chat' && inputRef.current) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        inputRef.current?.focus()
+      }, 100)
+    }
+  }, [isOpen, view])
+
+  // Onboarding tooltip - show once on first chat open
+  useEffect(() => {
+    if (isOpen && view === 'chat' && messages.length === 0) {
+      const hasSeenTooltip = localStorage.getItem('chatbot_tooltip_seen')
+      if (!hasSeenTooltip) {
+        const timer = setTimeout(() => {
+          setShowTooltip(true)
+          // Auto-hide after 8 seconds
+          setTimeout(() => {
+            setShowTooltip(false)
+            localStorage.setItem('chatbot_tooltip_seen', 'true')
+          }, 8000)
+        }, 1500)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [isOpen, view, messages.length])
+
+  // Update welcome message when language changes
+  useEffect(() => {
+    const plWelcome = translations.pl.chatbot.welcome
+    const enWelcome = translations.en.chatbot.welcome
+    setMessages(prev => {
+      if (prev.length === 0 || prev[0].role !== 'assistant') return prev
+      if (prev[0].content !== plWelcome && prev[0].content !== enWelcome) return prev
+      return [{ ...prev[0], content: t(language, 'chatbot.welcome') }, ...prev.slice(1)]
+    })
+  }, [language])
 
   // Reset location state when entering location view
   useEffect(() => {
@@ -231,15 +271,75 @@ export default function WelcomeWidget() {
     }
   }, [])
 
-  async function sendMessage() {
-    const text = input.trim()
+  // Preload and cache best Polish voice for TTS
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const loadVoices = () => {
+        const voices = window.speechSynthesis.getVoices()
+
+        console.log(`🎙️ All available voices (${voices.length}):`, voices.map(v => `${v.name} (${v.lang})`))
+
+        // ⚠️ FILTRUJ TYLKO POLSKIE GŁOSY (lang zawiera 'pl')!
+        const polishVoices = voices.filter(v =>
+          v.lang.toLowerCase().includes('pl')
+        )
+
+        console.log(`🇵🇱 Polish voices (${polishVoices.length}):`, polishVoices.map(v => `${v.name} (${v.lang})`))
+
+        // Priorytet głosów (od najlepszych) - TYLKO Z POLSKICH!
+        const preferredNames = [
+          'Zofia',           // macOS pl-PL (jeśli istnieje)
+          'Paulina',         // Google Cloud
+          'Jakub',           // Google Cloud (męski)
+          'Google polski',   // Chrome
+          'Microsoft Paulina', // Windows
+        ]
+
+        for (const preferred of preferredNames) {
+          const voice = polishVoices.find(v => v.name.includes(preferred))
+          if (voice) {
+            cachedVoiceRef.current = voice
+            console.log(`✅ Cached POLISH voice: ${voice.name} (${voice.lang})`)
+            return
+          }
+        }
+
+        // Fallback: pierwszy dostępny polski głos
+        if (polishVoices.length > 0) {
+          cachedVoiceRef.current = polishVoices[0]
+          console.log(`✅ Cached fallback POLISH voice: ${polishVoices[0].name} (${polishVoices[0].lang})`)
+        } else {
+          console.warn('⚠️ Brak polskich głosów w systemie - TTS użyje domyślnego głosu')
+        }
+      }
+
+      // Load voices immediately
+      loadVoices()
+
+      // Listen for voiceschanged event (Safari/macOS fix)
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+
+      return () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
+      }
+    }
+  }, [])
+
+  async function sendMessage(retryText?: string) {
+    const text = retryText || input.trim()
     if (!text || loading) return
 
     // Mark as interacted (hide quick prompts)
     setHasInteracted(true)
 
     const sanitized = sanitizeText(text)
-    const newMessages: Message[] = [...messages, { role: 'user', content: sanitized }]
+
+    // Save for retry
+    setLastUserMessage(sanitized)
+
+    // If retry, remove last error message
+    const baseMessages = retryText ? messages.slice(0, -1) : messages
+    const newMessages: Message[] = [...baseMessages, { role: 'user', content: sanitized }]
     setMessages(newMessages)
     setInput('')
     setLoading(true)
@@ -248,28 +348,32 @@ export default function WelcomeWidget() {
     analytics.trackMessage(text.length, newMessages.length - 1)
 
     try {
+      // 🔒 SECURITY: Add timeout for streaming (60s max)
+      const abortController = new AbortController()
+      const timeoutId = setTimeout(() => abortController.abort(), 60000)
+
       const resp = await fetch('/api/asystent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          language: language, // Send current language to API
         }),
+        signal: abortController.signal,
       })
 
-      const data = await resp.json()
+      clearTimeout(timeoutId) // Clear timeout if request completes
 
-      if (!resp.ok || data.error) {
-        let errorMessage = 'Przepraszam, wystąpił błąd.'
+      if (!resp.ok) {
+        let errorMessage = t(language, 'chatbot.errors.generic')
         let errorType: '429' | '503' | '500' | 'network' = '500'
 
         if (resp.status === 429) {
-          errorMessage = 'Zbyt wiele zapytań. Poczekaj chwilę (ok. 1 min) i spróbuj ponownie.'
+          errorMessage = t(language, 'chatbot.errors.tooManyRequests')
           errorType = '429'
         } else if (resp.status === 503) {
-          errorMessage = 'Chatbot chwilowo niedostępny. Spróbuj później lub skorzystaj z menu powyżej.'
+          errorMessage = t(language, 'chatbot.errors.unavailable')
           errorType = '503'
-        } else if (data.error) {
-          errorMessage = data.error
         }
 
         analytics.trackError(errorType, errorMessage)
@@ -282,20 +386,87 @@ export default function WelcomeWidget() {
         return
       }
 
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.answer,
-        actions: data.actions || [],
-      }])
-    } catch (err) {
-      console.error('Chat error:', err)
-      analytics.trackError('network', 'Connection failed')
+      // 🎯 STREAMING RESPONSE - Read SSE events
+      const reader = resp.body?.getReader()
+      const decoder = new TextDecoder()
 
+      if (!reader) {
+        throw new Error('No response body')
+      }
+
+      // Create placeholder message that will be updated
+      const messageIndex = newMessages.length
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Przepraszam, wystąpił problem z połączeniem. Sprawdź internet i spróbuj ponownie.',
+        content: '',
         actions: [],
       }])
+
+      let streamedText = ''
+      let streamedActions: Action[] = []
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6))
+
+            if (data.type === 'text') {
+              streamedText += data.content
+              // Update message with new text
+              setMessages(prev => {
+                const updated = [...prev]
+                updated[messageIndex] = {
+                  role: 'assistant',
+                  content: streamedText,
+                  actions: streamedActions,
+                }
+                return updated
+              })
+            } else if (data.type === 'actions') {
+              streamedActions = data.actions
+              // Update message with actions
+              setMessages(prev => {
+                const updated = [...prev]
+                updated[messageIndex] = {
+                  role: 'assistant',
+                  content: streamedText,
+                  actions: streamedActions,
+                }
+                return updated
+              })
+            } else if (data.type === 'done') {
+              setLoading(false)
+            } else if (data.type === 'error') {
+              throw new Error(data.message)
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Chat error:', err)
+
+      // Handle timeout/abort
+      if (err instanceof Error && err.name === 'AbortError') {
+        analytics.trackError('timeout', 'Request timeout')
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: t(language, 'chatbot.errors.generic') + ' (timeout)',
+          actions: [],
+        }])
+      } else {
+        analytics.trackError('network', 'Connection failed')
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: t(language, 'chatbot.errors.network'),
+          actions: [],
+        }])
+      }
     } finally {
       setLoading(false)
     }
@@ -308,7 +479,11 @@ export default function WelcomeWidget() {
     if (action.type === 'placowka' && action.id) {
       router.push(`/placowka/${action.id}`)
     } else if (action.type === 'mapa' && action.powiat) {
-      router.push(`/search?powiat=${encodeURIComponent(action.powiat)}&view=map`)
+      // Use URLSearchParams to avoid double encoding
+      const params = new URLSearchParams()
+      params.set('powiat', action.powiat)
+      params.set('view', 'map')
+      router.push(`/search?${params.toString()}`)
     } else if (action.type === 'search') {
       // Build search URL with filters
       const params = new URLSearchParams()
@@ -318,10 +493,12 @@ export default function WelcomeWidget() {
         params.set('type', action.facilityType)
       }
       if (action.powiat) {
-        params.set('powiat', encodeURIComponent(action.powiat))
+        // URLSearchParams.set() already encodes - NO encodeURIComponent!
+        params.set('powiat', action.powiat)
       }
       if (action.query) {
-        params.set('q', encodeURIComponent(action.query))
+        // URLSearchParams.set() already encodes - NO encodeURIComponent!
+        params.set('q', action.query)
       }
 
       router.push(`/search?${params.toString()}`)
@@ -344,8 +521,8 @@ export default function WelcomeWidget() {
   }
 
   function resetToMain() {
-    // No main menu anymore - just close chatbot
-    handleClose()
+    // No main menu anymore - reset to chat view
+    setView('chat')
   }
 
   function resetChat() {
@@ -362,7 +539,7 @@ export default function WelcomeWidget() {
       setSessionStart(null)
     }
     setIsOpen(false)
-    setView('main')
+    setView('chat') // Fixed: 'main' view is disabled, use 'chat' instead
   }
 
   function openChat() {
@@ -374,7 +551,7 @@ export default function WelcomeWidget() {
     if (messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: 'Cześć! Jestem Olek 👋\n\nPomogę Ci znaleźć DPS lub ŚDS w Małopolsce i odpowiem na pytania o opiekę nad seniorem.\n\nWybierz temat z listy lub zadaj swoje pytanie:',
+        content: t(language, 'chatbot.welcome'),
         actions: [],
       }])
     }
@@ -427,12 +604,40 @@ export default function WelcomeWidget() {
     // Stop current speech if any
     window.speechSynthesis.cancel()
 
-    // Strip HTML tags from text
-    const plainText = text.replace(/<[^>]*>/g, '')
+    // Strip HTML tags and emoji from text
+    const plainText = text
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
+      .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Symbols & pictographs
+      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport & map
+      .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')   // Misc symbols
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')   // Dingbats
+      .replace(/[\u{FE00}-\u{FE0F}]/gu, '')   // Variation selectors
+      .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Supplemental symbols
+      .replace(/[\u{1FA70}-\u{1FAFF}]/gu, '') // Extended pictographs
+      .trim()
 
     const utterance = new SpeechSynthesisUtterance(plainText)
+
+    // 🎯 USE CACHED VOICE (zamiast pobierać getVoices() za każdym razem!)
+    if (cachedVoiceRef.current) {
+      utterance.voice = cachedVoiceRef.current
+      console.log(`🎙️ Using cached voice: ${cachedVoiceRef.current.name}`)
+    } else {
+      // Fallback jeśli cache pusty (nie powinno się zdarzyć)
+      console.warn('⚠️ No cached voice, trying to load...')
+      const voices = window.speechSynthesis.getVoices()
+      const plVoice = voices.find(v => v.name.includes('Zofia')) ||
+                      voices.find(v => v.lang === 'pl-PL')
+      if (plVoice) {
+        utterance.voice = plVoice
+        cachedVoiceRef.current = plVoice // Cache for next time
+      }
+    }
+
     utterance.lang = 'pl-PL'
-    utterance.rate = 0.9 // Slightly slower for seniors
+    utterance.rate = 0.91 // Natural conversation speed (zwiększone o ~7%)
     utterance.pitch = 1.0
     utterance.volume = 1.0
 
@@ -487,7 +692,7 @@ export default function WelcomeWidget() {
   return (
     <div className="fixed bottom-20 right-5 z-40 flex flex-col items-end">
       {isOpen && (
-        <div className="mb-3 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-fade-in flex flex-col" style={{ maxHeight: '500px' }}>
+        <div className="mb-3 w-72 sm:w-96 md:w-[28rem] lg:w-[32rem] bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-fade-in flex flex-col" style={{ maxHeight: '500px' }}>
 
           {/* Header */}
           <div className="bg-slate-900 px-5 py-4 flex items-start justify-between flex-shrink-0">
@@ -503,28 +708,51 @@ export default function WelcomeWidget() {
               )}
               <div>
                 <p className="text-white font-black text-base">
-                  {view === 'chat' ? 'W czym mogę pomóc? 👋' :
+                  {view === 'chat' ? t(language, 'chatbot.title') :
                    view === 'search-type' ? 'Jaki rodzaj? 🏥' :
                    view === 'info-type' ? 'Informacje 📚' :
                    view === 'location' ? 'Gdzie szukasz? 📍' :
-                   'W czym mogę pomóc? 👋'}
+                   t(language, 'chatbot.title')}
                 </p>
-                <p className="text-slate-400 text-xs mt-0.5 font-medium">
-                  {view === 'chat' ? 'Asystent KompasSeniora' :
-                   view === 'search-type' ? 'Wybierz typ placówki' :
-                   view === 'info-type' ? 'Wybierz temat' :
-                   view === 'location' ? 'Wpisz miejscowość' :
-                   'Wybierz opcję poniżej'}
-                </p>
+                {view !== 'chat' && (
+                  <p className="text-slate-400 text-xs mt-0.5 font-medium">
+                    {view === 'search-type' ? 'Wybierz typ placówki' :
+                     view === 'info-type' ? 'Wybierz temat' :
+                     view === 'location' ? 'Wpisz miejscowość' :
+                     'Wybierz opcję poniżej'}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2 ml-3 mt-0.5">
               {view === 'chat' && (
-                <button onClick={resetChat} className="text-slate-400 hover:text-white transition-colors" title="Zacznij od nowa">
-                  <RotateCcw size={14} />
-                </button>
+                <>
+                  <button
+                    onClick={resetChat}
+                    className="text-slate-400 hover:text-white transition-colors"
+                    title="Zacznij od nowa"
+                    aria-label="Zacznij rozmowę od nowa"
+                  >
+                    <RotateCcw size={14} />
+                  </button>
+                  <button
+                    onClick={() => setLanguage(lang => lang === 'pl' ? 'en' : 'pl')}
+                    title={language === 'pl' ? 'Switch to English' : 'Przełącz na polski'}
+                    aria-label={language === 'pl' ? 'Switch to English' : 'Przełącz na polski'}
+                    className="flex items-center gap-0.5 bg-slate-700 hover:bg-slate-600 rounded-full px-1.5 py-0.5 transition-colors"
+                  >
+                    <span className={`text-[9px] font-bold transition-colors ${language === 'pl' ? 'text-white' : 'text-slate-400'}`}>PL</span>
+                    <span className="text-slate-500 text-[9px]">/</span>
+                    <span className={`text-[9px] font-bold transition-colors ${language === 'en' ? 'text-white' : 'text-slate-400'}`}>EN</span>
+                  </button>
+                </>
               )}
-              <button onClick={handleClose} className="text-slate-400 hover:text-white transition-colors">
+              <button
+                onClick={handleClose}
+                className="text-slate-400 hover:text-white transition-colors"
+                aria-label={t(language, 'chatbot.close')}
+                title={t(language, 'chatbot.close')}
+              >
                 <X size={16} />
               </button>
             </div>
@@ -757,16 +985,30 @@ export default function WelcomeWidget() {
               <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0" style={{ maxHeight: '340px' }}>
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed ${
+                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap ${
                       msg.role === 'user'
                         ? 'bg-emerald-600 text-white rounded-br-sm'
                         : 'bg-slate-100 text-slate-800 rounded-bl-sm'
                     }`}>
-                      <div dangerouslySetInnerHTML={{ __html: msg.content }} />
+                      {/* 🔒 SECURITY: Plain text only - NO dangerouslySetInnerHTML! */}
+                      {msg.content}
                     </div>
 
+                    {/* Retry button for error messages */}
+                    {msg.role === 'assistant' && i === messages.length - 1 &&
+                     (msg.content.includes('błąd') || msg.content.includes('Przepraszam') ||
+                      msg.content.includes('niedostępny') || msg.content.includes('problem')) && (
+                      <button
+                        onClick={() => sendMessage(lastUserMessage)}
+                        className="mt-2 flex items-center gap-1.5 text-xs px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-medium transition-all shadow-sm"
+                        title={t(language, 'chatbot.retry')}
+                      >
+                        <RotateCcw size={12} /> {t(language, 'chatbot.retry')}
+                      </button>
+                    )}
+
                     {/* Thumbs up/down feedback + TTS button */}
-                    {msg.role === 'assistant' && i > 0 && (
+                    {msg.role === 'assistant' && i > 0 && !msg.content.includes('błąd') && (
                       <div className="flex gap-1 mt-1">
                         <button
                           onClick={() => speakingIndex === i ? stopSpeaking() : speakText(msg.content, i)}
@@ -776,6 +1018,7 @@ export default function WelcomeWidget() {
                               : 'text-slate-400 hover:text-blue-600'
                           }`}
                           title={speakingIndex === i ? "Zatrzymaj czytanie" : "Przeczytaj na głos"}
+                          aria-label={speakingIndex === i ? "Zatrzymaj czytanie" : "Przeczytaj na głos"}
                         >
                           {speakingIndex === i ? <VolumeX size={12} /> : <Volume2 size={12} />}
                         </button>
@@ -787,6 +1030,7 @@ export default function WelcomeWidget() {
                               : 'text-slate-400 hover:text-emerald-600'
                           }`}
                           title="Pomocna odpowiedź"
+                          aria-label="Pomocna odpowiedź"
                         >
                           <ThumbsUp size={12} />
                         </button>
@@ -798,6 +1042,7 @@ export default function WelcomeWidget() {
                               : 'text-slate-400 hover:text-red-600'
                           }`}
                           title="Niepomocna odpowiedź"
+                          aria-label="Niepomocna odpowiedź"
                         >
                           <ThumbsDown size={12} />
                         </button>
@@ -823,16 +1068,14 @@ export default function WelcomeWidget() {
                 ))}
 
                 {loading && (
-                  <div className="flex justify-start">
-                    <div className="bg-slate-100 rounded-2xl rounded-bl-sm px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <div className="flex gap-1">
-                          <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                        </div>
-                        <span className="text-[10px] text-slate-500">Przeszukuję 184 placówki...</span>
+                  <div className="flex items-start">
+                    <div className="bg-slate-100 rounded-2xl rounded-bl-sm px-4 py-3">
+                      <div className="flex gap-1 mb-2">
+                        <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
+                      <div className="text-sm text-slate-800 font-bold">{t(language, 'chatbot.searching')}</div>
                     </div>
                   </div>
                 )}
@@ -841,8 +1084,8 @@ export default function WelcomeWidget() {
 
               {/* Quick suggestions (only before first interaction) */}
               {!hasInteracted && view === 'chat' && (
-                <div className="px-2 pb-2 flex flex-wrap gap-1">
-                  {QUICK_PROMPTS.map((prompt, i) => (
+                <div className="px-2 pb-2 flex flex-wrap gap-1 items-center">
+                  {t(language, 'prompts').map((prompt: any, i: number) => (
                     <button
                       key={i}
                       onClick={() => useQuickPrompt(prompt.href)}
@@ -851,31 +1094,85 @@ export default function WelcomeWidget() {
                       {prompt.text}
                     </button>
                   ))}
+                  {messages.length > 0 && (
+                    <button
+                      onClick={() => speakingIndex === 0 ? stopSpeaking() : speakText(messages[0].content, 0)}
+                      className={`flex items-center gap-1 text-[10px] px-2.5 py-1.5 rounded-full border transition-colors ${
+                        speakingIndex === 0
+                          ? 'bg-blue-100 border-blue-300 text-blue-700 animate-pulse'
+                          : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
+                      }`}
+                      title={speakingIndex === 0 ? 'Zatrzymaj' : 'Odczytaj powitanie'}
+                      aria-label={speakingIndex === 0 ? 'Zatrzymaj czytanie' : 'Odczytaj powitanie na głos'}
+                    >
+                      {speakingIndex === 0 ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                    </button>
+                  )}
                 </div>
               )}
 
-              <div className="border-t border-slate-100 p-2 flex gap-2 flex-shrink-0">
+              <div className="border-t border-slate-100 p-2 flex gap-2 flex-shrink-0 relative">
+                {/* Onboarding tooltip */}
+                {showTooltip && (
+                  <div className="absolute bottom-full left-2 right-2 mb-2 animate-fade-in">
+                    <div className="bg-emerald-600 text-white text-xs px-4 py-3 rounded-xl shadow-lg relative">
+                      <button
+                        onClick={() => {
+                          setShowTooltip(false)
+                          localStorage.setItem('chatbot_tooltip_seen', 'true')
+                        }}
+                        className="absolute top-1 right-1 text-white/80 hover:text-white"
+                        aria-label="Zamknij podpowiedź"
+                      >
+                        <X size={14} />
+                      </button>
+                      <p className="font-bold mb-1">{t(language, 'chatbot.tooltip.title')}</p>
+                      <p className="text-xs text-emerald-50">
+                        {t(language, 'chatbot.tooltip.example')}
+                      </p>
+                      {/* Arrow pointing down */}
+                      <div className="absolute -bottom-2 left-4 w-4 h-4 bg-emerald-600 transform rotate-45"></div>
+                    </div>
+                  </div>
+                )}
+
                 <input
+                  ref={inputRef}
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder="Napisz pytanie..."
+                  placeholder={t(language, 'chatbot.placeholder')}
                   className="flex-1 text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400"
                   disabled={loading}
                   maxLength={500}
+                  aria-label="Wpisz pytanie do asystenta"
+                  aria-describedby="chatbot-help-text"
                 />
 
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
                   className="w-8 h-8 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
+                  aria-label="Wyślij wiadomość"
+                  title="Wyślij wiadomość"
                 >
                   <Send size={13} className="text-white" />
                 </button>
               </div>
-              <p className="text-center text-[9px] text-slate-400 pb-2 px-4">
-                <kbd className="text-[8px] px-1 py-0.5 bg-slate-200 rounded ml-1">Esc</kbd> zamknij
-              </p>
+              <div className="flex items-center justify-center gap-3 pb-2 px-4">
+                {messages.length > 1 && (
+                  <button
+                    onClick={resetChat}
+                    className="text-[9px] text-slate-500 hover:text-emerald-600 font-bold flex items-center gap-1 transition-colors"
+                    aria-label={t(language, 'chatbot.clearChat')}
+                  >
+                    <RotateCcw size={10} /> {t(language, 'chatbot.clearChat')}
+                  </button>
+                )}
+                <p className="text-[9px] text-slate-400">
+                  <kbd className="text-[8px] px-1 py-0.5 bg-slate-200 rounded">Esc</kbd> zamknij
+                </p>
+              </div>
             </>
           )}
         </div>

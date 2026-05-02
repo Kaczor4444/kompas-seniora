@@ -385,13 +385,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       }
 
       // Sprawdź czy którakolwiek znaleziona miejscowość DOKŁADNIE pasuje do zapytania
-      // Jeśli nie (tylko partial: np. "opole" matchuje "Nowopole", "Wielopole") →
+      // LUB zaczyna się od zapytania (np. "Kwaśniów" → "Kwaśniów Górny", "Kwaśniów Dolny")
+      // Jeśli nie (tylko partial w środku: np. "opole" matchuje "Nowopole", "Wielopole") →
       // miejscowość o tej nazwie nie istnieje w Małopolsce
-      const hasExactNameMatch = terytMatches.some(
-        (t: any) => normalizePolish(t.nazwa) === normalizedQuery
+      const hasExactOrPrefixMatch = terytMatches.some(
+        (t: any) => {
+          const normalized = normalizePolish(t.nazwa);
+          return normalized === normalizedQuery || normalized.startsWith(normalizedQuery + ' ');
+        }
       );
 
-      if (terytMatches.length === 0 || !hasExactNameMatch) {
+      if (terytMatches.length === 0 || !hasExactOrPrefixMatch) {
         results = [];
         const displayQuery = query.charAt(0).toUpperCase() + query.slice(1);
         message = `Miejscowość „${displayQuery}" nie istnieje w Małopolsce. Wpisz nazwę miejscowości z terenu Małopolski.`;

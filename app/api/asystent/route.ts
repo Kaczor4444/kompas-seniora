@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { checkRedisRateLimit } from '@/lib/redis'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -18,46 +19,331 @@ const messageSchema = z.object({
 
 const requestSchema = z.object({
   messages: z.array(messageSchema).min(1).max(20),
+  language: z.enum(['pl', 'en']).optional(), // Multi-language support
 })
 
-// Simple in-memory rate limiting (10 requests per minute per IP)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
+// Security: Validate AI response structure
+const actionSchema = z.object({
+  type: z.enum(['placowka', 'mapa', 'search', 'artykul', 'kalkulator']),
+  id: z.number().int().positive().optional(),
+  powiat: z.string().max(50).optional(),
+  query: z.string().max(200).optional(),
+  href: z.string().max(500).optional(),
+  label: z.string().min(1).max(100),
+  facilityType: z.enum(['dps', 'sds']).optional(),
+})
 
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const limit = rateLimitMap.get(ip)
+const aiResponseSchema = z.object({
+  answer: z.string().min(1).max(2000), // Max 2000 chars
+  actions: z.array(actionSchema).max(20).optional(),
+})
 
-  if (!limit || now > limit.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + 60000 }) // 1 minute
-    return true
-  }
+// Security: Prompt injection detection
+const DANGEROUS_KEYWORDS = [
+  'ignore previous', 'ignore all', 'ignore instructions', 'system prompt',
+  'database', 'credentials', 'api key', 'api_key', 'password', 'passwd',
+  'drop table', 'delete from', 'truncate', 'update', 'insert into',
+  '<script>', 'javascript:', 'eval(', 'onclick=', 'onerror=',
+  'admin', 'root', 'sudo', 'exec(', 'shell', 'cmd',
+  'you are now', 'new instructions', 'roleplay as', 'pretend you are'
+]
 
-  if (limit.count >= 10) {
-    return false
-  }
-
-  limit.count++
-  return true
+function detectPromptInjection(text: string): boolean {
+  const lowerText = text.toLowerCase()
+  return DANGEROUS_KEYWORDS.some(keyword => lowerText.includes(keyword))
 }
 
-// Cleanup old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  for (const [ip, limit] of rateLimitMap.entries()) {
-    if (now > limit.resetTime) {
-      rateLimitMap.delete(ip)
+// Security: CSRF protection
+function checkOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get('origin')
+  const referer = request.headers.get('referer')
+
+  // Allow requests without origin (same-origin or direct API calls)
+  if (!origin && !referer) return true
+
+  const allowedOrigins = [
+    'https://kompaseniora.pl',
+    'https://www.kompaseniora.pl',
+    'https://kompas-seniora.vercel.app',
+    'https://kompas-seniora-git-main-iwona.vercel.app',
+  ]
+
+  // Development mode
+  if (process.env.NODE_ENV === 'development') {
+    allowedOrigins.push('http://localhost:3000')
+    allowedOrigins.push('http://127.0.0.1:3000')
+  }
+
+  const requestOrigin = origin || referer?.split('/').slice(0, 3).join('/')
+  return allowedOrigins.some(allowed => requestOrigin?.startsWith(allowed))
+}
+
+// Security: Log suspicious activity
+function logSecurityEvent(ip: string, eventType: string, details: string) {
+  const timestamp = new Date().toISOString()
+  console.error(`[SECURITY] ${timestamp} | IP: ${ip} | Event: ${eventType} | Details: ${details.substring(0, 200)}`)
+
+  // TODO: Save to database for audit trail
+  // await prisma.securityEvent.create({ data: { ip, eventType, details } })
+}
+
+// Multi-language: System prompts
+function getSystemPrompt(lang: 'pl' | 'en'): string {
+  if (lang === 'en') {
+    return `You are a helpful assistant for KompasSeniora.pl — a directory of senior care facilities in Lesser Poland (Małopolska), Poland.
+
+YOUR ROLE:
+- Help families find appropriate care facilities for seniors
+- Answer ONLY questions about care facilities, nursing homes (DPS), day care centers (ŚDS), and senior care
+- If someone asks about unrelated topics, politely decline and return to the topic
+
+RESPONSE RULES:
+- Answer only based on the data provided below
+- ⚠️⚠️⚠️ WRITE ONLY IN ENGLISH! No Polish, Russian, or any other languages!
+- ⚠️⚠️⚠️ TELL THE TRUTH ABOUT LOCATION! Check "Lokalizacja:" field of each facility!
+  - If facility is in Olkusz → say "in Olkusz" (NOT "in Klucze"!)
+  - If user asked about small village where NO facility exists → say "No DPS directly in [village], but in [county] county we have facilities in [city1], [city2]..."
+- Write briefly and concisely (max 2-3 sentences)
+- ⚠️ ABSOLUTELY DO NOT COPY [ID: XXX] to responses! ID is ONLY for actions!
+- ⚠️ DO NOT LIST in text: prices, phone numbers, emails, addresses - all in actions!
+- ⚠️ DO NOT write contact details - user will click "View facility" button
+- ⚠️ BE NEUTRAL - don't use words like "most popular", "I recommend", "best"
+- Mention facilities with their actual cities (e.g., "Social Welfare Home in Muszyna" if it's in Muszyna)
+- ⚠️⚠️⚠️ ALWAYS add "placowka" type actions for every mentioned facility!
+- ⚠️⚠️⚠️ ALWAYS add "mapa" action when question is about specific county/city!
+
+DIFFERENCE DPS vs ŚDS:
+- DPS — 24/7 residential care
+- ŚDS — day care, person returns home at night, for people with mental disorders
+
+COUNTIES IN MAŁOPOLSKA (21 counties):
+- bocheński, chrzanowski, dąbrowski, gorlicki, krakowski, limanowski, miechowski, myślenicki, nowosądecki, nowotarski, olkuski, oświęcimski, proszowicki, suski, tarnowski, tatrzański, wadowicki, wielicki
+- Cities with county rights: Kraków (use "krakowski"), Nowy Sącz (use "nowosądecki"), Tarnów (use "tarnowski")
+
+⚠️⚠️⚠️ CRITICAL - COMMON MISTAKES:
+- KLUCZE = Lesser Poland, OLKUSKI county (NOT Silesia!) - we have 1 DPS facility here!
+- If someone asks about "Klucze" → ALWAYS respond about OLKUSKI county in Lesser Poland
+
+IMPORTANT CITY MAPPING:
+- Klucze → olkuski county (Klucze is in Lesser Poland, not Silesia!)
+- Olkusz → olkuski, Wieliczka → wielicki, Oświęcim → oświęcimski
+- Zakopane → tatrzański, Nowy Targ → nowotarski
+
+JSON RESPONSE FORMAT:
+⚠️ CRITICAL: Your response MUST be pure JSON only!
+⚠️ ALWAYS start with { and end with }
+⚠️ DO NOT add text before or after JSON!
+
+{
+  "answer": "Brief answer (2-3 sentences, NO contact details!)",
+  "actions": [
+    {"type": "placowka", "id": 123, "label": "Facility name"},
+    {"type": "mapa", "powiat": "olkuski", "label": "Show on map 🗺️"}
+  ]
+}
+
+EXAMPLES OF GOOD RESPONSES:
+
+User: "looking for nursing home in Klucze" (Klucze is small village - DPS is in Olkusz!)
+Assistant: {
+  "answer": "No DPS directly in Klucze, but in olkuski county there's a facility in Olkusz (about 10 km from Klucze).",
+  "actions": [
+    {"type": "placowka", "id": 15, "label": "DPS Olkusz"},
+    {"type": "mapa", "powiat": "olkuski", "label": "Show on map 🗺️"}
+  ]
+}
+
+User: "nursing home in Zakopane" (Zakopane has DPS!)
+Assistant: {
+  "answer": "In Zakopane in tatrzański county we have 1 DPS facility.",
+  "actions": [
+    {"type": "placowka", "id": 78, "label": "DPS Zakopane"},
+    {"type": "mapa", "powiat": "tatrzański", "label": "Show on map 🗺️"}
+  ]
+}
+
+⚠️ ACTION RULES:
+- ALWAYS add {"type": "placowka", "id": ID} action for EVERY mentioned facility
+- ALWAYS add {"type": "mapa", "powiat": "..."} when user asks about specific city/county
+- DO NOT write details (phone, email, address) in "answer" field - user will click button!
+
+AVAILABLE DATA:
+Below is the list of facilities in Lesser Poland. Each facility has [ID: number] - use this ONLY for generating actions, NEVER in response text.`
+  }
+
+  // Polish (default)
+  return `Jesteś pomocnym asystentem serwisu KompasSeniora.pl — katalogu placówek opieki dla seniorów w Małopolsce.
+
+TWOJA ROLA:
+- Pomagasz rodzinom znaleźć odpowiednią placówkę opieki dla seniora
+- Odpowiadasz WYŁĄCZNIE na pytania dotyczące placówek opieki, DPS, ŚDS i opieki nad seniorami
+- Jeśli ktoś pyta o coś niezwiązanego, grzecznie odmawiasz i wracasz do tematu
+
+ZASADY ODPOWIEDZI:
+- Odpowiadaj tylko na podstawie danych które masz poniżej
+- ⚠️⚠️⚠️ PISZ WYŁĄCZNIE PO POLSKU! Żadnego rosyjskiego, angielskiego ani innych języków!
+- ⚠️⚠️⚠️ MÓW PRAWDĘ O LOKALIZACJI! Sprawdź pole "Lokalizacja:" każdej placówki!
+  - Jeśli placówka jest w Olkuszu → mów "w Olkuszu" (NIE "w Kluczach"!)
+  - Jeśli user pytał o małą miejscowość (wieś) gdzie NIE MA placówki → powiedz "Nie ma DPS bezpośrednio w [wieś], ale w powiecie [powiat] mamy placówki w [miasto1], [miasto2]..."
+- Pisz krótko i rzeczowo (max 2-3 zdania)
+- ⚠️ ABSOLUTNIE NIE KOPIUJ [ID: XXX] do odpowiedzi! ID jest TYLKO dla akcji!
+- ⚠️ NIE WYMIENIAJ w tekście: cen, telefonów, emaili, adresów - to wszystko jest w akcjach!
+- ⚠️ NIE pisz szczegółów kontaktowych - użytkownik kliknie przycisk "Zobacz placówkę"
+- ⚠️ BĄDŹ NEUTRALNY - nie używaj słów "najpopularniejsze", "polecam", "najlepsze"
+- Wspominaj placówki z ich rzeczywistych miast (np. "Dom Pomocy Społecznej w Muszynie" jeśli jest w Muszynie)
+- ⚠️⚠️⚠️ ZAWSZE dodawaj akcje typu "placowka" dla każdej wymienionej placówki!
+- ⚠️⚠️⚠️ ZAWSZE dodawaj akcję "mapa" gdy pytanie dotyczy konkretnego powiatu/miasta!
+
+RÓŻNICA DPS vs ŚDS:
+- DPS — całodobowa opieka stacjonarna
+- ŚDS — opieka dzienna, osoba wraca do domu na noc, dla osób z zaburzeniami psychicznymi
+
+POWIATY MAŁOPOLSKI (21 powiatów):
+- bocheński, chrzanowski, dąbrowski, gorlicki, krakowski, limanowski, miechowski, myślenicki, nowosądecki, nowotarski, olkuski, oświęcimski, proszowicki, suski, tarnowski, tatrzański, wadowicki, wielicki
+- Miasta na prawach powiatu: Kraków (użyj "krakowski"), Nowy Sącz (użyj "nowosądecki"), Tarnów (użyj "tarnowski")
+
+⚠️⚠️⚠️ UWAGA - CZĘSTE BŁĘDY:
+- KLUCZE = Małopolska, powiat OLKUSKI (NIE Śląskie!) - mamy tutaj 1 placówkę DPS!
+- Jeśli ktoś pyta o "Klucze", "Kluczach", "Kluczami" → ZAWSZE odpowiedz o powiecie OLKUSKIM w Małopolsce
+
+MAPOWANIE MIAST → POWIATY (najczęstsze):
+- Kraków → krakowski, Bochnia → bocheński, Chrzanów → chrzanowski, Dąbrowa Tarnowska → dąbrowski
+- Gorlice → gorlicki, Limanowa → limanowski, Miechów → miechowski, Myślenice → myślenicki
+- Nowy Sącz → nowosądecki, Nowy Targ → nowotarski, Olkusz → olkuski, Klucze → olkuski, Oświęcim → oświęcimski
+- Proszowice → proszowicki, Sucha Beskidzka → suski, Tarnów → tarnowski, Zakopane → tatrzański
+- Wadowice → wadowicki, Wieliczka → wielicki
+
+FORMAT ODPOWIEDZI JSON:
+⚠️ KRYTYCZNE: Twoja odpowiedź MUSI być TYLKO czystym JSON-em!
+⚠️ ZAWSZE zaczynaj od { i kończ na }
+⚠️ NIE dodawaj tekstu przed ani po JSON!
+
+{
+  "answer": "Krótka odpowiedź (2-3 zdania, БЕЗ szczegółów kontaktowych!)",
+  "actions": [
+    {"type": "placowka", "id": 123, "label": "Nazwa placówki"},
+    {"type": "mapa", "powiat": "olkuski", "label": "Pokaż na mapie 🗺️"}
+  ]
+}
+
+PRZYKŁADY DOBRYCH ODPOWIEDZI:
+
+User: "szukam dps w kluczach" (Klucze to mała wieś - DPS jest w Olkuszu!)
+Assistant: {
+  "answer": "Nie ma DPS bezpośrednio w Kluczach, ale w powiecie olkuskim jest placówka w Olkuszu (ok. 10 km od Kluczy).",
+  "actions": [
+    {"type": "placowka", "id": 15, "label": "DPS Olkusz"},
+    {"type": "mapa", "powiat": "olkuski", "label": "Pokaż na mapie 🗺️"}
+  ]
+}
+
+User: "dps w gorlicach" (Gorlice to miasto powiatowe - DPS jest tam!)
+Assistant: {
+  "answer": "W Gorlicach i powiecie gorlickim mamy 3 placówki DPS.",
+  "actions": [
+    {"type": "placowka", "id": 45, "label": "DPS Gorlice"},
+    {"type": "placowka", "id": 46, "label": "DPS Biecz"},
+    {"type": "mapa", "powiat": "gorlicki", "label": "Pokaż na mapie 🗺️"}
+  ]
+}
+
+User: "szukam dps w zakopanem" (Zakopane ma DPS!)
+Assistant: {
+  "answer": "W Zakopanem w powiecie tatrzańskim mamy 1 placówkę DPS.",
+  "actions": [
+    {"type": "placowka", "id": 78, "label": "DPS Zakopane"},
+    {"type": "mapa", "powiat": "tatrzański", "label": "Pokaż na mapie 🗺️"}
+  ]
+}
+
+⚠️ ZASADY TWORZENIA AKCJI:
+- ZAWSZE dodaj akcję {"type": "placowka", "id": ID} dla KAŻDEJ wymienionej placówki
+- ZAWSZE dodaj akcję {"type": "mapa", "powiat": "..."} gdy user pyta o konkretne miasto/powiat
+- NIE pisz szczegółów (telefon, email, adres) w polu "answer" - user kliknie przycisk!
+
+DOSTĘPNE DANE:
+Poniżej lista placówek w Małopolsce. Każda placówka ma [ID: numer] - używaj go TYLKO do generowania akcji, NIGDY w tekście odpowiedzi.`
+}
+
+// Normalize Polish characters (same as in search)
+function normalizePolish(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/ł/g, 'l')
+    .replace(/Ł/g, 'l')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+// Performance: Detect user intent to filter facilities BEFORE sending to AI
+function detectIntent(userMessage: string): { powiat?: string; type?: 'DPS' | 'ŚDS' } {
+  const lowerMsg = normalizePolish(userMessage)
+
+  // Detect facility type
+  let type: 'DPS' | 'ŚDS' | undefined
+  if (lowerMsg.includes('dps') || lowerMsg.includes('całodobow')) {
+    type = 'DPS'
+  } else if (lowerMsg.includes('śds') || lowerMsg.includes('sds') || lowerMsg.includes('dzienn')) {
+    type = 'ŚDS'
+  }
+
+  // Detect powiat from common patterns (use word stems to match all declensions)
+  // NOTE: All patterns are normalized (Polish chars → ASCII) via normalizePolish()
+  const powiatPatterns: Record<string, string> = {
+    'krakow': 'krakowski',
+    'tarnow': 'tarnowski',
+    'nowy sacz': 'nowosądecki',
+    'olkusz': 'olkuski',
+    'klucz': 'olkuski',      // Klucze → Klucz (stem to match Kluczach, Kluczami)
+    'wielicz': 'wielicki',    // Wieliczka → Wielicz (stem to match all forms)
+    'oswiecim': 'oświęcimski',
+    'bochni': 'bocheński',
+    'myslenic': 'myślenicki', // Myślenice → Myslenic (normalized)
+    'sucha beskidzka': 'suski',
+    'zakopan': 'tatrzański',
+    'nowy targ': 'nowotarski',
+    'gorlic': 'gorlicki',     // Gorlice → Gorlic (stem to match Gorlicach, Gorlicami)
+    'limanow': 'limanowski',
+    'wadowic': 'wadowicki',
+    'chrzanow': 'chrzanowski',
+  }
+
+  let powiat: string | undefined
+  for (const [city, county] of Object.entries(powiatPatterns)) {
+    if (lowerMsg.includes(city)) {
+      powiat = county
+      console.log(`🎯 INTENT: Wykryto miasto "${city}" → powiat ${county}`)
+      break
     }
   }
-}, 300000)
+
+  if (!powiat) {
+    console.log(`⚠️ INTENT: Nie wykryto powiatu dla zapytania: "${userMessage}"`)
+  }
+
+  return { powiat, type }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
+    // Get client IP
     const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
-    if (!checkRateLimit(ip)) {
+
+    // Security: CSRF Protection
+    if (!checkOrigin(request)) {
+      logSecurityEvent(ip, 'CSRF_ATTEMPT', `Invalid origin: ${request.headers.get('origin')}`)
       return NextResponse.json(
-        { error: 'Zbyt wiele zapytań. Poczekaj chwilę i spróbuj ponownie.' },
-        { status: 429 }
+        { error: 'Forbidden - Invalid origin' },
+        { status: 403 }
+      )
+    }
+
+    // Rate limiting with Redis (10 requests per minute)
+    const rateLimit = await checkRedisRateLimit(ip, 10, 60)
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait a moment and try again.' },
+        { status: 429, headers: { 'X-RateLimit-Remaining': '0' } }
       )
     }
 
@@ -72,9 +358,42 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { messages } = validation.data
+    const { messages, language = 'pl' } = validation.data
+
+    // Security: Prompt Injection Detection
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage.role === 'user' && detectPromptInjection(lastMessage.content)) {
+      logSecurityEvent(ip, 'PROMPT_INJECTION', lastMessage.content)
+      return NextResponse.json({
+        answer: 'Wykryłem podejrzane zapytanie. Odpowiadam tylko na pytania dotyczące placówek opieki dla seniorów w Małopolsce.',
+        actions: [
+          { type: 'search', label: 'Szukaj placówek' },
+          { type: 'artykul', href: '/poradniki', label: 'Zobacz poradniki' }
+        ]
+      })
+    }
+
+    // Performance: Detect user intent and filter facilities BEFORE sending to AI
+    const intent = detectIntent(lastMessage.content)
+    const whereClause: any = {}
+
+    if (intent.type) {
+      whereClause.typ_placowki = intent.type
+      console.log(`🎯 INTENT: Filtrowanie do typu ${intent.type}`)
+    }
+
+    if (intent.powiat) {
+      whereClause.powiat = intent.powiat
+      console.log(`🎯 INTENT: Filtrowanie do powiatu ${intent.powiat}`)
+    }
+
+    // Extract city name from user query for AI context
+    const cityMatch = lastMessage.content.match(/w\s+([a-zżźćńółęąś]{3,}(?:\s+[a-zżźćńółęąś]+)?)/i)
+    const userCity = cityMatch ? cityMatch[1].trim() : null
+    console.log(`📍 User pytał o miejscowość: "${userCity}"`)
 
     const placowki = await prisma.placowka.findMany({
+      where: Object.keys(whereClause).length > 0 ? whereClause : undefined,
       select: {
         id: true,
         nazwa: true,
@@ -91,8 +410,10 @@ export async function POST(request: NextRequest) {
         prowadzacy: true,
       },
       orderBy: { powiat: 'asc' },
-      take: 200,
+      take: 100, // Reduced from 200 - with filtering we need less
     })
+
+    console.log(`📊 PERFORMANCE: Wysyłam ${placowki.length} placówek do AI (intent: type=${intent.type || 'all'}, powiat=${intent.powiat || 'all'})`)
 
     const placowkiTekst = placowki.map(p => {
       const czesci = [
@@ -109,187 +430,117 @@ export async function POST(request: NextRequest) {
       return czesci.join('\n')
     }).join('\n\n---\n\n')
 
-    const systemPrompt = `Jesteś pomocnym asystentem serwisu KompasSeniora.pl — katalogu placówek opieki dla seniorów w Małopolsce.
+    // Build context about user's query
+    let userQueryContext = ''
+    if (userCity) {
+      // Check if any facility is EXACTLY in the city user asked about
+      const exactMatch = placowki.find(p =>
+        normalizePolish(p.miejscowosc) === normalizePolish(userCity)
+      )
 
-TWOJA ROLA:
-- Pomagasz rodzinom znaleźć odpowiednią placówkę opieki dla seniora
-- Odpowiadasz WYŁĄCZNIE na pytania dotyczące placówek opieki, DPS, ŚDS i opieki nad seniorami
-- Jeśli ktoś pyta o coś niezwiązanego, grzecznie odmawiasz i wracasz do tematu
+      if (exactMatch) {
+        userQueryContext = `\n\n⚠️ KONTEKST ZAPYTANIA:\nUser pytał o: "${userCity}"\n✅ MAMY placówkę bezpośrednio w miejscowości ${userCity}: ${exactMatch.nazwa}\n`
+      } else {
+        userQueryContext = `\n\n⚠️ KONTEKST ZAPYTANIA:\nUser pytał o: "${userCity}"\n❌ NIE MAMY placówki bezpośrednio w miejscowości ${userCity}!\n\n⚠️⚠️⚠️ WAŻNE - POWIEDZ PRAWDĘ:\n- NIE mów "w ${userCity} mamy placówkę" - TO KŁAMSTWO!\n- Powiedz: "Nie ma DPS bezpośrednio w ${userCity}, ale w powiecie ${intent.powiat || '...'} mamy placówki:"\n- Wymień nazwy placówek z ich rzeczywistych miejscowości\n- Dodaj akcje dla każdej placówki + mapa powiatu\n`
+      }
+    }
 
-ZASADY ODPOWIEDZI:
-- Odpowiadaj tylko na podstawie danych które masz poniżej
-- Pisz po polsku, krótko i rzeczowo (max 3-4 zdania)
-- ⚠️⚠️⚠️ ABSOLUTNIE NIE KOPIUJ [ID: XXX] do odpowiedzi! ID jest TYLKO dla akcji!
-- ⚠️ NIGDY nie pisz "[ID:169]" ani "ID:169" ani żadnej innej formy ID w tekście odpowiedzi!
-- ⚠️ NIE WYMIENIAJ CEN w tekście odpowiedzi - ceny są widoczne w akcjach placówek
-- ⚠️ BĄDŹ NEUTRALNY - nie używaj słów "najpopularniejsze", "polecam", "najlepsze"
-- Wspominaj placówki TYLKO po nazwie (np. "Dom Pomocy Społecznej w Muszynie")
-- ID używaj TYLKO w akcjach: {"type": "placowka", "id": 169, ...}
-- Gdy pytanie dotyczy konkretnego powiatu/miejscowości, zaproponuj TYLKO mapę (bez "Zobacz listę")
+    // Get system prompt based on language (with facility data appended)
+    const systemPrompt = `${getSystemPrompt(language)}${userQueryContext}
 
-RÓŻNICA DPS vs ŚDS:
-- DPS — całodobowa opieka stacjonarna
-- ŚDS — opieka dzienna, osoba wraca do domu na noc, dla osób z zaburzeniami psychicznymi
-
-POWIATY MAŁOPOLSKI (21 powiatów):
-- bocheński, chrzanowski, dąbrowski, gorlicki, krakowski, limanowski, miechowski, myślenicki, nowosądecki, nowotarski, olkuski, oświęcimski, proszowicki, suski, tarnowski, tatrzański, wadowicki, wielicki
-- Miasta na prawach powiatu: Kraków (użyj "krakowski"), Nowy Sącz (użyj "nowosądecki"), Tarnów (użyj "tarnowski")
-
-MAPOWANIE MIAST → POWIATY (najczęstsze):
-- Kraków → krakowski, Bochnia → bocheński, Chrzanów → chrzanowski, Dąbrowa Tarnowska → dąbrowski
-- Gorlice → gorlicki, Limanowa → limanowski, Miechów → miechowski, Myślenice → myślenicki
-- Nowy Sącz → nowosądecki, Nowy Targ → nowotarski, Olkusz → olkuski, Oświęcim → oświęcimski
-- Proszowice → proszowicki, Sucha Beskidzka → suski, Tarnów → tarnowski, Zakopane → tatrzański
-- Wadowice → wadowicki, Wieliczka → wielicki
-
-⚠️ Dla MAŁYCH miejscowości (wsi) których nie znasz:
-- NIE zgaduj powiatu!
-- Użyj akcji: {"type": "search", "query": "NAZWA_MIEJSCOWOŚCI", "facilityType": "dps"}
-- Frontend automatycznie użyje TERYT API do znalezienia powiatu
-
-DOSTĘPNE ARTYKUŁY (linkuj gdy pasuje):
-- /poradniki/wybor-opieki/wybor-placowki → "Jak wybrać dom opieki?"
-- /poradniki/finanse-prawne/koszty-dps → "Ile kosztuje pobyt w DPS?"
-- /poradniki/finanse-prawne/procedura-umieszczenia → "Jak umieścić bliskiego w DPS?"
-- /poradniki/dla-seniora/przygotowanie-do-dps → "Jak przygotować się do przeprowadzki?"
-
-FORMAT ODPOWIEDZI:
-⚠️ KRYTYCZNE: Twoja odpowiedź MUSI być TYLKO czystym JSON-em. Żadnego tekstu przed ani po JSON!
-⚠️ ZAWSZE zaczynaj od { i kończ na }
-
-{
-  "answer": "treść odpowiedzi tekstowej (krótka, max 3-4 zdania)",
-  "actions": [
-    {"type": "placowka", "id": 123, "label": "Zobacz placówkę"},
-    {"type": "mapa", "powiat": "olkuski", "label": "Pokaż na mapie"},
-    {"type": "search", "powiat": "krakowski", "facilityType": "dps", "label": "Szukaj DPS"},
-    {"type": "artykul", "href": "/poradniki", "label": "Jak wybrać DPS?"}
-  ]
-}
-
-⚠️ AKCJA SEARCH - WAŻNE ZASADY:
-- Gdy user pyta o DPS w konkretnym powiecie → {"type": "search", "powiat": "NAZWA_POWIATU", "facilityType": "dps", "label": "..."}
-- Gdy user pyta o ŚDS w konkretnym powiecie → {"type": "search", "powiat": "NAZWA_POWIATU", "facilityType": "sds", "label": "..."}
-- NIE używaj pola "query" dla nazw powiatów - używaj pola "powiat"
-- Pole "facilityType" może być: "dps" lub "sds"
-
-Pole "actions" może być pustą tablicą [] jeśli nie ma sensownych akcji.
-⚠️ PAMIĘTAJ: Odpowiedź w polu "answer" powinna być KRÓTKA (3-4 zdania max), bo użytkownik ma małe okno czatu!
-
-ZASADY TWORZENIA AKCJI:
-⚠️ WAŻNE: Dla KAŻDEJ placówki którą wspominasz w odpowiedzi, MUSISZ dodać akcję typu "placowka"!
-
-Dodawaj akcje gdy:
-- Wspominasz placówkę → dodaj akcję {"type": "placowka", "id": ID_PLACOWKI, "label": "Nazwa placówki"}
-- Wspominasz kilka placówek → dodaj osobną akcję dla KAŻDEJ z nich
-- Pytanie o powiat/miasto → dodaj akcję "mapa" (Pokaż na mapie)
-- Pytanie o DPS w powiecie → {"type": "search", "powiat": "POWIAT", "facilityType": "dps", "label": "Szukaj DPS"}
-- Pytanie o ŚDS w powiecie → {"type": "search", "powiat": "POWIAT", "facilityType": "sds", "label": "Szukaj ŚDS"}
-- Pytanie ogólne o DPS → {"type": "search", "facilityType": "dps", "label": "Zobacz wszystkie DPS"}
-- Pytanie ogólne o ŚDS → {"type": "search", "facilityType": "sds", "label": "Zobacz wszystkie ŚDS"}
-- Pytanie o procedury/formalności → dodaj akcję "artykul"
-- Pytanie o koszty/cenę/emeryturę/dopłatę → dodaj akcję "kalkulator"
-
-PRZYKŁAD - wspominasz 3 placówki:
-"answer": "W powiecie krakowskim mamy 3 placówki DPS. Kliknij na wybraną placówkę aby poznać szczegóły.",
-"actions": [
-  {"type": "placowka", "id": 15, "label": "Dom w Krakowie"},
-  {"type": "placowka", "id": 23, "label": "Dom w Wieliczce"},
-  {"type": "placowka", "id": 42, "label": "Dom w Bochni"},
-  {"type": "mapa", "powiat": "krakowski", "label": "Pokaż na mapie 🗺️"}
-]
-
-PRZYKŁADY DOBRYCH ODPOWIEDZI:
-
-User: "Szukam DPS w Krakowie dla mamy z demencją"
-Assistant: {
-  "answer": "W Krakowie i powiecie krakowskim mamy 9 placówek DPS. Dla osoby z demencją warto sprawdzić placówki z profilem opieki C (chroniczni psychicznie) lub P (przewlekle psychicznie chorzy). Kliknij poniżej aby zobaczyć szczegóły konkretnej placówki.",
-  "actions": [
-    {"type": "mapa", "powiat": "krakowski", "label": "Pokaż na mapie 🗺️"},
-    {"type": "artykul", "href": "/poradniki/wybor-opieki/wybor-placowki", "label": "Jak wybrać DPS?"}
-  ]
-}
-
-User: "Jakie są DPS-y w powiecie nowosądeckim?"
-Assistant: {
-  "answer": "W powiecie nowosądeckim mamy 2 placówki DPS: Dom Pomocy Społecznej w Muszynie oraz Dom Pomocy Społecznej w Zbyszycach. Kliknij na wybraną placówkę aby poznać szczegóły.",
-  "actions": [
-    {"type": "placowka", "id": 169, "label": "DPS Muszyna"},
-    {"type": "placowka", "id": 170, "label": "DPS Zbyszyce"},
-    {"type": "mapa", "powiat": "nowosądecki", "label": "Pokaż na mapie 🗺️"}
-  ]
-}
-
-User: "Szukam DPS w Książu Wielkim" (mała miejscowość - AI nie zna powiatu)
-Assistant: {
-  "answer": "Sprawdzam placówki DPS w okolicy miejscowości Książ Wielki. Kliknij poniżej aby zobaczyć wyniki wyszukiwania.",
-  "actions": [
-    {"type": "search", "query": "Książ Wielki", "facilityType": "dps", "label": "Szukaj DPS"}
-  ]
-}
-
-User: "Czym się różni DPS od ŚDS?"
-Assistant: {
-  "answer": "DPS (Dom Pomocy Społecznej) to całodobowa opieka stacjonarna — senior mieszka w placówce. ŚDS (Środowiskowy Dom Samopomocy) to opieka dzienna dla osób z zaburzeniami psychicznymi — senior wraca do domu na noc. DPS jest płatny (3000-6000 zł/miesiąc), ŚDS jest bezpłatny.",
-  "actions": [
-    {"type": "artykul", "href": "/poradniki/wybor-opieki/wybor-placowki", "label": "Dowiedz się więcej"}
-  ]
-}
-
-User: "Ile kosztuje DPS?"
-Assistant: {
-  "answer": "Koszt pobytu w DPS w Małopolsce waha się od 2500 do 6000 zł miesięcznie, średnio około 3500-4000 zł. Cena zależy od powiatu i profilu opieki. Senior płaci ze swojej emerytury, a rodzina dopłaca różnicę jeśli emerytura nie wystarcza.",
-  "actions": [
-    {"type": "kalkulator", "label": "Oblicz swoją dopłatę 💰"},
-    {"type": "artykul", "href": "/poradniki/finanse-prawne/koszty-dps", "label": "Szczegóły o kosztach"},
-    {"type": "search", "query": "dps", "label": "Zobacz ceny w placówkach"}
-  ]
-}
-
-User: "Moja mama ma emeryturę 2000 zł, ile będziemy dopłacać?"
-Assistant: {
-  "answer": "Dokładna dopłata zależy od kosztu placówki (2500-6000 zł) i sytuacji rodziny. Wykorzystaj nasz kalkulator - podasz emeryturę i koszt DPS, a obliczysz dopłatę zgodnie z przepisami o pomocy społecznej.",
-  "actions": [
-    {"type": "kalkulator", "label": "Oblicz dopłatę"},
-    {"type": "artykul", "href": "/poradniki/finanse-prawne/koszty-dps", "label": "Jak to działa?"}
-  ]
-}
-
-WAŻNE O FORMACIE DANYCH:
-- Każda placówka ma [ID: XXX] na początku - to TYLKO dla Ciebie do tworzenia akcji
-- NIGDY nie kopiuj [ID: XXX] do pola "answer"!
-- W odpowiedzi używaj tylko nazw placówek
-
-DANE PLACÓWEK:
 ${placowkiTekst}`
 
-    const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 1200,
-      system: systemPrompt,
-      messages: messages.map((m: { role: string; content: string }) => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-      })),
+    // 🎯 STREAMING RESPONSE with Server-Sent Events (SSE)
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+        let fullText = ''
+
+        try {
+          // Create streaming response from Claude
+          const response = await anthropic.messages.stream({
+            model: 'claude-haiku-4-5',
+            max_tokens: 1200,
+            system: systemPrompt,
+            messages: messages.map((m: { role: string; content: string }) => ({
+              role: m.role as 'user' | 'assistant',
+              content: m.content,
+            })),
+          })
+
+          // Stream each text delta (raw JSON from AI)
+          for await (const chunk of response) {
+            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+              fullText += chunk.delta.text
+            }
+          }
+
+          // Parse JSON and extract answer + actions
+          try {
+            const jsonMatch = fullText.match(/\{[\s\S]*\}/)
+            if (!jsonMatch) {
+              throw new Error('No JSON found in response')
+            }
+
+            const parsed = JSON.parse(jsonMatch[0])
+
+            // 🔒 SECURITY: Validate AI response with Zod
+            const validation = aiResponseSchema.safeParse(parsed)
+            if (!validation.success) {
+              console.error('❌ AI response validation failed:', validation.error.flatten())
+              logSecurityEvent(ip, 'INVALID_AI_RESPONSE', JSON.stringify(validation.error.flatten()))
+              throw new Error('Invalid AI response structure')
+            }
+
+            const { answer, actions = [] } = validation.data
+
+            console.log(`✅ AI Response validated: answer length=${answer.length}, actions=${actions.length}`)
+
+            // Stream answer text word-by-word
+            const words = answer.split(' ')
+            for (let i = 0; i < words.length; i++) {
+              const word = i === 0 ? words[i] : ' ' + words[i]
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ type: 'text', content: word })}\n\n`)
+              )
+              // Small delay for natural typing effect
+              await new Promise(resolve => setTimeout(resolve, 30))
+            }
+
+            // Send actions after answer completes
+            if (actions.length > 0) {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ type: 'actions', actions: actions })}\n\n`)
+              )
+            }
+          } catch (err) {
+            console.error('❌ Failed to parse AI response:', err)
+            // Fallback: send raw text
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: 'text', content: fullText })}\n\n`)
+            )
+          }
+
+          // Send done event
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`))
+        } catch (error) {
+          console.error('Streaming error:', error)
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ type: 'error', message: 'Stream error' })}\n\n`)
+          )
+        } finally {
+          controller.close()
+        }
+      },
     })
 
-    const rawText = response.content
-      .map(c => (c.type === 'text' ? c.text : ''))
-      .join('')
-      .trim()
-
-    try {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0])
-        return NextResponse.json({
-          answer: parsed.answer || rawText,
-          actions: parsed.actions || [],
-        })
-      }
-    } catch {}
-
-    return NextResponse.json({ answer: rawText, actions: [] })
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
   } catch (error: unknown) {
     console.error('Asystent API error:', error)
 
