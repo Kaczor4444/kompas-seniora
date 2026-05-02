@@ -51,7 +51,6 @@ export default function WelcomeWidget() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionStart, setSessionStart] = useState<number | null>(null)
-  const [bounceAnimation, setBounceAnimation] = useState(false)
   const [handWaveAnimation, setHandWaveAnimation] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null)
@@ -230,22 +229,13 @@ export default function WelcomeWidget() {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       const loadVoices = () => {
         const voices = window.speechSynthesis.getVoices()
+        const polishVoices = voices.filter(v => v.lang.toLowerCase().includes('pl'))
 
-        console.log(`🎙️ All available voices (${voices.length}):`, voices.map(v => `${v.name} (${v.lang})`))
-
-        // ⚠️ FILTRUJ TYLKO POLSKIE GŁOSY (lang zawiera 'pl')!
-        const polishVoices = voices.filter(v =>
-          v.lang.toLowerCase().includes('pl')
-        )
-
-        console.log(`🇵🇱 Polish voices (${polishVoices.length}):`, polishVoices.map(v => `${v.name} (${v.lang})`))
-
-        // Priorytet głosów (od najlepszych) - TYLKO Z POLSKICH!
         const preferredNames = [
-          'Zofia',           // macOS pl-PL (jeśli istnieje)
-          'Paulina',         // Google Cloud
-          'Jakub',           // Google Cloud (męski)
-          'Google polski',   // Chrome
+          'Zofia',             // macOS pl-PL
+          'Paulina',           // Google Cloud
+          'Jakub',             // Google Cloud (męski)
+          'Google polski',     // Chrome
           'Microsoft Paulina', // Windows
         ]
 
@@ -253,17 +243,12 @@ export default function WelcomeWidget() {
           const voice = polishVoices.find(v => v.name.includes(preferred))
           if (voice) {
             cachedVoiceRef.current = voice
-            console.log(`✅ Cached POLISH voice: ${voice.name} (${voice.lang})`)
             return
           }
         }
 
-        // Fallback: pierwszy dostępny polski głos
         if (polishVoices.length > 0) {
           cachedVoiceRef.current = polishVoices[0]
-          console.log(`✅ Cached fallback POLISH voice: ${polishVoices[0].name} (${polishVoices[0].lang})`)
-        } else {
-          console.warn('⚠️ Brak polskich głosów w systemie - TTS użyje domyślnego głosu')
         }
       }
 
@@ -309,7 +294,7 @@ export default function WelcomeWidget() {
 
       const resp = await fetch('/api/asystent', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           language: language, // Send current language to API
@@ -568,10 +553,7 @@ export default function WelcomeWidget() {
     // 🎯 USE CACHED VOICE (zamiast pobierać getVoices() za każdym razem!)
     if (cachedVoiceRef.current) {
       utterance.voice = cachedVoiceRef.current
-      console.log(`🎙️ Using cached voice: ${cachedVoiceRef.current.name}`)
     } else {
-      // Fallback jeśli cache pusty (nie powinno się zdarzyć)
-      console.warn('⚠️ No cached voice, trying to load...')
       const voices = window.speechSynthesis.getVoices()
       const plVoice = voices.find(v => v.name.includes('Zofia')) ||
                       voices.find(v => v.lang === 'pl-PL')

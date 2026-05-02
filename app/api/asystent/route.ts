@@ -66,9 +66,12 @@ function detectPromptInjection(text: string): boolean {
 function checkOrigin(request: NextRequest): boolean {
   const origin = request.headers.get('origin')
   const referer = request.headers.get('referer')
+  const xRequestedWith = request.headers.get('x-requested-with')
 
-  // Allow requests without origin (same-origin or direct API calls)
-  if (!origin && !referer) return true
+  // Require X-Requested-With for requests without Origin/Referer (blocks curl/automation)
+  if (!origin && !referer) {
+    return xRequestedWith === 'XMLHttpRequest'
+  }
 
   const allowedOrigins = [
     'https://kompaseniora.pl',
@@ -375,12 +378,18 @@ export async function POST(request: NextRequest) {
     const lastMessage = messages[messages.length - 1]
     if (lastMessage.role === 'user' && detectPromptInjection(lastMessage.content)) {
       logSecurityEvent(ip, 'PROMPT_INJECTION', lastMessage.content)
-      return NextResponse.json({
-        answer: 'Wykryłem podejrzane zapytanie. Odpowiadam tylko na pytania dotyczące placówek opieki dla seniorów w Małopolsce.',
-        actions: [
-          { type: 'search', label: 'Szukaj placówek' },
-          { type: 'artykul', href: '/poradniki', label: 'Zobacz poradniki' }
-        ]
+      // Return SSE format — client expects streaming, not plain JSON
+      const encoder = new TextEncoder()
+      const msg = language === 'en'
+        ? 'I detected a suspicious query. I only answer questions about senior care facilities in Lesser Poland.'
+        : 'Wykryłem podejrzane zapytanie. Odpowiadam tylko na pytania dotyczące placówek opieki dla seniorów w Małopolsce.'
+      const sseBody = [
+        `data: ${JSON.stringify({ type: 'text', content: msg })}\n\n`,
+        `data: ${JSON.stringify({ type: 'actions', actions: [{ type: 'search', label: language === 'en' ? 'Search facilities' : 'Szukaj placówek' }] })}\n\n`,
+        `data: ${JSON.stringify({ type: 'done' })}\n\n`,
+      ].join('')
+      return new Response(encoder.encode(sseBody), {
+        headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' },
       })
     }
 

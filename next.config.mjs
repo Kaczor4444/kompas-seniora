@@ -24,8 +24,7 @@ const securityHeaders = [
   },
   {
     key: 'Permissions-Policy',
-    // microphone=(self) required for Web Speech API (SpeechRecognition)
-    value: 'camera=(), microphone=(self), geolocation=(self)',
+    value: 'camera=(), microphone=(), geolocation=(self)',
   },
   {
     key: 'Content-Security-Policy',
