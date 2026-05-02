@@ -4,7 +4,7 @@ export const translations = {
   pl: {
     // Chatbot UI
     chatbot: {
-      title: 'W czym mogę pomóc? 👋',
+      title: 'W czym mogę pomóc?',
       subtitle: 'Asystent KompasSeniora',
       placeholder: 'Napisz pytanie...',
       send: 'Wyślij wiadomość',
@@ -35,7 +35,7 @@ export const translations = {
   en: {
     // Chatbot UI
     chatbot: {
-      title: 'How can I help? 👋',
+      title: 'How can I help?',
       subtitle: 'KompasSeniora Assistant',
       placeholder: 'Type your question...',
       send: 'Send message',

@@ -696,7 +696,7 @@ export default function WelcomeWidget() {
 
           {/* Header */}
           <div className="bg-slate-900 px-5 py-4 flex items-start justify-between flex-shrink-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {showBackButton && (
                 <button
                   onClick={resetToMain}
@@ -705,6 +705,16 @@ export default function WelcomeWidget() {
                 >
                   <ChevronLeft size={18} />
                 </button>
+              )}
+              {view === 'chat' && (
+                <div className="relative flex-shrink-0">
+                  <img
+                    src="/images/advisor-sm.webp"
+                    alt="Ola"
+                    className="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-500"
+                  />
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-900" />
+                </div>
               )}
               <div>
                 <p className="text-white font-black text-base">
