@@ -1,24 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+const ALLOWED_BOT_TYPES = ['ai_bot', 'search_bot', 'unknown'] as const
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { botType, botName, userAgent, path, referer } = body;
 
-    if (!botType || !userAgent) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!botType || !ALLOWED_BOT_TYPES.includes(botType)) {
+      return NextResponse.json({ error: 'Invalid bot type' }, { status: 400 });
     }
 
-    // Log to AppEvent table
     await prisma.appEvent.create({
       data: {
-        eventType: `bot_visit_${botType}`, // e.g., "bot_visit_ai_bot" or "bot_visit_search_bot"
+        eventType: `bot_visit_${botType}`,
         metadata: {
-          botName,
-          userAgent,
-          path,
-          referer: referer || null,
+          botName: typeof botName === 'string' ? botName.slice(0, 200) : undefined,
+          userAgent: typeof userAgent === 'string' ? userAgent.slice(0, 500) : undefined,
+          path: typeof path === 'string' ? path.slice(0, 500) : undefined,
+          referer: typeof referer === 'string' ? referer.slice(0, 500) : null,
         },
       },
     });
@@ -26,9 +27,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Bot tracking error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

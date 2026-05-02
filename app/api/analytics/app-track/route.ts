@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       data: {
         eventType,
         language: language || null,
-        metadata: metadata || undefined,
+        metadata: metadata ? JSON.parse(JSON.stringify(metadata).slice(0, 2000)) : undefined,
       },
     });
 

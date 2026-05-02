@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const typ = searchParams.get('typ') || ''; // "DPS" lub "ŚDS"
     const isAdmin = searchParams.get('admin') === 'true'; // 🆕 Admin mode - pokaż wszystkie miasta
 
-    console.log('🔍 AUTOCOMPLETE API:', { query, wojewodztwo, powiat, typ, isAdmin });
+    if (process.env.NODE_ENV === 'development') console.log('🔍 AUTOCOMPLETE API:', { query, wojewodztwo, powiat, typ, isAdmin });
 
     // Minimum 2 znaki
     if (query.length < 2) {
@@ -41,13 +41,13 @@ export async function GET(request: NextRequest) {
     // ✅ Sprawdź czy województwo ma dane TERYT
     const hasTerytData = wojewodztwo === '' || wojewodztwo === 'malopolskie' || wojewodztwo === 'slaskie';
 
-    console.log('  hasTerytData:', hasTerytData, '(wojewodztwo:', wojewodztwo, ')');
+    if (process.env.NODE_ENV === 'development') console.log('  hasTerytData:', hasTerytData, '(wojewodztwo:', wojewodztwo, ')');
 
     // ========================================
     // TRYB 1: Z TERYT (Małopolskie + Śląskie)
     // ========================================
     if (hasTerytData) {
-      console.log('  Mode: TERYT');
+      if (process.env.NODE_ENV === 'development') console.log('  Mode: TERYT');
 
       // 1. Znajdź pasujące lokalizacje TERYT
       const terytWhere: any = {
@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
 
       const terytMatches = Array.from(deduplicatedMap.values()).slice(0, 50);
 
-      console.log('  TERYT matches:', terytMatches.length);
+      if (process.env.NODE_ENV === 'development') console.log('  TERYT matches:', terytMatches.length);
 
       if (terytMatches.length === 0) {
         return NextResponse.json({
@@ -218,16 +218,16 @@ export async function GET(request: NextRequest) {
           return b.facilitiesCount - a.facilitiesCount;
         });
 
-      console.log('  All suggestions (sorted):', allSuggestions.length);
+      if (process.env.NODE_ENV === 'development') console.log('  All suggestions (sorted):', allSuggestions.length);
 
       // 🐛 DEBUG: Show what we're returning
       if (allSuggestions.length > 0) {
-        console.log('  📋 Top suggestions (sorted):');
+        if (process.env.NODE_ENV === 'development') console.log('  📋 Top suggestions (sorted):');
         allSuggestions.slice(0, 10).forEach((s, i) => {
           const isExact = normalizePolish(s.nazwa).toLowerCase() === normalizedQuery;
           const isMain = ['01', '96', '98'].includes(s.rodzaj_miejscowosci || '');
           const rmLabel = isMain ? '⭐' : '🟡';
-          console.log(`    ${i + 1}. "${s.nazwa}" (${s.facilitiesCount}) - ${s.powiat} ${rmLabel}${isExact ? ' EXACT' : ''} RM=${s.rodzaj_miejscowosci}`);
+          if (process.env.NODE_ENV === 'development') console.log(`    ${i + 1}. "${s.nazwa}" (${s.facilitiesCount}) - ${s.powiat} ${rmLabel}${isExact ? ' EXACT' : ''} RM=${s.rodzaj_miejscowosci}`);
         });
       }
 
@@ -246,7 +246,7 @@ export async function GET(request: NextRequest) {
     // TRYB 2: BEZ TERYT (inne województwa)
     // ========================================
     else {
-      console.log('  Mode: DIRECT (no TERYT)');
+      if (process.env.NODE_ENV === 'development') console.log('  Mode: DIRECT (no TERYT)');
 
       // Pobierz wszystkie placówki
       const typeFilter: any = {};
@@ -266,7 +266,7 @@ export async function GET(request: NextRequest) {
         }
       });
 
-      console.log('  All facilities:', allFacilities.length);
+      if (process.env.NODE_ENV === 'development') console.log('  All facilities:', allFacilities.length);
 
       // Filtruj po miejscowości + województwie (case-insensitive)
       const matchingFacilities = allFacilities.filter(f => {
@@ -284,7 +284,7 @@ export async function GET(request: NextRequest) {
         return normalizedMiejscowosc.includes(normalizedQuery);
       });
 
-      console.log('  Matching facilities:', matchingFacilities.length);
+      if (process.env.NODE_ENV === 'development') console.log('  Matching facilities:', matchingFacilities.length);
 
       // Grupuj po miejscowości
       const locationGroups = new Map<string, { count: number; wojewodztwo: string; powiat: string }>();
@@ -311,7 +311,7 @@ export async function GET(request: NextRequest) {
         }))
         .sort((a, b) => b.facilitiesCount - a.facilitiesCount);
 
-      console.log('  Final suggestions:', suggestions.length);
+      if (process.env.NODE_ENV === 'development') console.log('  Final suggestions:', suggestions.length);
 
       const topSuggestions = suggestions.slice(0, 5);
       const totalCount = suggestions.length;
