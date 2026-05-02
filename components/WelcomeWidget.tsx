@@ -3,27 +3,9 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Mic, MicOff, Volume2, VolumeX, Calculator, Globe } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Volume2, VolumeX, Calculator, Globe } from 'lucide-react'
 import { useChatbotAnalytics } from '@/src/hooks/useChatbotAnalytics'
 import { translations, t, type Language } from '@/lib/translations'
-
-// Type definition for Web Speech API
-declare global {
-  interface Window {
-    SpeechRecognition: any
-    webkitSpeechRecognition: any
-  }
-}
-
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList
-  resultIndex: number
-}
-
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string
-  message: string
-}
 
 interface Action {
   type: 'placowka' | 'mapa' | 'search' | 'artykul' | 'kalkulator'
@@ -71,8 +53,6 @@ export default function WelcomeWidget() {
   const [sessionStart, setSessionStart] = useState<number | null>(null)
   const [bounceAnimation, setBounceAnimation] = useState(false)
   const [handWaveAnimation, setHandWaveAnimation] = useState(false)
-  const [isRecording, setIsRecording] = useState(false)
-  const [voiceSupported, setVoiceSupported] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null)
   const [selectedType, setSelectedType] = useState<'dps' | 'sds' | null>(null)
@@ -82,10 +62,8 @@ export default function WelcomeWidget() {
   const [lastUserMessage, setLastUserMessage] = useState<string>('') // For retry
   const [showTooltip, setShowTooltip] = useState(false) // Onboarding tooltip
   const [language, setLanguage] = useState<Language>('pl') // Language (pl/en)
-  const [micConsentGiven, setMicConsentGiven] = useState(false) // GDPR mic consent
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null) // For auto-focus
-  const recognitionRef = useRef<any>(null)
   const cachedVoiceRef = useRef<SpeechSynthesisVoice | null>(null) // Cache best voice
   const router = useRouter()
   const analytics = useChatbotAnalytics()
@@ -246,44 +224,6 @@ export default function WelcomeWidget() {
       return () => clearTimeout(timer)
     }
   }, [isOpen])
-
-  // Setup Web Speech API
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-
-      if (SpeechRecognition) {
-        setVoiceSupported(true)
-        const recognition = new SpeechRecognition()
-        recognition.lang = 'pl-PL' // Polish language
-        recognition.continuous = false
-        recognition.interimResults = false
-        recognition.maxAlternatives = 1
-
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
-          const transcript = event.results[0][0].transcript
-          setInput(transcript)
-          setIsRecording(false)
-        }
-
-        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-          console.error('Speech recognition error:', event.error)
-          setIsRecording(false)
-
-          // Show user-friendly error
-          if (event.error === 'not-allowed') {
-            alert('Brak dostępu do mikrofonu. Sprawdź uprawnienia przeglądarki.')
-          }
-        }
-
-        recognition.onend = () => {
-          setIsRecording(false)
-        }
-
-        recognitionRef.current = recognition
-      }
-    }
-  }, [])
 
   // Preload and cache best Polish voice for TTS
   useEffect(() => {
@@ -594,43 +534,6 @@ export default function WelcomeWidget() {
     // Close chatbot and redirect to article/page
     setIsOpen(false)
     router.push(href)
-  }
-
-  function startVoiceRecording() {
-    if (!voiceSupported || !recognitionRef.current) {
-      alert('Twoja przeglądarka nie obsługuje rozpoznawania mowy. Spróbuj Chrome lub Edge.')
-      return
-    }
-
-    // GDPR: inform user that audio is processed by browser's speech service (Google/Apple)
-    if (!micConsentGiven) {
-      const consent = window.confirm(
-        language === 'en'
-          ? 'Voice input sends audio to your browser\'s speech recognition service (e.g. Google). Audio is not stored by KompasSeniora. Continue?'
-          : 'Rozpoznawanie mowy wysyła dźwięk do usługi przeglądarki (np. Google). KompasSeniora nie przechowuje nagrań. Kontynuować?'
-      )
-      if (!consent) return
-      setMicConsentGiven(true)
-    }
-
-    try {
-      // Set lang based on current UI language (not hardcoded at init time)
-      recognitionRef.current.lang = language === 'en' ? 'en-US' : 'pl-PL'
-      setIsRecording(true)
-      recognitionRef.current.start()
-      analytics.trackMessage(0, messages.length) // Track voice usage
-    } catch (error) {
-      console.error('Failed to start recording:', error)
-      setIsRecording(false)
-      alert('Nie można uruchomić mikrofonu. Sprawdź uprawnienia.')
-    }
-  }
-
-  function stopVoiceRecording() {
-    if (recognitionRef.current && isRecording) {
-      recognitionRef.current.stop()
-      setIsRecording(false)
-    }
   }
 
   // Text-to-Speech functions
