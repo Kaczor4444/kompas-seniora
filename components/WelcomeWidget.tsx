@@ -302,13 +302,15 @@ export default function WelcomeWidget() {
     // Track message
     analytics.trackMessage(text.length, newMessages.length - 1)
 
-    // Hoisted so finally block can cancel stream and clear timeout
+    // Hoisted before try so finally block can always cancel stream and clear timeout
+    // (covers both fetch phase AND stream reading phase — not just headers)
     let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
     const abortController = new AbortController()
     const timeoutId = setTimeout(() => abortController.abort(), 60000)
+    // Track whether placeholder message was added, to avoid empty bubble on abort
+    let placeholderAdded = false
 
     try {
-
       const resp = await fetch('/api/asystent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
@@ -353,6 +355,7 @@ export default function WelcomeWidget() {
 
       // Create placeholder message that will be updated
       const messageIndex = newMessages.length
+      placeholderAdded = true
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: '',
@@ -418,11 +421,15 @@ export default function WelcomeWidget() {
       // Handle timeout/abort
       if (err instanceof Error && err.name === 'AbortError') {
         analytics.trackError('500', 'Request timeout')
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: t(language, 'chatbot.errors.generic') + ' (timeout)',
-          actions: [],
-        }])
+        setMessages(prev => {
+          // Remove empty placeholder if abort fired during stream reading
+          const base = placeholderAdded ? prev.slice(0, -1) : prev
+          return [...base, {
+            role: 'assistant',
+            content: t(language, 'chatbot.errors.generic') + ' (timeout)',
+            actions: [],
+          }]
+        })
       } else {
         analytics.trackError('network', 'Connection failed')
         setMessages(prev => [...prev, {
