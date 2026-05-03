@@ -1,10 +1,20 @@
 # Security Audit — Kompas Seniora
 
-**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–12)  
-**Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution, HSTS, CSV injection, log injection, timing side-channel  
-**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → `d6bb83a` (rundy 6–12)  
-**Rundy:** 12 rund analizy + napraw  
-**Liczba luk:** 61 (7 krytycznych, 21 wysokich, 22 średnich, 11 niskich)
+**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–12) + 2026-05-03 (runda 13) + 2026-05-03 (rundy 14a–14e)  
+**Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution, HSTS, CSV injection, log injection, timing side-channel + SSRF, IDOR, RSC data leak, middleware bypass, business logic  
+**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → `d6bb83a` (rundy 6–12) + `3050985`, `8735186` (runda 13)  
+**Rundy:** 13 rund zakończonych + 5 w toku (14a–14e)  
+**Liczba luk:** 62 (7 krytycznych, 21 wysokich, 22 średnich, 12 niskich)
+
+### Status rund 14a–14e (nowe kąty ataku — 2026-05-03)
+
+| Runda | Obszar | Status |
+|-------|--------|--------|
+| 14a | SSRF — server-side fetche z userinputem (Nominatim, zewnętrzne URL) | ✅ Zakończona (4 znaleziska, 4 naprawione) |
+| 14b | IDOR — dostęp do rekordów po ID bez autoryzacji | ⏳ Zaplanowana |
+| 14c | Next.js RSC data leak — wrażliwe dane w Server Component payload | ⏳ Zaplanowana |
+| 14d | Middleware bypass — omijanie CSP/nonce przez spreparowany path | ⏳ Zaplanowana |
+| 14e | Business logic — manipulacja analytics, share listami, cenami | ⏳ Zaplanowana |
 
 ---
 
@@ -684,4 +694,49 @@ Atakujący mierzący czas odpowiedzi wiedział kiedy długość jest właściwa 
 *Runda 10 przeprowadzona: 2026-05-03 | Commits: `5bca4de`*  
 *Runda 11 przeprowadzona: 2026-05-03 | Commits: `f6317c5`*  
 *Runda 12 przeprowadzona: 2026-05-03 | Commits: `d6bb83a`*  
-*Runda 13 przeprowadzona: 2026-05-03 | Commit: `3050985`*
+*Runda 13 przeprowadzona: 2026-05-03 | Commit: `3050985`*  
+*Runda 14a przeprowadzona: 2026-05-03 | SSRF audit (Opus 4.7)*
+
+---
+
+## Runda 14a — SSRF (Server-Side Request Forgery)
+
+### Wynik: brak klasycznego SSRF, 4 znaleziska pokrewne
+
+Aplikacja **nie ma eksploatowalnego SSRF** (atakujący nie może wybrać dowolnego hosta). Wszystkie server-side fetche używają hardcoded URL lub self-fetch oparty o `request.nextUrl.origin`. Znalezione i naprawione problemy pokrewne:
+
+---
+
+#### 63. `/api/geocode` — publiczny open-relay do Nominatim bez rate limitingu
+**Plik:** `app/api/geocode/route.ts`  
+**Ryzyko:** ŚREDNIE  
+**Problem:** Publiczny endpoint GET bez auth, bez rate limitingu, bez limitu długości inputu, bez timeoutu. Atakujący mógł bombardować różnymi `?miejscowosc=` → IP serwera zbanowane przez Nominatim (1 req/s limit OSM) → utrata geocodingu dla wszystkich użytkowników. Bez timeoutu: zawieszony Nominatim zawieszał cały request.  
+**Fix:** Rate limit 30/60s (Redis, namespace `geocode`). Truncate inputów do 100 znaków. `AbortSignal.timeout(5000)`. Usunięto console.log i `details` z error response.
+
+---
+
+#### 64. Brak walidacji lat/lng przed fetch do Nominatim
+**Plik:** `app/search/page.tsx` — `reverseGeocode()`  
+**Ryzyko:** NISKIE  
+**Problem:** `reverseGeocode(lat, lng)` akceptowało `NaN`, `Infinity`, wartości spoza zakresu geograficznego (-90..90, -180..180). Trafiały do URL Nominatim jako `"NaN"`/`"Infinity"` → niepotrzebny zewnętrzny request z niepoprawnym URL.  
+**Fix:** Guard na początku funkcji: `!Number.isFinite(lat/lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180 → return null`. Dodano też `AbortSignal.timeout(5000)` do obu Nominatim fetchów w tym pliku.
+
+---
+
+#### 65. `admin/ceny/import` — self-fetch przez `request.nextUrl.origin` z pełnym nagłówkiem Cookie
+**Plik:** `app/api/admin/ceny/import/route.ts`  
+**Ryzyko:** NISKIE (za auth)  
+**Problem:** Self-fetch do `/api/admin/ceny` używał `request.nextUrl.origin` (derywowanego z headera `Host`) + forwardował cały nagłówek `Cookie`. W przypadku misconfigured proxy z `Host: evil.com` → serwer wysyłałby cały cookie jar (łącznie z `admin-auth`) do zewnętrznego hosta.  
+**Fix:** Usunięto self-fetch całkowicie. Logika upsert Prismy przeniesiona bezpośrednio do importu. Eliminuje roundtrip HTTP, Host header risk i cookie forwarding.
+
+---
+
+#### 66. `middleware.ts` — self-fetch bot-track bez walidacji hosta
+**Plik:** `middleware.ts`  
+**Ryzyko:** NISKIE  
+**Problem:** Fire-and-forget `fetch(request.nextUrl.origin + '/api/analytics/bot-track')` wywoływany dla każdego pasującego User-Agenta bota, bez sprawdzenia czy `Host` header wskazuje na nasz serwer. Możliwy blind SSRF przy misconfigured proxy.  
+**Fix:** Walidacja `request.headers.get('host')` względem allowlisty `['kompaseniora.pl', 'www.kompaseniora.pl', 'localhost:3000']` (lub `NEXT_PUBLIC_APP_URL`). Fetch wywołany tylko gdy host pasuje. Usunięto też `console.error` z catch (fire-and-forget nie powinien logować).
+
+---
+
+**Lekcja z rundy 14a:** `request.nextUrl.origin` nie jest bezpiecznym źródłem URL dla self-fetchów — pochodzi z headera `Host` który może być sfałszowany przy misconfigured proxy. Zawsze używaj `process.env.APP_URL` lub hardcoded origin dla wewnętrznych requestów.

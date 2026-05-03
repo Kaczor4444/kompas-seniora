@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { prisma } from '@/lib/prisma';
 import { isValidAdminCookie } from '@/lib/adminAuth';
 
 // POST /api/admin/ceny/import
@@ -23,44 +24,59 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Format for bulk update
     const formatted = updates.map((u: any) => ({
       placowkaId: u.placowkaId,
       rok,
       kwota: u.kwota,
       typ_kosztu: 'podstawowy',
       zrodlo: u.zrodlo || zrodlo_domyslne || null,
-      verified: true, // Assume verified from official PDF
+      verified: true,
       notatki: `Import z CSV - ${new Date().toLocaleDateString('pl-PL')}`
     }));
 
-    // Call existing bulk update endpoint
-    const origin = request.nextUrl.origin;
-    const response = await fetch(`${origin}/api/admin/ceny`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cookie': request.headers.get('Cookie') || ''
-      },
-      body: JSON.stringify({ updates: formatted })
-    });
+    // Bezpośrednie wywołanie Prisma — bez self-fetch (eliminuje Host header injection)
+    const results = await prisma.$transaction(
+      formatted.map((update: any) =>
+        prisma.placowkaCena.upsert({
+          where: {
+            placowkaId_rok_typ_kosztu: {
+              placowkaId: update.placowkaId,
+              rok: update.rok,
+              typ_kosztu: update.typ_kosztu || 'podstawowy'
+            }
+          },
+          update: {
+            kwota: update.kwota,
+            zrodlo: update.zrodlo || null,
+            verified: update.verified || false,
+            notatki: update.notatki || null,
+            data_obowiazuje: update.data_obowiazuje ? new Date(update.data_obowiazuje) : null,
+            data_pobrania: new Date()
+          },
+          create: {
+            placowkaId: update.placowkaId,
+            rok: update.rok,
+            kwota: update.kwota,
+            typ_kosztu: update.typ_kosztu || 'podstawowy',
+            zrodlo: update.zrodlo || null,
+            verified: update.verified || false,
+            notatki: update.notatki || null,
+            data_obowiazuje: update.data_obowiazuje ? new Date(update.data_obowiazuje) : null,
+            data_pobrania: new Date()
+          }
+        })
+      )
+    );
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Błąd podczas importu');
-    }
-
-    const result = await response.json();
     return NextResponse.json({
       success: true,
-      updated: result.updated || formatted.length,
-      message: `Zaimportowano ${formatted.length} cen`
+      updated: results.length,
+      message: `Zaimportowano ${results.length} cen`
     });
 
   } catch (error) {
-    console.error('POST admin/ceny/import error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

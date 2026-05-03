@@ -99,19 +99,24 @@ export async function middleware(request: NextRequest) {
         userAgent.toLowerCase().includes(pattern.toLowerCase())
       ) || 'unknown';
 
-      fetch(`${request.nextUrl.origin}/api/analytics/bot-track`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          botType,
-          botName: detectedBot,
-          userAgent,
-          path: pathname,
-          referer: request.headers.get('referer')?.replace(/[\x00-\x1F\x7F]/g, '').slice(0, 500) || undefined,
-        }),
-      }).catch(err => {
-        console.error('Failed to track bot visit:', err);
-      });
+      // Walidacja hosta przed self-fetch — chroni przed Host header injection
+      const allowedHosts = (process.env.NEXT_PUBLIC_APP_URL
+        ? [new URL(process.env.NEXT_PUBLIC_APP_URL).host]
+        : ['kompaseniora.pl', 'www.kompaseniora.pl', 'localhost:3000']);
+      const requestHost = request.headers.get('host') || '';
+      if (allowedHosts.includes(requestHost)) {
+        fetch(`${request.nextUrl.origin}/api/analytics/bot-track`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            botType,
+            botName: detectedBot,
+            userAgent,
+            path: pathname,
+            referer: request.headers.get('referer')?.replace(/[\x00-\x1F\x7F]/g, '').slice(0, 500) || undefined,
+          }),
+        }).catch(() => {});
+      }
     }
   }
 

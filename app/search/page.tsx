@@ -78,7 +78,7 @@ async function geocodeCity(cityName: string, powiat?: string, woj?: string): Pro
 
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encoded}&countrycodes=pl&limit=1&format=json&addressdetails=1&featuretype=settlement`,
-      { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 } }
+      { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 }, signal: AbortSignal.timeout(5000) }
     );
     if (!res.ok) {
       console.log(`❌ Nominatim API error: ${res.status}`);
@@ -132,10 +132,14 @@ async function geocodeCity(cityName: string, powiat?: string, woj?: string): Pro
 
 // Reverse geocoding - zamienia współrzędne GPS na nazwę miasta
 async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) ||
+      lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    return null;
+  }
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pl`,
-      { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 } }
+      { headers: { 'User-Agent': 'KompasSeniora/1.0' }, next: { revalidate: 86400 }, signal: AbortSignal.timeout(5000) }
     );
     if (!res.ok) return null;
     const data = await res.json();
