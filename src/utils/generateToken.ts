@@ -1,15 +1,7 @@
-/**
- * Generate a random 6-character token for sharing lists
- * Uses lowercase letters and numbers (a-z, 0-9)
- * Example: "k7m9x2"
- */
+import { randomBytes } from 'crypto';
+
+// 12 hex chars = 48 bits of entropy = ~281 trillion combinations
+// Math.random() (previous) had 36^6 = 2.1B — brute-forceable in hours
 export function generateToken(): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let token = '';
-  
-  for (let i = 0; i < 6; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  
-  return token;
+  return randomBytes(6).toString('hex');
 }

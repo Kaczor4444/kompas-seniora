@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
     if (!recommendation) {
       return NextResponse.json({ error: 'Missing recommendation parameter' }, { status: 400 });
     }
-    if (!location) {
-      return NextResponse.json({ error: 'Missing location parameter' }, { status: 400 });
+    if (!location || typeof location !== 'string' || location.length < 2 || location.length > 200) {
+      return NextResponse.json({ error: 'Invalid location parameter' }, { status: 400 });
     }
 
     const facilityType = recommendation === 'ŚDS' ? 'ŚDS' : 'DPS';

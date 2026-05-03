@@ -19,8 +19,8 @@ const mopsSchema = z.object({
   address:      z.string().min(1, 'Wymagane'),
   website:      z.string().url('Nieprawidłowy URL').optional().or(z.literal('')),
   wojewodztwo:  z.string().min(1, 'Wymagane'),
-  latitude:     z.number().nullable().optional(),
-  longitude:    z.number().nullable().optional(),
+  latitude:     z.number().min(-90).max(90).nullable().optional(),
+  longitude:    z.number().min(-180).max(180).nullable().optional(),
   verified:     z.boolean().default(false),
   notes:        z.string().optional().or(z.literal('')),
 });

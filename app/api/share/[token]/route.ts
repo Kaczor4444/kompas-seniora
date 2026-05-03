@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { checkRedisRateLimit } from '@/lib/redis';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { token: string } }
 ) {
+  const ip =
+    request.headers.get('x-real-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+    'unknown';
+  const rateLimit = await checkRedisRateLimit(ip, 30, 60, 'share-token');
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const { token } = params;
 

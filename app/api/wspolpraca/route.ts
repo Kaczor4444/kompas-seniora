@@ -1,8 +1,10 @@
 import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { partnerInquirySchema } from "@/lib/validations/partner";
 import { checkPartnerInquiryRateLimit } from "@/lib/rate-limit/partner-inquiry";
 import { sendPartnerInquiryEmails } from "@/lib/email/send-partner-emails";
+import { isValidAdminCookie } from "@/lib/adminAuth";
 import { z } from "zod";
 
 // POST - Submit partnership inquiry
@@ -112,16 +114,14 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET - List inquiries (Admin only - TODO: add auth)
+// GET - List inquiries (Admin only)
 export async function GET(req: NextRequest) {
+  const cookieStore = await cookies();
+  if (!isValidAdminCookie(cookieStore.get('admin-auth')?.value)) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    // TODO: Add admin auth check here
-    if (process.env.NODE_ENV === "production") {
-      return Response.json(
-        { success: false, message: "Not implemented yet" },
-        { status: 501 }
-      );
-    }
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");

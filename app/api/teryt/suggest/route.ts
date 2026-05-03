@@ -26,12 +26,11 @@ export async function GET(request: NextRequest) {
 
     if (process.env.NODE_ENV === 'development') console.log('🔍 AUTOCOMPLETE API:', { query, wojewodztwo, powiat, typ, isAdmin });
 
-    // Minimum 2 znaki
-    if (query.length < 2) {
+    if (query.length < 2 || query.length > 100) {
       return NextResponse.json({
         suggestions: [],
         totalCount: 0,
-        message: 'Wpisz co najmniej 2 znaki'
+        message: 'Wpisz od 2 do 100 znaków'
       });
     }
 

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const rawPage = parseInt(searchParams.get("page") || "1");
     const rawLimit = parseInt(searchParams.get("limit") || "25");
-    const page = Math.max(1, isNaN(rawPage) ? 1 : rawPage);
+    const page = Math.min(10000, Math.max(1, isNaN(rawPage) ? 1 : rawPage));
     const limit = Math.min(200, Math.max(1, isNaN(rawLimit) ? 25 : rawLimit));
     const sortBy = searchParams.get("sortBy") || "id";
     const sortOrder = searchParams.get("sortOrder") || "desc";
@@ -113,10 +113,10 @@ const placowkaSchema = z.object({
   facebook: z.string().url().optional().or(z.literal('')),
   liczba_miejsc: z.number().int().positive().optional(),
   miejsca_za_zyciem: z.number().nonnegative().optional().nullable(),
-  koszt_pobytu: z.number().nonnegative().optional(),
+  koszt_pobytu: z.number().nonnegative().max(999999).finite().optional(),
   rok_ceny: z.number().int().min(2024).max(2030).optional(),
-  latitude: z.number().nullable().optional(),
-  longitude: z.number().nullable().optional(),
+  latitude: z.number().min(-90).max(90).nullable().optional(),
+  longitude: z.number().min(-180).max(180).nullable().optional(),
   profil_opieki: z.string().optional(),
 
   // Weryfikacja z oficjalnym wykazem PDF

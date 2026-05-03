@@ -420,23 +420,27 @@ export async function GET(request: NextRequest) {
           const searchBotVisits = botEvents.filter(e => e.eventType === 'bot_visit_search_bot');
 
           // Get unique bot names
+          // Object.create(null) prevents prototype pollution via crafted botName keys
           const botsByName = botEvents.reduce((acc: Record<string, number>, e) => {
-            const botName = (e.metadata as any)?.botName || 'unknown';
+            const meta = e.metadata && typeof e.metadata === 'object' ? e.metadata as Record<string, unknown> : {};
+            const rawName = typeof meta.botName === 'string' ? meta.botName : 'unknown';
+            const botName = rawName.slice(0, 100);
             acc[botName] = (acc[botName] || 0) + 1;
             return acc;
-          }, {});
+          }, Object.create(null) as Record<string, number>);
 
           const topBots = Object.entries(botsByName)
             .sort(([, a], [, b]) => b - a)
             .slice(0, 10)
             .map(([name, count]) => ({ name, count }));
 
-          // Get most visited pages by bots
           const pagesByBots = botEvents.reduce((acc: Record<string, number>, e) => {
-            const path = (e.metadata as any)?.path || 'unknown';
+            const meta = e.metadata && typeof e.metadata === 'object' ? e.metadata as Record<string, unknown> : {};
+            const rawPath = typeof meta.path === 'string' ? meta.path : 'unknown';
+            const path = rawPath.slice(0, 500);
             acc[path] = (acc[path] || 0) + 1;
             return acc;
-          }, {});
+          }, Object.create(null) as Record<string, number>);
 
           const topPages = Object.entries(pagesByBots)
             .sort(([, a], [, b]) => b - a)
@@ -471,11 +475,11 @@ export async function GET(request: NextRequest) {
         const emptyResults = appEvents
           .filter(e => e.eventType === 'empty_results')
           .reduce((acc: Record<string, number>, e) => {
-            const m = e.metadata as any;
-            const key = `${m?.powiat || '?'} / ${m?.type || 'all'}`;
+            const m = e.metadata && typeof e.metadata === 'object' ? e.metadata as Record<string, unknown> : {};
+            const key = `${String(m.powiat || '?').slice(0, 100)} / ${String(m.type || 'all').slice(0, 20)}`;
             acc[key] = (acc[key] || 0) + 1;
             return acc;
-          }, {});
+          }, Object.create(null) as Record<string, number>);
         const topEmptyResults = Object.entries(emptyResults)
           .sort(([, a], [, b]) => b - a)
           .slice(0, 10)
@@ -485,11 +489,11 @@ export async function GET(request: NextRequest) {
         const filterCombos = appEvents
           .filter(e => e.eventType === 'filter_applied')
           .reduce((acc: Record<string, number>, e) => {
-            const m = e.metadata as any;
-            const key = m?.combo || 'unknown';
+            const m = e.metadata && typeof e.metadata === 'object' ? e.metadata as Record<string, unknown> : {};
+            const key = String(m.combo || 'unknown').slice(0, 200);
             acc[key] = (acc[key] || 0) + 1;
             return acc;
-          }, {});
+          }, Object.create(null) as Record<string, number>);
         const topFilterCombos = Object.entries(filterCombos)
           .sort(([, a], [, b]) => b - a)
           .slice(0, 10)
@@ -518,11 +522,11 @@ export async function GET(request: NextRequest) {
         const crossPowiatEvents = appEvents.filter(e => e.eventType === 'cross_powiat_view');
         const crossPowiatPaths = crossPowiatEvents
           .reduce((acc: Record<string, number>, e) => {
-            const m = e.metadata as any;
-            const key = `${m?.searchedPowiat} → ${m?.facilityPowiat}`;
+            const m = e.metadata && typeof e.metadata === 'object' ? e.metadata as Record<string, unknown> : {};
+            const key = `${String(m.searchedPowiat || '?').slice(0, 100)} → ${String(m.facilityPowiat || '?').slice(0, 100)}`;
             acc[key] = (acc[key] || 0) + 1;
             return acc;
-          }, {});
+          }, Object.create(null) as Record<string, number>);
         const topCrossPowiatPaths = Object.entries(crossPowiatPaths)
           .sort(([, a], [, b]) => b - a)
           .slice(0, 10)
@@ -568,7 +572,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Analytics API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
