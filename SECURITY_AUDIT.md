@@ -1,10 +1,10 @@
 # Security Audit — Kompas Seniora
 
-**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–7)  
-**Zakres:** Widget czatu (`WelcomeWidget.tsx`), API chatbota (`/api/asystent`), Redis rate limiting, nagłówki bezpieczeństwa, panel admina, API analityki, API share/TERYT, indirect prompt injection, cookie forgery, nonce-based CSP  
-**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `2bf62e3` → bieżący (rundy 6–7)  
-**Rundy:** 7 rund analizy + napraw  
-**Liczba luk:** 36 (5 krytycznych, 14 wysokich, 10 średnich, 7 niskich)
+**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–8)  
+**Zakres:** Widget czatu (`WelcomeWidget.tsx`), API chatbota (`/api/asystent`), Redis rate limiting, nagłówki bezpieczeństwa, panel admina, API analityki, API share/TERYT, indirect prompt injection, cookie forgery, nonce-based CSP, SQL injection, broken access control  
+**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → bieżący (rundy 6–8)  
+**Rundy:** 8 rund analizy + napraw  
+**Liczba luk:** 41 (6 krytycznych, 17 wysokich, 11 średnich, 7 niskich)
 
 ---
 
@@ -388,6 +388,73 @@ Dwa kolejne requesty → dwa różne nonce ✓
 
 ---
 
+## Runda 8 — SQL Injection, Broken Access Control, Rate Limiting (2026-05-03)
+
+### 🔴 KRYTYCZNE
+
+---
+
+#### 36. SQL Injection w `/api/placowki` — `$queryRawUnsafe` z interpolacją inputów użytkownika
+**Plik:** `app/api/placowki/route.ts`  
+**Problem:** Trzy gałęzie query używały `$queryRawUnsafe` z bezpośrednią interpolacją parametrów `search` i `type` do SQL:
+```typescript
+AND typ_placowki = '${type}'            // type kontrolowany przez atakującego
+LIKE '%${searchNormalized}%'            // normalizePolish() nie escapuje ' ; -- %
+```
+Payload: `?search=a' OR '1'='1&type=DPS' OR '1'='1'--` → dump całej tabeli.  
+**Fix:** Zastąpiono `$queryRawUnsafe` → `$queryRaw(Prisma.sql\`...\`)`. Interpolacje `${likeParam}`, `${type}`, `${voivodeships}` w `Prisma.sql` stają się parametrami PostgreSQL (`$1`, `$2`, ...) — user input NIGDY nie trafia jako SQL structure. Dodano też allowlist dla `type`: `['DPS', 'ŚDS'].includes(rawType)`.  
+**Lekcja:** `normalizePolish()` zastępuje tylko polskie litery, NIE escapeuje SQL meta-znaków (`'`, `;`, `--`). Każde raw query musi używać parametryzacji.
+
+---
+
+### 🟠 WYSOKIE
+
+---
+
+#### 37. `check-duplicate` endpoint bez autentykacji — dump danych wszystkich placówek
+**Plik:** `app/api/admin/placowki/check-duplicate/route.ts`  
+**Problem:** Endpoint `/api/admin/placowki/check-duplicate` (pod ścieżką admin!) nie miał żadnego sprawdzenia `isValidAdminCookie()`. Każdy anonimowy request zwracał pełne dane 184 placówek: `telefon`, `email`, `ulica`, `www`, daty. Brak auth check = publiczny data dump.  
+**Fix:** Dodano `isValidAdminCookie()` na początku handlera.  
+**Lekcja:** Ścieżka URL zaczynająca się od `/api/admin/` NIE gwarantuje ochrony. Każdy endpoint musi samodzielnie weryfikować cookie.
+
+---
+
+#### 38. Brak rate limitingu na `/api/teryt/suggest` — kosztowne query bez ochrony
+**Plik:** `app/api/teryt/suggest/route.ts`  
+**Problem:** Każde zapytanie wykonywało `prisma.terytLocation.findMany({ take: 200 })` + `prisma.placowka.findMany({ take: 184 })`. Brak rate limitingu → `while(true) { fetch('/api/teryt/suggest?q=ab') }` zalewało bazę.  
+**Fix:** `checkRedisRateLimit(ip, 60, 60, 'teryt-suggest')` — 60 req/60s per IP.
+
+---
+
+#### 39. Brak rate limitingu na `/api/recommendations` — 3x `findMany` bez ochrony
+**Plik:** `app/api/recommendations/route.ts`  
+**Problem:** Publiczny endpoint bez rate limitingu. Każde żądanie wykonywało do 3 zapytań `findMany`. Dodatkowo `console.log` z parametrami zapytań w produkcji.  
+**Fix:** `checkRedisRateLimit(ip, 30, 60, 'recommendations')`. Usunięto console.log i ujawniające `error.message` w error response.
+
+---
+
+### 🟡 ŚREDNIE
+
+---
+
+#### 40. `page/limit` bez górnych boundów w admin API — DB DoS
+**Plik:** `app/api/admin/placowki/route.ts`  
+**Problem:** `page=999999&limit=999999` → `OFFSET 999999×999999 = 10^12` → timeout bazy.  
+**Fix:** `page = Math.max(1, ...)`, `limit = Math.min(200, Math.max(1, ...))`.
+
+---
+
+### 🔵 NISKIE
+
+---
+
+#### 41. `console.log` w produkcji ujawniające query params i stack traces
+**Pliki:** `app/api/placowki/route.ts`, `app/api/recommendations/route.ts`  
+**Problem:** Logi ujawniały searchNormalized (query użytkownika), facilityType, location, stack traces w error response.  
+**Fix:** Wszystkie logi debugowe usunięte lub za `process.env.NODE_ENV === 'development'`. Error response nie zwraca `error.message` ani `error.stack`.
+
+---
+
 ## Co zostało jako TODO
 
 | # | Problem | Dlaczego nie naprawiony | Jak naprawić |
@@ -475,4 +542,5 @@ Rate limit counter bez namespace — blokowanie jednego endpointa wpływało na 
 
 *Rundy 1–5 przeprowadzone: 2026-05-02 | Commits: `719a0c5` → `dc06df1`*  
 *Runda 6 przeprowadzona: 2026-05-03 | Commits: `61eb2c6`*  
-*Runda 7 przeprowadzona: 2026-05-03 | Commits: `d50cfda`*
+*Runda 7 przeprowadzona: 2026-05-03 | Commits: `d50cfda`*  
+*Runda 8 przeprowadzona: 2026-05-03 | Commits: `c40173a`*
