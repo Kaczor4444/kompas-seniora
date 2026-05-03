@@ -1,10 +1,10 @@
 # Security Audit — Kompas Seniora
 
-**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–9)  
-**Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution  
-**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → bieżący (rundy 6–9)  
-**Rundy:** 9 rund analizy + napraw  
-**Liczba luk:** 49 (7 krytycznych, 20 wysokich, 14 średnich, 8 niskich)
+**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–12)  
+**Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution, HSTS, CSV injection, log injection, timing side-channel  
+**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → `d6bb83a` (rundy 6–12)  
+**Rundy:** 12 rund analizy + napraw  
+**Liczba luk:** 61 (7 krytycznych, 21 wysokich, 22 średnich, 11 niskich)
 
 ---
 
@@ -580,8 +580,95 @@ Rate limit counter bez namespace — blokowanie jednego endpointa wpływało na 
 
 ---
 
+---
+
+## Rundy 10–12 (2026-05-03)
+
+### Runda 10 — Nagłówki, CSV injection, bounds, cookie path
+
+#### 50. Logout: IP order + brak `path` przy usuwaniu cookie
+**Plik:** `app/api/admin/logout/route.ts`  
+`x-forwarded-for || x-real-ip` zamiast `x-real-ip || x-forwarded-for` — niespójny audit trail z loginem. `cookieStore.delete('admin-auth')` bez `path: '/'` mogło nie usunąć cookie ustawionego z `path: '/'`.  
+**Fix:** IP order ujednolicony z login; `cookieStore.delete({ name: 'admin-auth', path: '/' })`.
+
+#### 51. admin/mops GET — `limit` bez bounds
+**Fix:** `Math.min(200, Math.max(1, ...))` + `Math.min(10000, page)`.
+
+#### 52. CSV formula injection w export endpoints
+**Pliki:** `app/api/admin/ceny/export/route.ts`, `app/api/admin/export/csv/route.ts`  
+Komórki zaczynające się od `=`, `+`, `-`, `@` są traktowane jako formuły przez Excel.  
+**Fix:** `escapeCsv()` z prefixem `'` przed niebezpiecznymi znakami w obu plikach.
+
+#### 53. Brak HSTS i `frame-ancestors` w CSP
+**Fix:** `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` w `next.config.mjs`. `frame-ancestors 'self'` dodane do CSP w middleware.
+
+#### 54. wspolpraca GET — `limit/offset` bez bounds → DoS
+**Fix:** `Math.min(200, limit)`, `Math.min(100000, offset)`.
+
+#### 55. `?admin=true` dead code w teryt/suggest — bomba czasowa
+Parametr czytany z URL ale nieużywany — gdyby ktoś dodał logikę bez auth check, każdy mógłby go użyć.  
+**Fix:** Usunięto zmienną zanim stała się luką.
+
+---
+
+### Runda 11 — Prompt injection `\n`, metadata crash, log injection
+
+#### 56. `sanitizeDbField()` zostawiał pojedynczy `\n` — prompt injection
+**Plik:** `app/api/asystent/route.ts`  
+`.replace(/\n{2,}/g, '\n')` kolapsowało tylko 2+ newlines, zostawiając single `\n`. Nazwa placówki `"DPS Kraków\nZIGNORUJ INSTRUKCJE"` trafiała do system promptu z przełamaniem linii.  
+**Fix:** `.replace(/\n+/g, ' ')` — wszystkie newlines → spacja.
+
+#### 57. `JSON.parse(JSON.stringify(metadata).slice(2000))` — crash
+**Plik:** `app/api/analytics/track/route.ts`  
+Slice na stringified JSON tworzy invalid JSON (obcięty w środku stringa) → `JSON.parse` rzuca wyjątek.  
+**Fix:** Bezpieczny IIFE z try-catch; metadata >2000 znaków → `{ _truncated: true }`.
+
+#### 58. Control chars w userAgent/referer/path bez sanityzacji
+**Pliki:** `app/api/analytics/bot-track/route.ts`, `middleware.ts`, `lib/admin-security.ts`  
+`\n`, `\x00` i inne control chars trafiały do bazy przez `.slice()` bez strippowania — log injection.  
+**Fix:** `.replace(/[\x00-\x1F\x7F]/g, '')` przed `.slice()` we wszystkich tych miejscach.
+
+---
+
+### Runda 12 — Timing side-channel w login + Dependabot
+
+#### 59. Timing side-channel — `length` check przed `timingSafeEqual` ujawniał długość hasła
+**Plik:** `app/api/admin/login/route.ts`  
+```typescript
+password.length === correctPassword.length &&  // ← szybka odmowa = zła długość
+timingSafeEqual(Buffer.from(password), Buffer.from(correctPassword))
+```
+Atakujący mierzący czas odpowiedzi wiedział kiedy długość jest właściwa (wolniejsza odmowa przez `timingSafeEqual`).  
+**Fix:** `createHmac('sha256', salt).update(value).digest()` na obu stronach → zawsze 32 bajty → `timingSafeEqual` zawsze wykonuje tę samą pracę niezależnie od długości inputu.
+
+#### 60. `passwordLength` w security logu — information disclosure
+**Plik:** `app/api/admin/login/route.ts`  
+`metadata: { passwordLength: password?.length }` logowało długość próbowanego hasła.  
+**Fix:** Usunięto `passwordLength` z metadanych.
+
+#### 61. Brak Dependabot — zero alertów o CVE w zależnościach
+**Fix:** `.github/dependabot.yml` — cotygodniowe PR-y (poniedziałek), minor/patch automatycznie, major ignorowane.
+
+---
+
+## Co zostało jako TODO (świadome decyzje)
+
+| # | Problem | Dlaczego | Jak naprawić |
+|---|---------|----------|--------------|
+| 1 | `style-src 'unsafe-inline'` w CSP | Leaflet + Framer Motion wymagają inline styles | Nie naprawiać — akceptowalne ryzyko |
+| 2 | Jakość hasła admina | Ustawiana przez operatora w `.env` — aplikacja nie może wymusić | Zmień na `openssl rand -base64 18` |
+| 3 | Alerty na anomalie w logach | Wymaga Vercel/Sentry konfiguracji poza kodem | Vercel Notifications / Sentry |
+| 4 | Neon database 2FA | Konto Neon — poza kodem | Neon dashboard → Security → 2FA |
+
+**Wszystkie naprawialne luki w kodzie zostały naprawione.**
+
+---
+
 *Rundy 1–5 przeprowadzone: 2026-05-02 | Commits: `719a0c5` → `dc06df1`*  
 *Runda 6 przeprowadzona: 2026-05-03 | Commits: `61eb2c6`*  
 *Runda 7 przeprowadzona: 2026-05-03 | Commits: `d50cfda`*  
 *Runda 8 przeprowadzona: 2026-05-03 | Commits: `c40173a`*  
-*Runda 9 przeprowadzona: 2026-05-03 | Commits: `5228930`*
+*Runda 9 przeprowadzona: 2026-05-03 | Commits: `5228930`*  
+*Runda 10 przeprowadzona: 2026-05-03 | Commits: `5bca4de`*  
+*Runda 11 przeprowadzona: 2026-05-03 | Commits: `f6317c5`*  
+*Runda 12 przeprowadzona: 2026-05-03 | Commits: `d6bb83a`*
