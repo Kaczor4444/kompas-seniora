@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { timingSafeEqual } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { logSecurityEvent, checkRateLimit } from '@/lib/admin-security';
 import { signCookie } from '@/lib/adminAuth';
+
+// Hash password with HMAC-SHA256 so both sides are always 32 bytes.
+// This prevents the timing side-channel where checking `password.length === correctPassword.length`
+// before timingSafeEqual leaks the correct password length via response time differences.
+function hashForComparison(value: string): Buffer {
+  return createHmac('sha256', 'login-comparison').update(value).digest();
+}
 
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json();
-    
-    // Use x-real-ip first — it's set by trusted proxy and cannot be spoofed by client
-    // x-forwarded-for is client-controlled and must not be used for rate limiting
+
     const ipAddress = request.headers.get('x-real-ip') ||
                       request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
                       'unknown';
     const userAgent = request.headers.get('user-agent') || undefined;
 
-    // Check rate limit
     const { isBlocked, attempts } = await checkRateLimit(ipAddress);
-    
+
     if (isBlocked) {
       await logSecurityEvent({
         eventType: 'rate_limit',
@@ -25,72 +29,49 @@ export async function POST(request: NextRequest) {
         userAgent,
         metadata: { attempts },
       });
-      
       return NextResponse.json(
         { error: 'Zbyt wiele prób logowania. Spróbuj ponownie za 15 minut.' },
         { status: 429 }
       );
     }
 
-    // Check password
     const correctPassword = process.env.ADMIN_PASSWORD;
-    
+
     if (!correctPassword) {
       console.error('ADMIN_PASSWORD not set in environment variables');
-      return NextResponse.json(
-        { error: 'Błąd konfiguracji serwera' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Błąd konfiguracji serwera' }, { status: 500 });
     }
 
-    // Timing-safe comparison prevents timing attacks (measuring char-by-char match time)
-    const passwordMatch = password &&
-      password.length === correctPassword.length &&
-      timingSafeEqual(Buffer.from(password), Buffer.from(correctPassword))
+    // Always hash both values to 32 bytes, then compare with timingSafeEqual.
+    // Previous pattern (length check + timingSafeEqual) leaked password length via timing.
+    const passwordMatch = typeof password === 'string' &&
+      timingSafeEqual(hashForComparison(password), hashForComparison(correctPassword));
 
     if (!passwordMatch) {
-      // Log failed attempt
       await logSecurityEvent({
         eventType: 'login_failed',
         ipAddress,
         userAgent,
-        metadata: { 
-          passwordLength: password?.length || 0,
-          attempts: attempts + 1,
-        },
+        metadata: { attempts: attempts + 1 },
       });
-      
-      return NextResponse.json(
-        { error: 'Nieprawidłowe hasło' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Nieprawidłowe hasło' }, { status: 401 });
     }
 
-    // Success! Set cookie
-    await logSecurityEvent({
-      eventType: 'login_success',
-      ipAddress,
-      userAgent,
-    });
+    await logSecurityEvent({ eventType: 'login_success', ipAddress, userAgent });
 
     const cookieStore = await cookies();
-    // Sign cookie value with HMAC-SHA256 to prevent cookie forgery.
-    // Without signing, anyone can open DevTools and set admin-auth=true.
     cookieStore.set('admin-auth', signCookie('true'), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: 60 * 60 * 24,
       path: '/',
     });
 
     return NextResponse.json({ success: true });
-    
+
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json(
-      { error: 'Błąd serwera' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Błąd serwera' }, { status: 500 });
   }
 }
