@@ -651,6 +651,18 @@ Atakujący mierzący czas odpowiedzi wiedział kiedy długość jest właściwa 
 
 ---
 
+## Runda 13 — Korekta: nonce na JSON-LD script tagach (2026-05-03)
+
+### 🔵 NISKIE (korekta błędu z Rundy 7)
+
+#### 62. `nonce` na `<script type="application/ld+json">` — zbędny i powodujący hydration mismatch
+**Plik:** `app/layout.tsx`  
+**Problem:** Runda 7 dodała `nonce={nonce}` do obu JSON-LD script tagów (Organization + LocalBusiness schema). `type="application/ld+json"` to blok danych — przeglądarka nigdy go nie wykonuje jako JavaScript, więc CSP `script-src` z nonce w ogóle nie ma do niego zastosowania. Nonce na takim tagu jest semantycznie bez sensu. Efekt praktyczny: serwer wstrzykiwał nonce z request headers, ale React przy re-hydratacji klienta nie miał dostępu do tego nonce → hydration mismatch w każdej nawigacji do `/admin/placowki` (i innych stron SSR).  
+**Fix:** Usunięto `nonce={nonce}` z obu JSON-LD `<script>` tagów. CSP ochrona niezmieniona — nonce nadal działa na faktycznych skryptach JS (GoogleAnalytics).  
+**Lekcja:** CSP nonce dotyczy tylko skryptów które przeglądarka wykonuje. `type` inny niż `text/javascript`/`module` = data block = poza zakresem CSP.
+
+---
+
 ## Co zostało jako TODO (świadome decyzje)
 
 | # | Problem | Dlaczego | Jak naprawić |
@@ -671,4 +683,5 @@ Atakujący mierzący czas odpowiedzi wiedział kiedy długość jest właściwa 
 *Runda 9 przeprowadzona: 2026-05-03 | Commits: `5228930`*  
 *Runda 10 przeprowadzona: 2026-05-03 | Commits: `5bca4de`*  
 *Runda 11 przeprowadzona: 2026-05-03 | Commits: `f6317c5`*  
-*Runda 12 przeprowadzona: 2026-05-03 | Commits: `d6bb83a`*
+*Runda 12 przeprowadzona: 2026-05-03 | Commits: `d6bb83a`*  
+*Runda 13 przeprowadzona: 2026-05-03 | Commit: `3050985`*
