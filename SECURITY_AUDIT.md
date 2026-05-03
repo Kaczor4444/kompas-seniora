@@ -682,7 +682,31 @@ Atakujący mierzący czas odpowiedzi wiedział kiedy długość jest właściwa 
 | 3 | Alerty na anomalie w logach | Wymaga Vercel/Sentry konfiguracji poza kodem | Vercel Notifications / Sentry |
 | 4 | Neon database 2FA | Konto Neon — poza kodem | Neon dashboard → Security → 2FA |
 
-**Wszystkie naprawialne luki w kodzie zostały naprawione.**
+---
+
+## TODO następna sesja
+
+### A. Rundy 14d i 14e (security audit — nowe kąty)
+
+| Runda | Obszar | Opis |
+|-------|--------|------|
+| 14d | Middleware bypass | Czy da się ominąć middleware (CSP/nonce/bot-tracking) przez spreparowany path lub header? Sprawdzić `matcher` config, edge cases w `middleware.ts` |
+| 14e | Business logic | Manipulacja analytics (fałszywe kliknięcia), share listami, cenami; enumeracja tokenów; abuse publicznych endpointów w nieoczekiwany sposób |
+
+### B. Naprawa 95 błędów TypeScript (nie security, ale jakość kodu)
+
+Błędy istniały przed audytem, nie są przez niego spowodowane. Naprawa bezpieczna — nie psuje działających funkcji.
+
+| # | Problem | Pliki | Fix |
+|---|---------|-------|-----|
+| B1 | Zod v4: `required_error` → `error` | `app/admin/placowki/dodaj/page.tsx`, `app/admin/placowki/[id]/edytuj/page.tsx` | Zmień `{ required_error: '...' }` na `{ error: '...' }` w `z.enum()` |
+| B2 | Next.js 16: `params` nie-async | `app/api/share/[token]/route.ts` i inne route handlers | Dodaj `const { token } = await params` zamiast destrukturyzacji w argumencie |
+| B3 | `updatedAt` nie istnieje w typie ceny | `app/admin/ceny/page.tsx:418` | Sprawdź jakie pole faktycznie zwraca API i użyj go — to bug wyświetlający `Invalid Date` w UI admina |
+| B4 | Resolver type mismatch w formularzach | `edytuj/page.tsx`, `dodaj/page.tsx` | Ujednolicić typ `verified` (optional vs required) między Zod schema a `useForm` |
+
+**⚠️ Po naprawie:** uruchom `npm run build` jako weryfikacja — Turbopack build jest bardziej rygorystyczny niż dev.
+
+**Wszystkie naprawialne luki bezpieczeństwa w kodzie zostały naprawione.**
 
 ---
 
