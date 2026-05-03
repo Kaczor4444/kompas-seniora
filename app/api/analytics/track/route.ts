@@ -368,7 +368,18 @@ export async function POST(request: NextRequest) {
         referer: referer || undefined,
         language: language || null,
         // Limit metadata size to prevent large object injection
-        metadata: metadata ? JSON.parse(JSON.stringify(metadata).slice(0, 2000)) : undefined,
+        metadata: (() => {
+          if (!metadata) return undefined
+          try {
+            const str = JSON.stringify(metadata)
+            // Slicing a JSON string mid-way creates invalid JSON → JSON.parse throws
+            // Instead: if too large, return truncation marker
+            if (str.length > 2000) return { _truncated: true }
+            return metadata
+          } catch {
+            return undefined
+          }
+        })(),
       },
     })
 

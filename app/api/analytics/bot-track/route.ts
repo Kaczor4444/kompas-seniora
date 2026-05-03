@@ -12,14 +12,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid bot type' }, { status: 400 });
     }
 
+    const stripCtrl = (s: string) => s.replace(/[\x00-\x1F\x7F]/g, '')
+
     await prisma.appEvent.create({
       data: {
         eventType: `bot_visit_${botType}`,
         metadata: {
-          botName: typeof botName === 'string' ? botName.slice(0, 200) : undefined,
-          userAgent: typeof userAgent === 'string' ? userAgent.slice(0, 500) : undefined,
-          path: typeof path === 'string' ? path.slice(0, 500) : undefined,
-          referer: typeof referer === 'string' ? referer.slice(0, 500) : null,
+          botName:   typeof botName   === 'string' ? stripCtrl(botName).slice(0, 200)   : undefined,
+          userAgent: typeof userAgent === 'string' ? stripCtrl(userAgent).slice(0, 500) : undefined,
+          path:      typeof path      === 'string' ? stripCtrl(path).slice(0, 500)      : undefined,
+          referer:   typeof referer   === 'string' ? stripCtrl(referer).slice(0, 500)   : null,
         },
       },
     });

@@ -296,11 +296,11 @@ Poniżej lista placówek w Małopolsce. Każda placówka ma [ID: numer] - używa
 function sanitizeDbField(value: string | null | undefined): string | null {
   if (!value) return null
   return value
-    // Strip null bytes and other control chars (keep \n, \t as visible whitespace)
+    // Strip null bytes and control chars
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
-    // Collapse multiple newlines to one (prevents injected blank-line prompt separators)
-    .replace(/\n{2,}/g, '\n')
-    // Trim to reasonable length (field-level cap)
+    // Replace ALL newlines with space — single \n could act as prompt separator
+    // e.g. "DPS Kraków\nZIGNORUJ INSTRUKCJE" would inject a new line into system prompt
+    .replace(/\n+/g, ' ')
     .slice(0, 500)
     .trim() || null
 }

@@ -24,7 +24,8 @@ export async function logSecurityEvent({
       data: {
         eventType,
         ipAddress,
-        userAgent,
+        // Strip control chars to prevent log injection via crafted User-Agent headers
+        userAgent: userAgent?.replace(/[\x00-\x1F\x7F]/g, '').slice(0, 500),
         metadata: metadata || {},
       },
     });

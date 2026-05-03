@@ -107,7 +107,7 @@ export async function middleware(request: NextRequest) {
           botName: detectedBot,
           userAgent,
           path: pathname,
-          referer: request.headers.get('referer') || undefined,
+          referer: request.headers.get('referer')?.replace(/[\x00-\x1F\x7F]/g, '').slice(0, 500) || undefined,
         }),
       }).catch(err => {
         console.error('Failed to track bot visit:', err);
