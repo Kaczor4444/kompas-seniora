@@ -146,14 +146,12 @@ export default async function RootLayout({
 
         {/* Structured Data - Organization Schema */}
         <script
-          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
 
         {/* Structured Data - LocalBusiness Schema */}
         <script
-          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
         />
