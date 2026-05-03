@@ -11,7 +11,7 @@
 | Runda | Obszar | Status |
 |-------|--------|--------|
 | 14a | SSRF — server-side fetche z userinputem (Nominatim, zewnętrzne URL) | ✅ Zakończona (4 znaleziska, 4 naprawione) |
-| 14b | IDOR — dostęp do rekordów po ID bez autoryzacji | ⏳ Zaplanowana |
+| 14b | IDOR — dostęp do rekordów po ID bez autoryzacji | ✅ Zakończona (8 znalezisk, 7 naprawionych) |
 | 14c | Next.js RSC data leak — wrażliwe dane w Server Component payload | ⏳ Zaplanowana |
 | 14d | Middleware bypass — omijanie CSP/nonce przez spreparowany path | ⏳ Zaplanowana |
 | 14e | Business logic — manipulacja analytics, share listami, cenami | ⏳ Zaplanowana |
@@ -695,7 +695,8 @@ Atakujący mierzący czas odpowiedzi wiedział kiedy długość jest właściwa 
 *Runda 11 przeprowadzona: 2026-05-03 | Commits: `f6317c5`*  
 *Runda 12 przeprowadzona: 2026-05-03 | Commits: `d6bb83a`*  
 *Runda 13 przeprowadzona: 2026-05-03 | Commit: `3050985`*  
-*Runda 14a przeprowadzona: 2026-05-03 | SSRF audit (Opus 4.7)*
+*Runda 14a przeprowadzona: 2026-05-03 | SSRF audit (Opus 4.7) | Commit: `e014f82`*  
+*Runda 14b przeprowadzona: 2026-05-03 | IDOR audit (Opus 4.7) | Commit: `8e72e2b`*
 
 ---
 
