@@ -4,8 +4,18 @@ import { prisma } from '@/lib/prisma';
 import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 import { normalizePolish } from '@/lib/normalize-polish';
 import { mapCityCountyToPowiat } from '@/lib/city-county-mapping';
+import { checkRedisRateLimit } from '@/lib/redis';
 
 export async function GET(request: NextRequest) {
+  const ip =
+    request.headers.get('x-real-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+    'unknown';
+  const rateLimit = await checkRedisRateLimit(ip, 60, 60, 'teryt-suggest');
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q') || '';

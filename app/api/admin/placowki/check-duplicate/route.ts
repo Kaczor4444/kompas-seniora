@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 // Funkcja normalizująca telefon
 function normalizePhone(phone: string): string {
@@ -31,6 +33,11 @@ function normalizeText(text: string): string {
 }
 
 export async function GET(request: NextRequest) {
+  const cookieStore = await cookies();
+  if (!isValidAdminCookie(cookieStore.get('admin-auth')?.value)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const nazwa = searchParams.get('nazwa');
