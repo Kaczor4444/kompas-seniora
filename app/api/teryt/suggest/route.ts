@@ -22,9 +22,8 @@ export async function GET(request: NextRequest) {
     const wojewodztwo = searchParams.get('woj') || '';
     const powiat = searchParams.get('powiat') || '';
     const typ = searchParams.get('typ') || ''; // "DPS" lub "ŚDS"
-    const isAdmin = searchParams.get('admin') === 'true'; // 🆕 Admin mode - pokaż wszystkie miasta
 
-    if (process.env.NODE_ENV === 'development') console.log('🔍 AUTOCOMPLETE API:', { query, wojewodztwo, powiat, typ, isAdmin });
+    if (process.env.NODE_ENV === 'development') console.log('🔍 AUTOCOMPLETE API:', { query, wojewodztwo, powiat, typ });
 
     if (query.length < 2 || query.length > 100) {
       return NextResponse.json({

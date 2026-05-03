@@ -125,8 +125,10 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
-    const limit = parseInt(searchParams.get("limit") || "50");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    const rawLimit  = parseInt(searchParams.get("limit")  || "50");
+    const rawOffset = parseInt(searchParams.get("offset") || "0");
+    const limit  = Math.min(200, Math.max(1,  isNaN(rawLimit)  ? 50 : rawLimit));
+    const offset = Math.min(100000, Math.max(0, isNaN(rawOffset) ? 0  : rawOffset));
 
     const where = status ? { status } : {};
 

@@ -33,8 +33,10 @@ export async function GET(request: NextRequest) {
   const search      = searchParams.get('search') || '';
   const wojewodztwo = searchParams.get('wojewodztwo') || '';
   const verified    = searchParams.get('verified') || '';
-  const page        = Math.max(1, parseInt(searchParams.get('page') || '1'));
-  const limit       = parseInt(searchParams.get('limit') || '25');
+  const rawPage  = parseInt(searchParams.get('page') || '1');
+  const rawLimit = parseInt(searchParams.get('limit') || '25');
+  const page  = Math.min(10000, Math.max(1, isNaN(rawPage)  ? 1  : rawPage));
+  const limit = Math.min(200,   Math.max(1, isNaN(rawLimit) ? 25 : rawLimit));
 
   const where: any = {};
 

@@ -121,11 +121,11 @@ export async function GET(request: NextRequest) {
 function formatDateOnly(date: Date): string {
   return date.toISOString().split('T')[0];
 }
-function escapeCsv(value: string | null | undefined): string {
-  if (!value) return '';
-  const stringValue = String(value);
-  if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-    return `"${stringValue.replace(/"/g, '""')}"`;
-  }
-  return stringValue;
+function escapeCsv(value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '') return '';
+  const str = String(value);
+  const dangerous = /^[=+\-@\t\r]/.test(str);
+  const needsQuote = str.includes(',') || str.includes('"') || str.includes('\n') || dangerous;
+  if (!needsQuote) return str;
+  return `"${(dangerous ? "'" + str : str).replace(/"/g, '""')}"`;
 }

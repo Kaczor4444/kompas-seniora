@@ -3,9 +3,10 @@ import { cookies } from 'next/headers';
 import { logSecurityEvent } from '@/lib/admin-security';
 
 export async function POST(request: NextRequest) {
-  const ipAddress = request.headers.get('x-forwarded-for') || 
-                    request.headers.get('x-real-ip') || 
-                    'unknown';
+  const ipAddress =
+    request.headers.get('x-real-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+    'unknown';
   const userAgent = request.headers.get('user-agent') || undefined;
 
   await logSecurityEvent({
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
   });
 
   const cookieStore = await cookies();
-  cookieStore.delete('admin-auth');
+  cookieStore.delete({ name: 'admin-auth', path: '/' });
 
   return NextResponse.redirect(new URL('/admin/login', request.url));
 }
