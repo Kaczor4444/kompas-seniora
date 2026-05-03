@@ -1,10 +1,10 @@
 # Security Audit — Kompas Seniora
 
-**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–8)  
-**Zakres:** Widget czatu (`WelcomeWidget.tsx`), API chatbota (`/api/asystent`), Redis rate limiting, nagłówki bezpieczeństwa, panel admina, API analityki, API share/TERYT, indirect prompt injection, cookie forgery, nonce-based CSP, SQL injection, broken access control  
-**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → bieżący (rundy 6–8)  
-**Rundy:** 8 rund analizy + napraw  
-**Liczba luk:** 41 (6 krytycznych, 17 wysokich, 11 średnich, 7 niskich)
+**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–9)  
+**Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution  
+**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → bieżący (rundy 6–9)  
+**Rundy:** 9 rund analizy + napraw  
+**Liczba luk:** 49 (7 krytycznych, 20 wysokich, 14 średnich, 8 niskich)
 
 ---
 
@@ -461,6 +461,46 @@ Payload: `?search=a' OR '1'='1&type=DPS' OR '1'='1'--` → dump całej tabeli.
 |---|---------|------------------------|--------------|
 | 1 | `style-src 'unsafe-inline'` w CSP | **Nie można usunąć bez zepsucia strony** — Leaflet, Framer Motion i React `style={}` wymagają inline styles. CSS injection jest znacznie mniej groźny niż script injection. | Nie naprawiać — akceptowalne ryzyko |
 
+## Runda 9 — Token entropy, rate limiting, input validation, prototype pollution (2026-05-03)
+
+### 🔴 KRYTYCZNE
+
+#### 42. Słabe tokeny share — Math.random() + brak rate limiting = brute-force
+**Pliki:** `src/utils/generateToken.ts`, `app/api/share/[token]/route.ts`  
+**Problem:** 6-znakowy token z `Math.random()` (36^6 = 2,176,782,336 kombinacji) + brak rate limitingu na `/api/share/[token]` = atakujący może wypróbować wszystkie tokeny w kilka godzin. Share listy zawierają historię szukania placówek (wrażliwa informacja o osobach szukających opieki).  
+**Fix:** `crypto.randomBytes(6).toString('hex')` → 12 hex znaków = 48 bitów entropii (2^48 ≈ 281 bilionów). Rate limiting 30 req/60s na endpoint (namespace `share-token`).
+
+### 🟠 WYSOKIE
+
+#### 43. `/api/wspolpraca GET` bez auth — TODO comment w produkcji
+**Plik:** `app/api/wspolpraca/route.ts`  
+**Problem:** `// TODO: Add admin auth check here` — endpoint zwracał 501 w produkcji jako prowizoryczna ochrona. Żaden kod security nie może polegać na `NODE_ENV` jako jedynym mechanizmie ochrony.  
+**Fix:** `isValidAdminCookie()` zamiast NODE_ENV check.
+
+#### 44–45. Brak max-length na query params — ReDoS
+**Pliki:** `app/api/teryt/suggest/route.ts`, `app/api/recommendations/route.ts`  
+**Problem:** `normalizePolish(query)` na 50KB stringu → CPU spike (ReDoS przez regex + Unicode normalization). Podobnie `location` w recommendations bez ograniczenia.  
+**Fix:** `query.length > 100` → 400. `location.length > 200` → 400.
+
+### 🟡 ŚREDNIE
+
+#### 46. Page bez górnego cap — huge OFFSET DoS
+**Fix:** `Math.min(10000, page)`.
+
+#### 47. `details: error.message` w analytics — leak Prisma errors
+**Fix:** Usunięto `details` z error response.
+
+#### 48. lat/long bez boundów — data integrity
+**Pliki:** `app/api/admin/mops/route.ts`, `app/api/admin/placowki/route.ts`  
+**Fix:** `.min(-90).max(90)` / `.min(-180).max(180)`. `koszt_pobytu: max(999999).finite()`.
+
+#### 49. Prototype pollution w analytics — `as any` metadata jako klucze obiektów
+**Plik:** `app/api/admin/analytics/route.ts`  
+**Problem:** `acc[botName]` gdzie `botName = (e.metadata as any)?.botName` — jeśli botName = `__proto__`, modyfikuje prototyp Object.  
+**Fix:** Wszystkie `reduce()` z `{}` → `Object.create(null)`. Metadata access typowany i slicowany.
+
+---
+
 **Wszystkie naprawialne luki zostały naprawione. TODO #1 — świadomie zostawiony.**
 
 ---
@@ -543,4 +583,5 @@ Rate limit counter bez namespace — blokowanie jednego endpointa wpływało na 
 *Rundy 1–5 przeprowadzone: 2026-05-02 | Commits: `719a0c5` → `dc06df1`*  
 *Runda 6 przeprowadzona: 2026-05-03 | Commits: `61eb2c6`*  
 *Runda 7 przeprowadzona: 2026-05-03 | Commits: `d50cfda`*  
-*Runda 8 przeprowadzona: 2026-05-03 | Commits: `c40173a`*
+*Runda 8 przeprowadzona: 2026-05-03 | Commits: `c40173a`*  
+*Runda 9 przeprowadzona: 2026-05-03 | Commits: `5228930`*
