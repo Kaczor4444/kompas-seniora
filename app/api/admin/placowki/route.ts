@@ -3,13 +3,14 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { formatPhoneNumber } from '@/lib/phone-utils';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 // GET - Lista placówek z filtrowaniem i paginacją
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
 
-    const isAuthenticated = cookieStore.get("admin-auth")?.value === "true";
+    const isAuthenticated = isValidAdminCookie(cookieStore.get("admin-auth")?.value);
 
     if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -134,7 +135,7 @@ const placowkaSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+    const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
     
     if (!isAuthenticated) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

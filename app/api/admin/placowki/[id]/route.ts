@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { formatPhoneNumber } from '@/lib/phone-utils';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 // GET - Pojedyncza placówka (do edycji)
 export async function GET(
@@ -11,7 +12,7 @@ export async function GET(
 ) {
   try {
     const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+    const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 
     if (!isAuthenticated) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -93,7 +94,7 @@ export async function PUT(
 ) {
   try {
     const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+    const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 
     if (!isAuthenticated) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -191,7 +192,7 @@ export async function DELETE(
 ) {
   try {
     const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+    const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 
     if (!isAuthenticated) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

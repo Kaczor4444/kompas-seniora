@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 // GET /api/admin/ceny
 // Returns facilities with price history and statistics
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+    const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 
     if (!isAuthenticated) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -130,7 +131,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+    const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 
     if (!isAuthenticated) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 // GET /api/admin/ceny/export
 // Generates CSV file with all facility prices
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+    const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 
     if (!isAuthenticated) {
       return new NextResponse('Unauthorized', { status: 401 });

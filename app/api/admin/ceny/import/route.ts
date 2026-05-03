@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 // POST /api/admin/ceny/import
 // Bulk import prices from CSV
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+    const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 
     if (!isAuthenticated) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

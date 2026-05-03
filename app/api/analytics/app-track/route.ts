@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkRedisRateLimit } from '@/lib/redis';
 
 const ALLOWED_EVENTS = [
   'empty_results',
@@ -27,6 +28,17 @@ const ALLOWED_EVENTS = [
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 30 events per 60 seconds per IP (prevents DoS / DB flooding)
+    const ip =
+      request.headers.get('x-real-ip') ||
+      request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+      'unknown';
+
+    const rateLimit = await checkRedisRateLimit(ip, 30, 60, 'app-track');
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const body = await request.json();
     const { eventType, metadata, language } = body;
 

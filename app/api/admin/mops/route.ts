@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 function isAuth(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  return cookieStore.get('admin-auth')?.value === 'true';
+  return isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 }
 
 const mopsSchema = z.object({

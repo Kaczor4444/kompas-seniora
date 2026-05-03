@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { timingSafeEqual } from 'crypto';
 import { logSecurityEvent, checkRateLimit } from '@/lib/admin-security';
+import { signCookie } from '@/lib/adminAuth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,7 +74,9 @@ export async function POST(request: NextRequest) {
     });
 
     const cookieStore = await cookies();
-    cookieStore.set('admin-auth', 'true', {
+    // Sign cookie value with HMAC-SHA256 to prevent cookie forgery.
+    // Without signing, anyone can open DevTools and set admin-auth=true.
+    cookieStore.set('admin-auth', signCookie('true'), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

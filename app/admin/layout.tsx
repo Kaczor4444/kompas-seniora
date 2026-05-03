@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 export default async function AdminLayout({
   children,
@@ -8,7 +9,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+  const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
 
   return (
     <div className="min-h-screen bg-gray-50">

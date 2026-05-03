@@ -1,10 +1,11 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import { isValidAdminCookie } from '@/lib/adminAuth';
 
 export default async function SecurityLogPage() {
   const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get('admin-auth')?.value === 'true';
+  const isAuthenticated = isValidAdminCookie(cookieStore.get('admin-auth')?.value);
   
   if (!isAuthenticated) {
     redirect('/admin/login');

@@ -31,16 +31,20 @@ function checkInMemoryLimit(
 export async function checkRedisRateLimit(
   ip: string,
   limit: number = 10,
-  windowSeconds: number = 60
+  windowSeconds: number = 60,
+  namespace: string = 'chatbot'
 ): Promise<{ allowed: boolean; remaining: number }> {
   if (!redis) {
     if (process.env.NODE_ENV === 'development') {
       console.warn('⚠️ Redis not configured - using in-memory rate limiter')
     }
-    return checkInMemoryLimit(ip, limit, windowSeconds * 1000)
+    // Include namespace in in-memory key to prevent cross-endpoint counter sharing
+    return checkInMemoryLimit(`${namespace}:${ip}`, limit, windowSeconds * 1000)
   }
 
-  const key = `ratelimit:chatbot:${ip}`
+  // Namespace separates rate limit counters per endpoint (chatbot, app-track, etc.)
+  // Without this, 10 chatbot requests would also block app-track requests.
+  const key = `ratelimit:${namespace}:${ip}`
 
   try {
     // Atomic increment-first pattern (fixes TOCTOU race condition)
@@ -60,7 +64,7 @@ export async function checkRedisRateLimit(
     return { allowed: true, remaining: limit - count }
   } catch (error) {
     console.error('❌ Redis error, falling back to in-memory limiter:', error)
-    // Fallback to in-memory instead of fail-open
-    return checkInMemoryLimit(ip, limit, windowSeconds * 1000)
+    // Fallback to in-memory instead of fail-open (include namespace to avoid counter sharing)
+    return checkInMemoryLimit(`${namespace}:${ip}`, limit, windowSeconds * 1000)
   }
 }
