@@ -13,7 +13,7 @@ import Script from 'next/script'
  * 2. Dodaj do .env.local: NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
  * 3. Dodaj na Vercel: Settings → Environment Variables → NEXT_PUBLIC_GA_MEASUREMENT_ID
  */
-export default function GoogleAnalytics() {
+export default function GoogleAnalytics({ nonce }: { nonce?: string }) {
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 
   // SAFETY CHECK: Jeśli nie ma ID, nie renderuj nic (brak błędu!)
@@ -31,8 +31,9 @@ export default function GoogleAnalytics() {
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
         strategy="afterInteractive"
+        nonce={nonce}
       />
-      <Script id="google-analytics" strategy="afterInteractive">
+      <Script id="google-analytics" strategy="afterInteractive" nonce={nonce}>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

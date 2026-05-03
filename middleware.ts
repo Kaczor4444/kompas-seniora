@@ -1,6 +1,24 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+function buildCspHeader(nonce: string): string {
+  return [
+    "default-src 'self'",
+    // nonce replaces 'unsafe-inline'; 'strict-dynamic' trusts scripts loaded by nonced scripts
+    // 'self' kept as fallback for older browsers that ignore 'strict-dynamic'
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    // style-src: 'unsafe-inline' required by Leaflet + Framer Motion (accepted risk, TODO #2)
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://images.unsplash.com https://cdnjs.cloudflare.com https://raw.githubusercontent.com https://*.tile.openstreetmap.org",
+    "connect-src 'self' https://*.tile.openstreetmap.org https://nominatim.openstreetmap.org",
+    "font-src 'self' data:",
+    "media-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; ');
+}
+
 // AI crawler User-Agent patterns
 const AI_BOT_PATTERNS = [
   // OpenAI
@@ -48,61 +66,63 @@ export async function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const pathname = request.nextUrl.pathname;
 
-  // 1. ADMIN PANEL PROTECTION - Check if admin is enabled
+  // 1. ADMIN PANEL PROTECTION
   if (pathname.startsWith('/admin')) {
     const adminEnabled = process.env.ADMIN_ENABLED === 'true';
     if (!adminEnabled) {
-      // Return 404 (looks like page doesn't exist)
       return new NextResponse(null, { status: 404 });
     }
   }
 
-  // 2. BOT TRACKING - Skip for static files and API routes
+  // 2. CSP NONCE - unique per request, passed to Server Components via x-nonce header
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+
+  // 3. BOT TRACKING - skip for static files and API routes
   if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/static') ||
-    pathname.startsWith('/images') ||
-    pathname.startsWith('/api/analytics') || // Skip to avoid logging our own tracking
-    pathname.startsWith('/api/admin')
+    !pathname.startsWith('/_next') &&
+    !pathname.startsWith('/static') &&
+    !pathname.startsWith('/images') &&
+    !pathname.startsWith('/api/analytics') &&
+    !pathname.startsWith('/api/admin')
   ) {
-    return NextResponse.next();
-  }
-
-  // Detect bot type
-  const isAIBot = AI_BOT_PATTERNS.some(pattern =>
-    userAgent.toLowerCase().includes(pattern.toLowerCase())
-  );
-
-  const isSearchBot = SEARCH_ENGINE_PATTERNS.some(pattern =>
-    userAgent.toLowerCase().includes(pattern.toLowerCase())
-  );
-
-  // Log AI bot visit asynchronously (fire and forget)
-  if (isAIBot || isSearchBot) {
-    const botType = isAIBot ? 'ai_bot' : 'search_bot';
-    const detectedBot = [...AI_BOT_PATTERNS, ...SEARCH_ENGINE_PATTERNS].find(pattern =>
+    const isAIBot = AI_BOT_PATTERNS.some(pattern =>
       userAgent.toLowerCase().includes(pattern.toLowerCase())
-    ) || 'unknown';
+    );
+    const isSearchBot = SEARCH_ENGINE_PATTERNS.some(pattern =>
+      userAgent.toLowerCase().includes(pattern.toLowerCase())
+    );
 
-    // Fire and forget - don't await to avoid slowing down the request
-    fetch(`${request.nextUrl.origin}/api/analytics/bot-track`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        botType,
-        botName: detectedBot,
-        userAgent,
-        path: pathname,
-        referer: request.headers.get('referer') || undefined,
-      }),
-    }).catch(err => {
-      console.error('Failed to track bot visit:', err);
-    });
+    if (isAIBot || isSearchBot) {
+      const botType = isAIBot ? 'ai_bot' : 'search_bot';
+      const detectedBot = [...AI_BOT_PATTERNS, ...SEARCH_ENGINE_PATTERNS].find(pattern =>
+        userAgent.toLowerCase().includes(pattern.toLowerCase())
+      ) || 'unknown';
+
+      fetch(`${request.nextUrl.origin}/api/analytics/bot-track`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          botType,
+          botName: detectedBot,
+          userAgent,
+          path: pathname,
+          referer: request.headers.get('referer') || undefined,
+        }),
+      }).catch(err => {
+        console.error('Failed to track bot visit:', err);
+      });
+    }
   }
 
-  return NextResponse.next();
+  // 4. Forward nonce to Server Components + set CSP header on response
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  response.headers.set('Content-Security-Policy', buildCspHeader(nonce));
+  return response;
 }
 
 // Configure which routes to run middleware on

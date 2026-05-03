@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono, Playfair_Display, Quicksand, Open_Sans, Lato, Inter } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
@@ -82,11 +83,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get('x-nonce') ?? '';
   // Organization structured data for SEO and AI crawlers
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -144,12 +146,14 @@ export default function RootLayout({
 
         {/* Structured Data - Organization Schema */}
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
 
         {/* Structured Data - LocalBusiness Schema */}
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
         />
@@ -158,7 +162,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${quicksand.variable} ${openSans.variable} ${lato.variable} ${inter.variable} antialiased flex flex-col min-h-screen`}
       >
         {/* Analytics (top - ładuje się jako pierwszy) */}
-        <GoogleAnalytics />
+        <GoogleAnalytics nonce={nonce} />
         <Analytics />
         <ReturnVisitorTracker />
         

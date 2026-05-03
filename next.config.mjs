@@ -26,26 +26,7 @@ const securityHeaders = [
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=(self)',
   },
-  {
-    key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self'",
-      // unsafe-inline required by Next.js 15 runtime + Framer Motion + Leaflet inline styles
-      // TODO: migrate to nonce-based CSP via Next.js middleware to remove unsafe-inline
-      // unsafe-eval removed (not needed in production builds)
-      "script-src 'self' 'unsafe-inline'",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://images.unsplash.com https://cdnjs.cloudflare.com https://raw.githubusercontent.com https://*.tile.openstreetmap.org",
-      // nominatim.openstreetmap.org used for geocoding in search
-      "connect-src 'self' https://*.tile.openstreetmap.org https://nominatim.openstreetmap.org",
-      "font-src 'self' data:",
-      // media-src self needed for Web Speech API (SpeechSynthesis TTS)
-      "media-src 'self'",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join('; '),
-  },
+  // CSP is now set dynamically in middleware.ts (nonce-based, per-request)
 ];
 
 /** @type {import('next').NextConfig} */
