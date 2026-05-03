@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { getVoivodeshipFilter, ENABLED_VOIVODESHIPS } from '@/lib/voivodeship-filter';
+import { PUBLIC_PLACOWKA_SELECT } from '@/lib/public-placowka-fields';
 import { normalizePolish } from '@/lib/normalize-polish';
 import { mapCityCountyToPowiat } from '@/lib/city-county-mapping';
 import SearchResults from '@/components/SearchResults';
@@ -217,6 +218,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const allFacilities = await prisma.placowka.findMany({
     where: getVoivodeshipFilter(),
     orderBy: { nazwa: 'asc' },
+    select: PUBLIC_PLACOWKA_SELECT,
   });
 
   // TRYB 3: GEOLOCATION SEARCH
