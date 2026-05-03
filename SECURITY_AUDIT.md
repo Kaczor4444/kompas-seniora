@@ -1,10 +1,10 @@
 # Security Audit — Kompas Seniora
 
-**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (runda 6)  
-**Zakres:** Widget czatu (`WelcomeWidget.tsx`), API chatbota (`/api/asystent`), Redis rate limiting, nagłówki bezpieczeństwa, panel admina, API analityki, API share/TERYT, indirect prompt injection, cookie forgery  
-**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `2bf62e3` → bieżący (runda 6)  
-**Rundy:** 6 rund analizy + napraw  
-**Liczba luk:** 35 (5 krytycznych, 13 wysokich, 10 średnich, 7 niskich)
+**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–7)  
+**Zakres:** Widget czatu (`WelcomeWidget.tsx`), API chatbota (`/api/asystent`), Redis rate limiting, nagłówki bezpieczeństwa, panel admina, API analityki, API share/TERYT, indirect prompt injection, cookie forgery, nonce-based CSP  
+**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `2bf62e3` → bieżący (rundy 6–7)  
+**Rundy:** 7 rund analizy + napraw  
+**Liczba luk:** 36 (5 krytycznych, 14 wysokich, 10 średnich, 7 niskich)
 
 ---
 
@@ -361,14 +361,40 @@ const shareUrl = `${protocol}://${host}/s/${token}`;
 
 ---
 
+## Runda 7 — Nonce-based CSP (2026-05-03)
+
+### 🟠 WYSOKIE
+
+---
+
+#### 35. `script-src 'unsafe-inline'` w CSP — CSP nie chroniło przed XSS inline
+**Pliki:** `middleware.ts` (nowy buildCspHeader), `next.config.mjs`, `app/layout.tsx`, `components/GoogleAnalytics.tsx`  
+**Problem:** CSP zawierał `script-src 'self' 'unsafe-inline'`. Dyrektywa `'unsafe-inline'` pozwala na wykonanie KAŻDEGO inline skryptu, w tym tych wstrzykniętych przez XSS. CSP z `'unsafe-inline'` daje złudzenie ochrony — w rzeczywistości nie blokuje inline XSS.  
+**Fix:**
+- `middleware.ts` generuje `nonce = Buffer.from(crypto.randomUUID()).toString('base64')` per request
+- CSP przeniesione z `next.config.mjs` do middleware (dynamiczne nagłówki zamiast statycznych)
+- `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'` — tylko skrypty z pasującym nonce są dozwolone
+- `'strict-dynamic'` — skrypty dynamicznie tworzone przez zaufane skrypty też są dozwolone (potrzebne dla Vercel Analytics)
+- `app/layout.tsx` → `async`, odczytuje `x-nonce` przez `headers()`, przekazuje nonce do JSON-LD `<script nonce>` i do `<GoogleAnalytics nonce>`
+- `components/GoogleAnalytics.tsx` → akceptuje `nonce?: string` prop, przekazuje do obu `<Script>` komponentów
+
+**Weryfikacja:**
+```
+content-security-policy: script-src 'self' 'nonce-MTZhNWI4ZWI...' 'strict-dynamic'; ...
+```
+Dwa kolejne requesty → dwa różne nonce ✓
+
+**Lekcja:** Statyczny CSP w `next.config.mjs` nie może zawierać nonce (każdy request musi mieć inny). Tylko middleware może generować dynamiczne nagłówki per-request.
+
+---
+
 ## Co zostało jako TODO
 
 | # | Problem | Dlaczego nie naprawiony | Jak naprawić |
 |---|---------|------------------------|--------------|
-| 1 | `script-src 'unsafe-inline'` w CSP | Wymaga nonce-based CSP przez Next.js middleware | `middleware.ts` generuje nonce per request → ustawia CSP header → `app/layout.tsx` przekazuje nonce do `<Script>` komponentów |
-| 2 | `style-src 'unsafe-inline'` w CSP | **Nie można usunąć bez zepsucia strony** — Leaflet, Framer Motion i React `style={}` wymagają inline styles. CSS injection jest znacznie mniej groźny niż script injection. | Nie naprawiać — akceptowalne ryzyko |
+| 1 | `style-src 'unsafe-inline'` w CSP | **Nie można usunąć bez zepsucia strony** — Leaflet, Framer Motion i React `style={}` wymagają inline styles. CSS injection jest znacznie mniej groźny niż script injection. | Nie naprawiać — akceptowalne ryzyko |
 
-**Priorytet na następną sesję:** TODO #1 — nonce dla `script-src`. Implementacja ~30 min, nie zepsuje strony. TODO #2 — świadomie zostawiony.
+**Wszystkie naprawialne luki zostały naprawione. TODO #1 — świadomie zostawiony.**
 
 ---
 
@@ -448,4 +474,5 @@ Rate limit counter bez namespace — blokowanie jednego endpointa wpływało na 
 ---
 
 *Rundy 1–5 przeprowadzone: 2026-05-02 | Commits: `719a0c5` → `dc06df1`*  
-*Runda 6 przeprowadzona: 2026-05-03 | Commits: `2bf62e3` → bieżący*
+*Runda 6 przeprowadzona: 2026-05-03 | Commits: `61eb2c6`*  
+*Runda 7 przeprowadzona: 2026-05-03 | Commits: `d50cfda`*
