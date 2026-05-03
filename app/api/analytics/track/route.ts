@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { isValidAdminCookie } from '@/lib/adminAuth';
+import { checkRedisRateLimit } from '@/lib/redis';
 
 export async function GET(request: NextRequest) {
   try {
@@ -343,6 +344,15 @@ const ALLOWED_PLACOWKA_EVENT_TYPES = [
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 30 events/60s per IP — zapobiega fałszowaniu analytics i DoS DB
+    const ip = request.headers.get('x-real-ip') ||
+      request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+      'unknown';
+    const rl = await checkRedisRateLimit(ip, 30, 60, 'analytics-track');
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const body = await request.json()
     const { placowkaId, eventType, metadata, language } = body
 

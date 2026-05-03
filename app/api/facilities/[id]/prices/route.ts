@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 
 // GET /api/facilities/[id]/prices
 // Returns price history for a facility with year-over-year statistics
@@ -15,9 +16,9 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid facility ID' }, { status: 400 });
     }
 
-    // Fetch facility basic info
-    const facility = await prisma.placowka.findUnique({
-      where: { id: facilityId },
+    // Fetch facility basic info — voivodeship filter zapobiega dostępowi do ukrytych regionów
+    const facility = await prisma.placowka.findFirst({
+      where: getVoivodeshipFilter({ id: facilityId }),
       select: {
         id: true,
         nazwa: true,
@@ -43,9 +44,6 @@ export async function GET(
         typ_kosztu: true,
         zrodlo: true,
         data_pobrania: true,
-        verified: true,
-        notatki: true,
-        createdAt: true
       }
     });
 

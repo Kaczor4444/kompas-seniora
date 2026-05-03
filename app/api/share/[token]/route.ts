@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
 import { checkRedisRateLimit } from '@/lib/redis';
+import { PUBLIC_PLACOWKA_SELECT } from '@/lib/public-placowka-fields';
 
 export async function GET(
   request: NextRequest,
@@ -40,7 +41,8 @@ export async function GET(
     const facilities = await prisma.placowka.findMany({
       where: getVoivodeshipFilter({
         id: { in: ids }
-      })
+      }),
+      select: PUBLIC_PLACOWKA_SELECT,
     });
 
     return NextResponse.json({

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma';
 import { ENABLED_VOIVODESHIPS, getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { PUBLIC_PLACOWKA_COLUMNS, PUBLIC_PLACOWKA_SELECT, pickPublicFields } from '@/lib/public-placowka-fields';
 
 function normalizePolish(str: string): string {
   return str
@@ -44,9 +45,11 @@ export async function GET(request: NextRequest) {
 
     // All raw queries use Prisma.sql tagged template literals — user inputs are parameterized,
     // never interpolated as SQL structure. This prevents SQL injection.
+    // PUBLIC_PLACOWKA_COLUMNS used instead of SELECT * to avoid leaking admin fields.
+    const cols = Prisma.raw(PUBLIC_PLACOWKA_COLUMNS);
     if (likeParam && type) {
-      placowki = await prisma.$queryRaw<any[]>(Prisma.sql`
-        SELECT * FROM "Placowka"
+      const rows = await prisma.$queryRaw<any[]>(Prisma.sql`
+        SELECT ${cols} FROM "Placowka"
         WHERE wojewodztwo IN (${voivodeships})
         AND (
           ${normCol(Prisma.raw('"miejscowosc"'))} LIKE ${likeParam} OR
@@ -57,9 +60,10 @@ export async function GET(request: NextRequest) {
         AND typ_placowki = ${type}
         ORDER BY nazwa ASC
       `)
+      placowki = rows.map(pickPublicFields);
     } else if (likeParam) {
-      placowki = await prisma.$queryRaw<any[]>(Prisma.sql`
-        SELECT * FROM "Placowka"
+      const rows = await prisma.$queryRaw<any[]>(Prisma.sql`
+        SELECT ${cols} FROM "Placowka"
         WHERE wojewodztwo IN (${voivodeships})
         AND (
           ${normCol(Prisma.raw('"miejscowosc"'))} LIKE ${likeParam} OR
@@ -69,17 +73,20 @@ export async function GET(request: NextRequest) {
         )
         ORDER BY nazwa ASC
       `)
+      placowki = rows.map(pickPublicFields);
     } else if (type) {
-      placowki = await prisma.$queryRaw<any[]>(Prisma.sql`
-        SELECT * FROM "Placowka"
+      const rows = await prisma.$queryRaw<any[]>(Prisma.sql`
+        SELECT ${cols} FROM "Placowka"
         WHERE wojewodztwo IN (${voivodeships})
         AND typ_placowki = ${type}
         ORDER BY nazwa ASC
       `)
+      placowki = rows.map(pickPublicFields);
     } else {
       placowki = await prisma.placowka.findMany({
         where: getVoivodeshipFilter(),
-        orderBy: { nazwa: 'asc' }
+        orderBy: { nazwa: 'asc' },
+        select: PUBLIC_PLACOWKA_SELECT,
       })
     }
 
