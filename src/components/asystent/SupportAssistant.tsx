@@ -329,10 +329,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     switch (currentStep) {
       case 'start':
         return (
-          <div className="text-center py-20 px-6 animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-[10px] font-black uppercase tracking-widest mb-10 border border-primary-100">
-               <HelpCircle size={14} className="text-primary-500" /> Inteligentny Asystent Wyboru
-            </div>
+          <div className="text-center py-12 px-6 animate-fade-in-up">
             <h2 className="text-4xl md:text-7xl font-black text-slate-900 mb-8 leading-tight tracking-tight">
               Dopasuj pomoc <br/> do potrzeb bliskiej osoby.
             </h2>
