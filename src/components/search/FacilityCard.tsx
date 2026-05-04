@@ -105,47 +105,62 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
             </div>
 
             {/* Compare Checkbox - tylko desktop (≥640px) */}
-            <button
-              onClick={onToggleCompare}
-              className={`
-                hidden sm:flex
-                w-7 h-7 rounded-md transition-all items-center justify-center
-                ${isCompared
-                  ? 'bg-blue-600 text-white border-2 border-blue-600'
-                  : 'bg-white text-slate-400 border-2 border-slate-300 hover:border-blue-400 hover:text-blue-600'
-                }
-              `}
-              aria-label={isCompared ? "Usuń z porównania" : "Dodaj do porównania"}
-              title={isCompared ? "Usuń z porównania" : "Porównaj z innymi"}
-            >
-              {isCompared && <Check size={16} strokeWidth={3} />}
-            </button>
+            <div className="relative hidden sm:flex">
+              <button
+                onClick={onToggleCompare}
+                className={`
+                  peer w-7 h-7 rounded-md transition-all flex items-center justify-center
+                  ${isCompared
+                    ? 'bg-blue-600 text-white border-2 border-blue-600'
+                    : 'bg-white text-slate-400 border-2 border-slate-300 hover:border-blue-400 hover:text-blue-600'
+                  }
+                `}
+                aria-label={isCompared ? "Usuń z porównania" : "Dodaj do porównania"}
+              >
+                {isCompared && <Check size={16} strokeWidth={3} />}
+              </button>
+              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-slate-800 text-white text-[11px] whitespace-nowrap opacity-0 peer-hover:opacity-100 transition-opacity z-20">
+                {isCompared ? 'Usuń z porównania' : 'Porównaj placówki'}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
+              </div>
+            </div>
 
             {/* Save Button */}
-            <button
-              onClick={onToggleSave}
-              className={`
-                p-2 rounded-lg transition-all
-                ${isSaved
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-stone-100 text-slate-400 hover:bg-stone-200 hover:text-slate-600'
-                }
-              `}
-              aria-label={isSaved ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
-            >
-              <Heart size={18} className={isSaved ? 'fill-current' : ''} />
-            </button>
+            <div className="relative">
+              <button
+                onClick={onToggleSave}
+                className={`
+                  peer p-2 rounded-lg transition-all
+                  ${isSaved
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-stone-100 text-slate-400 hover:bg-stone-200 hover:text-slate-600'
+                  }
+                `}
+                aria-label={isSaved ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+              >
+                <Heart size={18} className={isSaved ? 'fill-current' : ''} />
+              </button>
+              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-slate-800 text-white text-[11px] whitespace-nowrap opacity-0 peer-hover:opacity-100 transition-opacity z-20">
+                {isSaved ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
+              </div>
+            </div>
 
             {/* Ask AI Button */}
             {onAskAI && (
-              <button
-                onClick={onAskAI}
-                className="p-2 rounded-lg bg-stone-100 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600 transition-all"
-                aria-label="Zapytaj Asystenta AI o tę placówkę"
-                title="Zapytaj Asystenta AI"
-              >
-                <MessageCircle size={18} />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={onAskAI}
+                  className="peer p-2 rounded-lg bg-stone-100 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600 transition-all"
+                  aria-label="Zapytaj Asystenta AI o tę placówkę"
+                >
+                  <MessageCircle size={18} />
+                </button>
+                <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-slate-800 text-white text-[11px] whitespace-nowrap opacity-0 peer-hover:opacity-100 transition-opacity z-20">
+                  Zapytaj Asystenta AI
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
+                </div>
+              </div>
             )}
 
             {/* Arrow indicator */}
