@@ -1152,7 +1152,14 @@ export default function SearchResults({
                       onAskAI={(e) => {
                         e.stopPropagation();
                         window.dispatchEvent(new CustomEvent('askAboutFacility', {
-                          detail: { name: fac.nazwa, city: fac.miejscowosc }
+                          detail: {
+                            name: fac.nazwa,
+                            city: fac.miejscowosc,
+                            type: fac.typ_placowki,
+                            powiat: fac.powiat,
+                            price: fac.koszt_pobytu,
+                            profiles: fac.profil_opieki,
+                          }
                         }));
                       }}
                     />

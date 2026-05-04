@@ -152,10 +152,27 @@ export default function WelcomeWidget() {
   // "Zapytaj Asystenta AI o placówkę" — event z listy wyników
   useEffect(() => {
     function handleAskAboutFacility(e: CustomEvent<{ name: string; city: string }>) {
-      const { name, city } = e.detail
-      const query = languageRef.current === 'en'
-        ? `Tell me more about the facility "${name}" in ${city}`
-        : `Powiedz mi więcej o placówce "${name}" w ${city}`
+      const { name, city, type, powiat, price, profiles } = e.detail as {
+        name: string; city: string; type?: string; powiat?: string;
+        price?: number | null; profiles?: string | null;
+      }
+
+      let query: string
+      if (languageRef.current === 'en') {
+        const typeLabel = type === 'DPS' ? 'Residential Care Home (DPS)' : type === 'ŚDS' ? 'Day Care Center (ŚDS)' : type ?? ''
+        const parts = [`Describe this facility in English: ${typeLabel} "${name}", located in ${city}${powiat ? `, ${powiat} county` : ''}.`]
+        if (price) parts.push(`Monthly cost: ${price} PLN.`)
+        else if (price === 0 || price === null) parts.push('Funded by NFZ (no monthly cost).')
+        if (profiles) parts.push(`Care profiles: ${profiles}.`)
+        parts.push('What type of care does it offer and who is it for?')
+        query = parts.join(' ')
+      } else {
+        const parts = [`Opowiedz mi o placówce "${name}" w ${city}${powiat ? ` (powiat ${powiat})` : ''}.`]
+        if (price) parts.push(`Koszt: ${price} zł/miesiąc.`)
+        if (profiles) parts.push(`Profile opieki: ${profiles}.`)
+        parts.push('Dla kogo jest ta placówka i co oferuje?')
+        query = parts.join(' ')
+      }
       pendingQueryRef.current = query
       setIsOpen(true)
       setView('chat')
