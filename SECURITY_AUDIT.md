@@ -3,8 +3,8 @@
 **Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–13) + 2026-05-03 (rundy 14a–14c) + 2026-05-04 (rundy 14d–14e + TS fixes)  
 **Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution, HSTS, CSV injection, log injection, timing side-channel + SSRF, IDOR, RSC data leak, middleware bypass, business logic  
 **Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → `d6bb83a` (rundy 6–12) + `3050985`, `8735186` (runda 13)  
-**Rundy:** 18 rund zakończonych (14a–14e + TS)  
-**Liczba luk:** 69 (7 krytycznych, 23 wysokich, 24 średnich, 15 niskich)
+**Rundy:** 19 rund zakończonych (14a–14e + TS + 15)  
+**Liczba luk:** 76 (8 krytycznych, 25 wysokich, 27 średnich, 16 niskich)
 
 ### Status rund 14a–14e (nowe kąty ataku — 2026-05-03)
 
@@ -767,6 +767,55 @@ Przeanalizowano `middleware.ts` pod kątem omijania CSP/nonce i ochrony admina. 
 
 ---
 
+---
+
+## Runda 15 — Nowa perspektywa: HTML injection, rate limiting gaps (2026-05-04)
+
+### Wynik: 7 znalezisk, 7 naprawionych
+
+---
+
+#### 70. HTML injection w szablonach emaili admina (KRYTYCZNE)
+**Plik:** `lib/email/partner-inquiry-templates.ts`
+**Problem:** Wszystkie pola z formularza partnera (`name`, `email`, `organization`, `phone`, `message`) były interpolowane do HTML **bez escapowania**. Atakujący składający zapytanie partnerskie mógł wstrzyknąć dowolny HTML do emaila administratora. Szczególnie niebezpieczne:
+- `<a href="tel:${data.phone}">` — pole phone bez walidacji formatu = dowolny payload w href
+- `${data.message}` — 2000 znaków HTML w treści emaila
+- `${data.name}` — w `href="mailto:..."` i treści
+
+Skutki: wyświetlanie fałszywego UI w kliencie pocztowym admina, phishing, w klientach renderujących JavaScript — XSS.
+**Fix:** Funkcja `escapeHtml()` aplikowana do WSZYSTKICH pól user-controlled (treść + atrybuty href). Regex walidacja telefonu `^[0-9+\s\-().]{0,20}$` w Zod schema.
+**Lekcja:** HTML email template z interpolacją stringów = SQL injection poziom emaila. Każde pole zewnętrzne musi być escape'owane.
+
+---
+
+#### 71. `bot-track` — brak rate limitingu od początku audytu
+**Plik:** `app/api/analytics/bot-track/route.ts`
+**Ryzyko:** WYSOKIE
+**Problem:** Endpoint miał walidację `botType`, ale żadnego rate limitingu. Pominięty w poprzednich 14 rundach. Script wysyłający POST z dowolnym botType i dużymi payloadami → zalanie tabeli AppEvent.
+**Fix:** `checkRedisRateLimit(20/60s, 'bot-track')`.
+
+#### 72. `mops/search` — brak rate limitingu i limitu długości query
+**Plik:** `app/api/mops/search/route.ts`
+**Ryzyko:** WYSOKIE
+**Problem:** Query bez górnego limitu długości → `normalizePolish()` + `NFD normalize()` na 1MB stringu = CPU spike (ReDoS). Bez rate limitingu.
+**Fix:** `query.slice(0, 100)` + `checkRedisRateLimit(30/60s, 'mops-search')`.
+
+#### 73. `facilities/[id]/prices` — brak rate limitingu
+**Ryzyko:** ŚREDNIE. **Fix:** `checkRedisRateLimit(30/60s, 'facility-prices')`.
+
+#### 74. `wspolpraca POST` — tylko email-based rate limiting (bypassable)
+**Ryzyko:** ŚREDNIE
+**Problem:** `checkPartnerInquiryRateLimit(email)` — 5/24h per email. Atakujący z nieskończoną liczbą emaili może spamować DB bez ograniczeń.
+**Fix:** Dodano IP-based rate limit jako drugą warstwę: `checkRedisRateLimit(10/3600s, 'wspolpraca')`.
+
+#### 75. `advisor/count` — `powiat` bez limitu długości
+**Ryzyko:** NISKIE. **Fix:** `powiat.slice(0, 100)` przed `contains` query.
+
+#### 76. `placowki/counts` — `console.log` w produkcji
+**Fix:** Usunięto log.
+
+---
+
 ## TODO następna sesja
 
 ### Audit zakończony. Następne kroki — SEO i widoczność
@@ -799,7 +848,8 @@ Zgodnie z CLAUDE.md (sekcja KRYTYCZNE TODO):
 *Runda 14c przeprowadzona: 2026-05-03 | RSC data leak audit (Opus 4.7) | Commit: `ced7e2e`*  
 *Runda 14d przeprowadzona: 2026-05-04 | Middleware bypass — brak krytycznych bypassów*  
 *Runda 14e przeprowadzona: 2026-05-04 | Business logic — share rate limit, app-track regression*  
-*Naprawa TypeScript: 2026-05-04 | 0 błędów w kodzie aplikacji*
+*Naprawa TypeScript: 2026-05-04 | 0 błędów w kodzie aplikacji*  
+*Runda 15 przeprowadzona: 2026-05-04 | HTML injection email + rate limiting gaps (7 naprawionych)*
 
 ---
 
