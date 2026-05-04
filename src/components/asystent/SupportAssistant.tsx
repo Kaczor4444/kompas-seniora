@@ -334,7 +334,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
               Dopasuj pomoc <br/> do potrzeb bliskiej osoby.
             </h2>
             <p className="text-slate-500 text-xl max-w-2xl mx-auto mb-14 leading-relaxed">
-              Odpowiedz na 4 pytania o potrzeby seniora - podpowiemy która forma opieki DPS czy ŚDS będzie właściwa i co zrobić dalej.
+              Odpowiedz na 4 pytania o potrzeby seniora - podpowiemy która forma opieki DPS czy ŚDS będzie właściwa.
             </p>
             <button
               onClick={() => handleNext('who')}
