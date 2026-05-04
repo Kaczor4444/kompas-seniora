@@ -32,7 +32,7 @@ export default function Footer() {
               </div>
               
               <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                Twój rzetelny przewodnik po systemie opieki senioralnej. Łączymy sprawdzone dane z ludzkim podejściem.
+                Twój rzetelny przewodnik po systemie opieki senioralnej w Małopolsce. Łączymy sprawdzone dane z ludzkim podejściem.
               </p>
 
               <a
