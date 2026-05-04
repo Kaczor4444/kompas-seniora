@@ -12,11 +12,11 @@ import {
   PhoneIcon,
   HeartIcon,
 } from '@heroicons/react/24/outline';
-import { Icon as IconifyIcon } from '@iconify/react';
+import QuestionnaireIconSvg from './icons/QuestionnaireIcon';
 import { getFavoritesCount } from '@/src/utils/favorites';
 
 const QuestionnaireIcon = ({ className }: { className?: string }) => (
-  <IconifyIcon icon="tdesign:questionnaire-double-filled" className={className} width={24} height={24} />
+  <QuestionnaireIconSvg size={24} className={className} />
 );
 
 interface MobileMenuProps {
