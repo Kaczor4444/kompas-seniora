@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import {
-  ArrowRight, Sparkles, ShieldCheck, Building2, ChevronRight,
+  ArrowRight, ClipboardList, ShieldCheck, Building2, ChevronRight,
   Calculator, RefreshCw
 } from 'lucide-react';
 import { SearchBar } from '@/src/components/search/SearchBar';
@@ -127,7 +127,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg bg-white/10 text-emerald-400 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                  <Sparkles size={20} strokeWidth={2.5} />
+                  <ClipboardList size={20} strokeWidth={2.5} />
                 </div>
                 <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Sztuczna Inteligencja</span>
               </div>
