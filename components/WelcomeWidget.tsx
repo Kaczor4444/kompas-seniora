@@ -79,7 +79,7 @@ export default function WelcomeWidget() {
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const cachedVoiceRef = useRef<SpeechSynthesisVoice | null>(null)
-  const pendingQueryRef = useRef<string | null>(null)
+  const [pendingQuery, setPendingQuery] = useState<string | null>(null)
   const sendMessageRef = useRef<((text?: string) => void) | null>(null)
   const languageRef = useRef<Language>('pl')
   const router = useRouter()
@@ -173,7 +173,7 @@ export default function WelcomeWidget() {
         parts.push('Dla kogo jest ta placówka i co oferuje?')
         query = parts.join(' ')
       }
-      pendingQueryRef.current = query
+      setPendingQuery(query)
       setIsOpen(true)
       setView('chat')
       if (!sessionStart) setSessionStart(Date.now())
@@ -184,12 +184,12 @@ export default function WelcomeWidget() {
 
   // Wykonaj pending query gdy widget jest otwarty i gotowy
   useEffect(() => {
-    if (isOpen && view === 'chat' && pendingQueryRef.current && !loading) {
-      const q = pendingQueryRef.current
-      pendingQueryRef.current = null
+    if (isOpen && view === 'chat' && pendingQuery && !loading) {
+      const q = pendingQuery
+      setPendingQuery(null)
       setTimeout(() => sendMessageRef.current?.(q), 150)
     }
-  }, [isOpen, view, loading])
+  }, [isOpen, view, loading, pendingQuery])
 
   // Auto-open chat when chatbot opens
   useEffect(() => {
