@@ -4,8 +4,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Search, Calculator, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Heart } from 'lucide-react';
+import { Search, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Heart } from 'lucide-react';
 import QuestionnaireIcon from './icons/QuestionnaireIcon';
+import AccountingCalculatorIcon from './icons/AccountingCalculatorIcon';
 import { getFavoritesCount } from '@/src/utils/favorites';
 import { AccessibilityPanel } from './AccessibilityPanel';
 
@@ -300,7 +301,7 @@ export default function Navbar() {
               </Link>
 
               <Link href="/kalkulator">
-                <NavLink isHighContrast={isHighContrast} icon={<Calculator size={18} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
+                <NavLink isHighContrast={isHighContrast} icon={<AccountingCalculatorIcon size={18} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
               </Link>
 
               <Link href="/asystent">
@@ -427,7 +428,7 @@ export default function Navbar() {
               </Link>
 
               <Link href="/kalkulator" onClick={() => setIsOpen(false)} className="w-full block">
-                <MobileNavLink isHighContrast={isHighContrast} icon={<Calculator size={20} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
+                <MobileNavLink isHighContrast={isHighContrast} icon={<AccountingCalculatorIcon size={20} />} text="Kalkulator" isActive={isActive('/kalkulator')} />
               </Link>
 
               <Link href="/asystent" onClick={() => setIsOpen(false)} className="w-full block">

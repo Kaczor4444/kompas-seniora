@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import {
   HomeIcon,
   MagnifyingGlassIcon,
-  CalculatorIcon,
   BookOpenIcon,
   EnvelopeIcon,
   XMarkIcon,
@@ -13,10 +12,14 @@ import {
   HeartIcon,
 } from '@heroicons/react/24/outline';
 import QuestionnaireIconSvg from './icons/QuestionnaireIcon';
+import AccountingCalculatorIconSvg from './icons/AccountingCalculatorIcon';
 import { getFavoritesCount } from '@/src/utils/favorites';
 
 const QuestionnaireIcon = ({ className }: { className?: string }) => (
   <QuestionnaireIconSvg size={24} className={className} />
+);
+const CalcIcon = ({ className }: { className?: string }) => (
+  <AccountingCalculatorIconSvg size={24} className={className} />
 );
 
 interface MobileMenuProps {
@@ -70,7 +73,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { href: '/search', label: 'Wyszukiwarka', icon: MagnifyingGlassIcon },
     { href: '/ulubione', label: 'Ulubione', icon: HeartIcon },
     { href: '/asystent', label: 'Asystent', icon: QuestionnaireIcon },
-    { href: '/kalkulator', label: 'Kalkulator', icon: CalculatorIcon },
+    { href: '/kalkulator', label: 'Kalkulator', icon: CalcIcon },
     { href: '/poradniki', label: 'Poradniki', icon: BookOpenIcon },
     { href: '/kontakt', label: 'Kontakt', icon: EnvelopeIcon },
   ];
