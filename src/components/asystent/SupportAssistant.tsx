@@ -136,7 +136,6 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     if (answers.diagnosis === 'demencja' || answers.diagnosis === 'ruchowa') return 'DPS';
     if (answers.independence === 'red' || answers.mode === 'full') return 'DPS';
     if (answers.mode === 'day' && (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'upośledzenie')) return 'ŚDS';
-    if (answers.mode === 'day' && answers.independence === 'green') return 'ŚDS';
     return null;
   }, [answers.diagnosis, answers.mode, answers.independence]);
 
@@ -236,13 +235,10 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     if (answers.independence === 'red') return 'DPS';
     // Full-time mode → DPS
     if (answers.mode === 'full') return 'DPS';
-    // ŚDS: psychiatric or intellectual disability + day mode (statutory criteria)
+    // ŚDS: ONLY for qualifying diagnoses (statutory requirement) + day mode
     if (answers.mode === 'day' && (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'upośledzenie')) return 'ŚDS';
-    // ŚDS: fully independent, needs day activities
-    if (answers.mode === 'day' && answers.independence === 'green') return 'ŚDS';
-    // Unknown mode or no clear diagnosis → recommend MOPS consultation
-    if (answers.mode === 'unknown' || !answers.mode) return 'mops';
-    return 'DPS';
+    // Everything else (day without qualifying diagnosis, unknown mode) → MOPS consultation
+    return 'mops';
   }, [answers]);
 
   const handleDownloadPlan = () => {
