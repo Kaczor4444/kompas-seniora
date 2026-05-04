@@ -340,7 +340,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
               onClick={() => handleNext('who')}
               className="w-full sm:w-auto mx-auto bg-primary-600 text-white px-14 py-6 rounded-2xl font-black text-sm uppercase tracking-[0.2em] hover:bg-primary-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-4 group"
             >
-              Rozpocznij analizę <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              Rozpocznij <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         );
