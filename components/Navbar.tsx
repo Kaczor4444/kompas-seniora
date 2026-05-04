@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Search, Calculator, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, ClipboardList, Heart } from 'lucide-react';
+import { Search, Calculator, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Heart } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { getFavoritesCount } from '@/src/utils/favorites';
 import { AccessibilityPanel } from './AccessibilityPanel';
 
@@ -303,7 +304,7 @@ export default function Navbar() {
               </Link>
 
               <Link href="/asystent">
-                <NavLink isHighContrast={isHighContrast} icon={<ClipboardList size={18} />} text="Asystent" isActive={isActive('/asystent')} />
+                <NavLink isHighContrast={isHighContrast} icon={<Icon icon="tdesign:questionnaire-double-filled" width={18} height={18} />} text="Asystent" isActive={isActive('/asystent')} />
               </Link>
 
               <Link
@@ -430,7 +431,7 @@ export default function Navbar() {
               </Link>
 
               <Link href="/asystent" onClick={() => setIsOpen(false)} className="w-full block">
-                <MobileNavLink isHighContrast={isHighContrast} icon={<ClipboardList size={20} />} text="Asystent" isActive={isActive('/asystent')} />
+                <MobileNavLink isHighContrast={isHighContrast} icon={<Icon icon="tdesign:questionnaire-double-filled" width={20} height={20} />} text="Asystent" isActive={isActive('/asystent')} />
               </Link>
 
               <Link

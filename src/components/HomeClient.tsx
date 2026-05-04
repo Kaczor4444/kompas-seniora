@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ClipboardDocumentListIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Icon as IconifyIcon } from '@iconify/react';
 import MiniFAQSection from './faq/MiniFAQSection';
 import NewsletterSection from './newsletter/NewsletterSection';
 import KnowledgeCenter from './knowledge/KnowledgeCenter';
@@ -125,7 +126,7 @@ export default function HomeClient({ totalFacilities, powiatCounts, featuredArti
               <div>
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                    <ClipboardDocumentListIcon className="w-6 h-6" />
+                    <IconifyIcon icon="tdesign:questionnaire-double-filled" width={24} height={24} />
                   </div>
                   <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.25em]">Sztuczna inteligencja</span>
                 </div>

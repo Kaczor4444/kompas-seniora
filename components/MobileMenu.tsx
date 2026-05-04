@@ -11,9 +11,13 @@ import {
   XMarkIcon,
   PhoneIcon,
   HeartIcon,
-  ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline';
+import { Icon as IconifyIcon } from '@iconify/react';
 import { getFavoritesCount } from '@/src/utils/favorites';
+
+const QuestionnaireIcon = ({ className }: { className?: string }) => (
+  <IconifyIcon icon="tdesign:questionnaire-double-filled" className={className} width={24} height={24} />
+);
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -65,7 +69,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { href: '/', label: 'Strona główna', icon: HomeIcon },
     { href: '/search', label: 'Wyszukiwarka', icon: MagnifyingGlassIcon },
     { href: '/ulubione', label: 'Ulubione', icon: HeartIcon },
-    { href: '/asystent', label: 'Asystent', icon: ClipboardDocumentListIcon },
+    { href: '/asystent', label: 'Asystent', icon: QuestionnaireIcon },
     { href: '/kalkulator', label: 'Kalkulator', icon: CalculatorIcon },
     { href: '/poradniki', label: 'Poradniki', icon: BookOpenIcon },
     { href: '/kontakt', label: 'Kontakt', icon: EnvelopeIcon },
