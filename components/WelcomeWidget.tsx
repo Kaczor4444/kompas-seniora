@@ -756,16 +756,7 @@ export default function WelcomeWidget() {
                     <RotateCcw size={14} />
                   </button>
                   <button
-                    onClick={() => {
-                      const newLang = language === 'pl' ? 'en' : 'pl'
-                      setLanguage(newLang)
-                      setMessages([{
-                        role: 'assistant',
-                        content: t(newLang, 'chatbot.welcome'),
-                        actions: [],
-                      }])
-                      setHasInteracted(false)
-                    }}
+                    onClick={() => setLanguage(lang => lang === 'pl' ? 'en' : 'pl')}
                     title={language === 'pl' ? 'Switch to English' : 'Przełącz na polski'}
                     aria-label={language === 'pl' ? 'Switch to English' : 'Przełącz na polski'}
                     className="flex items-center gap-0.5 bg-slate-700 hover:bg-slate-600 rounded-full px-1.5 py-0.5 transition-colors"
