@@ -104,6 +104,7 @@ export default function WelcomeWidget() {
   const [pendingQuery, setPendingQuery] = useState<string | null>(null)
   const sendMessageRef = useRef<((text?: string) => void) | null>(null)
   const languageRef = useRef<Language>('pl')
+  const facilityCache = useRef<{ pl?: Message[], en?: Message[] }>({})
   const lastFacilityRef = useRef<{
     name: string; city: string; type?: string; powiat?: string;
     price?: number | null; profiles?: string | null;
@@ -183,6 +184,7 @@ export default function WelcomeWidget() {
         price?: number | null; profiles?: string | null;
       }
       lastFacilityRef.current = facility
+      facilityCache.current = {} // nowa placówka = czyść cache
       setPendingQuery(buildFacilityQuery(facility, languageRef.current))
       setIsOpen(true)
       setView('chat')
@@ -200,6 +202,13 @@ export default function WelcomeWidget() {
       setTimeout(() => sendMessageRef.current?.(q), 150)
     }
   }, [isOpen, view, loading, pendingQuery])
+
+  // Zapisz odpowiedź do cache gdy stream się skończy (facility mode)
+  useEffect(() => {
+    if (!loading && lastFacilityRef.current && messages.length >= 2) {
+      facilityCache.current[language] = [...messages]
+    }
+  }, [loading])
 
   // Auto-open chat when chatbot opens
   useEffect(() => {
@@ -770,9 +779,17 @@ export default function WelcomeWidget() {
                       const newLang = language === 'pl' ? 'en' : 'pl'
                       setLanguage(newLang)
                       if (lastFacilityRef.current) {
-                        setMessages([])
-                        setHasInteracted(false)
-                        setPendingQuery(buildFacilityQuery(lastFacilityRef.current, newLang))
+                        const cached = facilityCache.current[newLang]
+                        if (cached) {
+                          // Cache hit — zero tokenów
+                          setMessages(cached)
+                          setHasInteracted(true)
+                        } else {
+                          // Cache miss — nowy API call
+                          setMessages([])
+                          setHasInteracted(false)
+                          setPendingQuery(buildFacilityQuery(lastFacilityRef.current, newLang))
+                        }
                       }
                     }}
                     title={language === 'pl' ? 'Switch to English' : 'Przełącz na polski'}
