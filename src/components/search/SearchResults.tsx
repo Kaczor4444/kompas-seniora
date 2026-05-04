@@ -1149,6 +1149,12 @@ export default function SearchResults({
                         window.dispatchEvent(new Event("favoritesChanged"));
                       }}
                       onToggleCompare={(e) => toggleCompare(fac.id, e)}
+                      onAskAI={(e) => {
+                        e.stopPropagation();
+                        window.dispatchEvent(new CustomEvent('askAboutFacility', {
+                          detail: { name: fac.nazwa, city: fac.miejscowosc }
+                        }));
+                      }}
                     />
                   ))}
 

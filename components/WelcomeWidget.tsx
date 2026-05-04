@@ -77,8 +77,10 @@ export default function WelcomeWidget() {
   const [showTooltip, setShowTooltip] = useState(false) // Onboarding tooltip
   const [language, setLanguage] = useState<Language>('pl') // Language (pl/en)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null) // For auto-focus
-  const cachedVoiceRef = useRef<SpeechSynthesisVoice | null>(null) // Cache best voice
+  const inputRef = useRef<HTMLInputElement>(null)
+  const cachedVoiceRef = useRef<SpeechSynthesisVoice | null>(null)
+  const pendingQueryRef = useRef<string | null>(null)
+  const sendMessageRef = useRef<((text?: string) => void) | null>(null)
   const router = useRouter()
   const analytics = useChatbotAnalytics()
 
@@ -145,6 +147,28 @@ export default function WelcomeWidget() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, sessionStart, analytics])
+
+  // "Zapytaj Asystenta AI o placówkę" — event z listy wyników
+  useEffect(() => {
+    function handleAskAboutFacility(e: CustomEvent<{ name: string; city: string }>) {
+      const query = `Powiedz mi więcej o placówce "${e.detail.name}" w ${e.detail.city}`
+      pendingQueryRef.current = query
+      setIsOpen(true)
+      setView('chat')
+      if (!sessionStart) setSessionStart(Date.now())
+    }
+    window.addEventListener('askAboutFacility', handleAskAboutFacility as EventListener)
+    return () => window.removeEventListener('askAboutFacility', handleAskAboutFacility as EventListener)
+  }, [sessionStart])
+
+  // Wykonaj pending query gdy widget jest otwarty i gotowy
+  useEffect(() => {
+    if (isOpen && view === 'chat' && pendingQueryRef.current && !loading) {
+      const q = pendingQueryRef.current
+      pendingQueryRef.current = null
+      setTimeout(() => sendMessageRef.current?.(q), 150)
+    }
+  }, [isOpen, view, loading])
 
   // Auto-open chat when chatbot opens
   useEffect(() => {
@@ -444,6 +468,9 @@ export default function WelcomeWidget() {
       clearTimeout(timeoutId)
     }
   }
+
+  // Keep ref in sync so pendingQuery effect can call latest version
+  sendMessageRef.current = sendMessage
 
   function handleAction(action: Action) {
     const trackableType = action.type === 'kalkulator' ? 'search' : action.type

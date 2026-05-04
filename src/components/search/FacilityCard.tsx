@@ -1,7 +1,7 @@
 // src/components/search/FacilityCard.tsx
 // ✅ SIMPLIFIED & FLATTENED - No image, compact layout
 import React from 'react';
-import { MapPin, Heart, Navigation, ChevronRight, Check } from 'lucide-react';
+import { MapPin, Heart, Navigation, ChevronRight, Check, MessageCircle } from 'lucide-react';
 import { estimateDriveTime } from '@/src/utils/distance';
 
 interface FacilityCardProps {
@@ -26,6 +26,7 @@ interface FacilityCardProps {
   onClick: () => void;
   onToggleSave: (e: React.MouseEvent) => void;
   onToggleCompare: (e: React.MouseEvent) => void;
+  onAskAI?: (e: React.MouseEvent) => void;
   userLocation?: { lat: number; lng: number };
 }
 
@@ -38,6 +39,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
   onClick,
   onToggleSave,
   onToggleCompare,
+  onAskAI,
   userLocation
 }) => {
   return (
@@ -133,6 +135,18 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
             >
               <Heart size={18} className={isSaved ? 'fill-current' : ''} />
             </button>
+
+            {/* Ask AI Button */}
+            {onAskAI && (
+              <button
+                onClick={onAskAI}
+                className="p-2 rounded-lg bg-stone-100 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600 transition-all"
+                aria-label="Zapytaj Asystenta AI o tę placówkę"
+                title="Zapytaj Asystenta AI"
+              >
+                <MessageCircle size={18} />
+              </button>
+            )}
 
             {/* Arrow indicator */}
             <div className="text-slate-300 group-hover:text-emerald-600 transition-all group-hover:translate-x-1">
