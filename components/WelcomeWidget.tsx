@@ -81,6 +81,7 @@ export default function WelcomeWidget() {
   const cachedVoiceRef = useRef<SpeechSynthesisVoice | null>(null)
   const pendingQueryRef = useRef<string | null>(null)
   const sendMessageRef = useRef<((text?: string) => void) | null>(null)
+  const languageRef = useRef<Language>('pl')
   const router = useRouter()
   const analytics = useChatbotAnalytics()
 
@@ -151,7 +152,10 @@ export default function WelcomeWidget() {
   // "Zapytaj Asystenta AI o placówkę" — event z listy wyników
   useEffect(() => {
     function handleAskAboutFacility(e: CustomEvent<{ name: string; city: string }>) {
-      const query = `Powiedz mi więcej o placówce "${e.detail.name}" w ${e.detail.city}`
+      const { name, city } = e.detail
+      const query = languageRef.current === 'en'
+        ? `Tell me more about the facility "${name}" in ${city}`
+        : `Powiedz mi więcej o placówce "${name}" w ${city}`
       pendingQueryRef.current = query
       setIsOpen(true)
       setView('chat')
@@ -469,8 +473,9 @@ export default function WelcomeWidget() {
     }
   }
 
-  // Keep ref in sync so pendingQuery effect can call latest version
+  // Keep refs in sync each render
   sendMessageRef.current = sendMessage
+  languageRef.current = language
 
   function handleAction(action: Action) {
     const trackableType = action.type === 'kalkulator' ? 'search' : action.type
