@@ -1,10 +1,11 @@
 # Security Audit — Kompas Seniora
 
-**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–13) + 2026-05-03 (rundy 14a–14c) + 2026-05-04 (rundy 14d–14e + TS fixes)  
-**Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution, HSTS, CSV injection, log injection, timing side-channel + SSRF, IDOR, RSC data leak, middleware bypass, business logic  
-**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → `d6bb83a` (rundy 6–12) + `3050985`, `8735186` (runda 13)  
-**Rundy:** 19 rund zakończonych (14a–14e + TS + 15)  
-**Liczba luk:** 76 (8 krytycznych, 25 wysokich, 27 średnich, 16 niskich)
+**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–13) + 2026-05-03 (rundy 14a–14c) + 2026-05-04 (rundy 14d–14e + TS + runda 15)  
+**Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution, HSTS, CSV injection, log injection, timing side-channel + SSRF, IDOR, RSC data leak, middleware bypass, business logic, HTML injection email, rate limiting gaps  
+**Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → `d6bb83a` (rundy 6–12) + `3050985`, `8735186` (runda 13) + `9264b9e` (rundy 14d–14e + TS) + `9d28d56`, `8b78b6b` (runda 15)  
+**Rundy:** 19 rund zakończonych  
+**Liczba luk:** 76 (8 krytycznych, 25 wysokich, 27 średnich, 16 niskich) — wszystkie naprawione  
+**TypeScript:** 0 błędów w kodzie aplikacji (app/, src/, hooks/, lib/, components/)
 
 ### Status rund 14a–14e (nowe kąty ataku — 2026-05-03)
 
