@@ -12,7 +12,7 @@ export const translations = {
       clearChat: 'Wyczyść czat',
       retry: 'Spróbuj ponownie',
       searching: 'Szukam...',
-      welcome: 'Cześć! Jestem Ola 👋\n\nPomogę Ci znaleźć DPS lub ŚDS w Małopolsce i odpowiem na pytania o opiekę nad seniorem.\n\nWybierz temat z listy lub zadaj swoje pytanie:',
+      welcome: 'Cześć! Jestem asystentem AI Kompas Seniora 🧭\n\nPomogę Ci znaleźć DPS lub ŚDS w Małopolsce i odpowiem na pytania o opiekę nad seniorem.\n\nWybierz temat z listy lub zadaj swoje pytanie:',
       tooltip: {
         title: '💡 Zapytaj mnie o placówki!',
         example: 'Np. "Szukam DPS w Krakowie" lub "Ile kosztuje pobyt?"',
@@ -43,7 +43,7 @@ export const translations = {
       clearChat: 'Clear chat',
       retry: 'Try again',
       searching: 'Searching...',
-      welcome: 'Hi! I\'m Ola 👋\n\nI can help you find nursing homes (DPS) or day care centers (ŚDS) in Lesser Poland and answer questions about senior care.\n\nChoose a topic from the list or ask your question:',
+      welcome: 'Hi! I\'m the Kompas Seniora AI assistant 🧭\n\nI can help you find nursing homes (DPS) or day care centers (ŚDS) in Lesser Poland and answer questions about senior care.\n\nChoose a topic from the list or ask your question:',
       tooltip: {
         title: '💡 Ask me about facilities!',
         example: 'E.g., "Looking for nursing home in Krakow" or "How much does it cost?"',

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Volume2, VolumeX, Calculator, Globe } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Volume2, VolumeX, Calculator, Globe, Compass } from 'lucide-react'
 import { useChatbotAnalytics } from '@/src/hooks/useChatbotAnalytics'
 import { translations, t, type Language } from '@/lib/translations'
 
@@ -737,11 +737,9 @@ export default function WelcomeWidget() {
               )}
               {view === 'chat' && (
                 <div className="relative flex-shrink-0">
-                  <img
-                    src="/images/advisor-sm.webp"
-                    alt="Ola"
-                    className="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-500"
-                  />
+                  <div className="w-9 h-9 rounded-full bg-emerald-600 ring-2 ring-emerald-500 flex items-center justify-center">
+                    <Compass size={18} className="text-white" />
+                  </div>
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-900" />
                 </div>
               )}
@@ -1245,11 +1243,9 @@ export default function WelcomeWidget() {
             <X size={20} className="text-slate-700" />
           </div>
         ) : (
-          <img
-            src="/images/advisor-sm.webp"
-            alt="Doradca"
-            className="w-full h-full object-cover"
-          />
+          <div className="w-full h-full bg-emerald-600 flex items-center justify-center">
+            <Compass size={26} className="text-white" />
+          </div>
         )}
       </button>
     </div>
