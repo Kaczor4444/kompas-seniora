@@ -1,7 +1,7 @@
 // src/components/search/FacilityCard.tsx
 // ✅ SIMPLIFIED & FLATTENED - No image, compact layout
 import React from 'react';
-import { MapPin, Heart, Navigation, ChevronRight, Check, MessageCircle } from 'lucide-react';
+import { MapPin, Heart, Navigation, ChevronRight, ArrowLeftRight, MessageCircle } from 'lucide-react';
 import { estimateDriveTime } from '@/src/utils/distance';
 
 interface FacilityCardProps {
@@ -109,15 +109,15 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               <button
                 onClick={onToggleCompare}
                 className={`
-                  peer w-7 h-7 rounded-md transition-all flex items-center justify-center
+                  peer p-2 rounded-lg transition-all
                   ${isCompared
-                    ? 'bg-blue-600 text-white border-2 border-blue-600'
-                    : 'bg-white text-slate-400 border-2 border-slate-300 hover:border-blue-400 hover:text-blue-600'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-stone-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600'
                   }
                 `}
                 aria-label={isCompared ? "Usuń z porównania" : "Dodaj do porównania"}
               >
-                {isCompared && <Check size={16} strokeWidth={3} />}
+                <ArrowLeftRight size={18} />
               </button>
               <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-slate-800 text-white text-[11px] whitespace-nowrap opacity-0 peer-hover:opacity-100 transition-opacity z-20">
                 {isCompared ? 'Usuń z porównania' : 'Porównaj placówki'}
