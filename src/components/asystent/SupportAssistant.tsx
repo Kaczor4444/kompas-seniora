@@ -16,7 +16,7 @@ async function trackAdvisorEvent(eventType: string, metadata: Record<string, unk
 import {
   ChevronRight, ArrowLeft, Heart, Sun, Moon,
   MapPin, ClipboardList, CheckCircle2,
-  Download, Sparkles, Building2, Info,
+  Download, HelpCircle, Star, Building2, Info,
   User, UserCheck, RotateCcw, MessageSquare,
   Check, AlertCircle, Search, ArrowUpRight,
   Share2, ShieldCheck, Clock, Brain, 
@@ -331,7 +331,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
         return (
           <div className="text-center py-20 px-6 animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-[10px] font-black uppercase tracking-widest mb-10 border border-primary-100">
-               <Sparkles size={14} className="text-primary-500" /> Inteligentny Asystent Wyboru
+               <HelpCircle size={14} className="text-primary-500" /> Inteligentny Asystent Wyboru
             </div>
             <h2 className="text-4xl md:text-7xl font-black text-slate-900 mb-8 leading-tight tracking-tight">
               Dopasuj pomoc <br/> do potrzeb bliskiej osoby.
@@ -541,7 +541,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                    <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-primary-500/10 rounded-full blur-[80px] md:blur-[120px] -mr-20 md:-mr-40 -mt-20 md:-mt-40" />
                    <div className="relative z-10 max-w-4xl">
                       <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-500/20 text-primary-400 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 md:mb-8 border border-primary-500/20">
-                         <Sparkles size={14} /> Polecamy
+                         <Star size={14} /> Polecamy
                       </div>
                       <h3 className="text-3xl md:text-6xl lg:text-7xl font-black mb-4 md:mb-8 leading-tight tracking-tight">
                          Najlepsza opcja to <br className="hidden md:block" />
