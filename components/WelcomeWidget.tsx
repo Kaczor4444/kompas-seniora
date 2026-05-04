@@ -59,6 +59,28 @@ function isValidStoredMessages(data: unknown): data is Message[] {
   )
 }
 
+type FacilityDetail = {
+  name: string; city: string; type?: string; powiat?: string;
+  price?: number | null; profiles?: string | null;
+}
+
+function buildFacilityQuery(f: FacilityDetail, lang: Language): string {
+  if (lang === 'en') {
+    const typeLabel = f.type === 'DPS' ? 'Residential Care Home (DPS)' : f.type === 'ŚDS' ? 'Day Care Center (ŚDS)' : f.type ?? ''
+    const parts = [`Describe this facility in English: ${typeLabel} "${f.name}", located in ${f.city}${f.powiat ? `, ${f.powiat} county` : ''}.`]
+    if (f.price) parts.push(`Monthly cost: ${f.price} PLN.`)
+    else if (f.price === 0 || f.price === null) parts.push('Funded by NFZ (no monthly cost).')
+    if (f.profiles) parts.push(`Care profiles: ${f.profiles}.`)
+    parts.push('What type of care does it offer and who is it for?')
+    return parts.join(' ')
+  }
+  const parts = [`Opowiedz mi o placówce "${f.name}" w ${f.city}${f.powiat ? ` (powiat ${f.powiat})` : ''}.`]
+  if (f.price) parts.push(`Koszt: ${f.price} zł/miesiąc.`)
+  if (f.profiles) parts.push(`Profile opieki: ${f.profiles}.`)
+  parts.push('Dla kogo jest ta placówka i co oferuje?')
+  return parts.join(' ')
+}
+
 export default function WelcomeWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [view, setView] = useState<View>('chat') // Default to chat
@@ -82,6 +104,10 @@ export default function WelcomeWidget() {
   const [pendingQuery, setPendingQuery] = useState<string | null>(null)
   const sendMessageRef = useRef<((text?: string) => void) | null>(null)
   const languageRef = useRef<Language>('pl')
+  const lastFacilityRef = useRef<{
+    name: string; city: string; type?: string; powiat?: string;
+    price?: number | null; profiles?: string | null;
+  } | null>(null)
   const router = useRouter()
   const analytics = useChatbotAnalytics()
 
@@ -152,28 +178,12 @@ export default function WelcomeWidget() {
   // "Zapytaj Asystenta AI o placówkę" — event z listy wyników
   useEffect(() => {
     function handleAskAboutFacility(e: CustomEvent<{ name: string; city: string }>) {
-      const { name, city, type, powiat, price, profiles } = e.detail as {
+      const facility = e.detail as {
         name: string; city: string; type?: string; powiat?: string;
         price?: number | null; profiles?: string | null;
       }
-
-      let query: string
-      if (languageRef.current === 'en') {
-        const typeLabel = type === 'DPS' ? 'Residential Care Home (DPS)' : type === 'ŚDS' ? 'Day Care Center (ŚDS)' : type ?? ''
-        const parts = [`Describe this facility in English: ${typeLabel} "${name}", located in ${city}${powiat ? `, ${powiat} county` : ''}.`]
-        if (price) parts.push(`Monthly cost: ${price} PLN.`)
-        else if (price === 0 || price === null) parts.push('Funded by NFZ (no monthly cost).')
-        if (profiles) parts.push(`Care profiles: ${profiles}.`)
-        parts.push('What type of care does it offer and who is it for?')
-        query = parts.join(' ')
-      } else {
-        const parts = [`Opowiedz mi o placówce "${name}" w ${city}${powiat ? ` (powiat ${powiat})` : ''}.`]
-        if (price) parts.push(`Koszt: ${price} zł/miesiąc.`)
-        if (profiles) parts.push(`Profile opieki: ${profiles}.`)
-        parts.push('Dla kogo jest ta placówka i co oferuje?')
-        query = parts.join(' ')
-      }
-      setPendingQuery(query)
+      lastFacilityRef.current = facility
+      setPendingQuery(buildFacilityQuery(facility, languageRef.current))
       setIsOpen(true)
       setView('chat')
       if (!sessionStart) setSessionStart(Date.now())
@@ -756,7 +766,15 @@ export default function WelcomeWidget() {
                     <RotateCcw size={14} />
                   </button>
                   <button
-                    onClick={() => setLanguage(lang => lang === 'pl' ? 'en' : 'pl')}
+                    onClick={() => {
+                      const newLang = language === 'pl' ? 'en' : 'pl'
+                      setLanguage(newLang)
+                      if (lastFacilityRef.current) {
+                        setMessages([])
+                        setHasInteracted(false)
+                        setPendingQuery(buildFacilityQuery(lastFacilityRef.current, newLang))
+                      }
+                    }}
                     title={language === 'pl' ? 'Switch to English' : 'Przełącz na polski'}
                     aria-label={language === 'pl' ? 'Switch to English' : 'Przełącz na polski'}
                     className="flex items-center gap-0.5 bg-slate-700 hover:bg-slate-600 rounded-full px-1.5 py-0.5 transition-colors"
