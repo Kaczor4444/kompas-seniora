@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   const cityKey = data.city.trim().toLowerCase();
 
   // Sprawdź duplikat
-  const existing = await prisma.mopsContact.findUnique({ where: { city: cityKey } });
+  const existing = await prisma.mopsContact.findFirst({ where: { city: cityKey } });
   if (existing) {
     return NextResponse.json({ error: `Już istnieje wpis dla miasta "${existing.cityDisplay}"` }, { status: 409 });
   }

@@ -12,8 +12,8 @@ import toast from 'react-hot-toast';
 // Zod validation schema (ten sam co w dodaj)
 const placowkaSchema = z.object({
   nazwa: z.string().min(3, 'Minimum 3 znaki').max(200, 'Maksimum 200 znaków'),
-  typ_placowki: z.enum(['DPS', 'ŚDS'], {
-    required_error: 'Wybierz typ placówki',
+  typ_placowki: z.enum(['DPS', 'ŚDS'] as const, {
+    error: 'Wybierz typ placówki',
   }),
   prowadzacy: z.string().optional(),
   miejscowosc: z.string().min(2, 'Wymagane'),
@@ -49,7 +49,7 @@ const placowkaSchema = z.object({
   data_weryfikacji: z.string().optional(),
   notatki: z.string().optional(),
   
-  verified: z.boolean().default(false),
+  verified: z.boolean(),
 });
 
 type PlacowkaFormData = z.infer<typeof placowkaSchema>;
@@ -71,7 +71,7 @@ export default function EdytujPlacowkePage() {
     setValue,
     reset,
   } = useForm<PlacowkaFormData>({
-    resolver: zodResolver(placowkaSchema),
+    resolver: zodResolver(placowkaSchema) as any,
   });
 
   const telefon = watch('telefon');

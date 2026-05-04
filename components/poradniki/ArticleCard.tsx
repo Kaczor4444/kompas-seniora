@@ -24,10 +24,10 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         />
 
         {/* Featured Badge */}
-        {article.featured && !isPlaceholder && (
+        {article.badge && article.badge !== 'WKRÓTCE' && !isPlaceholder && (
           <div className="absolute top-3 right-3">
             <span className="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-              POLECANY
+              {article.badge}
             </span>
           </div>
         )}

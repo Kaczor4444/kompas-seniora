@@ -173,7 +173,7 @@ export async function PUT(
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Błąd walidacji danych', details: error.errors },
+        { error: 'Błąd walidacji danych', details: error.issues },
         { status: 400 }
       );
     }

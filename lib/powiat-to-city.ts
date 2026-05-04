@@ -37,7 +37,6 @@ export const powiatToCity: Record<string, string> = {
   'myślenice': 'myślenice',
   'nowosądecki': 'nowy sącz',
   'nowosadecki': 'nowy sącz',
-  'nowy sącz': 'nowy sącz',
   'nowy sacz': 'nowy sącz',
   'nowotarski': 'nowy targ',
   'nowatorski': 'nowy targ', // typo w bazie

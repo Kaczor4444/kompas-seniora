@@ -203,7 +203,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({ activeTab, o
                           ? `bg-white ${activeIconColor}`
                           : 'bg-stone-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700'
                       }`} aria-hidden="true">
-                        {React.cloneElement(cat.icon as React.ReactElement, { size: 20 })}
+                        {React.cloneElement(cat.icon as React.ReactElement<{ size?: number }>, { size: 20 })}
                       </div>
 
                       <h4 className={`font-bold text-xs leading-tight mb-1 ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>

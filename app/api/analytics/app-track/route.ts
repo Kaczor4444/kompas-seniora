@@ -50,13 +50,22 @@ export async function POST(request: NextRequest) {
       data: {
         eventType,
         language: language || null,
-        metadata: metadata ? JSON.parse(JSON.stringify(metadata).slice(0, 2000)) : undefined,
+        metadata: (() => {
+          if (!metadata) return undefined;
+          try {
+            const str = JSON.stringify(metadata);
+            if (str.length > 2000) return { _truncated: true };
+            return metadata;
+          } catch {
+            return undefined;
+          }
+        })(),
       },
     });
 
     return NextResponse.json({ success: true, eventId: event.id });
   } catch (error) {
-    console.error('App analytics track error:', error);
+    if (process.env.NODE_ENV === 'development') console.error('App analytics track error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,4 +1,4 @@
-import { ProfilOpiekiKod } from './profileopieki';
+import { ProfileOpiekiKod as ProfilOpiekiKod } from './profileopieki';
 
 export interface Placowka {
   id: string;

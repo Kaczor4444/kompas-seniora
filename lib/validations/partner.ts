@@ -17,8 +17,8 @@ export const partnerInquirySchema = z.object({
     .min(2, "Nazwa organizacji musi mieć minimum 2 znaki")
     .max(200, "Nazwa organizacji jest za długa"),
   
-  partnerType: z.enum(["mops", "facility", "association", "other"], {
-    errorMap: () => ({ message: "Wybierz typ partnera" })
+  partnerType: z.enum(["mops", "facility", "association", "other"] as const, {
+    error: "Wybierz typ partnera",
   }),
   
   phone: z

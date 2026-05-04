@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       };
 
       // Dodaj filtry jeśli wybrane
-      if (wojewodztwo && wojewodztwo !== '') {
+      if (wojewodztwo) {
         terytWhere.wojewodztwo = wojewodztwoDbName;
       }
 
@@ -279,7 +279,7 @@ export async function GET(request: NextRequest) {
       // Filtruj po miejscowości + województwie (case-insensitive)
       const matchingFacilities = allFacilities.filter(f => {
         // Filtr województwa
-        if (wojewodztwo && wojewodztwo !== '') {
+        if (wojewodztwo) {
           const normalizedFacilityWoj = normalizePolish(f.wojewodztwo);
           const normalizedTargetWoj = normalizePolish(wojewodztwoDbName);
           if (normalizedFacilityWoj !== normalizedTargetWoj) {

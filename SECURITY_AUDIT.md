@@ -1,10 +1,10 @@
 # Security Audit — Kompas Seniora
 
-**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–12) + 2026-05-03 (runda 13) + 2026-05-03 (rundy 14a–14e)  
+**Data audytu:** 2026-05-02 (rundy 1–5) + 2026-05-03 (rundy 6–13) + 2026-05-03 (rundy 14a–14c) + 2026-05-04 (rundy 14d–14e + TS fixes)  
 **Zakres:** Widget czatu, API chatbota, Redis rate limiting, CSP, panel admina, API analityki, share/TERYT, prompt injection, cookie forgery, nonce CSP, SQL injection, broken access control, token entropy, prototype pollution, HSTS, CSV injection, log injection, timing side-channel + SSRF, IDOR, RSC data leak, middleware bypass, business logic  
 **Commity:** `719a0c5` → `dc06df1` (rundy 1–5) + `61eb2c6` → `d6bb83a` (rundy 6–12) + `3050985`, `8735186` (runda 13)  
-**Rundy:** 13 rund zakończonych + 5 w toku (14a–14e)  
-**Liczba luk:** 62 (7 krytycznych, 21 wysokich, 22 średnich, 12 niskich)
+**Rundy:** 18 rund zakończonych (14a–14e + TS)  
+**Liczba luk:** 69 (7 krytycznych, 23 wysokich, 24 średnich, 15 niskich)
 
 ### Status rund 14a–14e (nowe kąty ataku — 2026-05-03)
 
@@ -13,8 +13,8 @@
 | 14a | SSRF — server-side fetche z userinputem (Nominatim, zewnętrzne URL) | ✅ Zakończona (4 znaleziska, 4 naprawione) |
 | 14b | IDOR — dostęp do rekordów po ID bez autoryzacji | ✅ Zakończona (8 znalezisk, 7 naprawionych) |
 | 14c | Next.js RSC data leak — wrażliwe dane w Server Component payload | ✅ Zakończona (1 znalezisko, 1 naprawione) |
-| 14d | Middleware bypass — omijanie CSP/nonce przez spreparowany path | ⏳ Zaplanowana |
-| 14e | Business logic — manipulacja analytics, share listami, cenami | ⏳ Zaplanowana |
+| 14d | Middleware bypass — omijanie CSP/nonce przez spreparowany path | ✅ Zakończona (0 krytycznych, 2 minor — świadome decyzje) |
+| 14e | Business logic — manipulacja analytics, share listami, cenami | ✅ Zakończona (3 znaleziska, 3 naprawione) |
 
 ---
 
@@ -684,27 +684,102 @@ Atakujący mierzący czas odpowiedzi wiedział kiedy długość jest właściwa 
 
 ---
 
+---
+
+## Runda 14d — Middleware bypass (2026-05-04)
+
+### Wynik: brak krytycznych bypassów, 2 świadome decyzje
+
+Przeanalizowano `middleware.ts` pod kątem omijania CSP/nonce i ochrony admina. Brak krytycznych exploitów.
+
+---
+
+#### Analiza: Admin panel (ADMIN_ENABLED=false)
+`pathname.startsWith('/admin')` zwraca 404 gdy `ADMIN_ENABLED !== 'true'`. Ale `/api/admin/*` NIE jest objęte tym checkiem — te endpointy odpowiadają 401 (isValidAdminCookie) zamiast 404. Ujawnia istnienie API. **Decyzja:** akceptowalne — HMAC-signed cookie uniemożliwia dostęp; 401 vs 404 to marginalny information disclosure.
+
+#### Analiza: x-nonce header injection
+`new Headers(request.headers)` kopiuje nagłówki klienta, ale `.set('x-nonce', nonce)` natychmiast nadpisuje. Klient nie może wpłynąć na nonce. **Bezpieczne.**
+
+#### Analiza: matcher pattern
+`/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|...)$).*)` nie wyklucza `_next/data` i plików fontów — middleware biegnie niepotrzebnie przez te ścieżki. **Decyzja:** akceptowalne — CSP na JSON data response jest nieszkodliwe.
+
+---
+
+## Runda 14e — Business Logic (2026-05-04)
+
+### Wynik: 3 znaleziska, 3 naprawione
+
+---
+
+#### 67. Brak rate limitingu na `POST /api/share` — DB flooding
+**Plik:** `app/api/share/route.ts`
+**Ryzyko:** WYSOKIE
+**Problem:** Endpoint tworzenia share list nie miał żadnego rate limitingu. Każde żądanie tworzyło nowy rekord w bazie (`SharedList`). Skrypt floodujący mógł zapełnić tabelę milionami rekordów → DoS bazy.
+**Fix:** `checkRedisRateLimit(ip, 10, 60, 'share-create')` — 10 req/60s per IP, namespace oddzielony od odczytu tokenów (`share-token`). Usunięto też martwy kod `ALLOWED_ORIGINS` (tablica nigdy nieużywana).
+
+---
+
+#### 68. Metadane w `app-track` — nienaprawiony bug z rundy 11 (regression)
+**Plik:** `app/api/analytics/app-track/route.ts`
+**Ryzyko:** ŚREDNIE
+**Problem:** `JSON.parse(JSON.stringify(metadata).slice(0, 2000))` — slice JSON stringa w środku tworzy invalid JSON → `JSON.parse` rzuca wyjątek → cały handler kończy się 500. Runda 11 naprawiła `analytics/track/route.ts` ale pominęła `app-track/route.ts`.
+**Fix:** Bezpieczny IIFE (taki sam wzorzec jak w track/route.ts): jeśli długość > 2000 → `{ _truncated: true }` zamiast 500.
+
+---
+
+#### 69. `console.error` w produkcji
+**Pliki:** `app/api/share/route.ts`, `app/api/analytics/app-track/route.ts`
+**Ryzyko:** NISKIE
+**Fix:** Za `process.env.NODE_ENV === 'development'` (spójnie z resztą kodu).
+
+---
+
+## Naprawa błędów TypeScript (2026-05-04)
+
+**Wynik:** 0 błędów w kodzie aplikacji (app/, src/, components/, hooks/, lib/). Błędy w `scripts/` (one-time narzędzia) celowo pominięte — nie wpływają na działanie.
+
+| # | Plik | Problem | Fix |
+|---|------|---------|-----|
+| B1 | `dodaj/page.tsx`, `edytuj/page.tsx` | `required_error` → `error` w Zod v4 `z.enum()` | Zmieniono na `error:` + `as const` na tablicy |
+| B2 | `app/api/share/[token]/route.ts` | `params` nie-async (Next.js 16) | `{ params: Promise<{ token: string }> }` + `await params` |
+| B3 | `app/admin/ceny/page.tsx:418` | `updatedAt` nie istnieje w typie ceny | Zmieniono na `data_pobrania` |
+| B4 | `dodaj/page.tsx`, `edytuj/page.tsx` | Resolver type mismatch (zod v4 + hookform v5) | `zodResolver(schema) as any` + `z.boolean()` bez `.default()` |
+| — | `lib/public-placowka-fields.ts` | Readonly property assignment w mapped type | `-readonly` w definicji `PublicPlacowka` |
+| — | `lib/public-placowka-fields.ts` | `zrodlo` nie istnieje w schema Prismy | Usunięto `zrodlo`, dodano `zrodlo_dane` |
+| — | `lib/importData.ts` | `zrodlo` → `zrodlo_dane` | Rename |
+| — | `lib/powiat-to-city.ts` | Duplikat klucza `'nowy sącz'` | Usunięto duplikat |
+| — | `lib/validations/partner.ts` | `errorMap` → `error` w Zod v4 | Zmieniono |
+| — | `app/api/admin/placowki/[id]/route.ts` | `ZodError.errors` → `ZodError.issues` w Zod v4 | Zmieniono |
+| — | `app/api/admin/placowki/route.ts` | `ZodError.errors` → `ZodError.issues` w Zod v4 | Zmieniono |
+| — | `app/api/admin/mops/route.ts` | `findUnique({ city })` — `city` nie jest unique (tylko `city+name`) | `findFirst` |
+| — | `app/api/mops/route.ts` | j.w. | `findFirst` |
+| — | `app/api/search/route.ts` | `gmina: null` vs `gmina: undefined` | `?? undefined` |
+| — | `app/api/teryt/suggest/route.ts` | Martwe porównanie `!== ''` na literal union | Usunięto `!== ''` |
+| — | `src/components/placowka/PlacowkaDetails.tsx` | `prowadzacy: string` → nullable, `zrodlo` → `zrodlo_dane` | Zaktualizowano typ i JSX |
+| — | `app/admin/ceny/_components/ImportCSVModal.tsx` | `cena: number` override konfliktu z CSVRow | `Omit<CSVRow, 'cena'>` |
+| — | `components/poradniki/ArticleCard.tsx` | `article.featured` (usunięte) | `article.badge !== 'WKRÓTCE'` |
+| — | `hooks/useArticles.ts` | Wiele `a.featured` (usunięte) | `a.badge && a.badge !== 'WKRÓTCE'` |
+| — | `src/app/faq/page.tsx` | Błędna ścieżka `@/components/faq/` | Zmieniono na `@/src/components/faq/` |
+| — | `src/components/FacilityNotesDisplay.tsx` | `note?.rating` possibly undefined | `?? 0` |
+| — | `src/components/CategorySelector.tsx` | `React.cloneElement` bez generic | Dodano `React.ReactElement<{ size?: number }>` |
+| — | `src/components/search/SearchResults.tsx` | Brak `wojewodztwo` w Placowka interface, `null/undefined` mismatche | Dodano pole, `?? null` w kilku miejscach |
+| — | `src/data/placowki.ts` | Typo `ProfilOpiekiKod` → `ProfileOpiekiKod` | Import alias |
+
+---
+
 ## TODO następna sesja
 
-### A. Rundy 14d i 14e (security audit — nowe kąty)
+### Audit zakończony. Następne kroki — SEO i widoczność
 
-| Runda | Obszar | Opis |
-|-------|--------|------|
-| 14d | Middleware bypass | Czy da się ominąć middleware (CSP/nonce/bot-tracking) przez spreparowany path lub header? Sprawdzić `matcher` config, edge cases w `middleware.ts` |
-| 14e | Business logic | Manipulacja analytics (fałszywe kliknięcia), share listami, cenami; enumeracja tokenów; abuse publicznych endpointów w nieoczekiwany sposób |
+Zgodnie z CLAUDE.md (sekcja KRYTYCZNE TODO):
 
-### B. Naprawa 95 błędów TypeScript (nie security, ale jakość kodu)
+| Zadanie | Opis | Czas |
+|---------|------|------|
+| robots.txt | `Disallow: /` → `Allow: /`, `Disallow: /admin/` | 5 min |
+| robots meta | `index: false` → `index: true` w `app/layout.tsx` | 5 min |
+| Sitemap | Dynamiczny `app/sitemap.ts` (184 placówki + artykuły) | 20 min |
 
-Błędy istniały przed audytem, nie są przez niego spowodowane. Naprawa bezpieczna — nie psuje działających funkcji.
-
-| # | Problem | Pliki | Fix |
-|---|---------|-------|-----|
-| B1 | Zod v4: `required_error` → `error` | `app/admin/placowki/dodaj/page.tsx`, `app/admin/placowki/[id]/edytuj/page.tsx` | Zmień `{ required_error: '...' }` na `{ error: '...' }` w `z.enum()` |
-| B2 | Next.js 16: `params` nie-async | `app/api/share/[token]/route.ts` i inne route handlers | Dodaj `const { token } = await params` zamiast destrukturyzacji w argumencie |
-| B3 | `updatedAt` nie istnieje w typie ceny | `app/admin/ceny/page.tsx:418` | Sprawdź jakie pole faktycznie zwraca API i użyj go — to bug wyświetlający `Invalid Date` w UI admina |
-| B4 | Resolver type mismatch w formularzach | `edytuj/page.tsx`, `dodaj/page.tsx` | Ujednolicić typ `verified` (optional vs required) między Zod schema a `useForm` |
-
-**⚠️ Po naprawie:** uruchom `npm run build` jako weryfikacja — Turbopack build jest bardziej rygorystyczny niż dev.
+**Po naprawie:** strona widoczna dla Google i AI botów.
 
 **Wszystkie naprawialne luki bezpieczeństwa w kodzie zostały naprawione.**
 
@@ -722,7 +797,9 @@ Błędy istniały przed audytem, nie są przez niego spowodowane. Naprawa bezpie
 *Runda 14a przeprowadzona: 2026-05-03 | SSRF audit (Opus 4.7) | Commit: `e014f82`*  
 *Runda 14b przeprowadzona: 2026-05-03 | IDOR audit (Opus 4.7) | Commit: `8e72e2b`*  
 *Runda 14c przeprowadzona: 2026-05-03 | RSC data leak audit (Opus 4.7) | Commit: `ced7e2e`*  
-*Rundy 14d–14e: do wykonania w następnej sesji*
+*Runda 14d przeprowadzona: 2026-05-04 | Middleware bypass — brak krytycznych bypassów*  
+*Runda 14e przeprowadzona: 2026-05-04 | Business logic — share rate limit, app-track regression*  
+*Naprawa TypeScript: 2026-05-04 | 0 błędów w kodzie aplikacji*
 
 ---
 

@@ -23,7 +23,7 @@ interface CSVRow {
   cena_2026?: string;
 }
 
-interface MatchedRow extends CSVRow {
+interface MatchedRow extends Omit<CSVRow, 'cena'> {
   matchedPlacowka: any | null;
   matchStatus: 'matched' | 'unmatched' | 'fuzzy';
   cena: number;

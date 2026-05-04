@@ -54,7 +54,7 @@ export async function importPlacowki() {
           profil_opieki: normalizeProfilOpieki(record.profil_opieki, record.typ_placowki),
           koszt_pobytu: record.koszt_pobytu ? parseFloat(record.koszt_pobytu) : null,
           data_aktualizacji: record.data_aktualizacji ? new Date(record.data_aktualizacji) : null,
-          zrodlo: record.zrodlo
+          zrodlo_dane: record.zrodlo
         }
       })
       

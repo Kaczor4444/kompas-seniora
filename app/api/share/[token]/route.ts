@@ -6,7 +6,7 @@ import { PUBLIC_PLACOWKA_SELECT } from '@/lib/public-placowka-fields';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   const ip =
     request.headers.get('x-real-ip') ||
@@ -18,7 +18,7 @@ export async function GET(
   }
 
   try {
-    const { token } = params;
+    const { token } = await params;
 
     const sharedList = await prisma.sharedList.findUnique({
       where: { token }

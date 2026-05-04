@@ -51,6 +51,7 @@ interface Facility {
   nazwa: string;
   typ_placowki: string;
   powiat: string;
+  wojewodztwo: string;
   miejscowosc: string;
   koszt_pobytu: number | null;
   telefon: string | null;
@@ -1114,7 +1115,7 @@ export default function SearchResults({
                         street: fac.ulica,
                         image: '/images/placeholder-facility.jpg',
                         waitTime: 'Brak danych',
-                        profileLabels: getShortProfileLabels(fac.profil_opieki, fac.typ_placowki),
+                        profileLabels: getShortProfileLabels(fac.profil_opieki ?? null, fac.typ_placowki),
                         distance: fac.distance
                       }}
                       userLocation={userLocation}
@@ -1135,13 +1136,13 @@ export default function SearchResults({
                             powiat: fac.powiat,
                             typ_placowki: fac.typ_placowki,
                             koszt_pobytu: fac.koszt_pobytu,
-                            telefon: fac.telefon,
-                            ulica: fac.ulica,
-                            kod_pocztowy: fac.kod_pocztowy,
-                            email: fac.email,
-                            www: fac.www,
-                            liczba_miejsc: fac.liczba_miejsc,
-                            profil_opieki: fac.profil_opieki,
+                            telefon: fac.telefon ?? null,
+                            ulica: fac.ulica ?? null,
+                            kod_pocztowy: fac.kod_pocztowy ?? null,
+                            email: fac.email ?? null,
+                            www: fac.www ?? null,
+                            liczba_miejsc: fac.liczba_miejsc ?? null,
+                            profil_opieki: fac.profil_opieki ?? null,
                             addedAt: new Date().toISOString()
                           });
                         }

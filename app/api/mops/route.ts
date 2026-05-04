@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const normalizedCity = city.toLowerCase().trim();
 
     // Find MOPS by city
-    const mops = await prisma.mopsContact.findUnique({
+    const mops = await prisma.mopsContact.findFirst({
       where: {
         city: normalizedCity
       }

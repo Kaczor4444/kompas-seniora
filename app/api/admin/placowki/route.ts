@@ -258,7 +258,7 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Błąd walidacji danych', details: error.errors },
+        { error: 'Błąd walidacji danych', details: error.issues },
         { status: 400 }
       );
     }

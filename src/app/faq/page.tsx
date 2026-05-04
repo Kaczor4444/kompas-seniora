@@ -1,5 +1,5 @@
-import FAQAccordion from '@/components/faq/FAQAccordion';
-import { allFAQData } from '@/components/faq/faqData';
+import FAQAccordion from '@/src/components/faq/FAQAccordion';
+import { allFAQData } from '@/src/components/faq/faqData';
 
 export const metadata = {
   title: 'Najczęściej zadawane pytania | Kompas Seniora',

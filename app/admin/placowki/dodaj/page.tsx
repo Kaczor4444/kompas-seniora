@@ -11,8 +11,8 @@ import { formatPhoneNumber } from '@/lib/phone-utils';
 // Zod validation schema
 const placowkaSchema = z.object({
   nazwa: z.string().min(3, 'Minimum 3 znaki').max(200, 'Maksimum 200 znaków'),
-  typ_placowki: z.enum(['DPS', 'ŚDS'], {
-    required_error: 'Wybierz typ placówki',
+  typ_placowki: z.enum(['DPS', 'ŚDS'] as const, {
+    error: 'Wybierz typ placówki',
   }),
   prowadzacy: z.string().optional(),
   miejscowosc: z.string().min(2, 'Wymagane'),
@@ -49,7 +49,7 @@ const placowkaSchema = z.object({
   data_weryfikacji: z.string().optional(),
   notatki: z.string().optional(),
   
-  verified: z.boolean().default(false),
+  verified: z.boolean(),
 });
 
 type PlacowkaFormData = z.infer<typeof placowkaSchema>;
@@ -85,9 +85,10 @@ export default function DodajPlacowkePage() {
     watch,
     setValue,
   } = useForm<PlacowkaFormData>({
-    resolver: zodResolver(placowkaSchema),
+    resolver: zodResolver(placowkaSchema) as any,
     defaultValues: {
       verified: true,
+      rok_ceny: 2026,
       data_weryfikacji: new Date().toISOString().split('T')[0],
     },
   });
@@ -874,7 +875,7 @@ export default function DodajPlacowkePage() {
           </button>
           <button
             type="submit"
-            disabled={isSubmitting || (duplicate && !forceAdd)}
+            disabled={isSubmitting || !!(duplicate && !forceAdd)}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Zapisywanie...' : 'Dodaj placówkę'}

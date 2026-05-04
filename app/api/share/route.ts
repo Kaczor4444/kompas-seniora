@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/src/utils/generateToken';
-
-const ALLOWED_ORIGINS = [
-  'https://kompaseniora.pl',
-  'https://www.kompaseniora.pl',
-  'https://kompas-seniora.vercel.app',
-]
+import { checkRedisRateLimit } from '@/lib/redis';
 
 export async function POST(request: NextRequest) {
+  const ip =
+    request.headers.get('x-real-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+    'unknown';
+  const rateLimit = await checkRedisRateLimit(ip, 10, 60, 'share-create');
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { ids } = body;
@@ -65,7 +69,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error creating shared list:', error);
+    if (process.env.NODE_ENV === 'development') console.error('Error creating shared list:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

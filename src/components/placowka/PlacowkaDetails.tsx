@@ -87,11 +87,11 @@ interface Placowka {
   id: number;
   nazwa: string;
   typ_placowki: string;
-  prowadzacy: string;
+  prowadzacy: string | null;
   ulica: string | null;
   miejscowosc: string;
   kod_pocztowy: string | null;
-  gmina: string;
+  gmina: string | null;
   powiat: string;
   wojewodztwo: string;
   telefon: string | null;
@@ -102,8 +102,8 @@ interface Placowka {
   miejsca_za_zyciem?: number | null;
   profil_opieki: string | null;
   koszt_pobytu: number | null;
-  data_aktualizacji: Date;
-  zrodlo: string | null;
+  data_aktualizacji: Date | null;
+  zrodlo_dane: string | null;
   latitude: number | null;
   longitude: number | null;
 }
@@ -790,14 +790,14 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                 <div>
                   <div className="text-emerald-600 font-medium mb-1">Źródło danych:</div>
                   <div className="font-bold text-emerald-900">
-                    {placowka.zrodlo ? (
+                    {placowka.zrodlo_dane ? (
                       <a
-                        href={placowka.zrodlo}
+                        href={placowka.zrodlo_dane}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-emerald-700 hover:text-emerald-900 hover:underline transition-colors"
                       >
-                        {placowka.zrodlo.includes('muw.pl')
+                        {placowka.zrodlo_dane.includes('muw.pl')
                           ? 'Małopolski Urząd Wojewódzki'
                           : 'Urząd Miasta/Gminy'}
                       </a>

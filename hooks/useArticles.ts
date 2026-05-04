@@ -52,13 +52,15 @@ export function useArticles({
           new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
         )
       case 'popular':
-        return sorted.filter(a => a.featured)
+        return sorted.filter(a => a.badge && a.badge !== 'WKRÓTCE')
       case 'recommended':
       default:
-        // Featured articles first, then by date
+        // Articles with badge first, then by date
         return sorted.sort((a, b) => {
-          if (a.featured && !b.featured) return -1
-          if (!a.featured && b.featured) return 1
+          const aFeatured = !!(a.badge && a.badge !== 'WKRÓTCE')
+          const bFeatured = !!(b.badge && b.badge !== 'WKRÓTCE')
+          if (aFeatured && !bFeatured) return -1
+          if (!aFeatured && bFeatured) return 1
           return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
         })
     }
@@ -67,7 +69,7 @@ export function useArticles({
   // Popular articles (featured ones)
   const popularArticles = useMemo(() => {
     return articles
-      .filter(a => a.featured)
+      .filter(a => a.badge && a.badge !== 'WKRÓTCE')
       .slice(0, 5)
   }, [articles])
 

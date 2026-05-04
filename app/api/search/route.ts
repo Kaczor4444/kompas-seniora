@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
         score: calculateMatchScore(query, {
           nazwa: placowka.nazwa,
           miejscowosc: placowka.miejscowosc,
-          gmina: placowka.gmina,
+          gmina: placowka.gmina ?? undefined,
           powiat: placowka.powiat,
         }),
       }))

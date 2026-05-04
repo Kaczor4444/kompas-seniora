@@ -90,8 +90,8 @@ export default function FacilityNotesDisplay({
           <h3 className="font-black text-slate-800 mb-1 tracking-tight">
             {hasNote ? 'Twoje notatki' : 'Dodaj prywatną notatkę'}
           </h3>
-          {note?.rating > 0 && (
-            <StarRating rating={note.rating} readonly size="sm" />
+          {(note?.rating ?? 0) > 0 && (
+            <StarRating rating={note!.rating!} readonly size="sm" />
           )}
         </div>
         <button

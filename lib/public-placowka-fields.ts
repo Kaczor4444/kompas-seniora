@@ -23,7 +23,7 @@ export const PUBLIC_PLACOWKA_SELECT = {
   latitude: true,
   longitude: true,
   data_aktualizacji: true,
-  zrodlo: true,
+  zrodlo_dane: true,
 } as const;
 
 // Kolumny do SELECT w raw SQL (ten sam zestaw co powyżej)
@@ -31,11 +31,11 @@ export const PUBLIC_PLACOWKA_COLUMNS = [
   'id', 'nazwa', 'typ_placowki', 'prowadzacy', 'ulica', 'miejscowosc',
   'kod_pocztowy', 'gmina', 'powiat', 'wojewodztwo', 'telefon', 'email',
   'www', 'facebook', 'liczba_miejsc', 'miejsca_za_zyciem', 'profil_opieki',
-  'koszt_pobytu', 'latitude', 'longitude', 'data_aktualizacji', 'zrodlo',
+  'koszt_pobytu', 'latitude', 'longitude', 'data_aktualizacji', 'zrodlo_dane',
 ].map(col => `"${col}"`).join(', ');
 
 type PublicPlacowka = {
-  [K in keyof typeof PUBLIC_PLACOWKA_SELECT]: any;
+  -readonly [K in keyof typeof PUBLIC_PLACOWKA_SELECT]: any;
 };
 
 // Filtruje surowy obiekt z bazy do tylko publicznych pól (używane po $queryRaw)

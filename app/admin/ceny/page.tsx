@@ -415,7 +415,7 @@ export default function AdminCenyPage() {
                                 )}
                               </div>
                               <div className="text-xs text-gray-500">
-                                {new Date(currentPrice.updatedAt).toLocaleDateString('pl-PL')}
+                                {new Date(currentPrice.data_pobrania).toLocaleDateString('pl-PL')}
                               </div>
                             </>
                           ) : (
