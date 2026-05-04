@@ -11,6 +11,7 @@ interface CityData {
   slug: string;
   count: number;
   voivodeship: string;
+  avgCost?: number;
 }
 
 export default function PopularLocationsSection() {
@@ -24,6 +25,7 @@ export default function PopularLocationsSection() {
         const data = await response.json();
 
         if (data.success && data.data.byCities) {
+          const avgCostMap: Record<string, number> = data.data.cityAvgCost || {};
           const citiesWithCounts = POPULAR_CITIES_CONFIG.map(config => {
             const cityStats = data.data.byCities.find(
               (city: { name: string; count: number }) =>
@@ -35,6 +37,7 @@ export default function PopularLocationsSection() {
               slug: config.slug,
               count: cityStats?.count || 0,
               voivodeship: config.voivodeship,
+              avgCost: avgCostMap[config.name] || undefined,
             };
           });
 
@@ -118,6 +121,7 @@ export default function PopularLocationsSection() {
                 name={city.name}
                 slug={city.slug}
                 count={city.count}
+                avgCost={city.avgCost}
               />
             ))
           )}

@@ -169,7 +169,7 @@ export default function HomeClient({ totalFacilities, powiatCounts, featuredArti
       <MiniFAQSection />
 
       {/* Newsletter - Dark Theme */}
-      <NewsletterSection />
+      {/* <NewsletterSection /> */}
     </div>
   );
 }

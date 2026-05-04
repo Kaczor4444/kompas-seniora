@@ -19,6 +19,12 @@ export async function GET() {
       orderBy: { _count: { id: 'desc' } },
     });
 
+    const avgCostByCity = await prisma.placowka.groupBy({
+      by: ['miejscowosc'],
+      where: getVoivodeshipFilter({ koszt_pobytu: { not: null } }),
+      _avg: { koszt_pobytu: true },
+    });
+
     const voivodeshipStats = facilitiesByVoivodeship.reduce((acc, item) => {
       acc[item.wojewodztwo.toLowerCase()] = item._count.id;
       return acc;
@@ -40,6 +46,14 @@ export async function GET() {
       where: getVoivodeshipFilter()
     });
 
+    const cityAvgCostMap: Record<string, number> = {};
+    for (const item of avgCostByCity) {
+      if (item._avg.koszt_pobytu) {
+        const key = item.miejscowosc.trim();
+        cityAvgCostMap[key] = Math.round(item._avg.koszt_pobytu);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -47,6 +61,7 @@ export async function GET() {
         byVoivodeship: voivodeshipStats,
         byCities: cityStats,
         topCities: cityStats.slice(0, 10),
+        cityAvgCost: cityAvgCostMap,
       },
     });
 

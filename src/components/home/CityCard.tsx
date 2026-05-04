@@ -6,11 +6,12 @@ import { MapPin, ChevronRight } from 'lucide-react';
 
 interface CityCardProps {
   name: string;
-  slug: string; // Still needed by parent component
+  slug: string;
   count: number;
+  avgCost?: number;
 }
 
-const CityCard = memo(({ name, count }: CityCardProps) => {
+const CityCard = memo(({ name, count, avgCost }: CityCardProps) => {
   // ✅ Szukaj tylko w mieście (nie w całym powiecie) - używamy parametru city=true
   const getCitySearchUrl = () => {
     // Przekazujemy name (z wielką literą) żeby pasowało do pola miejscowosc w bazie
@@ -39,15 +40,15 @@ const CityCard = memo(({ name, count }: CityCardProps) => {
             {count}
           </span>
         </div>
-        <div className="flex items-center justify-between mt-auto">
-          <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors">
+        <div className="mt-auto">
+          <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-primary-700 transition-colors leading-tight">
             {name}
           </h3>
-          <ChevronRight
-            size={16}
-            aria-hidden="true"
-            className="text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all"
-          />
+          {avgCost ? (
+            <p className="text-[11px] font-semibold text-slate-400 mt-0.5">
+              śr. {avgCost.toLocaleString('pl-PL')} zł/mies
+            </p>
+          ) : null}
         </div>
       </div>
     </Link>

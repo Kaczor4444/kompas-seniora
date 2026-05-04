@@ -132,6 +132,47 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* SEO POWIAT GRID */}
+        <div className="border-t border-slate-800 pt-8 mb-8">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-4">
+            DPS i ŚDS według powiatu — Małopolska
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-2">
+            {[
+              { label: 'powiat bocheński', powiat: 'bocheński' },
+              { label: 'powiat brzeski', powiat: 'brzeski' },
+              { label: 'powiat chrzanowski', powiat: 'chrzanowski' },
+              { label: 'powiat dąbrowski', powiat: 'dąbrowski' },
+              { label: 'powiat gorlicki', powiat: 'gorlicki' },
+              { label: 'powiat krakowski', powiat: 'krakowski' },
+              { label: 'powiat limanowski', powiat: 'limanowski' },
+              { label: 'powiat miechowski', powiat: 'miechowski' },
+              { label: 'powiat myślenicki', powiat: 'myślenicki' },
+              { label: 'powiat nowosądecki', powiat: 'nowosądecki' },
+              { label: 'powiat nowotarski', powiat: 'nowotarski' },
+              { label: 'powiat olkuski', powiat: 'olkuski' },
+              { label: 'powiat oświęcimski', powiat: 'oświęcimski' },
+              { label: 'powiat proszowicki', powiat: 'proszowicki' },
+              { label: 'powiat suski', powiat: 'suski' },
+              { label: 'powiat tarnowski', powiat: 'tarnowski' },
+              { label: 'powiat tatrzański', powiat: 'tatrzański' },
+              { label: 'powiat wadowicki', powiat: 'wadowicki' },
+              { label: 'powiat wielicki', powiat: 'wielicki' },
+              { label: 'Kraków', powiat: 'm. Kraków' },
+              { label: 'Nowy Sącz', powiat: 'm. Nowy Sącz' },
+              { label: 'Tarnów', powiat: 'm. Tarnów' },
+            ].map(({ label, powiat }) => (
+              <Link
+                key={powiat}
+                href={`/search?powiat=${encodeURIComponent(powiat)}`}
+                className="text-slate-500 hover:text-emerald-400 text-xs transition-colors truncate"
+              >
+                DPS {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* COPYRIGHT */}
         <div className="border-t border-slate-800 pt-8">
           <div className="text-center text-xs md:text-sm text-slate-400">

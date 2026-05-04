@@ -143,10 +143,12 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
         </div>
 
         {/* === TRUST BAR === */}
-        <div className="mt-12 pt-8 border-t border-slate-100 flex flex-wrap gap-10 lg:gap-20">
-          <TrustItem icon={<ShieldCheck size={16} />} label="Dane" value="Oficjalne BIP" />
-          <TrustItem icon={<Building2 size={16} />} label="Placówki" value={`${totalFacilities ?? 180} w Małopolsce`} />
-          <TrustItem icon={<RefreshCw size={16} />} label="Aktualizacja" value="Stale aktualizowane" />
+        <div className="mt-10 pt-8 border-t border-slate-100">
+          <div className="grid grid-cols-3 gap-3 md:gap-6">
+            <TrustItem icon={<ShieldCheck size={22} />} label="Źródło danych" value="Oficjalne BIP" />
+            <TrustItem icon={<Building2 size={22} />} label="Placówek w bazie" value={`${totalFacilities ?? 184} w Małopolsce`} />
+            <TrustItem icon={<RefreshCw size={22} />} label="Aktualizacja" value="Stale aktualizowane" />
+          </div>
         </div>
 
       </div>
@@ -174,11 +176,13 @@ const TypeChip = ({ active, label, sub, onClick }: { active: boolean; label: str
 );
 
 const TrustItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
-  <div className="flex items-center gap-3 group cursor-default">
-    <div className="text-emerald-600">{icon}</div>
-    <div>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">{label}</p>
-      <p className="text-base font-black text-slate-900">{value}</p>
+  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 bg-slate-50 rounded-2xl px-4 py-4 border border-slate-100">
+    <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 flex-shrink-0">
+      {icon}
+    </div>
+    <div className="text-center sm:text-left">
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p>
+      <p className="text-sm md:text-base font-black text-slate-900 leading-tight">{value}</p>
     </div>
   </div>
 );
