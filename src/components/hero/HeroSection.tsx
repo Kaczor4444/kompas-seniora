@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import {
   ArrowRight, ShieldCheck, Building2, ChevronRight,
-  Calculator, RefreshCw
+  RefreshCw
 } from 'lucide-react';
 import QuestionnaireIcon from '@/components/icons/QuestionnaireIcon';
+import AccountingCalculatorIcon from '@/components/icons/AccountingCalculatorIcon';
 import { SearchBar } from '@/src/components/search/SearchBar';
 
 
@@ -69,7 +70,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <Calculator size={20} strokeWidth={2.5} />
+                    <AccountingCalculatorIcon size={20} />
                   </div>
                   <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Finanse</span>
                 </div>
@@ -115,7 +116,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
                       : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
                   disabled={!showCalcResult}
                 >
-                  <Calculator size={14} />
+                  <AccountingCalculatorIcon size={14} />
                   {showCalcResult ? 'Pełna analiza →' : 'Wpisz dochód aby kontynuować'}
                 </button>
               </div>
