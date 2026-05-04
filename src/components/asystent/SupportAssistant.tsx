@@ -41,8 +41,9 @@ const LOADING_MESSAGES = [
 
 const DIAGNOSIS_OPTIONS = [
   { id: 'demencja', label: 'Demencja / Alzheimer', icon: <Brain size={18} /> },
-  { id: 'ruchowa', label: 'Niepełnosprawność ruchowa', icon: <Accessibility size={18} /> },
   { id: 'psychiatryczne', label: 'Schorzenia psychiatryczne', icon: <Activity size={18} /> },
+  { id: 'upośledzenie', label: 'Upośledzenie intelektualne', icon: <User size={18} /> },
+  { id: 'ruchowa', label: 'Niepełnosprawność ruchowa', icon: <Accessibility size={18} /> },
   { id: 'inne', label: 'Inne schorzenia przewlekłe', icon: <Info size={18} /> }
 ];
 
@@ -132,11 +133,10 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
 
   // Derive early type recommendation from partial answers
   const earlyType = useMemo(() => {
-    if (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'demencja') return 'DPS';
-    if (answers.mode === 'day') return 'ŚDS';
-    if (answers.mode === 'full') return 'DPS';
-    if (answers.independence === 'green') return 'ŚDS';
-    if (answers.independence === 'red') return 'DPS';
+    if (answers.diagnosis === 'demencja' || answers.diagnosis === 'ruchowa') return 'DPS';
+    if (answers.independence === 'red' || answers.mode === 'full') return 'DPS';
+    if (answers.mode === 'day' && (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'upośledzenie')) return 'ŚDS';
+    if (answers.mode === 'day' && answers.independence === 'green') return 'ŚDS';
     return null;
   }, [answers.diagnosis, answers.mode, answers.independence]);
 
@@ -183,11 +183,6 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
           independence: answers.independence,
           diagnosis: answers.diagnosis || null,
           mode: answers.mode || null,
-          recommendation: answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'demencja'
-            ? 'DPS'
-            : answers.mode === 'day' || (answers.independence === 'green' && answers.mode !== 'full')
-              ? 'ŚDS'
-              : 'DPS',
         });
       }, 2400);
     } else {
@@ -233,9 +228,20 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     return forms[who] || 'Bliska osoba';
   };
 
-  const recommendation = useMemo(() => {
-    if (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'demencja') return 'DPS';
-    if (answers.mode === 'day' || (answers.independence === 'green' && answers.mode !== 'full')) return 'ŚDS';
+  const recommendation = useMemo((): 'DPS' | 'ŚDS' | 'mops' => {
+    // Dementia/physical disability → always DPS
+    if (answers.diagnosis === 'demencja') return 'DPS';
+    if (answers.diagnosis === 'ruchowa') return 'DPS';
+    // 24/7 care needed → DPS
+    if (answers.independence === 'red') return 'DPS';
+    // Full-time mode → DPS
+    if (answers.mode === 'full') return 'DPS';
+    // ŚDS: psychiatric or intellectual disability + day mode (statutory criteria)
+    if (answers.mode === 'day' && (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'upośledzenie')) return 'ŚDS';
+    // ŚDS: fully independent, needs day activities
+    if (answers.mode === 'day' && answers.independence === 'green') return 'ŚDS';
+    // Unknown mode or no clear diagnosis → recommend MOPS consultation
+    if (answers.mode === 'unknown' || !answers.mode) return 'mops';
     return 'DPS';
   }, [answers]);
 
@@ -249,7 +255,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
 
   const handleShare = async () => {
     const shareTitle = "Kompas Seniora - Plan Wsparcia";
-    const shareText = `Cześć, wygenerowałem plan wsparcia dla osoby bliskiej (${getProperFormSummary(answers.who)}) na kompaseniora.pl. Rekomendacja dla ${answers.location || 'naszego regionu'}: ${recommendation === 'DPS' ? 'Pobyt całodobowy (DPS)' : 'Wsparcie dzienne (ŚDS)'}.`;
+    const recLabel = recommendation === 'DPS' ? 'Pobyt całodobowy (DPS)' : recommendation === 'ŚDS' ? 'Wsparcie dzienne (ŚDS)' : 'Konsultacja z MOPS';
+    const shareText = `Cześć, wygenerowałem plan wsparcia dla osoby bliskiej (${getProperFormSummary(answers.who)}) na kompaseniora.pl. Rekomendacja dla ${answers.location || 'naszego regionu'}: ${recLabel}.`;
     const shareUrl = window.location.href;
 
     if (navigator.share) {
@@ -273,7 +280,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     }
   };
 
-  const isSkipPath = answers.diagnosis === 'demencja' || answers.diagnosis === 'psychiatryczne';
+  const isSkipPath = answers.diagnosis === 'demencja';
   const totalSteps = isSkipPath ? 3 : 4;
   const currentStepNum = useMemo(() => {
     if (currentStep === 'who') return 1;
@@ -398,13 +405,13 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                          <button
                            key={opt.id}
                            onClick={() => {
-                             const isSkipEligible = opt.id === 'demencja' || opt.id === 'psychiatryczne';
+                             const skipMode = opt.id === 'demencja';
                              setAnswers({
-                               ...answers, 
+                               ...answers,
                                diagnosis: opt.id,
-                               mode: isSkipEligible ? 'full' : ''
+                               mode: skipMode ? 'full' : ''
                              });
-                             handleNext(isSkipEligible ? 'location' : 'mode');
+                             handleNext(skipMode ? 'location' : 'mode');
                            }}
                            className="flex items-center gap-3 p-4 rounded-xl border border-stone-100 bg-stone-50 hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all text-left group"
                          >
@@ -534,107 +541,185 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                 </div>
 
                 {/* Sekcja Rekomendacji - Adaptive Hero */}
-                <div className="bg-slate-900 p-6 md:p-16 lg:p-24 text-white relative text-center md:text-left overflow-hidden">
-                   <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-primary-500/10 rounded-full blur-[80px] md:blur-[120px] -mr-20 md:-mr-40 -mt-20 md:-mt-40" />
+                <div className={`p-6 md:p-16 lg:p-24 text-white relative text-center md:text-left overflow-hidden ${recommendation === 'mops' ? 'bg-amber-900' : 'bg-slate-900'}`}>
+                   <div className={`absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 rounded-full blur-[80px] md:blur-[120px] -mr-20 md:-mr-40 -mt-20 md:-mt-40 ${recommendation === 'mops' ? 'bg-amber-500/10' : 'bg-primary-500/10'}`} />
                    <div className="relative z-10 max-w-4xl">
-                      <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-500/20 text-primary-400 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 md:mb-8 border border-primary-500/20">
-                         <Star size={14} /> Polecamy
+                      <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 md:mb-8 border ${recommendation === 'mops' ? 'bg-amber-500/20 text-amber-300 border-amber-500/20' : 'bg-primary-500/20 text-primary-400 border-primary-500/20'}`}>
+                         {recommendation === 'mops' ? <HelpCircle size={14} /> : <Star size={14} />}
+                         {recommendation === 'mops' ? 'Zalecamy konsultację' : 'Polecamy'}
                       </div>
                       <h3 className="text-3xl md:text-6xl lg:text-7xl font-black mb-4 md:mb-8 leading-tight tracking-tight">
-                         Najlepsza opcja to <br className="hidden md:block" />
-                         <span className="text-primary-400 italic">
-                           {recommendation === 'ŚDS' ? 'Dom Dzienny (ŚDS)' : 'Pobyt całodobowy (DPS)'}
-                         </span>
+                         {recommendation === 'mops' ? (
+                           <>Najpierw skontaktuj się<br className="hidden md:block" />
+                           <span className="text-amber-400 italic">z MOPS w Twoim mieście</span></>
+                         ) : (
+                           <>Najlepsza opcja to <br className="hidden md:block" />
+                           <span className="text-primary-400 italic">
+                             {recommendation === 'ŚDS' ? 'Dom Dzienny (ŚDS)' : 'Pobyt całodobowy (DPS)'}
+                           </span></>
+                         )}
                       </h3>
                       <p className="text-slate-400 text-base md:text-xl leading-relaxed opacity-90 max-w-2xl">
                          {recommendation === 'ŚDS' && "To rozwiązanie wspierające aktywność seniora w ciągu dnia, które pozwala na powrót do własnego domu na noc."}
                          {recommendation === 'DPS' && "Zapewnia profesjonalną, całodobową opiekę medyczną oraz pełne bezpieczeństwo w sytuacjach wymagających stałego nadzoru."}
+                         {recommendation === 'mops' && "Pracownik socjalny MOPS oceni potrzeby, przeprowadzi wywiad środowiskowy i wskaże właściwą formę pomocy - DPS, ŚDS lub opiekę domową."}
                       </p>
                    </div>
                 </div>
 
                 <div className="p-6 md:p-16 lg:p-24 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16">
                    <div className="lg:col-span-7 space-y-10 md:space-y-16">
-                      
-                      <div className="bg-stone-50/50 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-stone-100">
-                         <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-6 md:mb-10 flex items-center gap-3">
-                            <Building2 size={20} className="text-primary-500" />
-                            Placówki w pobliżu: {answers.location}
-                         </h4>
-                         <div className="space-y-4 md:space-y-6">
-                            <div
-                              onClick={() => {
-                                const p = new URLSearchParams();
-                                if (answers.location) p.set('q', answers.location);
-                                if (resolvedPowiat) p.set('powiat', resolvedPowiat);
-                                if (recommendation === 'DPS') p.set('type', 'dps');
-                                if (recommendation === 'ŚDS') p.set('type', 'śds');
-                                window.location.href = `/search?${p.toString()}`;
-                              }}
-                              className="p-6 md:p-8 rounded-2xl border border-stone-200 bg-white flex items-center justify-between group cursor-pointer hover:border-primary-500 transition-all shadow-sm"
-                            >
-                               <div className="flex items-center gap-4 md:gap-6">
-                                  <div className="w-12 md:w-16 h-12 md:h-16 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 shrink-0">
-                                     <Building2 size={24} />
+
+                      {recommendation === 'mops' ? (
+                        <>
+                          {/* MOPS contact block */}
+                          <div className="bg-amber-50 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-amber-100">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-700 mb-6 md:mb-10 flex items-center gap-3">
+                              <MapPin size={20} className="text-amber-500" />
+                              MOPS / OPS w pobliżu: {answers.location}
+                            </h4>
+                            <p className="text-sm text-amber-900/70 font-medium mb-6 leading-relaxed">
+                              Skontaktuj się z Miejskim lub Gminnym Ośrodkiem Pomocy Społecznej. Pracownik socjalny przeprowadzi wywiad i bezpłatnie wskaże właściwą formę pomocy.
+                            </p>
+                            <div className="space-y-3 md:space-y-4">
+                              <a
+                                href={`https://www.google.com/search?q=MOPS+${encodeURIComponent(answers.location || 'Małopolska')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-5 md:p-6 rounded-2xl border border-amber-200 bg-white flex items-center justify-between group cursor-pointer hover:border-amber-400 transition-all shadow-sm"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                                    <Search size={22} />
                                   </div>
                                   <div>
-                                     <h5 className="font-bold text-slate-900 group-hover:text-primary-600 transition-colors text-sm md:text-base">Wstępne wyniki dla Twojej lokalizacji</h5>
-                                     <span className="text-[10px] md:text-xs text-slate-500 font-medium">Zasięg: powiat {resolvedPowiat || answers.location || 'region'}</span>
+                                    <h5 className="font-bold text-slate-900 group-hover:text-amber-700 transition-colors text-sm">Znajdź MOPS w {answers.location || 'Twojej miejscowości'}</h5>
+                                    <span className="text-[10px] text-slate-500 font-medium">Wyszukaj kontakt i godziny otwarcia</span>
                                   </div>
-                               </div>
-                               <ChevronRight size={20} className="text-slate-300 group-hover:text-primary-500 transition-all shrink-0" />
+                                </div>
+                                <ArrowUpRight size={18} className="text-slate-300 group-hover:text-amber-500 transition-colors shrink-0" />
+                              </a>
+                              <button
+                                onClick={() => {
+                                  const p = new URLSearchParams();
+                                  if (answers.location) p.set('q', answers.location);
+                                  if (resolvedPowiat) p.set('powiat', resolvedPowiat);
+                                  window.location.href = `/search?${p.toString()}`;
+                                }}
+                                className="w-full py-4 md:py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-primary-700 transition-all shadow-xl flex items-center justify-center gap-3"
+                              >
+                                Przeglądaj wszystkie placówki <ArrowUpRight size={16} />
+                              </button>
                             </div>
-                            <button
-                              onClick={() => {
-                                const p = new URLSearchParams();
-                                if (answers.location) p.set('q', answers.location);
-                                if (resolvedPowiat) p.set('powiat', resolvedPowiat);
-                                if (recommendation === 'DPS') p.set('type', 'dps');
-                                if (recommendation === 'ŚDS') p.set('type', 'śds');
-                                window.location.href = `/search?${p.toString()}`;
-                              }}
-                              className="w-full py-4 md:py-5 bg-primary-600 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-primary-700 transition-all shadow-xl flex items-center justify-center gap-3"
-                            >
-                               Przeglądaj wszystkie ({recommendation}) <ArrowUpRight size={16} />
-                            </button>
-                         </div>
-                      </div>
+                          </div>
 
-                      <div>
-                         <div className="flex items-center justify-between mb-6 md:mb-10">
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 flex items-center gap-3">
-                               <ClipboardList size={20} className="text-primary-500" /> Twój plan działania
+                          <div>
+                            <div className="flex items-center justify-between mb-6 md:mb-10">
+                              <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 flex items-center gap-3">
+                                <ClipboardList size={20} className="text-primary-500" /> Twój plan działania
+                              </h4>
+                            </div>
+                            <div className="space-y-3 md:space-y-4">
+                              <ChecklistItem checked={checklist.includes('mops-1')} onClick={() => toggleChecklist('mops-1')} text="Odwiedź MOPS / OPS w Twojej gminie lub zadzwoń" />
+                              <ChecklistItem checked={checklist.includes('mops-2')} onClick={() => toggleChecklist('mops-2')} text="Poproś o wywiad środowiskowy i ocenę potrzeb" />
+                              <ChecklistItem checked={checklist.includes('mops-3')} onClick={() => toggleChecklist('mops-3')} text="Zabierz dokumenty: dowód, decyzja emerytalna, orzeczenia" />
+                              <ChecklistItem checked={checklist.includes('mops-4')} onClick={() => toggleChecklist('mops-4')} text="Zapytaj o opiekę domową, ŚDS i DPS – wszystkie opcje" />
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="bg-stone-50/50 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-stone-100">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-6 md:mb-10 flex items-center gap-3">
+                              <Building2 size={20} className="text-primary-500" />
+                              Placówki w pobliżu: {answers.location}
                             </h4>
-                         </div>
-                         <div className="space-y-3 md:space-y-4">
-                            <ChecklistItem checked={checklist.includes('1')} onClick={() => toggleChecklist('1')} text="Pobierz wniosek o skierowanie w swoim OPS / MOPS" />
-                            <ChecklistItem checked={checklist.includes('2')} onClick={() => toggleChecklist('2')} text="Umów wizytę u lekarza POZ po zaświadczenie" />
-                            {answers.diagnosis && <ChecklistItem checked={checklist.includes('diag-doc')} onClick={() => toggleChecklist('diag-doc')} text={`Dokumentacja medyczna: ${DIAGNOSIS_OPTIONS.find(o => o.id === answers.diagnosis)?.label}`} />}
-                            <ChecklistItem checked={checklist.includes('3')} onClick={() => toggleChecklist('3')} text="Przygotuj ostatnią decyzję o wysokości emerytury" />
-                         </div>
-                      </div>
+                            <div className="space-y-4 md:space-y-6">
+                              <div
+                                onClick={() => {
+                                  const p = new URLSearchParams();
+                                  if (answers.location) p.set('q', answers.location);
+                                  if (resolvedPowiat) p.set('powiat', resolvedPowiat);
+                                  if (recommendation === 'DPS') p.set('type', 'dps');
+                                  if (recommendation === 'ŚDS') p.set('type', 'śds');
+                                  window.location.href = `/search?${p.toString()}`;
+                                }}
+                                className="p-6 md:p-8 rounded-2xl border border-stone-200 bg-white flex items-center justify-between group cursor-pointer hover:border-primary-500 transition-all shadow-sm"
+                              >
+                                <div className="flex items-center gap-4 md:gap-6">
+                                  <div className="w-12 md:w-16 h-12 md:h-16 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 shrink-0">
+                                    <Building2 size={24} />
+                                  </div>
+                                  <div>
+                                    <h5 className="font-bold text-slate-900 group-hover:text-primary-600 transition-colors text-sm md:text-base">Wstępne wyniki dla Twojej lokalizacji</h5>
+                                    <span className="text-[10px] md:text-xs text-slate-500 font-medium">Zasięg: powiat {resolvedPowiat || answers.location || 'region'}</span>
+                                  </div>
+                                </div>
+                                <ChevronRight size={20} className="text-slate-300 group-hover:text-primary-500 transition-all shrink-0" />
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const p = new URLSearchParams();
+                                  if (answers.location) p.set('q', answers.location);
+                                  if (resolvedPowiat) p.set('powiat', resolvedPowiat);
+                                  if (recommendation === 'DPS') p.set('type', 'dps');
+                                  if (recommendation === 'ŚDS') p.set('type', 'śds');
+                                  window.location.href = `/search?${p.toString()}`;
+                                }}
+                                className="w-full py-4 md:py-5 bg-primary-600 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-primary-700 transition-all shadow-xl flex items-center justify-center gap-3"
+                              >
+                                Przeglądaj wszystkie ({recommendation}) <ArrowUpRight size={16} />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="flex items-center justify-between mb-6 md:mb-10">
+                              <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 flex items-center gap-3">
+                                <ClipboardList size={20} className="text-primary-500" /> Twój plan działania
+                              </h4>
+                            </div>
+                            <div className="space-y-3 md:space-y-4">
+                              <ChecklistItem checked={checklist.includes('1')} onClick={() => toggleChecklist('1')} text="Pobierz wniosek o skierowanie w swoim OPS / MOPS" />
+                              <ChecklistItem checked={checklist.includes('2')} onClick={() => toggleChecklist('2')} text="Umów wizytę u lekarza POZ po zaświadczenie" />
+                              {answers.diagnosis && <ChecklistItem checked={checklist.includes('diag-doc')} onClick={() => toggleChecklist('diag-doc')} text={`Dokumentacja medyczna: ${DIAGNOSIS_OPTIONS.find(o => o.id === answers.diagnosis)?.label}`} />}
+                              <ChecklistItem checked={checklist.includes('3')} onClick={() => toggleChecklist('3')} text="Przygotuj ostatnią decyzję o wysokości emerytury" />
+                            </div>
+                          </div>
+                        </>
+                      )}
                    </div>
 
                    <div className="lg:col-span-5 space-y-6 md:space-y-10">
                       {/* Pytania do urzędnika - Collapsed on mobile */}
-                      <div className="bg-primary-50 rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 border border-primary-100 relative overflow-hidden shadow-sm">
-                         <button 
+                      <div className={`rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 border relative overflow-hidden shadow-sm ${recommendation === 'mops' ? 'bg-amber-50 border-amber-100' : 'bg-primary-50 border-primary-100'}`}>
+                         <button
                            onClick={() => setIsQuestionsExpanded(!isQuestionsExpanded)}
                            className="w-full text-left flex items-center justify-between group"
                          >
-                            <h4 className="text-xl md:text-2xl font-black text-primary-900 flex items-center gap-3">
-                               <MessageSquare size={26} className="text-primary-600" /> Pytania do urzędnika
+                            <h4 className={`text-xl md:text-2xl font-black flex items-center gap-3 ${recommendation === 'mops' ? 'text-amber-900' : 'text-primary-900'}`}>
+                               <MessageSquare size={26} className={recommendation === 'mops' ? 'text-amber-600' : 'text-primary-600'} />
+                               {recommendation === 'mops' ? 'Pytania do pracownika MOPS' : 'Pytania do urzędnika'}
                             </h4>
-                            <ChevronDown className={`text-primary-400 transition-transform md:hidden ${isQuestionsExpanded ? 'rotate-180' : ''}`} />
+                            <ChevronDown className={`transition-transform md:hidden ${recommendation === 'mops' ? 'text-amber-400' : 'text-primary-400'} ${isQuestionsExpanded ? 'rotate-180' : ''}`} />
                          </button>
-                         
+
                          <div className={`mt-6 md:mt-8 space-y-6 transition-all duration-300 overflow-hidden ${isQuestionsExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 md:max-h-none opacity-0 md:opacity-100'}`}>
-                            <ul className="space-y-6 md:space-y-8">
-                               <QuestionItem text="Ile wynosi średni czas oczekiwania na wolne miejsce?" />
-                               {answers.diagnosis === 'demencja' && <QuestionItem text="Czy placówka posiada oddział dla osób z Alzheimerem?" />}
-                               <QuestionItem text="Czy senior kwalifikuje się do dodatku pielęgnacyjnego?" />
-                               <QuestionItem text="Jakie konkretnie badania są wymagane w naszym powiecie?" />
-                            </ul>
+                            {recommendation === 'mops' ? (
+                              <ul className="space-y-6 md:space-y-8">
+                                <QuestionItem text="Jakie formy pomocy są dostępne w naszej gminie?" />
+                                <QuestionItem text="Czy mogę liczyć na opiekę domową zanim zostanie przyznane miejsce w placówce?" />
+                                <QuestionItem text="Ile czasu trwa przyznanie skierowania do DPS lub ŚDS?" />
+                                <QuestionItem text="Jakie dokumenty i zaświadczenia będą potrzebne?" />
+                              </ul>
+                            ) : (
+                              <ul className="space-y-6 md:space-y-8">
+                                <QuestionItem text="Ile wynosi średni czas oczekiwania na wolne miejsce?" />
+                                {answers.diagnosis === 'demencja' && <QuestionItem text="Czy placówka posiada oddział dla osób z Alzheimerem?" />}
+                                <QuestionItem text="Czy senior kwalifikuje się do dodatku pielęgnacyjnego?" />
+                                <QuestionItem text="Jakie konkretnie badania są wymagane w naszym powiecie?" />
+                              </ul>
+                            )}
                          </div>
                       </div>
 
@@ -648,32 +733,61 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                          </p>
 
                          <div className="space-y-3">
-                            <Link
-                              href="/poradniki/wybor-opieki/typy-dps"
-                              className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
-                            >
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1">
-                                  <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS w Polsce - który wybrać?</h5>
-                                  <p className="text-xs text-slate-500">Poznaj rodzaje DPS i sprawdź który pasuje</p>
-                                </div>
-                                <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
-                              </div>
-                            </Link>
-
-                            <Link
-                              href="/poradniki/wybor-opieki/wybor-placowki"
-                              className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
-                            >
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1">
-                                  <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">Jak wybrać odpowiednią placówkę?</h5>
-                                  <p className="text-xs text-slate-500">Kryteria wyboru domu opieki dla seniora</p>
-                                </div>
-                                <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
-                              </div>
-                            </Link>
-
+                            {recommendation === 'mops' ? (
+                              <>
+                                <Link
+                                  href="/poradniki/wybor-opieki/typy-dps"
+                                  className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1">
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS w Polsce - który wybrać?</h5>
+                                      <p className="text-xs text-slate-500">Poznaj opcje zanim pójdziesz do MOPS</p>
+                                    </div>
+                                    <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
+                                  </div>
+                                </Link>
+                                <Link
+                                  href="/poradniki/wybor-opieki/wybor-placowki"
+                                  className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1">
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">Jak wybrać odpowiednią placówkę?</h5>
+                                      <p className="text-xs text-slate-500">Kryteria wyboru domu opieki dla seniora</p>
+                                    </div>
+                                    <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
+                                  </div>
+                                </Link>
+                              </>
+                            ) : (
+                              <>
+                                <Link
+                                  href="/poradniki/wybor-opieki/typy-dps"
+                                  className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1">
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS w Polsce - który wybrać?</h5>
+                                      <p className="text-xs text-slate-500">Poznaj rodzaje DPS i sprawdź który pasuje</p>
+                                    </div>
+                                    <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
+                                  </div>
+                                </Link>
+                                <Link
+                                  href="/poradniki/wybor-opieki/wybor-placowki"
+                                  className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1">
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">Jak wybrać odpowiednią placówkę?</h5>
+                                      <p className="text-xs text-slate-500">Kryteria wyboru domu opieki dla seniora</p>
+                                    </div>
+                                    <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
+                                  </div>
+                                </Link>
+                              </>
+                            )}
                             <Link
                               href="/poradniki"
                               className="w-full mt-4 py-3 bg-slate-900 hover:bg-primary-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
