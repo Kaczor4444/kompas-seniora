@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkRedisRateLimit } from '@/lib/redis';
 
 const ALLOWED_BOT_TYPES = ['ai_bot', 'search_bot', 'unknown'] as const
 
 export async function POST(request: NextRequest) {
+  const ip =
+    request.headers.get('x-real-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+    'unknown';
+  const rateLimit = await checkRedisRateLimit(ip, 20, 60, 'bot-track');
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { botType, botName, userAgent, path, referer } = body;
@@ -28,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Bot tracking error:', error);
+    if (process.env.NODE_ENV === 'development') console.error('Bot tracking error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

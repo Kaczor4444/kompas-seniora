@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (powiat) {
-      where.powiat = { contains: powiat, mode: 'insensitive' };
+      where.powiat = { contains: powiat.slice(0, 100), mode: 'insensitive' };
     }
 
     const count = await prisma.placowka.count({ where });

@@ -23,6 +23,7 @@ export const partnerInquirySchema = z.object({
   
   phone: z
     .string()
+    .regex(/^[0-9+\s\-().]{0,20}$/, 'Nieprawidłowy numer telefonu')
     .optional()
     .transform(val => val?.trim() || undefined),
   

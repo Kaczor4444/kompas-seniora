@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { checkRedisRateLimit } from '@/lib/redis';
 
 // GET /api/facilities/[id]/prices
 // Returns price history for a facility with year-over-year statistics
@@ -8,6 +9,15 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const ip =
+    request.headers.get('x-real-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+    'unknown';
+  const rateLimit = await checkRedisRateLimit(ip, 30, 60, 'facility-prices');
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const { id } = await params;
     const facilityId = parseInt(id);

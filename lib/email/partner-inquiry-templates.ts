@@ -1,3 +1,12 @@
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+}
+
 interface AdminEmailData {
   name: string;
   email: string;
@@ -47,39 +56,39 @@ export function getAdminEmailTemplate(data: AdminEmailData): string {
     <div class="content">
       <div class="field">
         <div class="label">Imię i nazwisko:</div>
-        <div class="value">${data.name}</div>
+        <div class="value">${escapeHtml(data.name)}</div>
       </div>
-      
+
       <div class="field">
         <div class="label">Email:</div>
-        <div class="value"><a href="mailto:${data.email}">${data.email}</a></div>
+        <div class="value"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></div>
       </div>
-      
+
       <div class="field">
         <div class="label">Organizacja:</div>
-        <div class="value">${data.organization}</div>
+        <div class="value">${escapeHtml(data.organization)}</div>
       </div>
-      
+
       <div class="field">
         <div class="label">Typ partnera:</div>
-        <div class="value">${partnerTypeLabels[data.partnerType as keyof typeof partnerTypeLabels]}</div>
+        <div class="value">${escapeHtml(partnerTypeLabels[data.partnerType as keyof typeof partnerTypeLabels] ?? data.partnerType)}</div>
       </div>
-      
+
       ${data.phone ? `
       <div class="field">
         <div class="label">Telefon:</div>
-        <div class="value"><a href="tel:${data.phone}">${data.phone}</a></div>
+        <div class="value"><a href="tel:${escapeHtml(data.phone)}">${escapeHtml(data.phone)}</a></div>
       </div>
       ` : ''}
-      
+
       <div class="field">
         <div class="label">Wiadomość:</div>
-        <div class="value" style="white-space: pre-wrap; background: white; padding: 15px; border-radius: 6px; border: 1px solid #e5e7eb;">${data.message}</div>
+        <div class="value" style="white-space: pre-wrap; background: white; padding: 15px; border-radius: 6px; border: 1px solid #e5e7eb;">${escapeHtml(data.message)}</div>
       </div>
-      
+
       <div class="field">
         <div class="label">Data zgłoszenia:</div>
-        <div class="value">${data.submittedAt}</div>
+        <div class="value">${escapeHtml(data.submittedAt)}</div>
       </div>
       
       <a href="${process.env.NEXT_PUBLIC_BASE_URL}/admin/wspolpraca" class="button">
@@ -89,7 +98,7 @@ export function getAdminEmailTemplate(data: AdminEmailData): string {
     
     <div class="footer">
       <p>Ten email został wygenerowany automatycznie przez system Kompas Seniora.</p>
-      <p>Odpowiedz bezpośrednio na email partnera: <a href="mailto:${data.email}">${data.email}</a></p>
+      <p>Odpowiedz bezpośrednio na email partnera: <a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></p>
     </div>
   </div>
 </body>
@@ -121,7 +130,7 @@ export function getUserEmailTemplate(data: UserEmailData): string {
     <div class="content">
       <div class="checkmark">✅</div>
       
-      <p>Dzień dobry ${data.name},</p>
+      <p>Dzień dobry ${escapeHtml(data.name)},</p>
       
       <p>Dziękujemy za zgłoszenie chęci współpracy z Kompasem Seniora!</p>
       

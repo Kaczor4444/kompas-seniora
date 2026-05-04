@@ -36,8 +36,6 @@ export async function GET() {
       normalizedCounts[normalizedKey] = counts[key];
     });
 
-    console.log('📊 Facility counts by województwo:', normalizedCounts);
-
     return NextResponse.json({
       success: true,
       counts: normalizedCounts,

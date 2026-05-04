@@ -5,16 +5,30 @@ import { partnerInquirySchema } from "@/lib/validations/partner";
 import { checkPartnerInquiryRateLimit } from "@/lib/rate-limit/partner-inquiry";
 import { sendPartnerInquiryEmails } from "@/lib/email/send-partner-emails";
 import { isValidAdminCookie } from "@/lib/adminAuth";
+import { checkRedisRateLimit } from "@/lib/redis";
 import { z } from "zod";
 
 // POST - Submit partnership inquiry
 export async function POST(req: NextRequest) {
+  // IP-based rate limit: 10 submissions per hour (email-based limit is bypassable with new emails)
+  const ip =
+    req.headers.get('x-real-ip') ||
+    req.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
+    'unknown';
+  const ipLimit = await checkRedisRateLimit(ip, 10, 3600, 'wspolpraca');
+  if (!ipLimit.allowed) {
+    return Response.json(
+      { success: false, message: 'Osiągnięto limit zgłoszeń. Spróbuj ponownie za godzinę.' },
+      { status: 429 }
+    );
+  }
+
   try {
     // 1. Parse and validate request body
     const body = await req.json();
     const validatedData = partnerInquirySchema.parse(body);
 
-    // 2. Check rate limit
+    // 2. Check rate limit per email
     const rateLimit = await checkPartnerInquiryRateLimit(validatedData.email);
     
     if (!rateLimit.allowed) {
