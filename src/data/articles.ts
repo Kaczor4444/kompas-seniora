@@ -74,6 +74,15 @@ export const sections: Section[] = [
         thumbnail: '/images/babcia_dom_opieki.webp',
         isActive: true,
       },
+      {
+        slug: 'sds-alzheimer',
+        sectionId: 'wybor-opieki',
+        category: 'Wybór opieki',
+        badge: 'NOWE',
+        thumbnail: '/images/demencja.webp',
+        featuredOrder: 4,
+        isActive: true,
+      },
       // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
       // {
       //   slug: 'opieka-dzienna-calodobowa',
