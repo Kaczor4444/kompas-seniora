@@ -133,9 +133,13 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
 
   // Derive early type recommendation from partial answers
   const earlyType = useMemo(() => {
-    if (answers.diagnosis === 'demencja' || answers.diagnosis === 'ruchowa') return 'DPS';
+    if (answers.diagnosis === 'ruchowa') return 'DPS';
     if (answers.independence === 'red' || answers.mode === 'full') return 'DPS';
-    if (answers.mode === 'day' && (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'upośledzenie')) return 'ŚDS';
+    if (answers.mode === 'day' && (
+      answers.diagnosis === 'psychiatryczne' ||
+      answers.diagnosis === 'upośledzenie' ||
+      answers.diagnosis === 'demencja'
+    )) return 'ŚDS';
     return null;
   }, [answers.diagnosis, answers.mode, answers.independence]);
 
@@ -228,16 +232,21 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
   };
 
   const recommendation = useMemo((): 'DPS' | 'ŚDS' | 'mops' => {
-    // Dementia/physical disability → always DPS
-    if (answers.diagnosis === 'demencja') return 'DPS';
+    // Physical disability → DPS
     if (answers.diagnosis === 'ruchowa') return 'DPS';
     // 24/7 care needed → DPS
     if (answers.independence === 'red') return 'DPS';
-    // Full-time mode → DPS
+    // Full-time mode → DPS (for any diagnosis)
     if (answers.mode === 'full') return 'DPS';
-    // ŚDS: ONLY for qualifying diagnoses (statutory requirement) + day mode
-    if (answers.mode === 'day' && (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'upośledzenie')) return 'ŚDS';
-    // Everything else (day without qualifying diagnosis, unknown mode) → MOPS consultation
+    // ŚDS: qualifying diagnoses + day mode
+    // psychiatryczne/upośledzenie → statutory ŚDS Typ A/B
+    // demencja + day → ŚDS Typ C (early/mild dementia, returns home at night)
+    if (answers.mode === 'day' && (
+      answers.diagnosis === 'psychiatryczne' ||
+      answers.diagnosis === 'upośledzenie' ||
+      answers.diagnosis === 'demencja'
+    )) return 'ŚDS';
+    // Everything else → MOPS consultation
     return 'mops';
   }, [answers]);
 
@@ -250,13 +259,28 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     return 'Pobyt całodobowy (DPS)';
   }, [answers.diagnosis]);
 
+  // ŚDS type label - show Typ for demencja case
+  const sdsTypeLabel = useMemo(() => {
+    if (answers.diagnosis === 'demencja') return 'Dom Dzienny (ŚDS Typ C)';
+    if (answers.diagnosis === 'upośledzenie') return 'Dom Dzienny (ŚDS Typ B)';
+    if (answers.diagnosis === 'psychiatryczne') return 'Dom Dzienny (ŚDS Typ A)';
+    return 'Dom Dzienny (ŚDS)';
+  }, [answers.diagnosis]);
+
   // DPS description based on diagnosis
   const dpsTypeDesc = useMemo(() => {
-    if (answers.diagnosis === 'demencja') return 'Łagodna demencja (problemy z pamięcią) → DPS dla seniorów. Zaawansowana z agresją lub urojeniami → DPS psychiatryczny. MOPS pomoże określić właściwy profil po wywiadzie środowiskowym.';
+    if (answers.diagnosis === 'demencja') return 'Zaawansowana demencja (agresja, urojenia, brak orientacji) wymaga całodobowej opieki. Łagodna demencja z problemami z pamięcią → DPS dla seniorów; z zachowaniami psychotycznymi → DPS psychiatryczny. MOPS określi właściwy profil po wywiadzie.';
     if (answers.diagnosis === 'psychiatryczne') return 'Placówka zapewnia stałą opiekę psychiatryczną, farmakoterapię, terapię indywidualną i grupową oraz bezpieczne, specjalistyczne otoczenie.';
     if (answers.diagnosis === 'upośledzenie') return 'Placówka oferuje treningi samodzielności, terapię zajęciową i wsparcie psychologiczne. Celem jest rozwijanie niezależności i integracja społeczna.';
     if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny specjalizuje się w intensywnej fizjoterapii, monitoringu medycznym i stałej pielęgnacji przy chorobach takich jak udar, Parkinson czy SM.';
     return 'Zapewnia profesjonalną, całodobową opiekę medyczną oraz pełne bezpieczeństwo gdy niesamodzielność przekracza możliwości opieki domowej.';
+  }, [answers.diagnosis]);
+
+  // ŚDS description - contextual
+  const sdsTypeDesc = useMemo(() => {
+    if (answers.diagnosis === 'demencja') return 'ŚDS Typ C to opieka dzienna dla seniorów z łagodną demencją lub otępieniem. Senior uczestniczy w zajęciach aktywizujących i terapii przez kilka godzin — wieczorem wraca do domu. To rozwiązanie zanim zajdzie potrzeba przeprowadzki do DPS.';
+    if (answers.diagnosis === 'upośledzenie') return 'ŚDS Typ B to placówka wsparcia dziennego dla osób z niepełnosprawnością intelektualną. Uczestnicy rozwijają samodzielność przez terapię zajęciową i treningi społeczne, a wieczorem wracają do domu.';
+    return 'ŚDS to placówka wsparcia dziennego dla osób z zaburzeniami psychicznymi lub niepełnosprawnością intelektualną. Uczestnicy korzystają z terapii w ciągu dnia, a na noc wracają do domu.';
   }, [answers.diagnosis]);
 
   // Article subtitle based on DPS type
@@ -264,7 +288,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     if (answers.diagnosis === 'psychiatryczne') return 'DPS psychiatryczny — dla osób przewlekle psychicznie chorych';
     if (answers.diagnosis === 'upośledzenie') return 'DPS dla niepełnosprawnych intelektualnie — treningi samodzielności';
     if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny — dla osób z chorobami somatycznymi';
-    if (answers.diagnosis === 'demencja') return 'Łagodna vs zaawansowana demencja — który typ DPS wybrać?';
+    if (answers.diagnosis === 'demencja') return 'Zaawansowana demencja — DPS dla seniorów lub psychiatryczny?';
     return 'Poznaj 6 typów DPS i sprawdź który pasuje do potrzeb';
   }, [answers.diagnosis]);
 
@@ -303,7 +327,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     }
   };
 
-  const isSkipPath = answers.diagnosis === 'demencja';
+  const isSkipPath = false; // all diagnoses now show mode step (demencja+day → ŚDS Typ C)
   const totalSteps = isSkipPath ? 3 : 4;
   const currentStepNum = useMemo(() => {
     if (currentStep === 'who') return 1;
@@ -428,13 +452,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                          <button
                            key={opt.id}
                            onClick={() => {
-                             const skipMode = opt.id === 'demencja';
-                             setAnswers({
-                               ...answers,
-                               diagnosis: opt.id,
-                               mode: skipMode ? 'full' : ''
-                             });
-                             handleNext(skipMode ? 'location' : 'mode');
+                             setAnswers({ ...answers, diagnosis: opt.id, mode: '' });
+                             handleNext('mode');
                            }}
                            className="flex items-center gap-3 p-4 rounded-xl border border-stone-100 bg-stone-50 hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all text-left group"
                          >
@@ -577,14 +596,14 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                            <span className="text-amber-400 italic">z MOPS w Twoim mieście</span></>
                          ) : recommendation === 'ŚDS' ? (
                            <>Najlepsza opcja to <br className="hidden md:block" />
-                           <span className="text-primary-400 italic">Dom Dzienny (ŚDS)</span></>
+                           <span className="text-primary-400 italic">{sdsTypeLabel}</span></>
                          ) : (
                            <>Najlepsza opcja to <br className="hidden md:block" />
                            <span className="text-primary-400 italic">{dpsTypeLabel}</span></>
                          )}
                       </h3>
                       <p className="text-slate-400 text-base md:text-xl leading-relaxed opacity-90 max-w-2xl">
-                         {recommendation === 'ŚDS' && "Środowiskowy Dom Samopomocy to placówka wsparcia dziennego dla osób z zaburzeniami psychicznymi lub niepełnosprawnością intelektualną. Uczestnicy korzystają z terapii w ciągu dnia, a na noc wracają do domu."}
+                         {recommendation === 'ŚDS' && sdsTypeDesc}
                          {recommendation === 'DPS' && dpsTypeDesc}
                          {recommendation === 'mops' && "Pracownik socjalny MOPS oceni potrzeby, przeprowadzi wywiad środowiskowy i wskaże właściwą formę pomocy — DPS, ŚDS lub opiekę domową."}
                       </p>
@@ -739,7 +758,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                             ) : (
                               <ul className="space-y-6 md:space-y-8">
                                 <QuestionItem text="Ile wynosi średni czas oczekiwania na wolne miejsce?" />
-                                {answers.diagnosis === 'demencja' && <QuestionItem text="Czy to DPS dla seniorów czy psychiatryczny — jak to oceniacie?" />}
+                                {answers.diagnosis === 'demencja' && recommendation === 'DPS' && <QuestionItem text="Czy to DPS dla seniorów czy psychiatryczny — jak to oceniacie?" />}
+                                {answers.diagnosis === 'demencja' && recommendation === 'ŚDS' && <QuestionItem text="Czy to ŚDS Typ C? Ile dni w tygodniu i jakie godziny otwarcia?" />}
                                 {answers.diagnosis === 'psychiatryczne' && <QuestionItem text="Czy placówka ma kontrakt z psychiatrą i jak często przyjeżdża?" />}
                                 {answers.diagnosis === 'ruchowa' && <QuestionItem text="Jak wygląda codzienny plan rehabilitacji i kto go prowadzi?" />}
                                 {answers.diagnosis === 'upośledzenie' && <QuestionItem text="Jakie treningi samodzielności i terapia zajęciowa są dostępne?" />}
@@ -836,8 +856,12 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1">
-                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS w Polsce — na wypadek zmiany potrzeb</h5>
-                                      <p className="text-xs text-slate-500">Wiedz co dalej gdy tryb dzienny przestanie wystarczać</p>
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS — na wypadek gdy potrzeby wzrosną</h5>
+                                      <p className="text-xs text-slate-500">
+                                        {answers.diagnosis === 'demencja'
+                                          ? 'Gdy demencja się pogłębi — który DPS i co wówczas zrobić'
+                                          : 'Wiedz co dalej gdy tryb dzienny przestanie wystarczać'}
+                                      </p>
                                     </div>
                                     <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
                                   </div>
