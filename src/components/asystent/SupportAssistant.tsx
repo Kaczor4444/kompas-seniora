@@ -43,7 +43,7 @@ const DIAGNOSIS_OPTIONS = [
   { id: 'demencja', label: 'Demencja / Alzheimer', icon: <Brain size={18} /> },
   { id: 'psychiatryczne', label: 'Schorzenia psychiatryczne', icon: <Activity size={18} /> },
   { id: 'upośledzenie', label: 'Upośledzenie intelektualne', icon: <User size={18} /> },
-  { id: 'ruchowa', label: 'Niepełnosprawność ruchowa', icon: <Accessibility size={18} /> },
+  { id: 'ruchowa', label: 'Choroba przewlekła (udar, Parkinson, SM)', icon: <Accessibility size={18} /> },
   { id: 'inne', label: 'Inne schorzenia przewlekłe', icon: <Info size={18} /> }
 ];
 
@@ -240,6 +240,33 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     // Everything else (day without qualifying diagnosis, unknown mode) → MOPS consultation
     return 'mops';
   }, [answers]);
+
+  // DPS type label based on diagnosis (from article: typy-dps.mdx)
+  const dpsTypeLabel = useMemo(() => {
+    if (answers.diagnosis === 'psychiatryczne') return 'DPS psychiatryczny';
+    if (answers.diagnosis === 'upośledzenie') return 'DPS dla niepełnosprawnych';
+    if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny';
+    if (answers.diagnosis === 'demencja') return 'DPS dla seniorów';
+    return 'Pobyt całodobowy (DPS)';
+  }, [answers.diagnosis]);
+
+  // DPS description based on diagnosis
+  const dpsTypeDesc = useMemo(() => {
+    if (answers.diagnosis === 'demencja') return 'Łagodna demencja (problemy z pamięcią) → DPS dla seniorów. Zaawansowana z agresją lub urojeniami → DPS psychiatryczny. MOPS pomoże określić właściwy profil po wywiadzie środowiskowym.';
+    if (answers.diagnosis === 'psychiatryczne') return 'Placówka zapewnia stałą opiekę psychiatryczną, farmakoterapię, terapię indywidualną i grupową oraz bezpieczne, specjalistyczne otoczenie.';
+    if (answers.diagnosis === 'upośledzenie') return 'Placówka oferuje treningi samodzielności, terapię zajęciową i wsparcie psychologiczne. Celem jest rozwijanie niezależności i integracja społeczna.';
+    if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny specjalizuje się w intensywnej fizjoterapii, monitoringu medycznym i stałej pielęgnacji przy chorobach takich jak udar, Parkinson czy SM.';
+    return 'Zapewnia profesjonalną, całodobową opiekę medyczną oraz pełne bezpieczeństwo gdy niesamodzielność przekracza możliwości opieki domowej.';
+  }, [answers.diagnosis]);
+
+  // Article subtitle based on DPS type
+  const dpsArticleSubtitle = useMemo(() => {
+    if (answers.diagnosis === 'psychiatryczne') return 'DPS psychiatryczny — dla osób przewlekle psychicznie chorych';
+    if (answers.diagnosis === 'upośledzenie') return 'DPS dla niepełnosprawnych intelektualnie — treningi samodzielności';
+    if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny — dla osób z chorobami somatycznymi';
+    if (answers.diagnosis === 'demencja') return 'Łagodna vs zaawansowana demencja — który typ DPS wybrać?';
+    return 'Poznaj 6 typów DPS i sprawdź który pasuje do potrzeb';
+  }, [answers.diagnosis]);
 
   const handleDownloadPlan = () => {
     setIsGenerating(true);
@@ -548,17 +575,18 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                          {recommendation === 'mops' ? (
                            <>Najpierw skontaktuj się<br className="hidden md:block" />
                            <span className="text-amber-400 italic">z MOPS w Twoim mieście</span></>
+                         ) : recommendation === 'ŚDS' ? (
+                           <>Najlepsza opcja to <br className="hidden md:block" />
+                           <span className="text-primary-400 italic">Dom Dzienny (ŚDS)</span></>
                          ) : (
                            <>Najlepsza opcja to <br className="hidden md:block" />
-                           <span className="text-primary-400 italic">
-                             {recommendation === 'ŚDS' ? 'Dom Dzienny (ŚDS)' : 'Pobyt całodobowy (DPS)'}
-                           </span></>
+                           <span className="text-primary-400 italic">{dpsTypeLabel}</span></>
                          )}
                       </h3>
                       <p className="text-slate-400 text-base md:text-xl leading-relaxed opacity-90 max-w-2xl">
-                         {recommendation === 'ŚDS' && "To rozwiązanie wspierające aktywność seniora w ciągu dnia, które pozwala na powrót do własnego domu na noc."}
-                         {recommendation === 'DPS' && "Zapewnia profesjonalną, całodobową opiekę medyczną oraz pełne bezpieczeństwo w sytuacjach wymagających stałego nadzoru."}
-                         {recommendation === 'mops' && "Pracownik socjalny MOPS oceni potrzeby, przeprowadzi wywiad środowiskowy i wskaże właściwą formę pomocy - DPS, ŚDS lub opiekę domową."}
+                         {recommendation === 'ŚDS' && "Środowiskowy Dom Samopomocy to placówka wsparcia dziennego dla osób z zaburzeniami psychicznymi lub niepełnosprawnością intelektualną. Uczestnicy korzystają z terapii w ciągu dnia, a na noc wracają do domu."}
+                         {recommendation === 'DPS' && dpsTypeDesc}
+                         {recommendation === 'mops' && "Pracownik socjalny MOPS oceni potrzeby, przeprowadzi wywiad środowiskowy i wskaże właściwą formę pomocy — DPS, ŚDS lub opiekę domową."}
                       </p>
                    </div>
                 </div>
@@ -711,9 +739,13 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                             ) : (
                               <ul className="space-y-6 md:space-y-8">
                                 <QuestionItem text="Ile wynosi średni czas oczekiwania na wolne miejsce?" />
-                                {answers.diagnosis === 'demencja' && <QuestionItem text="Czy placówka posiada oddział dla osób z Alzheimerem?" />}
+                                {answers.diagnosis === 'demencja' && <QuestionItem text="Czy to DPS dla seniorów czy psychiatryczny — jak to oceniacie?" />}
+                                {answers.diagnosis === 'psychiatryczne' && <QuestionItem text="Czy placówka ma kontrakt z psychiatrą i jak często przyjeżdża?" />}
+                                {answers.diagnosis === 'ruchowa' && <QuestionItem text="Jak wygląda codzienny plan rehabilitacji i kto go prowadzi?" />}
+                                {answers.diagnosis === 'upośledzenie' && <QuestionItem text="Jakie treningi samodzielności i terapia zajęciowa są dostępne?" />}
+                                {recommendation === 'ŚDS' && <QuestionItem text="Ile dni w tygodniu działa ŚDS i jakie są godziny otwarcia?" />}
                                 <QuestionItem text="Czy senior kwalifikuje się do dodatku pielęgnacyjnego?" />
-                                <QuestionItem text="Jakie konkretnie badania są wymagane w naszym powiecie?" />
+                                <QuestionItem text="Jakie konkretnie dokumenty są wymagane w naszym powiecie?" />
                               </ul>
                             )}
                          </div>
@@ -756,7 +788,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                   </div>
                                 </Link>
                               </>
-                            ) : (
+                            ) : recommendation === 'DPS' ? (
                               <>
                                 <Link
                                   href="/poradniki/wybor-opieki/typy-dps"
@@ -764,8 +796,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1">
-                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS w Polsce - który wybrać?</h5>
-                                      <p className="text-xs text-slate-500">Poznaj rodzaje DPS i sprawdź który pasuje</p>
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS w Polsce — który wybrać?</h5>
+                                      <p className="text-xs text-slate-500">{dpsArticleSubtitle}</p>
                                     </div>
                                     <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
                                   </div>
@@ -776,8 +808,36 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1">
-                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">Jak wybrać odpowiednią placówkę?</h5>
-                                      <p className="text-xs text-slate-500">Kryteria wyboru domu opieki dla seniora</p>
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">Jak wybrać najlepszy DPS? Krok po kroku</h5>
+                                      <p className="text-xs text-slate-500">Wizyta, dokumenty, koszty i czerwone flagi</p>
+                                    </div>
+                                    <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
+                                  </div>
+                                </Link>
+                              </>
+                            ) : (
+                              /* ŚDS */
+                              <>
+                                <Link
+                                  href="/poradniki/wybor-opieki/wybor-placowki"
+                                  className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1">
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">DPS vs ŚDS — tabela różnic i wymagań</h5>
+                                      <p className="text-xs text-slate-500">Pobyt, cel, wymagania i koszty — porównanie</p>
+                                    </div>
+                                    <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
+                                  </div>
+                                </Link>
+                                <Link
+                                  href="/poradniki/wybor-opieki/typy-dps"
+                                  className="group block p-4 rounded-xl border border-stone-200 hover:border-primary-500 hover:bg-primary-50 transition-all"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1">
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS w Polsce — na wypadek zmiany potrzeb</h5>
+                                      <p className="text-xs text-slate-500">Wiedz co dalej gdy tryb dzienny przestanie wystarczać</p>
                                     </div>
                                     <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
                                   </div>
