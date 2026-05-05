@@ -724,9 +724,18 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                             </div>
                             <div className="space-y-3 md:space-y-4">
                               <ChecklistItem checked={checklist.includes('1')} onClick={() => toggleChecklist('1')} text="Pobierz wniosek o skierowanie w swoim OPS / MOPS" />
-                              <ChecklistItem checked={checklist.includes('2')} onClick={() => toggleChecklist('2')} text="Umów wizytę u lekarza POZ po zaświadczenie" />
+                              {recommendation === 'ŚDS' && (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'demencja' || answers.diagnosis === 'upośledzenie') ? (
+                                <>
+                                  <ChecklistItem checked={checklist.includes('sds-neurolog')} onClick={() => toggleChecklist('sds-neurolog')} text={answers.diagnosis === 'demencja' ? 'Zaświadczenie od psychiatry lub neurologa (wymagane do ŚDS)' : 'Zaświadczenie od psychiatry (wymagane do ŚDS)'} />
+                                  <ChecklistItem checked={checklist.includes('sds-poz')} onClick={() => toggleChecklist('sds-poz')} text="Zaświadczenie lekarza POZ o braku przeciwwskazań zdrowotnych" />
+                                  <ChecklistItem checked={checklist.includes('sds-orzeczenie')} onClick={() => toggleChecklist('sds-orzeczenie')} text="Orzeczenie o niepełnosprawności (jeśli nie ma — złóż wniosek do PCPR)" />
+                                </>
+                              ) : (
+                                <ChecklistItem checked={checklist.includes('2')} onClick={() => toggleChecklist('2')} text="Umów wizytę u lekarza POZ po zaświadczenie" />
+                              )}
                               {answers.diagnosis && <ChecklistItem checked={checklist.includes('diag-doc')} onClick={() => toggleChecklist('diag-doc')} text={`Dokumentacja medyczna: ${DIAGNOSIS_OPTIONS.find(o => o.id === answers.diagnosis)?.label}`} />}
                               <ChecklistItem checked={checklist.includes('3')} onClick={() => toggleChecklist('3')} text="Przygotuj ostatnią decyzję o wysokości emerytury" />
+                              {recommendation === 'ŚDS' && <ChecklistItem checked={checklist.includes('sds-mops')} onClick={() => toggleChecklist('sds-mops')} text="Złóż komplet dokumentów w OPS/MOPS — pracownik socjalny wyda skierowanie" />}
                             </div>
                           </div>
                         </>
