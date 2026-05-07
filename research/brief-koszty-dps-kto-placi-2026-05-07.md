@@ -46,12 +46,33 @@
 - Zastosowanie: wyjaśnienie skąd wzięły się nowe progi 2025
 
 **[3] Małopolski Urząd Wojewódzki — średni koszt utrzymania w DPS 2026**
-- Źródło: plik lokalny `raw_dane/malopolskie/do publikacji koszt dps-2026.pdf`
-- ✅ ZWERYFIKOWANY — pełna lista 91 placówek, dane zgodne z art. 60 ust. 2 (Dz. U. z 2025 r. poz. 1214 z późn. zm.)
-- Zastosowanie: tabela kosztów DPS w Małopolsce w artykule
-- **Uwaga o cytowaniu:** plik lokalny — nie ma publicznego URL do podlinkowania. Możliwości:
-  1. Linkuj do strony MUW: https://www.malopolska.uw.gov.pl (strona główna rejestru)
-  2. <mark>Sprawdź czy PDF jest publicznie dostępny na malopolska.uw.gov.pl/rejestry — jeśli tak, użyj bezpośredniego linka do PDF</mark>
+- Źródło lokalne: `raw_dane/malopolskie/do publikacji koszt dps-2026.pdf`
+- ✅ ZWERYFIKOWANY — 91 placówek, art. 60 ust. 2 (Dz. U. z 2025 r. poz. 1214 z późn. zm.)
+- **Publiczny URL do cytowania w artykule:**
+  `https://www.malopolska.uw.gov.pl/doc/średni%20miesięczny%20koszt%20utrzymania%20w%20dps%202026.pdf`
+  ⚠️ Serwer MUW ma problem z certyfikatem SSL — link działa w przeglądarce, ale narzędzie fetch go nie otwiera. Zweryfikuj ręcznie.
+- **Strona rejestru DPS/ŚDS MUW (fallback jeśli bezpośredni PDF nie działa):**
+  `https://www.malopolska.uw.gov.pl/default.aspx?page=sprawdz_placowke_w_rejestrze_wojewody`
+
+**[3b] MUW — Wykaz DPS Małopolska (lista placówek, nie koszty)**
+- URL: `https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf`
+- Aktualizowany: ostatnie wersje 18.02.2026 i 27.03.2026 (ten sam URL — nadpisywany)
+- Zastosowanie: weryfikacja czy wszystkie 91 placówek z kosztami są nadal aktywne
+
+**[3c] MUW — Wykaz ŚDS Małopolska**
+- URL: `https://www.malopolska.uw.gov.pl/doc/Wykaz%20Środowiskowych%20domów%20samopomocy.xlsx`
+- Format: Excel (.xlsx)
+- Zastosowanie: linkowanie wewnętrzne do artykułów o ŚDS (nie do tego artykułu)
+- 💡 **Potencjał:** te dane mogłyby wzbogacić bazę Placowka w projekcie
+
+**[3d] MUW — Koszty DPS 2025 (styczeń 2025)**
+- URL: <mark>URL niekompletny — użytkownik podał tylko https://www.malopolska.uw.gov.pl/doc/ — sprawdź pełny link</mark>
+- Prawdopodobny URL: `https://www.malopolska.uw.gov.pl/doc/średni%20miesięczny%20koszt%20utrzymania%20w%20dps%202025.pdf`
+- Zastosowanie: porównanie kosztów 2025 vs 2026 (trend wzrostu) — wartościowe do artykułu
+
+**[3e] MUW — Koszty DPS 2023 (archiwalne, dla kontekstu)**
+- URL: `https://www.malopolska.uw.gov.pl/doc/średni%20miesięczny%20koszt%20utrzymania%20w%20dps%202023%20r..pdf`
+- Zastosowanie: tylko jeśli piszesz o trendzie wzrostu cen przez lata
 
 ### ✅ Tier 2 — Weryfikowane artykuły i raporty
 
@@ -230,7 +251,8 @@ H1: Ile kosztuje DPS w 2026 roku? Kto płaci i kto jest zwolniony
 - [x] Progi dochodowe 2026 (300% kryterium) — ✅ 3030 zł / 2469 zł
 - [x] Kolejność płatności (senior → rodzina → gmina) — ✅ zweryfikowane
 - [x] Rodzeństwo nie płaci — ✅ zweryfikowane
-- [ ] <mark>Czy PDF MUW jest publicznie dostępny online? Znajdź URL do podlinkowania</mark>
+- [ ] <mark>Zweryfikuj ręcznie w przeglądarce: https://www.malopolska.uw.gov.pl/doc/średni%20miesięczny%20koszt%20utrzymania%20w%20dps%202026.pdf — czy to ten sam dokument co lokalny PDF?</mark>
+- [ ] <mark>Znajdź pełny URL kosztów 2025 (styczeń 2025) — prawdopodobnie: https://www.malopolska.uw.gov.pl/doc/średni%20miesięczny%20koszt%20utrzymania%20w%20dps%202025.pdf</mark>
 - [ ] <mark>Status projektu ustawy o dożywociu — projekt z 26.03.2026, sprawdź legislacja.gov.pl</mark>
 - [ ] <mark>Fraza "z późn. zm." w PDF MUW sugeruje nowelizacje PO sierpniu 2025 — sprawdź jakie zmiany weszły między VIII.2025 a V.2026 na isap.sejm.gov.pl</mark>
 - [ ] <mark>Średnia dla Małopolski — oblicz dokładną średnią arytmetyczną z 88 placówek (bez "bez zlecenia") jeśli chcesz podać konkretną liczbę w artykule</mark>
