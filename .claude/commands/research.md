@@ -58,10 +58,22 @@ Every research brief MUST identify at least **10 linkable sources** across these
 - mz.gov.pl — Ministry of Health data
 - nfz.gov.pl — NFZ reimbursement data
 
-**Tier 2 — Institutional reports:**
+**Tier 2 — Institutional reports (Polish):**
 - NIK reports (nik.gov.pl) on social care quality
-- WHO, Alzheimer's Disease International (for dementia statistics)
 - Central Register of Social Care Institutions
+- alzheimer.pl — Polskie Towarzystwo Alzheimerowskie
+
+**Tier 2b — International research (English OK — use when better data exists):**
+Research does NOT have to be limited to Polish sources. If international studies provide stronger evidence, cite them. Especially relevant for:
+- Alzheimer's & dementia: Alzheimer's Association (alz.org), Alzheimer's Disease International (alzint.org), Lancet, NEJM, BMJ
+- Lifestyle & healthy aging: WHO, Harvard Health, Mayo Clinic, Cochrane Reviews
+- Caregiver support: AARP, Dementia UK, Alzheimer's Society (UK)
+- Senior care models: studies from Nordic countries (often best practices in elderly care)
+
+When using English sources in a Polish article:
+- Translate/summarize the data into Polish in the article text
+- Link to the original English source (shows E-E-A-T, Google values international citations)
+- Format: "Według badań opublikowanych w [Lancet/NEJM/etc.] (2025)..."
 
 **Tier 3 — Data suitable for tables:**
 - Official price lists / fee schedules from individual DPS facilities

@@ -86,3 +86,14 @@ Każdy artykuł musi zawierać min. **5 linkowanych źródeł zewnętrznych** (c
 | zus.pl | Świadczenia, emerytury | Finanse, zasiłki |
 | alzheimer.pl | PTAiZ — Polskie Towarzystwo | Demencja, Alzheimer (PL źródło) |
 | alz.org / alzint.org | WHO/ADI raporty | Statystyki demencji światowe |
+| thelancet.com / nejm.org / bmj.com | Badania kliniczne | Demencja, styl życia, leczenie |
+| cochranelibrary.com | Przeglądy systematyczne | Skuteczność interwencji |
+| who.int | Raporty WHO | Dane globalne, starzenie się |
+| mayoclinic.org / health.harvard.edu | Wytyczne kliniczne | Zdrowie seniora, prewencja |
+
+**Źródła anglojęzyczne są dozwolone i pożądane** gdy:
+- Dostarczają nowszych lub lepiej udokumentowanych danych niż polskie źródła
+- Dotyczą tematów gdzie polska literatura jest uboga (badania nad Alzheimerem, styl życia, modele opieki)
+- Są to badania recenzowane (peer-reviewed) z prestiżowych czasopism
+
+Format cytowania w polskim artykule: "Według badań opublikowanych w [Lancet/NEJM] (2025)..." + link do oryginału.
