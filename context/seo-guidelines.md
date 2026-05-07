@@ -68,7 +68,7 @@ Tematy medyczno-prawne (demencja, przepisy, koszty) wymagają:
 
 ## ⚠️ Źródła do linkowania — OBOWIĄZKOWE
 
-Każdy artykuł musi zawierać min. **2 linkowane źródła zewnętrzne**. Podczas researchu zawsze szukaj źródeł nadających się do:
+Każdy artykuł musi zawierać min. **5 linkowanych źródeł zewnętrznych** (cel: 8–12). Podczas researchu zawsze szukaj źródeł nadających się do:
 - cytowania inline (np. "według danych GUS z 2025...")
 - przypisu pod tabelą (np. "Źródło: rejestr MUW, stan na 01.2026")
 - sekcji FAQ (link do oficjalnej odpowiedzi np. z ZUS, NFZ)

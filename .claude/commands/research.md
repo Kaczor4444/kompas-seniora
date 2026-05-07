@@ -49,7 +49,7 @@ Use this command to conduct comprehensive SEO keyword research and competitive a
 
 ### ⚠️ Linkable Sources — MANDATORY
 
-Every research brief MUST identify at least **5 linkable sources** across these categories:
+Every research brief MUST identify at least **10 linkable sources** across these categories (minimum: 3 Tier 1 + 3 Tier 2 + 4 Tier 3):
 
 **Tier 1 — Official Polish government (highest authority, always prefer):**
 - isap.sejm.gov.pl — texts of laws (Dz.U., ustawa o pomocy społecznej)
