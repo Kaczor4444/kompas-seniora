@@ -254,14 +254,16 @@ After `/write` completes and saves the draft, stop and prompt the user:
 
 ```
 ✅ Artykuł zapisany: drafts/[nazwa-pliku].md
+   Słów: [liczba] | Szacowany czas czytania: [N] min
 
-Kolejne kroki (wykonaj ręcznie w tej kolejności):
+Kolejne kroki:
 1. Przejrzyj artykuł — sprawdź fakty, cytowania prawne, źródła
 2. /scrub drafts/[nazwa-pliku].md — gdy jesteś zadowolony z treści
 3. /optimize drafts/[nazwa-pliku].md — finalna optymalizacja SEO
+4. /publish-draft drafts/[nazwa-pliku].md — przeniesie do MDX + doda do articles.ts + zrobi commit
 ```
 
-Do NOT proceed automatically to scrub or optimize. Wait for the user.
+Do NOT proceed automatically. Wait for the user to review and give the next command.
 
 ## Automatic Agent Execution
 After saving the main article, immediately execute optimization agents:
