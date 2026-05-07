@@ -207,16 +207,15 @@ export const sections: Section[] = [
       //   sectionId: 'finanse-prawne',
       //   category: 'Finanse',
       // },
-      // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
-      // {
-      //   slug: 'koszty-opieki',
-      //   sectionId: 'finanse-prawne',
-      //   category: 'Finanse',
-      //   badge: 'WKRÓTCE',
-      //   thumbnail: '/images/senior_obliczenia.webp',
-      //   isActive: false,
-      //   featuredOrder: 4,
-      // },
+      {
+        slug: 'koszty-opieki',
+        sectionId: 'finanse-prawne',
+        category: 'Finanse',
+        badge: 'NOWE',
+        thumbnail: '/images/senior_obliczenia.webp',
+        isActive: true,
+        featuredOrder: 5,
+      },
       // Prawne
       // WKRÓTCE - odkomentuj gdy artykuły będą gotowe
       // {
