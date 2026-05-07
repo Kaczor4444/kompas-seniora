@@ -38,6 +38,20 @@ Use this command to conduct comprehensive SEO keyword research and competitive a
 - **Target Keywords**: Cross-reference with @context/target-keywords.md priority list
 - **SEO Guidelines**: Ensure research aligns with @context/seo-guidelines.md requirements
 
+### 🚫 Anti-Hallucination — MANDATORY, READ FIRST
+
+**NEVER invent, guess, or approximate sources. Every link must be real and verified.**
+
+Rules:
+- Do NOT include a URL unless you have fetched it and confirmed it contains the claimed data
+- Do NOT paraphrase what you think a source "probably says" — quote what it actually says
+- If you cannot find a real source for a claim, write: "⚠️ Brak źródła — wymaga weryfikacji" and flag it visibly
+- A missing source is better than a made-up one. Do not add links just to reach the minimum count.
+- If a search returns a plausible-looking URL but you haven't verified its content — do NOT include it
+- When in doubt: fetch the page, confirm the data exists, then cite it
+
+Quality over quantity: **8 verified sources beat 10 invented ones every time.**
+
 ### ⚠️ Data Freshness — MANDATORY
 
 **Current year is 2026. All research MUST use 2026 data.**
