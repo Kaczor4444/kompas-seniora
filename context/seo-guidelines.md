@@ -13,11 +13,92 @@
 Każdy artykuł MUSI zawierać:
 
 1. **Frontmatter** z `title`, `excerpt`, `readTime`, `publishedAt`
-2. **Sekcja "Najważniejsze wnioski"** — 3–5 bullet points na górze (przed H2)
+2. **Sekcja "Najważniejsze wnioski"** — 3–5 bullet points na górze (przed H2) — patrz reguły AEO poniżej
 3. **Min. 2 nagłówki H2** z keyword lub pokrewną frazą
-4. **Sekcja FAQ** — min. 4 pytania (boost dla Featured Snippets i People Also Ask)
+4. **Sekcja FAQ** — min. 4 pytania — patrz reguły AEO poniżej
 5. **CTA na końcu** — link do wyszukiwarki `/search` lub kalkulatora `/kalkulator`
 6. **Sekcja "Powiązane artykuły"** — 2–3 linki wewnętrzne
+
+## ⚠️ AEO — Answer Engine Optimization (dla AI i skanerów)
+
+Dziś treść jest konsumowana na 3 sposoby jednocześnie:
+- **AI (Perplexity, ChatGPT, Google AI Overview)** — wyciągają samodzielne fragmenty, nie czytają całości
+- **Skaner** — czyta nagłówki i pierwsze zdania każdego akapitu, pomija resztę
+- **Czytelnik** — czyta dokładnie, ale tylko jeśli poprzednie dwa go nie odstraszą
+
+Artykuł musi działać dla wszystkich trzech. Oto konkretne reguły:
+
+### Reguła 1 — "Najważniejsze wnioski" = samodzielne odpowiedzi, nie spis treści
+
+❌ ŹLE (spis treści):
+```
+- Czym jest DPS
+- Jak wygląda proces
+- Ile to kosztuje
+```
+
+✅ DOBRZE (samodzielne odpowiedzi, każdy bullet działa bez kontekstu):
+```
+- Opłata za DPS wynosi maksymalnie 70% dochodu seniora — reszta zostaje na kieszonkowe
+- Wniosek składa się w MOPS, nie w placówce — to częsty błąd który opóźnia proces
+- Czas oczekiwania na miejsce w DPS w Małopolsce wynosi średnio 3–18 miesięcy
+- Jeśli dochód seniora nie pokrywa kosztów, resztę w pierwszej kolejności dopłaca rodzina
+```
+
+Każdy bullet musi zawierać **konkretną liczbę, fakt lub zasadę** — nie ogólnik.
+Pisz je PO napisaniu artykułu, nie przed.
+
+### Reguła 2 — FAQ: pytania jak w Google "People Also Ask"
+
+Min. 4 pytania, cel: 6–8. Każda odpowiedź w FAQ musi:
+- Mieć **40–80 słów** (tyle wyciąga Google do Featured Snippet)
+- Zaczynać się od **bezpośredniej odpowiedzi** (nie od "To zależy...")
+- Być **samodzielna** — zrozumiała bez czytania reszty artykułu
+- Kończyć się **linkiem wewnętrznym** gdy temat jest rozwinięty w innym artykule
+
+❌ ŹLE:
+```
+### Czy można zmienić DPS?
+To zależy od wielu czynników. Warto skonsultować się z pracownikiem socjalnym...
+```
+
+✅ DOBRZE:
+```
+### Czy można zmienić placówkę DPS po zamieszkaniu?
+Tak — mieszkaniec DPS ma prawo złożyć wniosek o przeniesienie do innej placówki.
+Decyzję wydaje MOPS na podstawie nowego wywiadu środowiskowego. Proces trwa
+zazwyczaj 1–3 miesiące. Wniosek może złożyć też rodzina w imieniu seniora.
+```
+
+Pytania w FAQ formułuj jak realny użytkownik wpisałby je w Google lub ChatGPT:
+- "Czy dzieci muszą płacić za DPS rodziców?"
+- "Ile się czeka na miejsce w DPS?"
+- "Co jeśli senior nie chce iść do DPS?"
+
+### Reguła 3 — pierwsze zdanie każdego H2 = samodzielna odpowiedź
+
+AI i skanery czytają pierwsze zdanie po nagłówku. Musi ono zawierać główną tezę sekcji.
+
+❌ ŹLE (pierwsze zdanie nie mówi nic):
+```
+## Koszty pobytu w DPS
+Kwestia finansowa jest jedną z najważniejszych przy wyborze placówki i warto ją dokładnie przeanalizować.
+```
+
+✅ DOBRZE:
+```
+## Koszty pobytu w DPS
+Miesięczna opłata za DPS wynosi maksymalnie 70% dochodu seniora — reszta do pełnej ceny pochodzi z kieszeni rodziny lub gminy.
+```
+
+### Reguła 4 — H2 jako pytanie gdy to naturalne
+
+Gdy artykuł odpowiada na konkretne pytania użytkowników, formułuj H2 jako pytanie:
+- "Ile kosztuje pobyt w DPS?" zamiast "Koszty DPS"
+- "Kto płaci za DPS gdy brakuje pieniędzy?" zamiast "Finansowanie przez rodzinę"
+- "Jak długo czeka się na miejsce?" zamiast "Czas oczekiwania"
+
+Nie na siłę — jeśli sekcja nie jest odpowiedzią na pytanie, zostaw H2 opisowy.
 
 ## Meta elementy
 
