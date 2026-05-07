@@ -35,10 +35,53 @@ Draft z `/write` ma format SEO Machine. Zamień na format MDX Kompas Seniora:
 title: "[tytuł z draftu]"
 excerpt: "[meta description z draftu, 140-160 znaków]"
 category: "[nazwa sekcji po polsku: Wybór opieki / Dla opiekuna / Dla seniora / Finanse i prawo]"
-readTime: "[oblicz: liczba słów / 200, zaokrąglij]"
+readTime: "[oblicz: liczba słów / 200, zaokrąglij] min"
 publishedAt: "[dzisiejsza data YYYY-MM-DD]"
+thumbnail: "[patrz: Krok 2b]"
+heroImage: "[patrz: Krok 2b]"
 ---
 ```
+
+### Krok 2b — Dobierz zdjęcia (thumbnail + heroImage)
+
+Dostępne zdjęcia w `/public/images/` z sugestiami zastosowania:
+
+| Plik | Pasuje do tematu |
+|------|-----------------|
+| `senior_opiekunka.webp` | opieka, wybór placówki, relacja senior-opiekun |
+| `demencja.webp` | Alzheimer, demencja, opieka nad chorym |
+| `demencja_hero.webp` | hero dla artykułów o demencji |
+| `babcia_dom_opieki.webp` | DPS, dom opieki, przeprowadzka do placówki |
+| `babcia_dom_opieki2.webp` | j.w., wersja alternatywna |
+| `seniorzy_puzle.webp` | aktywność umysłowa, ŚDS, zajęcia terapeutyczne |
+| `seniorzy_puzle2.webp` | j.w., wersja hero |
+| `seniorzy_ciasto.png` | codzienność w DPS, integracja, zajęcia |
+| `seniorzy_ciasto2.webp` | j.w., wersja hero |
+| `aktywnosc_seniora.webp` | ćwiczenia, aktywność fizyczna, zdrowie |
+| `aktywnosc_seniora_2.webp` | j.w., wersja hero |
+| `senior_cwiczenia.webp` | rehabilitacja, ruch, zdrowie po 70 |
+| `senior_obliczenia.webp` | koszty, finanse, obliczenia, budżet |
+| `babcia_tablet.webp` | technologia, internet, nowoczesność |
+| `babcie_rowery.webp` | aktywność, styl życia, seniorzy aktywni |
+| `dps-comfort.webp` | komfort w DPS, dobra placówka |
+| `family-support.webp` | rodzina, wsparcie, relacje |
+| `garden-therapy.webp` | terapia ogrodowa, aktywność w placówce |
+| `wybor_placowki_hero.webp` | hero dla artykułów o wyborze DPS |
+| `zdrowie_po_70_hero.webp` | hero dla artykułów o zdrowiu seniora |
+| `telefon.webp` | kontakt, MOPS, telefon do placówki |
+
+**Zasada doboru:**
+- `thumbnail` = zdjęcie które wygląda dobrze w karcie artykułu (kwadrat/poziom, twarz lub akcja)
+- `heroImage` = szersze, bardziej "filmowe" zdjęcie na baner górny artykułu
+- Często `thumbnail` i `heroImage` to para (np. `demencja.webp` + `demencja_hero.webp`)
+
+**Jeśli żadne zdjęcie nie pasuje:**
+Zamiast zgadywać, dodaj placeholder i wyraźnie zaznacz:
+```yaml
+thumbnail: "📸 PLACEHOLDER — potrzebne zdjęcie: [opis co powinno być na zdjęciu]"
+heroImage: "📸 PLACEHOLDER — potrzebne zdjęcie: [opis co powinno być na zdjęciu]"
+```
+Np. dla artykułu o kosztach DPS: `"📸 PLACEHOLDER — senior z dokumentami/rachunkami, ciepłe światło"`
 
 ### Krok 3 — Przenieś plik
 
