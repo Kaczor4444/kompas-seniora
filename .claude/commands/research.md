@@ -38,12 +38,47 @@ Use this command to conduct comprehensive SEO keyword research and competitive a
 - **Target Keywords**: Cross-reference with @context/target-keywords.md priority list
 - **SEO Guidelines**: Ensure research aligns with @context/seo-guidelines.md requirements
 
-### Podcast Industry Focus
-- **Podcast Creator Angle**: How does this topic specifically impact target audiences?
-- **Technical Requirements**: Any your industry-specific technical considerations?
-- **Industry Trends**: Current trends in your industry that relate to this topic
-- **Use Cases**: Real podcast scenarios where this topic matters
-- **Pain Points**: Specific challenges target audiences face with this topic
+### ⚠️ Data Freshness — MANDATORY
+
+**Current year is 2026. All research MUST use 2026 data.**
+
+- **Never cite data older than 2024** — always search for "2025" or "2026" versions of statistics
+- When searching, always append the year: e.g. "koszty DPS 2026", "dodatek pielęgnacyjny 2026 kwota"
+- If only older data is available, explicitly note it: "(dane za 2024 — brak nowszych)"
+- Check if cited laws/regulations have been updated since 2024
+
+### ⚠️ Linkable Sources — MANDATORY
+
+Every research brief MUST identify at least **5 linkable sources** across these categories:
+
+**Tier 1 — Official Polish government (highest authority, always prefer):**
+- isap.sejm.gov.pl — texts of laws (Dz.U., ustawa o pomocy społecznej)
+- malopolska.uw.gov.pl — Małopolska regional data, DPS registries
+- stat.gov.pl — GUS statistics (population, elderly care data)
+- mz.gov.pl — Ministry of Health data
+- nfz.gov.pl — NFZ reimbursement data
+
+**Tier 2 — Institutional reports:**
+- NIK reports (nik.gov.pl) on social care quality
+- WHO, Alzheimer's Disease International (for dementia statistics)
+- Central Register of Social Care Institutions
+
+**Tier 3 — Data suitable for tables:**
+- Official price lists / fee schedules from individual DPS facilities
+- Regional statistics (how many DPS per powiat, waiting times)
+- Comparison data (DPS vs private care costs)
+
+For each source found, note:
+1. URL (full, linkable)
+2. What specific data it contains (statistic, regulation, table)
+3. Date of the data
+4. How to use it (inline citation, table source, FAQ answer)
+
+### Kompas Seniora — Topic Focus
+- **Senior Care Angle**: How does this topic impact families choosing care for elderly relatives?
+- **Legal/Financial Angle**: Are there regulations, costs, or rights relevant to this topic?
+- **Regional Angle**: Is there Małopolska-specific data available (DPS counts, waiting times, prices)?
+- **Pain Points**: What specific challenges do families and caregivers face with this topic?
 
 ### Content Planning
 - **Recommended Structure**: Outline H2 and H3 headings based on research

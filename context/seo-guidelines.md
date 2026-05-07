@@ -53,6 +53,36 @@ Każdy artykuł MUSI zawierać:
 
 Tematy medyczno-prawne (demencja, przepisy, koszty) wymagają:
 - Cytowania konkretnych ustaw z numerami artykułów
-- Dat aktualizacji danych ("stan na X 2025")
+- Dat aktualizacji danych ("stan na X 2025" lub "stan na X 2026")
 - Linków do oficjalnych rejestrów (np. rejestr DPS Małopolska)
 - Unikania twierdzeń bez źródła przy danych liczbowych
+
+## ⚠️ Aktualność danych — OBOWIĄZKOWE
+
+**Aktualny rok to 2026. Wszystkie dane muszą być z 2025 lub 2026.**
+
+- Nigdy nie cytuj danych starszych niż 2024 bez wyraźnego zaznaczenia
+- Przy wyszukiwaniu zawsze dodawaj rok: "koszty DPS 2026", "dodatek pielęgnacyjny 2026"
+- Jeśli nowszych danych brak, napisz wprost: "(dane za 2024, brak nowszych oficjalnych)"
+- Sprawdzaj czy cytowane przepisy były nowelizowane po 2024
+
+## ⚠️ Źródła do linkowania — OBOWIĄZKOWE
+
+Każdy artykuł musi zawierać min. **2 linkowane źródła zewnętrzne**. Podczas researchu zawsze szukaj źródeł nadających się do:
+- cytowania inline (np. "według danych GUS z 2025...")
+- przypisu pod tabelą (np. "Źródło: rejestr MUW, stan na 01.2026")
+- sekcji FAQ (link do oficjalnej odpowiedzi np. z ZUS, NFZ)
+
+**Priorytetowe domeny źródeł (od najwyższego autorytetu):**
+
+| Domena | Co zawiera | Kiedy linkować |
+|--------|-----------|----------------|
+| isap.sejm.gov.pl | Teksty ustaw (Dz.U.) | Każde powołanie na przepis prawny |
+| malopolska.uw.gov.pl | Rejestry DPS/ŚDS, wolne miejsca | Dane regionalne Małopolska |
+| stat.gov.pl (GUS) | Statystyki ludności, opieki | Dane demograficzne, liczby placówek |
+| mz.gov.pl | Dane Ministerstwa Zdrowia | Tematy zdrowotne, demencja |
+| nfz.gov.pl | Refundacje, świadczenia | Finansowanie opieki przez NFZ |
+| nik.gov.pl | Raporty NIK o jakości DPS | Jakość opieki, kontrole |
+| zus.pl | Świadczenia, emerytury | Finanse, zasiłki |
+| alzheimer.pl | PTAiZ — Polskie Towarzystwo | Demencja, Alzheimer (PL źródło) |
+| alz.org / alzint.org | WHO/ADI raporty | Statystyki demencji światowe |
