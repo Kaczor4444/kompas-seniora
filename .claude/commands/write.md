@@ -239,40 +239,29 @@ After completing the article, automatically save to:
 
 Example: `drafts/content-marketing-strategies-2025-10-15.md`
 
-## Automatic Content Scrubbing
+## ⛔ Auto-Scrub DISABLED — Manual Workflow Required
 
-**CRITICAL**: Immediately after saving the article file, automatically invoke the content scrubber to remove AI watermarks and telltale patterns.
+Do NOT automatically run `/scrub` after saving. For Kompas Seniora, scrubbing is a manual step.
 
-### Why This Matters
-AI-generated content often contains invisible Unicode watermarks and characteristic patterns (like em-dash overuse) that can identify it as AI-written. Scrubbing removes these indicators to make content appear naturally human-written.
+### Reasons
+1. Articles contain legal citations (art. 60 ustawy o pomocy społecznej etc.) — auto-scrub risks rephrasing legally precise text
+2. Scrub patterns target English AI-slop; Polish patterns are different and need human review
+3. Low article volume (1–2/week) — manual review at each step is feasible and preferred
 
-### Scrubbing Process
-1. **Invoke Scrubber**: Run `/scrub [file-path]` on the saved article file
-2. **Automatic Execution**: This should happen automatically, not require user action
-3. **Timing**: Must occur immediately after file save, before any other processing
-4. **Scope**: Scrub the main article file only (not meta or analysis files)
+### Required Workflow for Kompas Seniora
 
-### What Gets Cleaned
-- Invisible Unicode watermarks (zero-width spaces, BOMs, format-control characters)
-- Em-dashes replaced with contextually appropriate punctuation (commas, semicolons, periods)
-- Whitespace normalization and formatting cleanup
-- All changes preserve content meaning and markdown structure
+After `/write` completes and saves the draft, stop and prompt the user:
 
-### Verification
-The scrubber will display statistics:
-- Unicode watermarks removed
-- Format-control characters removed
-- Em-dashes replaced
-
-### Example Workflow
 ```
-1. Write article → Save to drafts/article-name-2025-10-31.md
-2. IMMEDIATELY run: /scrub drafts/article-name-2025-10-31.md
-3. Verify scrubbing statistics
-4. THEN proceed with optimization agents below
+✅ Artykuł zapisany: drafts/[nazwa-pliku].md
+
+Kolejne kroki (wykonaj ręcznie w tej kolejności):
+1. Przejrzyj artykuł — sprawdź fakty, cytowania prawne, źródła
+2. /scrub drafts/[nazwa-pliku].md — gdy jesteś zadowolony z treści
+3. /optimize drafts/[nazwa-pliku].md — finalna optymalizacja SEO
 ```
 
-This ensures all published content is free of AI signatures before any further processing.
+Do NOT proceed automatically to scrub or optimize. Wait for the user.
 
 ## Automatic Agent Execution
 After saving the main article, immediately execute optimization agents:
