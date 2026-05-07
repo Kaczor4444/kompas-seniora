@@ -58,8 +58,14 @@ Quality over quantity: **8 verified sources beat 10 invented ones every time.**
 
 - **Never cite data older than 2024** — always search for "2025" or "2026" versions of statistics
 - When searching, always append the year: e.g. "koszty DPS 2026", "dodatek pielęgnacyjny 2026 kwota"
-- If only older data is available, explicitly note it: "(dane za 2024 — brak nowszych)"
-- Check if cited laws/regulations have been updated since 2024
+- If only older data is available, explicitly note it: "⚠️ dane za [rok] — brak nowszych, wymaga weryfikacji"
+- **International research (health/lifestyle only)**: max 5 years old = from 2021 minimum. If only older studies exist, flag: "⚠️ Brak nowszych badań — najnowsze dostępne z [rok], wymaga weryfikacji czy opublikowano coś nowszego"
+
+**Polish legal/regulatory sources — special rules:**
+- Always fetch the current consolidated text from isap.sejm.gov.pl (not a blog quoting it)
+- After citing any law article, note: "tekst jednolity z dnia [date of latest consolidation]"
+- If you cannot confirm the last amendment date, flag: "⚠️ Wymaga weryfikacji czy ustawa była nowelizowana po [date you checked]"
+- Never cite a secondary source (news article, blog) for legal data — always go to primary ISAP
 
 ### ⚠️ Linkable Sources — MANDATORY
 
@@ -77,17 +83,21 @@ Every research brief MUST identify at least **10 linkable sources** across these
 - Central Register of Social Care Institutions
 - alzheimer.pl — Polskie Towarzystwo Alzheimerowskie
 
-**Tier 2b — International research (English OK — use when better data exists):**
-Research does NOT have to be limited to Polish sources. If international studies provide stronger evidence, cite them. Especially relevant for:
-- Alzheimer's & dementia: Alzheimer's Association (alz.org), Alzheimer's Disease International (alzint.org), Lancet, NEJM, BMJ
-- Lifestyle & healthy aging: WHO, Harvard Health, Mayo Clinic, Cochrane Reviews
-- Caregiver support: AARP, Dementia UK, Alzheimer's Society (UK)
-- Senior care models: studies from Nordic countries (often best practices in elderly care)
+**Tier 2b — International research (English OK — ONLY for health, lifestyle, dementia topics):**
+❌ NOT allowed for: finanse-prawne, dokumenty, koszty DPS, zasiłki, przepisy — Polish law only.
+✅ Allowed for: dla-seniora (health, activity), dla-opiekuna (dementia care, caregiver burnout), wybor-opieki (care models, quality of life research)
+
+Use when international studies provide stronger evidence than Polish sources. Max age: 5 years (2021+).
+- Alzheimer's & dementia: alz.org, alzint.org, Lancet, NEJM, BMJ, Cochrane
+- Lifestyle & healthy aging: WHO, Harvard Health, Mayo Clinic
+- Caregiver support: Dementia UK, Alzheimer's Society (UK)
+- Care quality models: Nordic countries research (Sweden, Denmark, Norway — gold standard in elderly care)
 
 When using English sources in a Polish article:
-- Translate/summarize the data into Polish in the article text
-- Link to the original English source (shows E-E-A-T, Google values international citations)
-- Format: "Według badań opublikowanych w [Lancet/NEJM/etc.] (2025)..."
+- Summarize the finding in Polish in the article text
+- Link to the original English source (E-E-A-T signal for Google)
+- Format: "Według badań opublikowanych w [Lancet] (2025)..."
+- If study is older than 5 years: flag "⚠️ Brak nowszych badań w tym obszarze"
 
 **Tier 3 — Data suitable for tables:**
 - Official price lists / fee schedules from individual DPS facilities
@@ -99,6 +109,13 @@ For each source found, note:
 2. What specific data it contains (statistic, regulation, table)
 3. Date of the data
 4. How to use it (inline citation, table source, FAQ answer)
+
+**When data exists but has no public URL (e.g. DPS price lists available only by phone/on-site):**
+- Do NOT invent a link
+- Do NOT skip the data if it's valuable
+- Instead, flag it as an internal data opportunity:
+  > "⚠️ Dane niedostępne publicznie online. Rozważ dodanie do bazy Kompas Seniora (tabela Placowka → koszt_pobytu) i linkowanie wewnętrzne do /search lub /placowka/[id] zamiast do zewnętrznego źródła."
+- This turns a missing external source into a reason to enrich the internal database
 
 ### Kompas Seniora — Topic Focus
 - **Senior Care Angle**: How does this topic impact families choosing care for elderly relatives?
