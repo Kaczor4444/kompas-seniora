@@ -1,3 +1,59 @@
+# SESSION NOTES - 2026-05-08
+
+## ✅ SESJA #12: Synchronizacja bazy DPS z wykazem PDF + Monitor automatyczny
+
+### Co zrobiliśmy:
+
+#### 1. Porównanie bazy z wykazem DPS Małopolska (27.03.2026)
+- PDF: 91 placówek | Baza przed: 89 placówek
+- **Brakujące:** l.p. 39 (Skrzydlna), l.p. 57 (Mogilno) → dodane ręcznie przez użytkownika
+- **Błędy nazw (3):** naprawione automatycznie
+  - l.p. 9: `DomDom` → `Dom`
+  - l.p. 17: błędna nazwa (adres urzędu) → prawidłowa nazwa DPS
+  - l.p. 62: brak spacji `SpołecznejBraci` → `Społecznej Braci`
+- **Wynik końcowy:** 91/91 zgodnych ✅
+
+#### 2. DPS bez ceny — logika "bez zlecenia"
+- l.p. 39 Skrzydlna: prowadzony przez stowarzyszenie bez zlecenia samorządu
+- l.p. 57 Mogilno: prowadzony przez osobę fizyczną
+- Oba: `koszt_pobytu = null`, `data_zrodla_cena = 2026`, `notatki` z podstawą prawną (art. 60 ust. 2)
+
+#### 3. Fix wyświetlania ceny na frontendzie
+- **Przed:** `null` → "NFZ" (błędne!)
+- **Po:** 3 stany:
+  - DPS z ceną → `4 500 zł / mies.`
+  - DPS bez ceny (null) → `Zapytaj` (szary)
+  - ŚDS (zawsze null) → `Bezpłatne` (zielony)
+- Pliki: `FacilityCard.tsx`, `SearchResults.tsx`
+
+#### 4. Dodatkowe porównanie: telefony, emaile, profile, miejsca
+- **Profil — 4 uszkodzone rekordy** (wartości "F", "E", "C", "A") → naprawione
+- **Telefony — 7 rozbieżności** → zaktualizowane z PDF
+- **Emaile — 15 rozbieżności** → zaktualizowane z PDF
+- **Miejsca — 1 rozbieżność** (l.p. 82: 72→70) → naprawione
+
+#### 5. GitHub Actions — automatyczny monitor PDF
+- Workflow: `.github/workflows/dps-pdf-monitor.yml`
+  - Cron: 1. każdego miesiąca o 8:00 UTC
+  - `workflow_dispatch` do ręcznego odpalenia
+  - Pobiera PDF, porównuje z bazą, tworzy GitHub Issue z raportem
+- Skrypt: `scripts/monitor-dps-pdf.py` (Python: pdfplumber + psycopg2)
+- API: `/api/admin/trigger-pdf-check` — wyzwala workflow przez GitHub API
+- Panel admina: przycisk "Sprawdź teraz" + checkbox "Wymuś porównanie"
+- Wymaga: `GITHUB_PAT` w `.env` i Vercel, `DATABASE_URL` jako GitHub Secret
+
+### Commity:
+- `2be69bf` — fix: Poprawne wyświetlanie ceny (ŚDS/DPS null/DPS z ceną)
+- `d6cd1da` — chore: Aktualizacja linków raw_dane + usunięcie advisor.png
+- `3a510ac` — feat: Monitor DPS PDF (GitHub Actions + admin panel)
+
+### Stan bazy po sesji:
+- **DPS Małopolska:** 91 placówek (zsynchronizowane z wykazem 27.03.2026 ✅)
+- **ŚDS:** 95 placówek (bez zmian)
+- **Łącznie:** 186 placówek
+
+---
+
 # SESSION NOTES - 2026-03-18
 
 ## ✅ SESJA #10: Fix out-of-region detection - KOMPLETNY

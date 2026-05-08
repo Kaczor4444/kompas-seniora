@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-04-22 (sesja #10 - SEO audit i AI bot tracking)
+> Ostatnia aktualizacja: 2026-05-08 (sesja #12 - Synchronizacja bazy DPS + Monitor PDF)
 
 ---
 
@@ -267,11 +267,12 @@ model Placowka {
    - 31 DPS auto-matched (pewne dopasowania po powiecie + ulicy)
 4. 🔄 Ręczne wypełnienie pozostałych (~49 DPS) - **W TRAKCIE**
 
-**Progress weryfikacji DPS:**
-- **36/85 DPS** wypełnione (42%)
-  - 31 automatycznie (skrypt)
-  - 5 ręcznie (l.p. 1-5)
-- **49/85 DPS** do uzupełnienia (58%)
+**Progress weryfikacji DPS (stan: 2026-05-08):**
+- **91/91 DPS** — pełna synchronizacja z wykazem PDF z 27.03.2026 ✅
+- Baza zawiera 2 placówki bez ceny (bez zlecenia samorządu):
+  - l.p. 39 Skrzydlna — stowarzyszenie EGIDA
+  - l.p. 57 Mogilno — osoba fizyczna
+  - Obie mają `koszt_pobytu = null` + `notatki` z podstawą prawną
 
 **Kluczowa koncepcja:**
 - `oficjalne_id` = **numer rejestru wojewódzkiego** (stały identyfikator)
@@ -279,9 +280,48 @@ model Placowka {
 - Ten sam `oficjalne_id` łączy dane z różnych źródeł (wykaz placówek, cennik, strony www)
 
 **Plany:**
-- [ ] Dokończyć weryfikację DPS (49 placówek)
+- [x] Pełna weryfikacja DPS (91 placówek) ✅ 2026-05-08
 - [ ] Powtórzyć proces dla ŚDS (95 placówek)
-- [ ] Skrypt porównujący nowe wykazy z bazą (automatyczna detekcja zmian)
+- [x] Automatyczny monitor PDF (GitHub Actions) ✅ 2026-05-08
+
+---
+
+## ✅ Synchronizacja bazy DPS + Monitor PDF (2026-05-08)
+
+### Stan bazy DPS po sesji
+- **91 placówek DPS Małopolska** — pełna synchronizacja z wykazem PDF z 27.03.2026
+- **2 placówki bez ceny** (prowadzone bez zlecenia samorządu — art. 60 ust. 2 nie dotyczy):
+  - l.p. 39: Dom Pomocy Społecznej w Skrzydlnej (stowarzyszenie EGIDA)
+  - l.p. 57: Dom Pomocy Społecznej im. O. Pio w Mogilnie (osoba fizyczna)
+
+### Fix wyświetlania ceny (FacilityCard.tsx)
+Trzy stany zamiast błędnego "NFZ":
+- DPS z ceną → `X zł / mies.`
+- DPS bez ceny (`null`) → `Zapytaj` (szary)
+- ŚDS (zawsze `null`) → `Bezpłatne` (zielony)
+
+### Automatyczny Monitor DPS PDF
+**Cel:** Co miesiąc pobiera aktualny wykaz DPS z MUW Małopolska, porównuje z bazą, tworzy GitHub Issue.
+
+**Architektura:**
+- `scripts/monitor-dps-pdf.py` — Python: pdfplumber + psycopg2
+  - Pobiera PDF z URL MUW
+  - Porównuje hash (pomija gdy bez zmian)
+  - Parsuje: nazwy, telefony, emaile, profile, liczba miejsc
+  - Tworzy GitHub Issue z raportem różnic
+- `.github/workflows/dps-pdf-monitor.yml`
+  - Cron: `0 8 1 * *` (1. każdego miesiąca)
+  - `workflow_dispatch` (ręczne odpalenie)
+  - Commituje nowy PDF do `raw_dane/malopolskie/`
+
+**Panel admina:** (`/admin`)
+- Przycisk "Sprawdź teraz" → wywołuje `POST /api/admin/trigger-pdf-check`
+- Checkbox "Wymuś porównanie" → `FORCE_COMPARE=true`
+- Link do poprzednich raportów na GitHub Issues
+
+**Wymagane zmienne środowiskowe:**
+- `GITHUB_PAT` — PAT z uprawnieniem Actions (w `.env` i Vercel)
+- `DATABASE_URL` — jako GitHub Secret (Actions → Secrets)
 
 ---
 
