@@ -12,7 +12,7 @@ interface FacilityCardProps {
     city: string;
     powiat: string;
     category: string;
-    price: number;
+    price: number | null;
     street?: string | null;
     image: string;
     waitTime: string;
@@ -91,15 +91,17 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
             {/* Price */}
             <div className="text-right">
               <div className="text-xl sm:text-2xl font-black text-slate-900">
-                {facility.price > 0 ? (
+                {facility.price && facility.price > 0 ? (
                   <>
-                    {facility.price} <span className="text-sm font-medium text-slate-500">zł</span>
+                    {facility.price.toLocaleString('pl-PL')} <span className="text-sm font-medium text-slate-500">zł</span>
                   </>
+                ) : facility.type === 'ŚDS' ? (
+                  <span className="text-emerald-600 text-lg">Bezpłatne</span>
                 ) : (
-                  <span className="text-emerald-600">NFZ</span>
+                  <span className="text-slate-400 text-base font-semibold">Zapytaj</span>
                 )}
               </div>
-              {facility.price > 0 && (
+              {facility.price && facility.price > 0 && (
                 <div className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">miesięcznie</div>
               )}
             </div>

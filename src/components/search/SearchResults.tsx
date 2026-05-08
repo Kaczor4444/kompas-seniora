@@ -1111,7 +1111,7 @@ export default function SearchResults({
                         city: fac.miejscowosc || '',
                         powiat: fac.powiat || '',
                         category: fac.typ_placowki === 'DPS' ? 'Dom Pomocy Społecznej' : 'Środowiskowy Dom Samopomocy',
-                        price: fac.koszt_pobytu || 0,
+                        price: fac.koszt_pobytu ?? null,
                         street: fac.ulica,
                         image: '/images/placeholder-facility.jpg',
                         waitTime: 'Brak danych',
