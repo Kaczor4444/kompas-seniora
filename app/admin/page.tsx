@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { isValidAdminCookie } from '@/lib/adminAuth';
+import PdfMonitorButton from './PdfMonitorButton';
 
 export default async function AdminDashboardPage() {
   // Auth check
@@ -109,6 +110,18 @@ export default async function AdminDashboardPage() {
             </p>
           </Link>
         </div>
+      </div>
+
+      {/* Monitor PDF */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+          📄 Monitor DPS PDF — Małopolska
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Pobiera aktualny wykaz DPS z MUW Małopolska, porównuje z bazą i tworzy raport jako GitHub Issue.
+          Uruchamia się automatycznie 1. każdego miesiąca.
+        </p>
+        <PdfMonitorButton />
       </div>
 
       {/* Recent Security Logs */}
