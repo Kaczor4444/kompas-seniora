@@ -102,6 +102,7 @@ interface Placowka {
   miejsca_za_zyciem?: number | null;
   profil_opieki: string | null;
   koszt_pobytu: number | null;
+  data_zrodla_cena?: Date | string | null;
   data_aktualizacji: Date | null;
   zrodlo_dane: string | null;
   latitude: number | null;
@@ -594,6 +595,15 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       <span className="font-bold">Dofinansowanie dostępne</span>
                     </div>
                   )}
+                  {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 && placowka.data_zrodla_cena && (() => {
+                    const d = new Date(placowka.data_zrodla_cena!);
+                    const months = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+                    return (
+                      <div className="text-xs text-primary-300 mt-1">
+                        ↳ obowiązuje od {months[d.getMonth()]} {d.getFullYear()}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* CTA BUTTONS */}
