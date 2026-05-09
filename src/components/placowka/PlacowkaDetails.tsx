@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getProfileOpiekiNazwy } from '@/src/data/profileopieki';
+import { getProfileOpiekiNazwyDPS, getProfileOpiekiNazwySDS } from '@/src/data/profileopieki';
 import { useAnalytics } from '@/src/hooks/useAnalytics';
 import { isFavorite, addFavorite, removeFavorite } from '@/src/utils/favorites';
 import {
@@ -123,6 +123,24 @@ function incrementSessionViews(): number {
   return count;
 }
 
+// Parses profil_opieki for DPS — handles both code format ("E,F") and full text
+function parseDpsProfile(profil_opieki: string | null): string[] {
+  if (!profil_opieki) return [];
+  const trimmed = profil_opieki.trim();
+
+  // Code format: "E", "E,F", "A,C,E" — all uppercase letters and commas
+  if (/^[A-Z](,[A-Z])*$/.test(trimmed)) {
+    return getProfileOpiekiNazwyDPS(trimmed);
+  }
+
+  // Full text format — split by newlines, strip capacity numbers (e.g. "- 50 miejsc")
+  return trimmed
+    .split('\n')
+    .map(line => line.replace(/\s*[-–]?\s*\d+.*$/g, '').trim().replace(/[,\s]+$/, ''))
+    .filter(line => line.length > 5)
+    .map(line => line.charAt(0).toUpperCase() + line.slice(1));
+}
+
 // Generate facility description from available data
 function generateFacilityDescription(placowka: Placowka): string {
   const parts: string[] = [];
@@ -173,7 +191,9 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
     return () => window.removeEventListener('favoritesChanged', onFavChange);
   }, [placowka.id]);
 
-  const profiles = getProfileOpiekiNazwy(placowka.profil_opieki);
+  const profiles = placowka.typ_placowki.includes('DPS')
+    ? parseDpsProfile(placowka.profil_opieki)
+    : getProfileOpiekiNazwySDS(placowka.profil_opieki);
 
   const handlePhoneClick = () => {
     trackEvent({
@@ -384,6 +404,16 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
               <MapPin size={16} className="text-primary-600" />
               <span>{placowka.ulica && `${placowka.ulica}, `}{placowka.miejscowosc}</span>
             </div>
+            {profiles.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {profiles.map((profile, i) => (
+                  <span key={i} className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-semibold px-2.5 py-1 rounded-full">
+                    <Users size={11} />
+                    {profile}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -422,7 +452,9 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             <div>
               <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Koszt (mc)</div>
               <div className="font-bold text-slate-900 text-sm">
-                {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł` : 'NFZ'}
+                {placowka.koszt_pobytu && placowka.koszt_pobytu > 0
+                  ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł`
+                  : placowka.typ_placowki.includes('ŚDS') ? 'Bezpłatne' : 'Zapytaj'}
               </div>
             </div>
           </div>
@@ -588,7 +620,9 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                     Koszt miesięczny
                   </div>
                   <div className="text-5xl md:text-6xl font-black mb-3">
-                    {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł` : 'NFZ'}
+                    {placowka.koszt_pobytu && placowka.koszt_pobytu > 0
+                      ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł`
+                      : placowka.typ_placowki.includes('ŚDS') ? 'Bezpłatne' : 'Zapytaj'}
                   </div>
                   {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 && placowka.data_zrodla_cena && (() => {
                     const d = new Date(placowka.data_zrodla_cena!);
