@@ -614,16 +614,16 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       <div className="flex items-end gap-2 h-14">
                         {ceny.map((c) => {
                           const height = max === min ? 100 : Math.round(((c.kwota - min) / (max - min)) * 70 + 30);
+                          const isCurrent = c.rok === ceny[ceny.length - 1].rok;
                           return (
                             <div key={c.rok} className="flex flex-col items-center flex-1 gap-1">
-                              <div className="text-[9px] text-primary-300 font-bold">
-                                {c.kwota.toLocaleString('pl-PL')}
-                              </div>
                               <div
-                                className="w-full rounded-t bg-primary-500"
+                                className={`w-full rounded-t ${isCurrent ? 'bg-emerald-400' : 'bg-primary-500'}`}
                                 style={{ height: `${height}%` }}
                               />
-                              <div className="text-[9px] text-primary-400">{c.rok}</div>
+                              <div className={`text-[9px] ${isCurrent ? 'text-emerald-400 font-bold' : 'text-primary-400'}`}>
+                                {c.rok}
+                              </div>
                             </div>
                           );
                         })}
