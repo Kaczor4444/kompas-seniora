@@ -15,7 +15,7 @@ import pdfplumber
 import psycopg2
 from pathlib import Path
 
-PDF_URL = "https://www.malopolska.uw.gov.pl/doc/do%20publikacji%20koszt%20%20dps-2026.pdf"
+PDF_URL = "https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf"
 REPO = os.environ.get("GITHUB_REPOSITORY", "Kaczor4444/kompas-seniora")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
