@@ -105,9 +105,6 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               {facility.price && facility.price > 0 && (
                 <div className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">miesięcznie</div>
               )}
-              {facility.price && facility.price > 0 && facility.priceDate && (
-                <div className="text-[9px] text-slate-400 leading-tight">↳ {facility.priceDate}</div>
-              )}
             </div>
 
             {/* Compare Checkbox - tylko desktop (≥640px) */}
