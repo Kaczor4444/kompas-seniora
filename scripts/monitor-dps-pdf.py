@@ -18,7 +18,7 @@ from pathlib import Path
 PDF_URL = "https://www.malopolska.uw.gov.pl/doc/do%20publikacji%20koszt%20%20dps-2026.pdf"
 REPO = os.environ.get("GITHUB_REPOSITORY", "Kaczor4444/kompas-seniora")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 RAW_DANE_DIR = Path(__file__).parent.parent / "raw_dane" / "malopolskie"
 
 
