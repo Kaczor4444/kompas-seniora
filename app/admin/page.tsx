@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { isValidAdminCookie } from '@/lib/adminAuth';
 import PdfMonitorButton from './PdfMonitorButton';
+import WolneMiejscaMonitorButton from './WolneMiejscaMonitorButton';
 
 export default async function AdminDashboardPage() {
   // Auth check
@@ -122,6 +123,18 @@ export default async function AdminDashboardPage() {
           Uruchamia się automatycznie 1. każdego miesiąca.
         </p>
         <PdfMonitorButton />
+      </div>
+
+      {/* Monitor wolnych miejsc */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+          🏠 Monitor wolnych miejsc DPS — Małopolska
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Pobiera plik XLSX z MUW Małopolska z aktualnym rejestrem wolnych miejsc.
+          Issue tworzony tylko gdy plik się zmienił. Uruchamia się automatycznie 1. każdego miesiąca.
+        </p>
+        <WolneMiejscaMonitorButton />
       </div>
 
       {/* Recent Security Logs */}
