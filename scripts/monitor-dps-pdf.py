@@ -25,7 +25,9 @@ RAW_DANE_DIR = Path(__file__).parent.parent / "raw_dane" / "malopolskie"
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 def download_pdf(url: str) -> bytes:
-    r = requests.get(url, timeout=30)
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    r = requests.get(url, timeout=30, verify=False)
     r.raise_for_status()
     return r.content
 
@@ -46,6 +48,24 @@ def save_pdf(data: bytes, h: str) -> Path:
     path.write_bytes(data)
     (RAW_DANE_DIR / ".pdf_hash").write_text(h)
     return path
+
+
+def update_download_log(pdf_path: Path, h: str, issue_url: str | None = None):
+    log_path = RAW_DANE_DIR / "pobrane.md"
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    issue_link = f" | [Issue]({issue_url})" if issue_url else ""
+    entry = f"| {now} | [{pdf_path.name}]({pdf_path.name}) | `{h}` | [źródło PDF]({PDF_URL}){issue_link} |\n"
+
+    if not log_path.exists():
+        log_path.write_text(
+            "# Dziennik pobrań — wykaz DPS Małopolska\n\n"
+            "| Data pobrania | Plik | Hash (SHA-256) | Źródło | Raport |\n"
+            "|---|---|---|---|---|\n"
+            + entry
+        )
+    else:
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(entry)
 
 
 def extract_pdf_rows(data: bytes) -> dict:
@@ -222,10 +242,10 @@ def build_report(diffs: dict, pdf_rows: dict, is_new_file: bool, pdf_path: str) 
     return "\n".join(lines)
 
 
-def create_github_issue(title: str, body: str):
+def create_github_issue(title: str, body: str) -> str | None:
     if not GITHUB_TOKEN:
         print("Brak GITHUB_TOKEN — pomijam tworzenie Issue")
-        return
+        return None
     r = requests.post(
         f"https://api.github.com/repos/{REPO}/issues",
         headers={"Authorization": f"Bearer {GITHUB_TOKEN}", "Accept": "application/vnd.github+json"},
@@ -233,9 +253,12 @@ def create_github_issue(title: str, body: str):
         timeout=15,
     )
     if r.ok:
-        print(f"Issue utworzone: {r.json()['html_url']}")
+        url = r.json()["html_url"]
+        print(f"Issue utworzone: {url}")
+        return url
     else:
         print(f"Błąd tworzenia Issue: {r.status_code} {r.text}")
+        return None
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
@@ -260,6 +283,7 @@ def main():
 
     pdf_path = save_pdf(pdf_data, h)
     print(f"Zapisano: {pdf_path}")
+    update_download_log(pdf_path, h)
 
     print("Parsowanie PDF...")
     pdf_rows = extract_pdf_rows(io.BytesIO(pdf_data))
@@ -280,7 +304,8 @@ def main():
     else:
         title = f"⚠️ DPS Monitor {today} — {total} rozbieżności do sprawdzenia"
 
-    create_github_issue(title, report)
+    issue_url = create_github_issue(title, report)
+    update_download_log(pdf_path, h, issue_url)
     print(f"\nRaport:\n{report}")
 
 
