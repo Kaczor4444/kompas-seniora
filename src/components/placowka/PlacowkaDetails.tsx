@@ -611,15 +611,15 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       <div className="text-[10px] font-black uppercase tracking-widest text-primary-400 mb-3">
                         Historia cen (zł/mies.)
                       </div>
-                      <div className="flex items-end gap-2 h-14">
+                      <div className="flex items-end gap-2" style={{ height: '64px' }}>
                         {ceny.map((c) => {
-                          const height = max === min ? 100 : Math.round(((c.kwota - min) / (max - min)) * 70 + 30);
+                          const px = max === min ? 48 : Math.round(((c.kwota - min) / (max - min)) * 32 + 16);
                           const isCurrent = c.rok === ceny[ceny.length - 1].rok;
                           return (
                             <div key={c.rok} className="flex flex-col items-center flex-1 gap-1">
                               <div
-                                className={`w-full rounded-t ${isCurrent ? 'bg-emerald-400' : 'bg-primary-500'}`}
-                                style={{ height: `${height}%` }}
+                                className={`w-full rounded-t ${isCurrent ? 'bg-emerald-400' : 'bg-primary-600'}`}
+                                style={{ height: `${px}px` }}
                               />
                               <div className={`text-[9px] ${isCurrent ? 'text-emerald-400 font-bold' : 'text-primary-400'}`}>
                                 {c.rok}
