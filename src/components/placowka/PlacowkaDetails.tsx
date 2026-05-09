@@ -103,6 +103,7 @@ interface Placowka {
   profil_opieki: string | null;
   koszt_pobytu: number | null;
   data_zrodla_cena?: Date | string | null;
+  ceny?: { rok: number; kwota: number }[];
   data_aktualizacji: Date | null;
   zrodlo_dane: string | null;
   latitude: number | null;
@@ -599,6 +600,37 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                     );
                   })()}
                 </div>
+
+                {/* Historia cen */}
+                {placowka.ceny && placowka.ceny.length >= 2 && (() => {
+                  const ceny = placowka.ceny!;
+                  const max = Math.max(...ceny.map(c => c.kwota));
+                  const min = Math.min(...ceny.map(c => c.kwota));
+                  return (
+                    <div className="mt-4 pt-4 border-t border-primary-700">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-primary-400 mb-3">
+                        Historia cen (zł/mies.)
+                      </div>
+                      <div className="flex items-end gap-2 h-14">
+                        {ceny.map((c) => {
+                          const height = max === min ? 100 : Math.round(((c.kwota - min) / (max - min)) * 70 + 30);
+                          return (
+                            <div key={c.rok} className="flex flex-col items-center flex-1 gap-1">
+                              <div className="text-[9px] text-primary-300 font-bold">
+                                {c.kwota.toLocaleString('pl-PL')}
+                              </div>
+                              <div
+                                className="w-full rounded-t bg-primary-500"
+                                style={{ height: `${height}%` }}
+                              />
+                              <div className="text-[9px] text-primary-400">{c.rok}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* CTA BUTTONS */}
                 <div className="space-y-3">

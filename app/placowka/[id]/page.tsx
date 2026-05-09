@@ -13,7 +13,14 @@ export default async function PlacowkaPage({ params }: { params: Promise<{ id: s
 
   const placowka = await prisma.placowka.findUnique({
     where: { id },
-    select: PUBLIC_PLACOWKA_SELECT,
+    select: {
+      ...PUBLIC_PLACOWKA_SELECT,
+      ceny: {
+        select: { rok: true, kwota: true },
+        where: { typ_kosztu: 'podstawowy', verified: true },
+        orderBy: { rok: 'asc' },
+      },
+    },
   });
 
   if (!placowka) {
