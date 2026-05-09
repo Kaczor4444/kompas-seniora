@@ -616,7 +616,11 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                           const px = max === min ? 48 : Math.round(((c.kwota - min) / (max - min)) * 32 + 16);
                           const isCurrent = c.rok === ceny[ceny.length - 1].rok;
                           return (
-                            <div key={c.rok} className="flex flex-col items-center flex-1 gap-1">
+                            <div key={c.rok} className="relative flex flex-col items-center flex-1 gap-1 group cursor-default">
+                              {/* Tooltip */}
+                              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                {c.rok}: {c.kwota.toLocaleString('pl-PL')} zł
+                              </div>
                               <div
                                 className={`w-full rounded-t ${isCurrent ? 'bg-emerald-400' : 'bg-primary-600'}`}
                                 style={{ height: `${px}px` }}
