@@ -594,7 +594,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                     const months = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
                     return (
                       <div className="text-xs text-primary-300 mt-1">
-                        ↳ obowiązuje od {months[d.getMonth()]} {d.getFullYear()}
+                        Cena obowiązuje od {months[d.getMonth()]} {d.getFullYear()}
                       </div>
                     );
                   })()}
