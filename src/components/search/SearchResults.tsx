@@ -30,6 +30,18 @@ const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
 });
 
 // ===== HELPER FUNCTIONS =====
+const ROMAN_MONTHS: Record<number, string> = {
+  1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI',
+  7: 'VII', 8: 'VIII', 9: 'IX', 10: 'X', 11: 'XI', 12: 'XII',
+};
+
+function formatPriceDate(raw: string | Date | null | undefined): string | null {
+  if (!raw) return null;
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return null;
+  return `obowiązuje od ${ROMAN_MONTHS[d.getMonth() + 1]} ${d.getFullYear()}`;
+}
+
 const getProfileName = (code: string): string => {
   const mapping: Record<string, string> = {
     'A': 'Niepełnosprawnić intelektualna',
@@ -54,6 +66,7 @@ interface Facility {
   wojewodztwo: string;
   miejscowosc: string;
   koszt_pobytu: number | null;
+  data_zrodla_cena?: string | Date | null;
   telefon: string | null;
   latitude: number | null;
   longitude: number | null;
@@ -1112,6 +1125,7 @@ export default function SearchResults({
                         powiat: fac.powiat || '',
                         category: fac.typ_placowki === 'DPS' ? 'Dom Pomocy Społecznej' : 'Środowiskowy Dom Samopomocy',
                         price: fac.koszt_pobytu ?? null,
+                        priceDate: formatPriceDate(fac.data_zrodla_cena),
                         street: fac.ulica,
                         image: '/images/placeholder-facility.jpg',
                         waitTime: 'Brak danych',

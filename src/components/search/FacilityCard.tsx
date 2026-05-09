@@ -13,6 +13,7 @@ interface FacilityCardProps {
     powiat: string;
     category: string;
     price: number | null;
+    priceDate?: string | null;
     street?: string | null;
     image: string;
     waitTime: string;
@@ -103,6 +104,9 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               </div>
               {facility.price && facility.price > 0 && (
                 <div className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">miesięcznie</div>
+              )}
+              {facility.price && facility.price > 0 && facility.priceDate && (
+                <div className="text-[9px] text-slate-400 leading-tight">↳ {facility.priceDate}</div>
               )}
             </div>
 

@@ -20,6 +20,7 @@ export const PUBLIC_PLACOWKA_SELECT = {
   miejsca_za_zyciem: true,
   profil_opieki: true,
   koszt_pobytu: true,
+  data_zrodla_cena: true,
   latitude: true,
   longitude: true,
   data_aktualizacji: true,
@@ -31,7 +32,7 @@ export const PUBLIC_PLACOWKA_COLUMNS = [
   'id', 'nazwa', 'typ_placowki', 'prowadzacy', 'ulica', 'miejscowosc',
   'kod_pocztowy', 'gmina', 'powiat', 'wojewodztwo', 'telefon', 'email',
   'www', 'facebook', 'liczba_miejsc', 'miejsca_za_zyciem', 'profil_opieki',
-  'koszt_pobytu', 'latitude', 'longitude', 'data_aktualizacji', 'zrodlo_dane',
+  'koszt_pobytu', 'data_zrodla_cena', 'latitude', 'longitude', 'data_aktualizacji', 'zrodlo_dane',
 ].map(col => `"${col}"`).join(', ');
 
 type PublicPlacowka = {
