@@ -584,17 +584,11 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                 {/* CENA */}
                 <div>
                   <div className="text-[10px] font-black uppercase tracking-widest text-primary-400 mb-2">
-                    Szacunkowy koszt miesięczny
+                    Koszt miesięczny
                   </div>
                   <div className="text-5xl md:text-6xl font-black mb-3">
                     {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł` : 'NFZ'}
                   </div>
-                  {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-emerald-400">
-                      <CheckCircle2 size={16} />
-                      <span className="font-bold">Dofinansowanie dostępne</span>
-                    </div>
-                  )}
                   {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 && placowka.data_zrodla_cena && (() => {
                     const d = new Date(placowka.data_zrodla_cena!);
                     const months = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
