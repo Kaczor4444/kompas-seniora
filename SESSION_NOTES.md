@@ -1,6 +1,115 @@
-# SESSION NOTES - 2026-05-09
+# SESSION NOTES
 
-## ✅ SESJA #13: Monitor DPS — naprawa workflow + ceny 2026 + historia cen
+---
+
+## ✅ SESJA #14: 2026-05-09 — Wolne miejsca DPS + profil opieki na karcie placówki
+
+### Co zrobiliśmy:
+
+#### 1. Profil opieki na karcie placówki (`PlacowkaDetails.tsx`)
+- **Problem:** profil niewidoczny bo DPS ma pełny tekst w `profil_opieki` (np. "dla osób przewlekle somatycznie chorych"), nie kody jak ŚDS ("A,B")
+- Nowa funkcja `parseDpsProfile()` — obsługuje oba formaty, czyści liczby miejsc z tekstu ("90 miejsc" → ""), wieloliniowe wpisy
+- Profil wyświetlany jako niebieskie pill-badges bezpośrednio pod adresem w nagłówku
+- Fix: `getProfileOpiekiNazwyDPS` / `getProfileOpiekiNazwySDS` zamiast generic `getProfileOpiekiNazwy`
+- Fix: NFZ → "Zapytaj" (DPS bez ceny) / "Bezpłatne" (ŚDS) w quick stats i sidebarze
+
+#### 2. Monitor wolnych miejsc DPS — GitHub Actions
+- Nowy plik: `scripts/monitor-wolne-miejsca.py`
+  - Pobiera `wolne_miejsca_w_dps.xlsx` z MUW Małopolska (SSL disabled)
+  - Hash SHA-256 — Issue tworzone TYLKO gdy plik się zmienił (zero spamu)
+  - Parsuje multi-row nagłówki XLSX (format MUW)
+  - Liczy wolne miejsca per powiat (bez podwójnego liczenia — tylko wiersze LP)
+- Nowy workflow: `.github/workflows/wolne-miejsca-monitor.yml`
+  - Cron: 1. każdego miesiąca o 9:00 UTC
+  - `workflow_dispatch` z opcją force
+  - Po wykryciu nowego pliku → automatycznie wywołuje `import-wolne-miejsca.py`
+- Pierwszy pobrany plik: **stan na 30.04.2026, 7482 wolnych miejsc w Małopolsce**
+
+#### 3. Przycisk w panelu admina
+- Nowy endpoint: `app/api/admin/trigger-wolne-miejsca/route.ts`
+- Nowy komponent: `app/admin/WolneMiejscaMonitorButton.tsx` (zielony, checkbox force)
+- Admin page: nowy blok pod PDF monitorem
+
+#### 4. Schemat bazy danych — `PlacowkaWolneMiejsca`
+```prisma
+model PlacowkaWolneMiejsca {
+  placowkaId, data_stanu, typ_opieki  ← unique constraint
+  liczba_miejsc, wolne_ogolem, wolne_kobiety, wolne_mezczyzni
+  oczekujacych, czas_oczekiwania_dni
+}
+```
+- Historia jak `PlacowkaCena` — wiele wpisów per placówka per data
+- `npx prisma db push` (baza była out-of-sync z migration history)
+
+#### 5. Skrypt importu `scripts/import-wolne-miejsca.py`
+- Match po nazwie (fuzzy, score≥0.75) dla placówek poza miastami — **61 dopasowanych**
+- Match po **sumie pojemności** dla Kraków/Nowy Sącz/Tarnów (grupuje wieloliniowe wpisy, np. 52+28=80) — **9 dopasowanych**
+- Ręczne mapowania dla 4 trudnych przypadków
+- Wynik pierwszego importu: **81 rekordów, 74 wolne miejsca (stan 30.04.2026)**
+- Upsert — bezpieczny przy ponownym uruchomieniu
+
+#### 6. Frontend — sekcja "Dostępność miejsc"
+Wyświetlana między "O placówce" a "Jak złożyć wniosek?" — tylko gdy są dane.
+- Grid 4 kafelków: wolne ogółem (zielony/szary) · kobiety (różowy) · mężczyźni (niebieski) · czas oczekiwania (bursztynowy)
+- Czas oczekiwania: "ok. X miesięcy" / "ok. X,X roku" / "X dni"
+- Oczekujący łączony z czasem w jednym kafelku
+- Typ opieki "dzieci i młodzieży" → "dla dziewcząt" / "dla chłopców"
+- Zielony badge "stan na kwiecień 2026"
+- Stopka: źródło MUW + potwierdź telefonicznie
+
+#### 7. Fix: wykres cen pokazuje 2025
+- `page.tsx`: usunięto `verified: true` z query → ceny 2025 (verified=false) też widoczne
+
+### Commity tej sesji:
+- `9fdcab8` — feat: monitor wolnych miejsc DPS + profil na karcie placówki
+- `ffcca38` — feat: przycisk "Sprawdź wolne miejsca" w panelu admina
+- `82cf4e7` — feat: wolne miejsca DPS — historia w bazie + sekcja na stronie placówki
+- `b3313e9` — fix: grupowanie wierszy miast po pojemności + redesign sekcji wolnych miejsc
+- `7fb19e2` — fix: drobne poprawki UI placówki
+
+### Stan bazy po sesji:
+- **DPS Małopolska:** 91 placówek
+- **ŚDS:** 95 placówek
+- **Łącznie:** 186 placówek
+- **PlacowkaCena:** 338 rekordów (2023–2026)
+- **PlacowkaWolneMiejsca:** 81 rekordów (stan 30.04.2026)
+
+### Niezmatowane placówki w imporcie wolnych miejsc (do poprawy):
+| Problem | Opis |
+|---------|------|
+| Gmina Borzęcin, Gmina Grybów, Gmina Sękowa | XLSX używa nazwy operatora (gminy) zamiast nazwy DPS |
+| DPS Zgromadzenie Sióstr... | Długa nazwa prowadzącego zamiast krótkiej nazwy DPS |
+| DPS "Miłosierny Samarytanin" | Cudzysłów w nazwie psuje fuzzy match |
+| Kraków (wiele) | Wiele placówek ma tę samą pojemność per typ → ambiguous match |
+
+---
+
+## 🚨 TODO — NASTĘPNA SESJA (priorytety)
+
+### KRYTYCZNE — SEO (strona niewidoczna dla Google i AI!)
+1. **`public/robots.txt`** — zmienić z `Disallow: /` na `Allow: /`, `Disallow: /admin/`
+2. **`app/layout.tsx`** — zmienić `robots: { index: false }` na `index: true`
+3. **`app/sitemap.ts`** — dodać dynamiczny sitemap (186 placówek + artykuły)
+   - Szacowany czas: 30–40 minut
+
+### CONTENT — Artykuł gotowy do publikacji
+- `drafts/koszty-dps-kto-placi-2026-05-07.md` — ~2800 słów, status: DRAFT
+- Research brief: `research/brief-koszty-dps-kto-placi-2026-05-07.md`
+- Do zrobienia: `/scrub` → `/optimize` → dodać do `src/data/articles.ts` → stworzyć MDX
+
+### WOLNE MIEJSCA — Ulepszenia importu
+- Obsługa Gmina Borzęcin/Grybów/Sękowa (operator zamiast nazwy DPS)
+- Kraków — wiele placówek o tej samej pojemności (potrzebna inna strategia)
+- Rozważyć: ręczna tabela mapowań dla ~15 niezmatowanych
+
+### INNE
+- Dodać nowe DPS Śląskie (4 placówki w bazie, brak danych)
+- Metadata dla 186 placówek (`generateMetadata()` w `/app/placowka/[id]/page.tsx`)
+- Canonical URLs
+
+---
+
+## ✅ SESJA #13: 2026-05-09 — Monitor DPS — naprawa workflow + ceny 2026 + historia cen
 
 ### Co zrobiliśmy:
 
