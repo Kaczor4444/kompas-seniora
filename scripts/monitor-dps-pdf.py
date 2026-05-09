@@ -82,6 +82,9 @@ def extract_pdf_rows(data: bytes) -> dict:
                     except ValueError:
                         continue
 
+                    def cell(idx):
+                        return row[idx] if idx < len(row) else None
+
                     def norm_cell(c):
                         return (c or "").strip().replace("\n", " ")
 
@@ -101,12 +104,12 @@ def extract_pdf_rows(data: bytes) -> dict:
                         return int(m.group(1)) if m else None
 
                     rows[num] = {
-                        "powiat":    norm_cell(row[1]),
-                        "nazwa":     norm_cell(row[2]),
-                        "telefon":   extract_tel(row[3]),
-                        "email":     extract_email(row[3]),
-                        "profil":    norm_cell(row[4]),
-                        "miejsca":   extract_miejsca(row[6]),
+                        "powiat":    norm_cell(cell(1)),
+                        "nazwa":     norm_cell(cell(2)),
+                        "telefon":   extract_tel(cell(3)),
+                        "email":     extract_email(cell(3)),
+                        "profil":    norm_cell(cell(4)),
+                        "miejsca":   extract_miejsca(cell(6)),
                     }
     return rows
 
