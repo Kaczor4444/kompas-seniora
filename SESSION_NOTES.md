@@ -1,3 +1,91 @@
+# SESSION NOTES - 2026-05-09
+
+## ✅ SESJA #13: Monitor DPS — naprawa workflow + ceny 2026 + historia cen
+
+### Co zrobiliśmy:
+
+#### 1. Naprawa GitHub Actions workflow (monitor PDF)
+- **Problem 401:** stary GITHUB_PAT był zamaskowany w `.env` → wygenerowano nowy fine-grained PAT
+  - Uprawnienia: Only `kompas-seniora`, Actions: Read and write
+- **Problem SSL:** `malopolska.uw.gov.pl` ma certyfikat nieufany przez GitHub Actions → `verify=False` w `requests.get()`
+- **Problem IndexError:** `row[6]` w parsowaniu PDF → bezpieczny dostęp przez `cell(idx)`
+- **Problem trailing newline:** `DATABASE_URL` w GitHub Secret miał `\n` na końcu → `.strip()` w skrypcie
+- **Problem zły URL:** skrypt używał pliku kosztów zamiast wykazu DPS → poprawiono na `wykaz%20dps.pdf`
+- **Wynik końcowy:** workflow działa ✅ — 1 rozbieżność (telefon l.p. 85) → zostawione świadomie
+
+#### 2. Dziennik pobrań PDF (`raw_dane/malopolskie/pobrane.md`)
+- Nowa funkcja `update_download_log()` w skrypcie Python
+- Dopisuje wpis po każdym pobraniu: data, plik, hash SHA-256, link do Issue
+- Retroaktywnie dodano wpisy dla plików z 18.02.26 i 27.03.26
+
+#### 3. Automatyczny SQL patch w GitHub Issue
+- Nowa funkcja `generate_sql_patch()` — generuje gotowy SQL na podstawie wykrytych różnic
+- SQL dołączany na końcu każdego Issue z raportem
+- Kategorie: UPDATE dla nazw/telefonów/emaili/miejsc, komentarze dla brakujących/extra
+
+#### 4. Porównanie pliku kosztów z wykazem DPS
+- Plik kosztów vs wykaz 27.03.26: 7 różnic — wszystkie formatowanie + zamiana kolejności l.p. 39/40/41
+- DB nazwy vs wykaz DPS: **91/91 zgodnych** ✅ — baza ma pełne nazwy z wykazu, nie skrócone z kosztów
+
+#### 5. Import cen 2026 do bazy
+- Parsowanie `do publikacji koszt dps-2026.pdf`
+- 87 cen wstawionych do `PlacowkaCena` (rok=2026, data_obowiazuje=2026-04-01)
+- `koszt_pobytu` i `data_zrodla_cena` w `Placowka` zaktualizowane
+- Historia 2025 zachowana w `PlacowkaCena`
+
+#### 6. Import historycznych cen 2023 i 2024
+- PDFy: `średni miesięczny koszt utrzymania w dps 2023/2024 r..pdf`
+- Matchowanie po nazwie (nie l.p.) — zmiana numeracji między latami
+- **2023:** 81/91 zaimportowano | **2024:** 81/91 zaimportowano
+- Pominięto: Radziwiłłowska 8 i im. Władysława Godynia (nie istnieją w aktualnej bazie — wykreślone z rejestru)
+- Łącznie w `PlacowkaCena`: 2023: 81 | 2024: 81 | 2025: 89 | 2026: 87
+
+#### 7. Podstawa prawna cen DPS (art. 60 ust. 2 ustawy o pomocy społecznej)
+- Ogłaszane: do 31 marca każdego roku
+- Wejście w życie: od 1. dnia miesiąca po publikacji → **od 1 kwietnia**
+- Obowiązują do ogłoszenia nowych (nie do końca roku kalendarzowego)
+
+#### 8. Frontend — karta placówki (strona szczegółów)
+- Nagłówek ceny: `Szacunkowy koszt miesięczny` → `Koszt miesięczny`
+- Usunięto tekst "Dofinansowanie dostępne"
+- Dodano etykietę `Cena obowiązuje od IV 2026` (z `data_zrodla_cena`)
+- Mini wykres słupkowy historii cen 2023–2026:
+  - Aktualny rok wyróżniony zielonym (`bg-emerald-400`)
+  - Tooltip na hover: sama cena bez roku
+  - Słupki px-based (16–48px), container 64px
+
+#### 9. Pliki zmienione
+- `scripts/monitor-dps-pdf.py` — SSL fix, IndexError fix, strip URL, generate_sql_patch, update_download_log
+- `.github/workflows/dps-pdf-monitor.yml` — bez zmian
+- `raw_dane/malopolskie/pobrane.md` — nowy dziennik pobrań
+- `lib/public-placowka-fields.ts` — dodano `data_zrodla_cena`
+- `src/components/search/SearchResults.tsx` — `data_zrodla_cena` w typie
+- `src/components/search/FacilityCard.tsx` — `priceDate` prop (nie używany na kafelkach)
+- `src/components/placowka/PlacowkaDetails.tsx` — wykres, tooltip, etykieta daty, nowy nagłówek
+- `app/placowka/[id]/page.tsx` — include `ceny` w zapytaniu
+
+### Commity:
+- `e64c8c4` — fix: SSL + dziennik pobrań PDF
+- `0bf2a52` — fix: bezpieczny dostęp do komórek tabeli PDF
+- `6dc8edb` — fix: strip DATABASE_URL
+- `8be02ac` — fix: poprawny URL wykazu DPS
+- `4860045` — feat: automatyczny SQL patch w Issue
+- `0529eb1` — feat: cena 2026 + etykieta 'obowiązuje od IV 2026'
+- `535d6af` — feat: etykieta na stronie szczegółów placówki
+- `8c5191b` — fix: nowy nagłówek ceny + usunięcie "Dofinansowanie dostępne"
+- `37ef82c` — feat: wykres historii cen 2023–2026
+- `f53c339` — fix: aktualny rok zielony, bez liczb nad słupkami
+- `3eaac49` — fix: słupki px-based, widoczne
+- `fb0e1c6` — feat: tooltip z samą ceną na hover
+
+### Stan bazy po sesji:
+- **DPS Małopolska:** 91 placówek ✅
+- **ŚDS:** 95 placówek (bez zmian)
+- **Łącznie:** 186 placówek
+- **PlacowkaCena:** 338 rekordów (2023: 81, 2024: 81, 2025: 89, 2026: 87)
+
+---
+
 # SESSION NOTES - 2026-05-08
 
 ## ✅ SESJA #12: Synchronizacja bazy DPS z wykazem PDF + Monitor automatyczny
