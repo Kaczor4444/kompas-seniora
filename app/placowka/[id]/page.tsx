@@ -17,7 +17,7 @@ export default async function PlacowkaPage({ params }: { params: Promise<{ id: s
       ...PUBLIC_PLACOWKA_SELECT,
       ceny: {
         select: { rok: true, kwota: true },
-        where: { typ_kosztu: 'podstawowy', verified: true },
+        where: { typ_kosztu: 'podstawowy' },
         orderBy: { rok: 'asc' },
       },
       wolneMiejsca: {

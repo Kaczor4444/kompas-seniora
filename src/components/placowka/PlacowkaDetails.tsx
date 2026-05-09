@@ -551,7 +551,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       </div>
                       <h3 className="text-xl font-black text-slate-900">Dostępność miejsc</h3>
                     </div>
-                    <span className="text-[11px] font-semibold text-slate-400 bg-stone-100 px-3 py-1 rounded-full">
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
                       stan na {miesiac}
                     </span>
                   </div>
@@ -579,19 +579,23 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                               <div className="text-[11px] text-slate-500 font-medium">wolnych miejsc</div>
                             </div>
 
-                            {/* Kobiety */}
+                            {/* Kobiety / Dziewczynki */}
                             {w.wolne_kobiety != null && (
                               <div className="rounded-xl p-4 text-center bg-rose-50 border border-rose-100">
                                 <div className="text-3xl font-black mb-1 text-rose-500">{w.wolne_kobiety}</div>
-                                <div className="text-[11px] text-slate-500 font-medium">dla kobiet</div>
+                                <div className="text-[11px] text-slate-500 font-medium">
+                                  {w.typ_opieki?.includes('dzieci') ? 'dla dziewcząt' : 'dla kobiet'}
+                                </div>
                               </div>
                             )}
 
-                            {/* Mężczyźni */}
+                            {/* Mężczyźni / Chłopcy */}
                             {w.wolne_mezczyzni != null && (
                               <div className="rounded-xl p-4 text-center bg-blue-50 border border-blue-100">
                                 <div className="text-3xl font-black mb-1 text-blue-500">{w.wolne_mezczyzni}</div>
-                                <div className="text-[11px] text-slate-500 font-medium">dla mężczyzn</div>
+                                <div className="text-[11px] text-slate-500 font-medium">
+                                  {w.typ_opieki?.includes('dzieci') ? 'dla chłopców' : 'dla mężczyzn'}
+                                </div>
                               </div>
                             )}
 
@@ -621,7 +625,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                   <div className="px-6 md:px-8 py-4 bg-stone-50 border-t border-stone-100">
                     <p className="text-[11px] text-slate-400 leading-relaxed">
                       Źródło: Rejestr wolnych miejsc Małopolskiego Urzędu Wojewódzkiego.
-                      Dane aktualizowane przez placówki raz w miesiącu — potwierdź dostępność telefonicznie.
+                      Potwierdź dostępność telefonicznie.
                     </p>
                   </div>
                 </section>
