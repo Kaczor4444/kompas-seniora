@@ -20,6 +20,19 @@ export default async function PlacowkaPage({ params }: { params: Promise<{ id: s
         where: { typ_kosztu: 'podstawowy', verified: true },
         orderBy: { rok: 'asc' },
       },
+      wolneMiejsca: {
+        select: {
+          typ_opieki: true,
+          wolne_ogolem: true,
+          wolne_kobiety: true,
+          wolne_mezczyzni: true,
+          oczekujacych: true,
+          czas_oczekiwania_dni: true,
+          data_stanu: true,
+        },
+        orderBy: { data_stanu: 'desc' },
+        take: 10, // max 10 najnowszych wierszy (kilka typów opieki × ostatnie daty)
+      },
     },
   });
 

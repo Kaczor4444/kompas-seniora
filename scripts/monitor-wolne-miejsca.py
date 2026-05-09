@@ -251,6 +251,17 @@ def main():
     issue_url = create_github_issue(title, report)
     update_log(xlsx_path, h, issue_url)
 
+    # Importuj dane do bazy
+    print("\nImportuję dane do bazy...")
+    import subprocess
+    result = subprocess.run(
+        ["python3", str(Path(__file__).parent / "import-wolne-miejsca.py"), str(xlsx_path)],
+        capture_output=True, text=True
+    )
+    print(result.stdout)
+    if result.returncode != 0:
+        print(f"⚠️ Błąd importu: {result.stderr[:500]}")
+
     print(f"\nRaport:\n{report[:2000]}...")  # print pierwsze 2000 znaków
 
 

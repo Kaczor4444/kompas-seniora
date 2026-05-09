@@ -104,6 +104,15 @@ interface Placowka {
   koszt_pobytu: number | null;
   data_zrodla_cena?: Date | string | null;
   ceny?: { rok: number; kwota: number }[];
+  wolneMiejsca?: {
+    typ_opieki: string | null;
+    wolne_ogolem: number | null;
+    wolne_kobiety: number | null;
+    wolne_mezczyzni: number | null;
+    oczekujacych: number | null;
+    czas_oczekiwania_dni: number | null;
+    data_stanu: Date | string;
+  }[];
   data_aktualizacji: Date | null;
   zrodlo_dane: string | null;
   latitude: number | null;
@@ -517,6 +526,98 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                 </>
               )}
             </section>
+
+            {/* WOLNE MIEJSCA */}
+            {placowka.wolneMiejsca && placowka.wolneMiejsca.length > 0 && (() => {
+              // Bierzemy tylko najnowszą datę stanu
+              const latestDate = placowka.wolneMiejsca!
+                .map(w => new Date(w.data_stanu).getTime())
+                .reduce((a, b) => Math.max(a, b), 0);
+              const latest = placowka.wolneMiejsca!.filter(
+                w => new Date(w.data_stanu).getTime() === latestDate
+              );
+              const dataStanu = new Date(latestDate);
+              const miesiac = dataStanu.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+
+              return (
+                <section className="bg-white p-6 md:p-8 rounded-2xl border border-stone-100 shadow-sm">
+                  <div className="flex items-center justify-between mb-6 border-b border-stone-200 pb-4">
+                    <h3 className="text-2xl font-black text-slate-900">
+                      Dostępność miejsc
+                    </h3>
+                    <span className="text-xs font-semibold text-slate-400 bg-stone-100 px-2.5 py-1 rounded-full">
+                      stan na {miesiac}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {latest.map((w, i) => {
+                      const wolne = w.wolne_ogolem ?? 0;
+                      const hasPlace = wolne > 0;
+                      return (
+                        <div key={i} className={`rounded-xl p-4 border ${hasPlace ? 'bg-emerald-50 border-emerald-200' : 'bg-stone-50 border-stone-200'}`}>
+                          {w.typ_opieki && (
+                            <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                              {w.typ_opieki}
+                            </div>
+                          )}
+                          <div className="flex flex-wrap items-center gap-4">
+                            {/* Wolne miejsca */}
+                            <div className="flex items-center gap-2">
+                              <span className={`text-2xl font-black ${hasPlace ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                {wolne}
+                              </span>
+                              <span className="text-sm text-slate-500">
+                                wolnych {wolne === 1 ? 'miejsce' : wolne < 5 ? 'miejsca' : 'miejsc'}
+                              </span>
+                            </div>
+
+                            {/* K/M podział */}
+                            {(w.wolne_kobiety != null || w.wolne_mezczyzni != null) && (
+                              <div className="flex gap-2 text-xs text-slate-500">
+                                {w.wolne_kobiety != null && (
+                                  <span className="bg-pink-50 text-pink-600 border border-pink-200 px-2 py-0.5 rounded-full font-semibold">
+                                    K: {w.wolne_kobiety}
+                                  </span>
+                                )}
+                                {w.wolne_mezczyzni != null && (
+                                  <span className="bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-full font-semibold">
+                                    M: {w.wolne_mezczyzni}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Czas oczekiwania */}
+                            {!hasPlace && w.czas_oczekiwania_dni && w.czas_oczekiwania_dni > 0 && (
+                              <div className="text-sm text-slate-500 ml-auto">
+                                <span className="font-bold text-slate-700">
+                                  {w.czas_oczekiwania_dni < 365
+                                    ? `~${Math.round(w.czas_oczekiwania_dni / 30)} mies.`
+                                    : `~${(w.czas_oczekiwania_dni / 365).toFixed(1)} lat`}
+                                </span>
+                                {' '}oczekiwania
+                              </div>
+                            )}
+
+                            {/* Oczekujący */}
+                            {w.oczekujacych != null && w.oczekujacych > 0 && (
+                              <div className="text-xs text-amber-600 font-semibold">
+                                {w.oczekujacych} {w.oczekujacych === 1 ? 'osoba czeka' : 'osób czeka'}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-xs text-slate-400 mt-4 leading-relaxed">
+                    Dane z rejestru Małopolskiego Urzędu Wojewódzkiego. Aktualność potwierdź telefonicznie.
+                  </p>
+                </section>
+              );
+            })()}
 
             {/* JAK ZŁOŻYĆ WNIOSEK - PROCEDURAL GUIDE */}
             <section className="bg-white p-6 md:p-8 rounded-2xl border border-stone-100 shadow-sm">

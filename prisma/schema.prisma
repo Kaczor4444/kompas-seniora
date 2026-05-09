@@ -46,7 +46,8 @@ model Placowka {
   analytics         PlacowkaAnalytics?
   events            PlacowkaEvent[]
   snapshots         PlacowkaSnapshot[]
-  ceny              PlacowkaCena[]     @relation("PlacowkaCeny")
+  ceny              PlacowkaCena[]           @relation("PlacowkaCeny")
+  wolneMiejsca      PlacowkaWolneMiejsca[]   @relation("PlacowkaWolneMiejsca")
 
   @@index([powiat])
   @@index([wojewodztwo])
@@ -239,6 +240,27 @@ model PartnerInquiry {
   @@index([createdAt])
   @@index([email, createdAt])
   @@map("partner_inquiries")
+}
+
+model PlacowkaWolneMiejsca {
+  id                   Int      @id @default(autoincrement())
+  placowkaId           Int
+  data_stanu           DateTime // data z tytułu pliku XLSX ("stan na dzień 30 kwietnia 2026")
+  typ_opieki           String?  // "dla osób w podeszłym wieku", "dla osób somatycznie chorych" itp.
+  liczba_miejsc        Int?     // kolumna E z XLSX (decyzja Wojewody Małopolskiego)
+  wolne_ogolem         Int?     // kolumna I - łączna liczba wolnych miejsc
+  wolne_kobiety        Int?     // kolumna J
+  wolne_mezczyzni      Int?     // kolumna L
+  oczekujacych         Int?     // kolumna N - liczba osób oczekujących
+  czas_oczekiwania_dni Int?     // kolumna O - przewidywany czas oczekiwania (w dniach)
+  createdAt            DateTime @default(now())
+
+  placowka             Placowka @relation("PlacowkaWolneMiejsca", fields: [placowkaId], references: [id], onDelete: Cascade)
+
+  @@unique([placowkaId, data_stanu, typ_opieki])
+  @@index([placowkaId])
+  @@index([data_stanu])
+  @@index([placowkaId, data_stanu])
 }
 
 model PlacowkaCena {

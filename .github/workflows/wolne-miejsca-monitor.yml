@@ -28,7 +28,7 @@ jobs:
           python-version: '3.11'
 
       - name: Zainstaluj zależności
-        run: pip install requests openpyxl
+        run: pip install requests openpyxl psycopg2-binary
 
       - name: Uruchom monitoring wolnych miejsc
         env:
