@@ -126,7 +126,8 @@ def parse_xlsx(path: Path) -> tuple[datetime.date | None, list[dict]]:
 
         if pow_ and pow_ != "X":
             current_powiat = pow_
-        if name and name not in ("X", ""):
+        is_new_facility = bool(name and name not in ("X", ""))
+        if is_new_facility:
             current_nazwa = name
 
         # Pomiń wiersze bez typu (sub-nagłówki)
@@ -139,6 +140,7 @@ def parse_xlsx(path: Path) -> tuple[datetime.date | None, list[dict]]:
         results.append({
             "powiat":               current_powiat,
             "nazwa_xlsx":           current_nazwa,
+            "is_new_facility":      is_new_facility,  # True = nowa placówka, False = kolejny typ tej samej
             "typ":                  typ,
             "liczba_miejsc":        parse_int(row[4]) if len(row) > 4 else None,
             "wolne_ogolem":         parse_int(row[8]) if len(row) > 8 else None,
@@ -189,13 +191,14 @@ def find_best_match_by_name(nazwa_xlsx: str, db: list[dict]) -> tuple[dict | Non
     return best, best_score
 
 
-def match_city_by_capacity(typ: str, liczba: int | None, powiat_norm: str,
+def match_city_by_capacity(group_total: int | None, powiat_norm: str,
                             db: list[dict]) -> dict | None:
     """
-    Dla miast (Kraków/Nowy Sącz/Tarnów): matchuj po liczba_miejsc + typ opieki.
-    Zwraca None gdy ambiguous (kilka kandydatów).
+    Dla miast (Kraków/Nowy Sącz/Tarnów): matchuj po sumie liczba_miejsc grupy.
+    group_total = suma pojemności wszystkich typów opieki w jednej placówce.
+    Zwraca None gdy ambiguous (kilka kandydatów z tą samą pojemnością).
     """
-    if liczba is None:
+    if group_total is None or group_total == 0:
         return None
 
     city_powiat_map = {
@@ -209,7 +212,7 @@ def match_city_by_capacity(typ: str, liczba: int | None, powiat_norm: str,
 
     candidates = [
         d for d in db
-        if d['powiat'] == db_powiat and d['liczba_miejsc'] == liczba
+        if d['powiat'] == db_powiat and d['liczba_miejsc'] == group_total
     ]
     return candidates[0] if len(candidates) == 1 else None
 
@@ -271,53 +274,69 @@ def main():
     db = load_db_facilities(conn)
     print(f"DPS w bazie: {len(db)}")
 
-    stats = {"matched_name": 0, "matched_capacity": 0, "skipped": 0, "no_match": 0}
+    stats = {"matched_name": 0, "matched_capacity": 0, "no_match": 0}
     unmatched = []
 
-    # Grupuj wiersze XLSX po (powiat, nazwa_xlsx) — każda placówka może mieć wiele typów
-    from itertools import groupby
-    from operator import itemgetter
+    # ── Podziel na placówki poza miastami i miasta ──────────────────────────
+    city_names = {"miasto ", "gmina "}
+    non_city_rows = [r for r in rows if not any(r['nazwa_xlsx'].lower().startswith(c) for c in city_names)]
+    city_rows     = [r for r in rows if     any(r['nazwa_xlsx'].lower().startswith(c) for c in city_names)]
 
-    # Sorted by nazwa_xlsx, potem iterujemy
-    rows_sorted = sorted(rows, key=lambda r: (r['powiat'], r['nazwa_xlsx']))
+    # ── 1. Placówki poza miastami — match po nazwie ─────────────────────────
+    matched_cache: dict[str, dict | None] = {}
 
-    matched_cache: dict[str, dict | None] = {}  # cache nazw → db_row
-
-    for row in rows_sorted:
+    for row in non_city_rows:
         nazwa = row['nazwa_xlsx'].strip()
         powiat_norm = row['powiat'].strip().lower()
-        is_city = nazwa.startswith("Miasto ") or nazwa.startswith("Gmina ")
-
-        # Pobierz match z cache lub szukaj
         cache_key = f"{powiat_norm}|{nazwa}"
+
         if cache_key not in matched_cache:
-            if is_city:
-                # Matchuj po liczba_miejsc (tylko dla wierszy z konkretną liczbą)
-                matched_cache[cache_key] = None  # będziemy matchować per wiersz
+            db_row, score = find_best_match_by_name(nazwa, db)
+            if score >= 0.75:
+                matched_cache[cache_key] = db_row
+                stats["matched_name"] += 1
+                print(f"  ✅ [{score:.2f}] {norm_name(nazwa)[:50]}")
             else:
-                db_row, score = find_best_match_by_name(nazwa, db)
-                if score >= 0.75:
-                    matched_cache[cache_key] = db_row
-                    stats["matched_name"] += 1
-                    print(f"  ✅ [{score:.2f}] {norm_name(nazwa)[:50]}")
-                else:
-                    matched_cache[cache_key] = None
-                    unmatched.append((nazwa, score, db_row['nazwa'] if db_row else '?'))
-                    print(f"  ❌ [{score:.2f}] {norm_name(nazwa)[:50]}")
+                matched_cache[cache_key] = None
+                unmatched.append((nazwa, score, db_row['nazwa'] if db_row else '?'))
+                print(f"  ❌ [{score:.2f}] {norm_name(nazwa)[:50]}")
 
         db_row = matched_cache[cache_key]
-
-        if is_city:
-            # Per-wiersz match po liczba_miejsc
-            db_row = match_city_by_capacity(row['typ'], row['liczba_miejsc'], powiat_norm, db)
-            if db_row:
-                stats["matched_capacity"] += 1
-
         if db_row is None:
             stats["no_match"] += 1
             continue
-
         upsert_record(conn, db_row['id'], data_stanu, row)
+
+    # ── 2. Miasta — grupuj po kolejności is_new_facility, matchuj po SUMIE pojemności ─
+    # Wiersze dla miast muszą być w oryginalnej kolejności (nie sortowane), bo
+    # is_new_facility=False to kontynuacja poprzedniego wiersza.
+    city_rows_ordered = [r for r in rows if any(r['nazwa_xlsx'].lower().startswith(c) for c in city_names)]
+
+    current_group: list[dict] = []
+    current_powiat = ""
+
+    def flush_city_group(group: list[dict]):
+        if not group:
+            return
+        group_total = sum(r['liczba_miejsc'] or 0 for r in group)
+        powiat_norm = group[0]['powiat'].strip().lower()
+        db_row = match_city_by_capacity(group_total, powiat_norm, db)
+        if db_row:
+            stats["matched_capacity"] += 1
+            print(f"  ✅ [pojemność {group_total}] {db_row['nazwa'][:50]}")
+            for r in group:
+                upsert_record(conn, db_row['id'], data_stanu, r)
+        else:
+            stats["no_match"] += len(group)
+            print(f"  ❌ [pojemność {group_total}] brak dopasowania ({powiat_norm})")
+
+    for row in city_rows_ordered:
+        if row['is_new_facility']:
+            flush_city_group(current_group)
+            current_group = [row]
+        else:
+            current_group.append(row)
+    flush_city_group(current_group)
 
     conn.commit()
     conn.close()

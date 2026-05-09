@@ -529,92 +529,101 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
 
             {/* WOLNE MIEJSCA */}
             {placowka.wolneMiejsca && placowka.wolneMiejsca.length > 0 && (() => {
-              // Bierzemy tylko najnowszą datę stanu
               const latestDate = placowka.wolneMiejsca!
                 .map(w => new Date(w.data_stanu).getTime())
                 .reduce((a, b) => Math.max(a, b), 0);
               const latest = placowka.wolneMiejsca!.filter(
                 w => new Date(w.data_stanu).getTime() === latestDate
               );
-              const dataStanu = new Date(latestDate);
-              const miesiac = dataStanu.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+              const miesiac = new Date(latestDate).toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+              const formatCzas = (dni: number) =>
+                dni < 30 ? `${dni} dni`
+                : dni < 365 ? `ok. ${Math.round(dni / 30)} miesięcy`
+                : `ok. ${(dni / 12 / 30).toFixed(1).replace('.', ',')} roku`;
 
               return (
-                <section className="bg-white p-6 md:p-8 rounded-2xl border border-stone-100 shadow-sm">
-                  <div className="flex items-center justify-between mb-6 border-b border-stone-200 pb-4">
-                    <h3 className="text-2xl font-black text-slate-900">
-                      Dostępność miejsc
-                    </h3>
-                    <span className="text-xs font-semibold text-slate-400 bg-stone-100 px-2.5 py-1 rounded-full">
+                <section className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+                  {/* Nagłówek */}
+                  <div className="px-6 md:px-8 py-5 border-b border-stone-100 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
+                        <Bed size={18} className="text-emerald-600" />
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900">Dostępność miejsc</h3>
+                    </div>
+                    <span className="text-[11px] font-semibold text-slate-400 bg-stone-100 px-3 py-1 rounded-full">
                       stan na {miesiac}
                     </span>
                   </div>
 
-                  <div className="space-y-3">
+                  {/* Wiersze per typ opieki */}
+                  <div className="divide-y divide-stone-100">
                     {latest.map((w, i) => {
                       const wolne = w.wolne_ogolem ?? 0;
                       const hasPlace = wolne > 0;
                       return (
-                        <div key={i} className={`rounded-xl p-4 border ${hasPlace ? 'bg-emerald-50 border-emerald-200' : 'bg-stone-50 border-stone-200'}`}>
+                        <div key={i} className="px-6 md:px-8 py-5">
+                          {/* Typ opieki */}
                           {w.typ_opieki && (
-                            <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-4">
                               {w.typ_opieki}
-                            </div>
+                            </p>
                           )}
-                          <div className="flex flex-wrap items-center gap-4">
-                            {/* Wolne miejsca */}
-                            <div className="flex items-center gap-2">
-                              <span className={`text-2xl font-black ${hasPlace ? 'text-emerald-600' : 'text-slate-400'}`}>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            {/* Wolne miejsca ogółem */}
+                            <div className={`rounded-xl p-4 text-center ${hasPlace ? 'bg-emerald-50 border border-emerald-200' : 'bg-stone-50 border border-stone-200'}`}>
+                              <div className={`text-3xl font-black mb-1 ${hasPlace ? 'text-emerald-600' : 'text-slate-400'}`}>
                                 {wolne}
-                              </span>
-                              <span className="text-sm text-slate-500">
-                                wolnych {wolne === 1 ? 'miejsce' : wolne < 5 ? 'miejsca' : 'miejsc'}
-                              </span>
+                              </div>
+                              <div className="text-[11px] text-slate-500 font-medium">wolnych miejsc</div>
                             </div>
 
-                            {/* K/M podział */}
-                            {(w.wolne_kobiety != null || w.wolne_mezczyzni != null) && (
-                              <div className="flex gap-2 text-xs text-slate-500">
-                                {w.wolne_kobiety != null && (
-                                  <span className="bg-pink-50 text-pink-600 border border-pink-200 px-2 py-0.5 rounded-full font-semibold">
-                                    K: {w.wolne_kobiety}
-                                  </span>
-                                )}
-                                {w.wolne_mezczyzni != null && (
-                                  <span className="bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-full font-semibold">
-                                    M: {w.wolne_mezczyzni}
-                                  </span>
-                                )}
+                            {/* Kobiety */}
+                            {w.wolne_kobiety != null && (
+                              <div className="rounded-xl p-4 text-center bg-rose-50 border border-rose-100">
+                                <div className="text-3xl font-black mb-1 text-rose-500">{w.wolne_kobiety}</div>
+                                <div className="text-[11px] text-slate-500 font-medium">dla kobiet</div>
                               </div>
                             )}
 
-                            {/* Czas oczekiwania */}
-                            {!hasPlace && w.czas_oczekiwania_dni && w.czas_oczekiwania_dni > 0 && (
-                              <div className="text-sm text-slate-500 ml-auto">
-                                <span className="font-bold text-slate-700">
-                                  {w.czas_oczekiwania_dni < 365
-                                    ? `~${Math.round(w.czas_oczekiwania_dni / 30)} mies.`
-                                    : `~${(w.czas_oczekiwania_dni / 365).toFixed(1)} lat`}
-                                </span>
-                                {' '}oczekiwania
+                            {/* Mężczyźni */}
+                            {w.wolne_mezczyzni != null && (
+                              <div className="rounded-xl p-4 text-center bg-blue-50 border border-blue-100">
+                                <div className="text-3xl font-black mb-1 text-blue-500">{w.wolne_mezczyzni}</div>
+                                <div className="text-[11px] text-slate-500 font-medium">dla mężczyzn</div>
                               </div>
                             )}
 
-                            {/* Oczekujący */}
-                            {w.oczekujacych != null && w.oczekujacych > 0 && (
-                              <div className="text-xs text-amber-600 font-semibold">
-                                {w.oczekujacych} {w.oczekujacych === 1 ? 'osoba czeka' : 'osób czeka'}
+                            {/* Czas oczekiwania lub oczekujący */}
+                            {w.czas_oczekiwania_dni != null && w.czas_oczekiwania_dni > 0 ? (
+                              <div className="rounded-xl p-4 text-center bg-amber-50 border border-amber-100">
+                                <div className="text-lg font-black mb-1 text-amber-600 leading-tight">
+                                  {formatCzas(w.czas_oczekiwania_dni)}
+                                </div>
+                                <div className="text-[11px] text-slate-500 font-medium">
+                                  czas oczekiwania{w.oczekujacych ? ` · ${w.oczekujacych} osób` : ''}
+                                </div>
                               </div>
-                            )}
+                            ) : w.oczekujacych != null && w.oczekujacych > 0 ? (
+                              <div className="rounded-xl p-4 text-center bg-amber-50 border border-amber-100">
+                                <div className="text-3xl font-black mb-1 text-amber-600">{w.oczekujacych}</div>
+                                <div className="text-[11px] text-slate-500 font-medium">osób oczekuje</div>
+                              </div>
+                            ) : null}
                           </div>
                         </div>
                       );
                     })}
                   </div>
 
-                  <p className="text-xs text-slate-400 mt-4 leading-relaxed">
-                    Dane z rejestru Małopolskiego Urzędu Wojewódzkiego. Aktualność potwierdź telefonicznie.
-                  </p>
+                  {/* Stopka */}
+                  <div className="px-6 md:px-8 py-4 bg-stone-50 border-t border-stone-100">
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Źródło: Rejestr wolnych miejsc Małopolskiego Urzędu Wojewódzkiego.
+                      Dane aktualizowane przez placówki raz w miesiącu — potwierdź dostępność telefonicznie.
+                    </p>
+                  </div>
                 </section>
               );
             })()}
