@@ -180,7 +180,7 @@ def compare(pdf: dict, db: dict) -> dict:
     return diffs
 
 
-def build_report(diffs: dict, pdf_rows: dict, is_new_file: bool, pdf_path: str) -> str:
+def build_report(diffs: dict, pdf_rows: dict, db_rows: dict, is_new_file: bool, pdf_path: str) -> str:
     today = datetime.date.today().strftime("%d.%m.%Y")
     total = sum(len(v) for v in diffs.values())
     status = "🆕 Nowy plik PDF" if is_new_file else "📄 Plik bez zmian (hash identyczny)"
@@ -240,8 +240,82 @@ def build_report(diffs: dict, pdf_rows: dict, is_new_file: bool, pdf_path: str) 
         lines.append("## ✅ Baza danych jest zgodna z aktualnym wykazem PDF.")
     else:
         lines.append(f"## ⚠️ Znaleziono {total} rozbieżności do sprawdzenia.")
+        lines.append("")
+        lines.append("## 🛠️ Sugerowany SQL patch")
+        lines.append("> Przejrzyj przed wykonaniem. Uruchom: `psql $DATABASE_URL` i wklej poniżej.")
+        lines.append("")
+        lines.append(generate_sql_patch(diffs, pdf_rows, db_rows))
 
     lines.append("\n---\n*Wygenerowano automatycznie przez GitHub Actions / Kompas Seniora*")
+    return "\n".join(lines)
+
+
+def generate_sql_patch(diffs: dict, pdf_rows: dict, db_rows: dict) -> str:
+    lines = ["```sql", "BEGIN;", ""]
+
+    # nazwa_oficjalna — prosta aktualizacja do wersji z PDF
+    nazwa_updates = [d for d in diffs["nazwa_diff"]]
+    if nazwa_updates:
+        lines.append("-- Aktualizacja nazwa_oficjalna zgodnie z nowym PDF")
+        for d in nazwa_updates:
+            safe = d["pdf"].replace("'", "''")
+            lines.append(
+                f"UPDATE \"Placowka\" SET nazwa_oficjalna = '{safe}'"
+                f" WHERE oficjalne_id = {d['lp']}"
+                f" AND typ_placowki = 'DPS' AND wojewodztwo = 'małopolskie';"
+            )
+        lines.append("")
+
+    # telefony
+    if diffs["telefon_diff"]:
+        lines.append("-- Aktualizacja telefonów zgodnie z nowym PDF")
+        for d in diffs["telefon_diff"]:
+            safe = d["pdf"].replace("'", "''")
+            lines.append(
+                f"UPDATE \"Placowka\" SET telefon = '{safe}'"
+                f" WHERE oficjalne_id = {d['lp']}"
+                f" AND typ_placowki = 'DPS' AND wojewodztwo = 'małopolskie';"
+            )
+        lines.append("")
+
+    # emaile
+    if diffs["email_diff"]:
+        lines.append("-- Aktualizacja emaili zgodnie z nowym PDF")
+        for d in diffs["email_diff"]:
+            safe = d["pdf"].replace("'", "''")
+            lines.append(
+                f"UPDATE \"Placowka\" SET email = '{safe}'"
+                f" WHERE oficjalne_id = {d['lp']}"
+                f" AND typ_placowki = 'DPS' AND wojewodztwo = 'małopolskie';"
+            )
+        lines.append("")
+
+    # liczba miejsc
+    if diffs["miejsca_diff"]:
+        lines.append("-- Aktualizacja liczby miejsc zgodnie z nowym PDF")
+        for d in diffs["miejsca_diff"]:
+            lines.append(
+                f"UPDATE \"Placowka\" SET liczba_miejsc = {d['pdf']}"
+                f" WHERE oficjalne_id = {d['lp']}"
+                f" AND typ_placowki = 'DPS' AND wojewodztwo = 'małopolskie';"
+            )
+        lines.append("")
+
+    # brakujące — tylko komentarz, wymagają ręcznej decyzji
+    if diffs["missing_in_db"]:
+        lines.append("-- ⚠️ BRAKUJĄCE W BAZIE — wymagają ręcznego dodania przez panel admina:")
+        for d in diffs["missing_in_db"]:
+            lines.append(f"-- l.p. {d['lp']}: {d['pdf']}")
+        lines.append("")
+
+    # extra — tylko komentarz
+    if diffs["extra_in_db"]:
+        lines.append("-- ⚠️ EXTRA W BAZIE — sprawdź czy nie usunięto z wykazu:")
+        for d in diffs["extra_in_db"]:
+            lines.append(f"-- l.p. {d['lp']}: {d['db']}")
+        lines.append("")
+
+    lines += ["COMMIT;", "```"]
     return "\n".join(lines)
 
 
@@ -299,7 +373,7 @@ def main():
     diffs = compare(pdf_rows, db_rows)
     total = sum(len(v) for v in diffs.values())
 
-    report = build_report(diffs, pdf_rows, is_new, str(pdf_path.name))
+    report = build_report(diffs, pdf_rows, db_rows, is_new, str(pdf_path.name))
 
     today = datetime.date.today().strftime("%d.%m.%Y")
     if total == 0:
