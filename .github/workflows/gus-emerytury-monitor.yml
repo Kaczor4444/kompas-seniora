@@ -1,0 +1,42 @@
+name: Monitor GUS BDL — wysokość emerytur
+
+on:
+  schedule:
+    # 1. każdego miesiąca o 9:30 UTC (30 min po monitorze GUS populacji)
+    - cron: '30 9 1 * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Utwórz Issue nawet jeśli brak nowych danych'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check-emerytury:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Zainstaluj zależności
+        run: pip install requests
+
+      - name: Sprawdź nowe dane emerytur w GUS BDL
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+          GUS_BDL_KEY: ${{ secrets.GUS_BDL_KEY }}
+          FORCE_CHECK: ${{ github.event.inputs.force || 'false' }}
+        run: python scripts/monitor-gus-emerytury.py
