@@ -265,36 +265,36 @@ export default function RaportPage() {
       </section>
 
       {/* Top 3 / Bottom 3 */}
-      <div className="border-t border-slate-700/50">
+      <div className="bg-slate-800 border-t border-slate-600">
         <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-2 gap-8">
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-4">
               <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Najgorszy dostęp</span>
+              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">Najgorszy dostęp</span>
             </div>
             {top3Najgorsze.map((r, i) => (
-              <div key={r.powiat} className="flex items-center gap-3 py-1.5 border-b border-slate-700 last:border-0">
-                <span className="text-slate-500 text-xs w-4 flex-shrink-0">{i + 1}.</span>
-                <span className="capitalize text-white text-sm font-medium">{formatPowiat(r.powiat)}</span>
-                <span className="ml-auto text-white font-bold text-sm tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
+              <div key={r.powiat} className="flex items-center gap-3 py-2 border-b border-slate-600 last:border-0">
+                <span className="text-slate-400 text-xs w-4 flex-shrink-0">{i + 1}.</span>
+                <span className="capitalize text-white text-sm font-semibold">{formatPowiat(r.powiat)}</span>
+                <span className="ml-auto bg-slate-700 text-white font-bold text-xs px-2 py-1 rounded-lg tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
               </div>
             ))}
           </div>
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-4">
               <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Najlepszy dostęp</span>
+              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">Najlepszy dostęp</span>
             </div>
             {top3Najlepsze.map((r, i) => (
-              <div key={r.powiat} className="flex items-center gap-3 py-1.5 border-b border-slate-700 last:border-0">
-                <span className="text-slate-500 text-xs w-4 flex-shrink-0">{i + 1}.</span>
-                <span className="capitalize text-white text-sm font-medium">{formatPowiat(r.powiat)}</span>
-                <span className="ml-auto text-white font-bold text-sm tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
+              <div key={r.powiat} className="flex items-center gap-3 py-2 border-b border-slate-600 last:border-0">
+                <span className="text-slate-400 text-xs w-4 flex-shrink-0">{i + 1}.</span>
+                <span className="capitalize text-white text-sm font-semibold">{formatPowiat(r.powiat)}</span>
+                <span className="ml-auto bg-slate-700 text-white font-bold text-xs px-2 py-1 rounded-lg tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
               </div>
             ))}
           </div>
         </div>
-        <p className="text-center text-xs text-slate-600 pb-4 px-4">Powiaty ziemskie — bez miast na prawach powiatu i powiatu krakowskiego</p>
+        <p className="text-center text-xs text-slate-400 pb-4 px-4">Powiaty ziemskie — bez miast na prawach powiatu i powiatu krakowskiego</p>
       </div>
 
       {/* Gradient przejście hero → jasna treść */}
