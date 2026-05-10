@@ -4,6 +4,7 @@ import { parse } from 'papaparse'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import RaportCharts from './RaportCharts'
+import KpiHero from './KpiHero'
 
 const PUBLISHED = '2026-05-11'
 const DATA_DATE = 'marzec 2026'
@@ -202,65 +203,14 @@ export default function RaportPage() {
           </p>
 
           {/* KPI grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-
-            {/* KPI 1 — średnia */}
-            <div className="bg-slate-800 border border-slate-600 rounded-2xl p-5">
-              <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-3">
-                Średnia Małopolska
-              </div>
-              <div className="text-4xl font-black text-white mb-1">{avgDost}</div>
-              <div className="text-slate-300 text-xs mt-2 leading-relaxed">
-                miejsc DPS na 10 tys.<br />seniorów 80+
-              </div>
-            </div>
-
-            {/* KPI 2 — najgorszy */}
-            <div className="bg-red-900 border border-red-700 rounded-2xl p-5">
-              <div className="text-[10px] font-semibold text-red-200 uppercase tracking-wider mb-3">
-                Najgorszy powiat
-              </div>
-              <div className="text-4xl font-black text-white mb-1">
-                {Math.round(worst?.dostepnosc_2024 ?? 0)}
-              </div>
-              <div className="text-red-200 text-xs mt-2 leading-relaxed">
-                miejsc / 10 tys. 80+<br />
-                <span className="font-semibold">{formatPowiat(worst?.powiat ?? '')}</span>
-              </div>
-            </div>
-
-            {/* KPI 3 — emerytura */}
-            <div className="bg-slate-800 border border-slate-600 rounded-2xl p-5">
-              <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-3">
-                Emerytura ZUS 2025
-              </div>
-              <div className="text-3xl font-black text-white mb-1">
-                {emerytura2025
-                  ? `${emerytura2025.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} zł`
-                  : '—'}
-              </div>
-              <div className="text-slate-300 text-xs mt-2 leading-relaxed">
-                średnia brutto · Małopolska
-              </div>
-            </div>
-
-            {/* KPI 4 — luka systemowa */}
-            <div className="bg-slate-800 border border-slate-600 rounded-2xl p-5">
-              <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-3">
-                Luka systemowa / rok
-              </div>
-              <div className="text-3xl font-black text-white mb-1">
-                {worstLukaKPI
-                  ? `${Math.round(worstLukaKPI.luka_systemowa_rok / 1000)} tys. zł`
-                  : '—'}
-              </div>
-              <div className="text-slate-300 text-xs mt-2 leading-relaxed">
-                co dopłaca rodzina lub gmina<br />
-                <span className="font-semibold text-white capitalize">{worstLukaKPI?.powiat ?? ''}</span>
-              </div>
-            </div>
-
-          </div>
+          <KpiHero
+            avgDost={avgDost}
+            worstValue={Math.round(worst?.dostepnosc_2024 ?? 0)}
+            worstPowiat={formatPowiat(worst?.powiat ?? '')}
+            emerytura2025={Math.round(emerytura2025)}
+            lukaValue={worstLukaKPI?.luka_systemowa_rok ?? 0}
+            lukaPowiat={worstLukaKPI?.powiat ?? ''}
+          />
         </div>
       </section>
 
