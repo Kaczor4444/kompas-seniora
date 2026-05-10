@@ -221,11 +221,11 @@ export default function RaportPage() {
                 Najgorszy powiat
               </div>
               <div className="text-4xl font-black text-red-400 mb-1">
-                {Math.round(worst3[0]?.dostepnosc_2024 ?? 0)}
+                {Math.round(worst?.dostepnosc_2024 ?? 0)}
               </div>
               <div className="text-red-400/70 text-xs leading-relaxed">
                 miejsc / 10 tys. 80+<br />
-                <span className="font-semibold">{formatPowiat(worst3[0]?.powiat ?? '')}</span>
+                <span className="font-semibold">{formatPowiat(worst?.powiat ?? '')}</span>
               </div>
             </div>
 
