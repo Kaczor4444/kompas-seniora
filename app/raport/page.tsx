@@ -205,33 +205,33 @@ export default function RaportPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
 
             {/* KPI 1 — średnia */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">
+            <div className="bg-slate-800 border border-slate-600 rounded-2xl p-5">
+              <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-3">
                 Średnia Małopolska
               </div>
               <div className="text-4xl font-black text-white mb-1">{avgDost}</div>
-              <div className="text-slate-400 text-xs mt-2 leading-relaxed">
+              <div className="text-slate-300 text-xs mt-2 leading-relaxed">
                 miejsc DPS na 10 tys.<br />seniorów 80+
               </div>
             </div>
 
-            {/* KPI 2 — najgorszy (jedyny z kolorem alarmowym) */}
-            <div className="bg-red-950/60 border border-red-800/50 rounded-2xl p-5">
-              <div className="text-[10px] font-semibold text-red-300 uppercase tracking-wider mb-3">
+            {/* KPI 2 — najgorszy */}
+            <div className="bg-red-900 border border-red-700 rounded-2xl p-5">
+              <div className="text-[10px] font-semibold text-red-200 uppercase tracking-wider mb-3">
                 Najgorszy powiat
               </div>
-              <div className="text-4xl font-black text-red-300 mb-1">
+              <div className="text-4xl font-black text-white mb-1">
                 {Math.round(worst?.dostepnosc_2024 ?? 0)}
               </div>
-              <div className="text-red-300/60 text-xs mt-2 leading-relaxed">
+              <div className="text-red-200 text-xs mt-2 leading-relaxed">
                 miejsc / 10 tys. 80+<br />
-                <span className="font-semibold text-red-200">{formatPowiat(worst?.powiat ?? '')}</span>
+                <span className="font-semibold">{formatPowiat(worst?.powiat ?? '')}</span>
               </div>
             </div>
 
             {/* KPI 3 — emerytura */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">
+            <div className="bg-slate-800 border border-slate-600 rounded-2xl p-5">
+              <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-3">
                 Emerytura ZUS 2025
               </div>
               <div className="text-3xl font-black text-white mb-1">
@@ -239,14 +239,14 @@ export default function RaportPage() {
                   ? `${emerytura2025.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} zł`
                   : '—'}
               </div>
-              <div className="text-slate-400 text-xs mt-2 leading-relaxed">
-                średnia brutto<br />Małopolska
+              <div className="text-slate-300 text-xs mt-2 leading-relaxed">
+                średnia brutto · Małopolska
               </div>
             </div>
 
             {/* KPI 4 — luka systemowa */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">
+            <div className="bg-slate-800 border border-slate-600 rounded-2xl p-5">
+              <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-3">
                 Luka systemowa / rok
               </div>
               <div className="text-3xl font-black text-white mb-1">
@@ -254,9 +254,9 @@ export default function RaportPage() {
                   ? `${Math.round(worstLukaKPI.luka_systemowa_rok / 1000)} tys. zł`
                   : '—'}
               </div>
-              <div className="text-slate-400 text-xs mt-2 leading-relaxed">
+              <div className="text-slate-300 text-xs mt-2 leading-relaxed">
                 co dopłaca rodzina lub gmina<br />
-                <span className="font-semibold text-slate-300 capitalize">{worstLukaKPI?.powiat ?? ''}</span>
+                <span className="font-semibold text-white capitalize">{worstLukaKPI?.powiat ?? ''}</span>
               </div>
             </div>
 
@@ -273,10 +273,10 @@ export default function RaportPage() {
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Najgorszy dostęp</span>
             </div>
             {top3Najgorsze.map((r, i) => (
-              <div key={r.powiat} className="flex items-center gap-3 py-1.5 border-b border-slate-800/60 last:border-0">
-                <span className="text-slate-600 text-xs w-4 flex-shrink-0">{i + 1}.</span>
-                <span className="capitalize text-slate-200 text-sm">{formatPowiat(r.powiat)}</span>
-                <span className="ml-auto text-slate-300 font-bold text-sm tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
+              <div key={r.powiat} className="flex items-center gap-3 py-1.5 border-b border-slate-700 last:border-0">
+                <span className="text-slate-500 text-xs w-4 flex-shrink-0">{i + 1}.</span>
+                <span className="capitalize text-white text-sm font-medium">{formatPowiat(r.powiat)}</span>
+                <span className="ml-auto text-white font-bold text-sm tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
               </div>
             ))}
           </div>
@@ -286,10 +286,10 @@ export default function RaportPage() {
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Najlepszy dostęp</span>
             </div>
             {top3Najlepsze.map((r, i) => (
-              <div key={r.powiat} className="flex items-center gap-3 py-1.5 border-b border-slate-800/60 last:border-0">
-                <span className="text-slate-600 text-xs w-4 flex-shrink-0">{i + 1}.</span>
-                <span className="capitalize text-slate-200 text-sm">{formatPowiat(r.powiat)}</span>
-                <span className="ml-auto text-slate-300 font-bold text-sm tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
+              <div key={r.powiat} className="flex items-center gap-3 py-1.5 border-b border-slate-700 last:border-0">
+                <span className="text-slate-500 text-xs w-4 flex-shrink-0">{i + 1}.</span>
+                <span className="capitalize text-white text-sm font-medium">{formatPowiat(r.powiat)}</span>
+                <span className="ml-auto text-white font-bold text-sm tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
               </div>
             ))}
           </div>
