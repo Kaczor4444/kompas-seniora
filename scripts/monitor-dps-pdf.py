@@ -319,6 +319,37 @@ def generate_sql_patch(diffs: dict, pdf_rows: dict, db_rows: dict) -> str:
     return "\n".join(lines)
 
 
+def validate_pdf_rows(pdf_rows: dict) -> list[str]:
+    """
+    Sprawdza czy parsowanie PDF dało sensowne wyniki.
+    Zmiana układu kolumn w pliku MUW → puste pola bez błędu parsera.
+    Zwraca listę komunikatów błędów (pusta = OK).
+    """
+    errors = []
+    n = len(pdf_rows)
+
+    if n < 80:
+        errors.append(f"Za mało rekordów: **{n}** (oczekiwane ≥80) — możliwa zmiana formatu PDF lub niekompletne parsowanie.")
+    if n > 105:
+        errors.append(f"Za dużo rekordów: **{n}** (oczekiwane ≤105) — możliwe zduplikowane wiersze.")
+
+    with_email = sum(1 for r in pdf_rows.values() if r.get('email'))
+    if n > 0 and with_email / n < 0.30:
+        errors.append(
+            f"Tylko **{with_email}/{n}** rekordów ma email ({with_email/n*100:.0f}%) — "
+            f"prawdopodobna zmiana układu kolumn w PDF."
+        )
+
+    with_name = sum(1 for r in pdf_rows.values() if r.get('nazwa') and len(r['nazwa']) > 5)
+    if n > 0 and with_name / n < 0.70:
+        errors.append(
+            f"Tylko **{with_name}/{n}** rekordów ma nazwę ({with_name/n*100:.0f}%) — "
+            f"prawdopodobna zmiana układu kolumn w PDF."
+        )
+
+    return errors
+
+
 def create_github_issue(title: str, body: str, auto_close: bool = False) -> str | None:
     if not GITHUB_TOKEN:
         print("Brak GITHUB_TOKEN — pomijam tworzenie Issue")
@@ -360,7 +391,7 @@ def main():
 
     force = os.environ.get("FORCE_COMPARE", "false").lower() == "true"
     today = datetime.date.today().strftime("%d.%m.%Y")
-    now_utc = datetime.datetime.utcnow().strftime("%H:%M UTC")
+    now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%H:%M UTC")
 
     # #1 — błąd pobierania → otwarty Issue z alertem
     print("Pobieranie PDF...")
@@ -409,6 +440,28 @@ def main():
     print("Parsowanie PDF...")
     pdf_rows = extract_pdf_rows(io.BytesIO(pdf_data))
     print(f"Znaleziono {len(pdf_rows)} rekordów w PDF")
+
+    # #7 — walidacja struktury — jeśli coś nie gra, alert i wyjście BEZ SQL patcha
+    validation_errors = validate_pdf_rows(pdf_rows)
+    if validation_errors:
+        err_list = "\n".join(f"- {e}" for e in validation_errors)
+        print(f"❌ Walidacja PDF nieudana:\n{err_list}")
+        create_github_issue(
+            f"🔴 DPS Monitor {today} — anomalia struktury PDF (sprawdź ręcznie)",
+            (
+                f"Sprawdzono {today} o {now_utc}.\n\n"
+                f"**Parsowanie PDF dało podejrzane wyniki — możliwa zmiana układu kolumn.**\n\n"
+                f"## Wykryte problemy\n\n{err_list}\n\n"
+                f"## Co zrobić\n\n"
+                f"1. Otwórz ręcznie: [{PDF_URL}]({PDF_URL})\n"
+                f"2. Sprawdź czy tabela ma tę samą strukturę kolumn co wcześniej\n"
+                f"3. Jeśli zmieniła się — zaktualizuj `extract_pdf_rows()` w `monitor-dps-pdf.py`\n\n"
+                f"**SQL patch NIE został wygenerowany** — dane są podejrzane i nie powinny trafić do bazy.\n\n"
+                f"- **Hash PDF:** `{h}`\n"
+                f"- **Źródło:** {PDF_URL}"
+            ),
+        )
+        sys.exit(1)
 
     print("Pobieranie danych z bazy...")
     db_rows = fetch_db_rows()

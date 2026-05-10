@@ -11,6 +11,7 @@ Harmonogram: 1., 8. i 15. każdego miesiąca.
 """
 
 import os
+import re
 import sys
 import hashlib
 import datetime
@@ -94,6 +95,41 @@ def parse_xlsx(data: bytes) -> tuple[list[str], list[list], str]:
 def find_previous_xlsx() -> Path | None:
     files = sorted(RAW_DANE_DIR.glob("wolne_miejsca_dps_*.xlsx"))
     return files[-2] if len(files) >= 2 else (files[0] if files else None)
+
+
+def find_latest_xlsx() -> Path | None:
+    files = sorted(RAW_DANE_DIR.glob("wolne_miejsca_dps_*.xlsx"))
+    return files[-1] if files else None
+
+
+def parse_data_stanu(title: str) -> datetime.date | None:
+    """Wyciąga datę stanu z tytułu XLSX: 'stan na dzień 30 kwietnia 2026'."""
+    months = {
+        'stycznia': 1, 'lutego': 2, 'marca': 3, 'kwietnia': 4,
+        'maja': 5, 'czerwca': 6, 'lipca': 7, 'sierpnia': 8,
+        'września': 9, 'października': 10, 'listopada': 11, 'grudnia': 12,
+    }
+    m = re.search(r'(\d{1,2})\s+(\w+)\s+(\d{4})', title.lower())
+    if m:
+        month = months.get(m.group(2))
+        if month:
+            try:
+                return datetime.date(int(m.group(3)), month, int(m.group(1)))
+            except ValueError:
+                pass
+    return None
+
+
+def days_since_data_stanu(xlsx_path: Path) -> int | None:
+    """Ile dni minęło od daty stanu w pliku XLSX."""
+    try:
+        _, _, title = parse_xlsx(xlsx_path.read_bytes())
+        d = parse_data_stanu(title)
+        if d:
+            return (datetime.date.today() - d).days
+    except Exception:
+        pass
+    return None
 
 
 def get_wolne_total(headers: list, rows: list) -> int | None:
@@ -268,7 +304,7 @@ def create_github_issue(title: str, body: str, auto_close: bool = False) -> str 
 def main():
     force = os.environ.get("FORCE_CHECK", "false").lower() == "true"
     today = datetime.date.today().strftime("%d.%m.%Y")
-    now_utc = datetime.datetime.utcnow().strftime("%H:%M UTC")
+    now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%H:%M UTC")
 
     # #4 — pomiń jeśli nowy plik już znaleziono w tym miesiącu
     if already_found_this_month() and not force:
@@ -310,20 +346,42 @@ def main():
 
     print(f"Hash: {h} | Poprzedni: {known} | Nowy plik: {is_new}")
 
-    # #3 — brak zmian → zamknięty Issue informacyjny
+    # #3 — brak zmian → Issue (zamknięty, chyba że dane są bardzo stare)
     if not is_new and not force:
-        print("Plik bez zmian — tworzę zamknięty Issue informacyjny.")
-        create_github_issue(
-            f"✅ Wolne miejsca DPS {today} — brak nowego pliku",
-            (
-                f"Sprawdzono {today} o {now_utc}.\n\n"
-                f"Plik XLSX nie zmienił się od ostatniego sprawdzenia.\n\n"
-                f"- **Hash (SHA-256):** `{h}`\n"
-                f"- **Źródło:** {XLSX_URL}\n\n"
-                f"Brak nowych danych o wolnych miejscach w DPS Małopolska."
-            ),
-            auto_close=True,
-        )
+        latest = find_latest_xlsx()
+        days = days_since_data_stanu(latest) if latest else None
+        stagnacja = days is not None and days > 45
+
+        if stagnacja:
+            # #5 — stagnacja: otwarty Issue, wymaga uwagi
+            print(f"⚠️ Brak aktualizacji od {days} dni — tworzę otwarty alert.")
+            create_github_issue(
+                f"🟠 Wolne miejsca DPS — brak aktualizacji od {days} dni",
+                (
+                    f"Sprawdzono {today} o {now_utc}.\n\n"
+                    f"**Plik XLSX nie zmienił się od {days} dni.**\n\n"
+                    f"Ostatnie dane mają stan z: `{latest.name if latest else 'nieznany'}`.\n"
+                    f"MUW Małopolska aktualizuje plik co miesiąc — tak długa przerwa może oznaczać "
+                    f"problem ze źródłem lub zmianę adresu pliku.\n\n"
+                    f"- **Hash (SHA-256):** `{h}`\n"
+                    f"- **Źródło:** [{XLSX_URL}]({XLSX_URL})\n\n"
+                    f"Sprawdź ręcznie czy plik jest dostępny i czy dane są aktualne."
+                ),
+                auto_close=False,
+            )
+        else:
+            print("Plik bez zmian — tworzę zamknięty Issue informacyjny.")
+            days_info = f" (dane sprzed {days} dni)" if days is not None else ""
+            create_github_issue(
+                f"✅ Wolne miejsca DPS {today} — brak nowego pliku",
+                (
+                    f"Sprawdzono {today} o {now_utc}.\n\n"
+                    f"Plik XLSX nie zmienił się od ostatniego sprawdzenia{days_info}.\n\n"
+                    f"- **Hash (SHA-256):** `{h}`\n"
+                    f"- **Źródło:** {XLSX_URL}"
+                ),
+                auto_close=True,
+            )
         sys.exit(0)
 
     # Nowy plik — pobierz poprzednie dane do trendu
@@ -356,16 +414,17 @@ def main():
     issue_url = create_github_issue(issue_title, report)
     update_log(xlsx_path, h, issue_url)
 
-    # Import do bazy
-    print("\nImportuję dane do bazy...")
-    import subprocess
-    result = subprocess.run(
-        ["python3", str(Path(__file__).parent / "import-wolne-miejsca.py"), str(xlsx_path)],
-        capture_output=True, text=True
-    )
-    print(result.stdout)
-    if result.returncode != 0:
-        print(f"⚠️ Błąd importu: {result.stderr[:500]}")
+    # Import do bazy — wyłączony w fazie testowej (2-3 miesiące)
+    # Po weryfikacji że raporty działają poprawnie, odkomentować:
+    # import subprocess
+    # result = subprocess.run(
+    #     ["python3", str(Path(__file__).parent / "import-wolne-miejsca.py"), str(xlsx_path)],
+    #     capture_output=True, text=True
+    # )
+    # print(result.stdout)
+    # if result.returncode != 0:
+    #     print(f"⚠️ Błąd importu: {result.stderr[:500]}")
+    print("ℹ️ Import do bazy pominięty — faza testowa raportów.")
 
 
 if __name__ == "__main__":
