@@ -2,6 +2,83 @@
 
 ---
 
+## ✅ SESJA #16: 2026-05-10 — GUS BDL + wskaźnik nasycenia DPS + koncepcja raportu
+
+### Co zrobiliśmy:
+
+#### 1. Dane GUS BDL — populacja per powiat Małopolska
+Commit: `5a26ad7`
+
+- `scripts/fetch-gus-bdl.py` — pobiera z GUS BDL API:
+  - Dane historyczne 2015–2024: populacja w wieku poprodukcyjnym (zmienna 72293)
+  - Prognozy 65+ na 2025, 2030, 2035, 2040 (subject P4359)
+  - Parent ID Małopolski: `011200000000`, 22 powiaty
+- `data/gus_populacja_malopolska.csv` — 308 rekordów
+
+#### 2. Wskaźnik nasycenia DPS per powiat
+- `scripts/calculate-saturation-index.py` — łączy GUS z bazą Neon
+- `data/wskaznik_nasycenia_malopolska.csv` — 22 powiaty
+- Wyniki 2024: chrzanowski 312, olkuski 290, nowotarski 235, m. Kraków 234
+- Najlepsza dostępność: krakowski 28 (ale ma DPS obsługujące całą Małopolskę)
+- **Kluczowy insight:** 11x różnica między najgorszym a najlepszym powiatem
+
+#### 3. Monitor GUS BDL 2025
+- `scripts/monitor-gus-bdl.py` — sprawdza czy GUS opublikował dane za 2025
+- `.github/workflows/gus-bdl-monitor.yml` — cron 1. każdego miesiąca 9:00 UTC
+- Gdy ≥15/22 powiatów ma dane → tworzy GitHub Issue z tabelą wartości
+- 2025 jeszcze niedostępne (GUS publikuje z ~rocznym opóźnieniem)
+
+#### 4. Koncepcja raportu publicznego (konsultacja z Opus 4.7)
+- Analiza z perspektyw: UX, marketing, startup, NGO/polityka społeczna
+- **Wniosek:** Raport to lead magnet, nie produkt. Revenue z grantów (FIO 50-150k zł),
+  zleceń od deweloperów senior-housing (20-50k zł), sponsoringu
+- **Headline:** nie "luka 1700 zł" (wszyscy wiedzą) ale wskaźnik nasycenia per powiat
+- Model: cykliczny raport kwartalny + live dashboard, nie tylko subskrypcja
+- Quick win: list do RPO z danymi → media ogólnopolskie za darmo
+
+### Commity tej sesji:
+- `5a26ad7` — feat: GUS BDL data + wskaźnik nasycenia DPS per powiat Małopolska
+- `e73678d` — feat: GUS BDL — przeciętne emerytury per województwo 2015–2025
+- `83cdc0f` — feat: monitor GUS BDL — wysokość emerytur per województwo
+- `baa17a3` — fix: wskaźnik dostępności DPS — metodologia poprawiona
+
+### Decyzje projektowe:
+- **Tylko DPS** w raporcie (ŚDS wykluczone — obsługuje też młodszych dorosłych z niepełnosprawnościami)
+- **Emerytury per województwo** — dane per powiat niedostępne publicznie (ZUS PSZ ma tylko 2011 woj., API BDL level=3). Opcja: wniosek o udostępnienie danych do statystyka@zus.pl
+- **Populacja 80+** jako właściwa miara dla DPS (nie "wiek poprodukcyjny")
+- **Konwencja wskaźnika**: miejsc/10k seniorów 80+ (wyższy = lepszy), nie odwrotnie
+
+### Stan danych po sesji:
+- **GUS BDL:** 308 rekordów (22 powiaty × 10 lat historii + 4 lata prognoz)
+- **Wskaźnik nasycenia:** 22 powiaty, zakres 28–312 osób/miejsce DPS
+- **PlacowkaWolneMiejsca:** 551 rekordów (bez zmian)
+
+---
+
+## 🚨 TODO — NASTĘPNA SESJA (priorytety)
+
+### KRYTYCZNE — SEO (strona niewidoczna dla Google i AI!)
+1. **`public/robots.txt`** — zmienić z `Disallow: /` na `Allow: /`, `Disallow: /admin/`
+2. **`app/layout.tsx`** — zmienić `robots: { index: false }` na `index: true`
+3. **`app/sitemap.ts`** — dodać dynamiczny sitemap (186 placówek + artykuły)
+
+### RAPORT — strona `/raport`
+- Landing z hero stat (wskaźnik nasycenia per powiat)
+- Mapa choropletyczna Małopolski
+- Trend cen 2023→2026
+- Formularz "powiadom mnie o pełnym raporcie" (walidacja popytu)
+- Strona `/raport/metodologia` z listą źródeł
+
+### CONTENT — Artykuł gotowy do publikacji
+- `drafts/koszty-dps-kto-placi-2026-05-07.md` — ~2800 słów, status: DRAFT
+- Do zrobienia: `/scrub` → `/optimize` → dodać do `src/data/articles.ts` → stworzyć MDX
+
+### INNE
+- Dodać label `gus-data` i `data-update` w GitHub repo (Settings → Labels)
+- Metadata dla 186 placówek (`generateMetadata()` w `/app/placowka/[id]/page.tsx`)
+
+---
+
 ## ✅ SESJA #15: 2026-05-10 — Import wolnych miejsc + ulepszenia monitorów
 
 ### Co zrobiliśmy:
