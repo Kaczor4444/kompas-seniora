@@ -31,7 +31,7 @@ export default async function PlacowkaPage({ params }: { params: Promise<{ id: s
           data_stanu: true,
         },
         orderBy: { data_stanu: 'desc' },
-        take: 10, // max 10 najnowszych wierszy (kilka typów opieki × ostatnie daty)
+        take: 20,
       },
     },
   });
