@@ -90,8 +90,6 @@ export default function RaportPage() {
   const powiaty   = loadSaturation()
   const emerytury = loadEmerytury()
 
-  const worst3  = powiaty.slice(0, 3)
-  const best1   = powiaty[powiaty.length - 1]
   const emerytura2025 = emerytury.find(e => e.rok === 2025)?.wartosc_zl ?? 0
   const totalMiejsc = powiaty.reduce((s, r) => s + r.dps_miejsca, 0)
   const totalPop80  = powiaty.reduce((s, r) => s + r.pop_80plus_2024, 0)
@@ -99,12 +97,31 @@ export default function RaportPage() {
   const totalPlacowek = powiaty.reduce((s, r) => s + r.dps_placowki, 0)
   const totalZCena = powiaty.reduce((s, r) => s + r.n_placowek_z_cena, 0)
 
-  // Dysproporcja: 2. najlepszy vs najgorszy (krakowski outlier wykluczony — obsługuje całe woj.)
-  const powiatyBezKrakowskiego = powiaty.filter(r => r.powiat !== 'krakowski')
-  const best1BezOutliera = powiatyBezKrakowskiego[powiatyBezKrakowskiego.length - 1]
-  const disparity = best1BezOutliera && worst3[0]
-    ? Math.round(best1BezOutliera.dostepnosc_2024 / worst3[0].dostepnosc_2024)
+  // Outlierzy — powiaty zaburzające statystyki (porównanie case-insensitive)
+  const OUTLIERS = ['krakowski', 'm. kraków', 'm. tarnów', 'm. nowy sącz']
+  const isOutlier = (p: string) => OUTLIERS.includes(p.toLowerCase())
+  const powiatyZiemskie = powiaty.filter(r => !isOutlier(r.powiat))
+
+  // Dysproporcja: tylko powiaty ziemskie (bez miast i krakowskiego)
+  const worst = powiaty[0]                                    // chrzanowski (171)
+  const bestZiemski = powiatyZiemskie[powiatyZiemskie.length - 1] // miechowski (1365)
+  const disparity = bestZiemski && worst
+    ? Math.round(bestZiemski.dostepnosc_2024 / worst.dostepnosc_2024)
     : null
+
+  // KPI luka — najgorszy WIARYGODNY powiat ziemski (N≥3, nie outlier)
+  const powiatyRzetelneLuka = powiatyZiemskie
+    .filter(r => !isOutlier(r.powiat) && r.n_placowek_z_cena >= 3 && r.cena_dps_mediana !== null)
+    .map(r => ({
+      ...r,
+      luka_systemowa_rok: Math.round(((r.cena_dps_mediana ?? 0) - 0.7 * r.emerytura_malopolska) * 12),
+    }))
+    .sort((a, b) => b.luka_systemowa_rok - a.luka_systemowa_rok)
+  const worstLukaKPI = powiatyRzetelneLuka[0]
+
+  // Top 3 najgorsze / najlepsze — powiaty ziemskie (bez outlierów w zestawieniu)
+  const top3Najgorsze = powiatyZiemskie.slice(0, 3)
+  const top3Najlepsze = [...powiatyZiemskie].reverse().slice(0, 3)
 
   const powiatyForChart = powiaty.map(r => ({
     ...r,
@@ -227,18 +244,20 @@ export default function RaportPage() {
               </div>
             </div>
 
-            {/* KPI 4 — dysproporcja */}
+            {/* KPI 4 — luka systemowa (worst wiarygodny powiat ziemski, N≥3) */}
             <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-5">
               <div className="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2">
-                Dysproporcja
+                Luka systemowa / rok
               </div>
-              <div className="text-4xl font-black text-orange-400 mb-1">
-                {disparity ? `${disparity}×` : '—'}
+              <div className="text-3xl font-black text-orange-400 mb-1">
+                {worstLukaKPI
+                  ? `${Math.round(worstLukaKPI.luka_systemowa_rok / 1000)} tys. zł`
+                  : '—'}
               </div>
               <div className="text-orange-400/70 text-xs leading-relaxed">
-                gorszy dostęp<br />
-                <span className="font-semibold">{formatPowiat(worst3[0]?.powiat ?? '')}</span> vs {formatPowiat(best1BezOutliera?.powiat ?? '')}
-                <span className="block mt-1 opacity-60">*bez powiatu krakowskiego</span>
+                co pokrywa rodzina lub gmina<br />
+                <span className="font-semibold capitalize">{worstLukaKPI?.powiat ?? ''}</span>
+                <span className="block mt-1 opacity-60">wg art. 61 ustawy o pomocy społecznej</span>
               </div>
             </div>
 
@@ -246,30 +265,31 @@ export default function RaportPage() {
         </div>
       </section>
 
-      {/* Top 3 / Bottom 3 — szybki kontekst */}
+      {/* Top 3 / Bottom 3 — tylko powiaty ziemskie (bez miast i outliera krakowskiego) */}
       <div className="bg-slate-800/50 border-t border-slate-700/50">
-        <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-2 gap-4">
+        <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-2 gap-6">
           <div>
             <div className="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Najgorszy dostęp</div>
-            {powiaty.slice(0, 3).map((r, i) => (
+            {top3Najgorsze.map((r, i) => (
               <div key={r.powiat} className="flex items-center gap-3 mb-2">
                 <span className="text-slate-500 text-xs w-4">{i + 1}.</span>
-                <span className="capitalize text-white text-sm font-medium">{r.powiat}</span>
+                <span className="capitalize text-white text-sm font-medium">{formatPowiat(r.powiat)}</span>
                 <span className="ml-auto text-red-400 font-bold text-sm">{r.dostepnosc_2024.toFixed(0)}/10k</span>
               </div>
             ))}
           </div>
           <div>
             <div className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3">Najlepszy dostęp</div>
-            {[...powiaty].reverse().slice(0, 3).map((r, i) => (
+            {top3Najlepsze.map((r, i) => (
               <div key={r.powiat} className="flex items-center gap-3 mb-2">
                 <span className="text-slate-500 text-xs w-4">{i + 1}.</span>
-                <span className="capitalize text-white text-sm font-medium">{r.powiat}</span>
+                <span className="capitalize text-white text-sm font-medium">{formatPowiat(r.powiat)}</span>
                 <span className="ml-auto text-emerald-400 font-bold text-sm">{r.dostepnosc_2024.toFixed(0)}/10k</span>
               </div>
             ))}
           </div>
         </div>
+        <p className="text-center text-xs text-slate-600 pb-4">Ranking tylko dla powiatów ziemskich — bez miast na prawach powiatu i powiatu krakowskiego (obsługuje całe województwo)</p>
       </div>
 
       {/* Gradient przejście hero → jasna treść */}

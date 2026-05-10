@@ -143,6 +143,10 @@ function LegendaKolorow({ extra }: { extra?: React.ReactNode }) {
 export default function RaportCharts({ powiaty, emerytury, avgDost }: Props) {
   const [mapYear, setMapYear] = useState<'2024' | '2035'>('2024')
 
+  // Outlierzy wykluczeni z analiz porównawczych
+  const OUTLIERS = ['krakowski', 'm. kraków', 'm. tarnów', 'm. nowy sącz']
+  const powiatyZiemskie = powiaty.filter(r => !OUTLIERS.includes(r.powiat.toLowerCase()))
+
   // Luka systemowa (art. 61 uos): pensjonariusz płaci max 70% dochodu
   const powiatyZLuka = powiaty
     .filter(r => r.luka_roczna_zl !== null && r.cena_dps_mediana !== null)
@@ -152,13 +156,14 @@ export default function RaportCharts({ powiaty, emerytury, avgDost }: Props) {
     }))
     .sort((a, b) => b.luka_systemowa_rok - a.luka_systemowa_rok)
 
-  // Worst/best wykluczając miasta i krakowski
-  const powiatyZiemskie = powiaty.filter(r => !isCity(r.powiat) && r.powiat !== 'krakowski')
-  const worst = powiaty[0]       // najgorszy ogółem (chrzanowski)
-  const best  = powiatyZiemskie[powiatyZiemskie.length - 1]  // najlepszy ziemski (miechowski)
+  // Worst/best tylko powiaty ziemskie
+  const worst = powiatyZiemskie[0]
+  const best  = powiatyZiemskie[powiatyZiemskie.length - 1]
   const disparity = best && worst ? Math.round(best.dostepnosc_2024 / worst.dostepnosc_2024) : 0
 
-  const worstLuka = powiatyZLuka[0]
+  // Insight luki — najgorszy wiarygodny powiat ziemski (N≥3, bez outlierów)
+  const worstLuka = powiatyZLuka
+    .filter(r => (r.n_placowek_z_cena ?? 0) >= 3 && !OUTLIERS.includes(r.powiat.toLowerCase().trim()))[0]
   const emFirst = emerytury[0]
   const emLast  = emerytury[emerytury.length - 1]
   const emWzrost = emFirst && emLast
