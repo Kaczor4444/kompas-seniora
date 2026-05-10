@@ -164,7 +164,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         <input
           type="range"
           min="0"
-          max="10000"
+          max="13000"
           step="500"
           value={priceLimit}
           onChange={(e) => onPriceLimitChange(Number(e.target.value))}

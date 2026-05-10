@@ -164,7 +164,7 @@ export default function SearchResults({
   const [selectedPowiat, setSelectedPowiat] = useState(getInitialPowiat());
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
   const [priceLimit, setPriceLimit] = useState(
-    activeFilters?.maxPrice || 12000  // Zwiększono z 10000 do 12000 (max cena w bazie: 11300 zł)
+    activeFilters?.maxPrice || 13000  // max w bazie: 12 400 zł (Kraków), suwak do 13 000
   );
 
   const [showFilters, setShowFilters] = useState(false);
@@ -277,10 +277,10 @@ export default function SearchResults({
         clear: () => setSelectedProfiles(selectedProfiles.filter(c => c !== code))
       });
     });
-    if (priceLimit < 10000) {
+    if (priceLimit < 13000) {
       chips.push({
         label: `Do: ${priceLimit} zł`,
-        clear: () => setPriceLimit(10000)
+        clear: () => setPriceLimit(13000)
       });
     }
     if (userLocation && maxDistance < maxDistanceFromServer) {
@@ -357,7 +357,7 @@ export default function SearchResults({
       setFacilities([]);
       setSelectedPowiat('Wszystkie');
       setSelectedProfiles([]);
-      setPriceLimit(10000);
+      setPriceLimit(13000);
       setMaxDistance(maxDistanceFromServer);
       setMaxDistanceFromCity(maxDistanceFromServer);
 
@@ -586,7 +586,7 @@ export default function SearchResults({
       setSelectedVoivodeship("Wszystkie");
       setSelectedPowiat("Wszystkie");
       setSelectedProfiles([]);
-      setPriceLimit(10000);
+      setPriceLimit(13000);
       setMaxDistance(maxDistanceFromServer);
       setMaxDistanceFromCity(maxDistanceFromServer);
     }
@@ -604,7 +604,7 @@ export default function SearchResults({
     setSelectedVoivodeship("Wszystkie");
     setSelectedPowiat("Wszystkie");
     setSelectedProfiles([]);
-    setPriceLimit(10000);
+    setPriceLimit(13000);
     setMaxDistance(maxDistanceFromServer);
     setMaxDistanceFromCity(maxDistanceFromServer);
   };
