@@ -2,7 +2,12 @@
 """
 Monitor wolnych miejsc DPS — pobiera plik XLSX z MUW Małopolska,
 wykrywa zmiany i tworzy GitHub Issue z raportem nowych danych.
-Issue tworzony TYLKO gdy plik się zmienił — brak spamu przy braku zmian.
+
+Harmonogram: 1., 8. i 15. każdego miesiąca.
+- Gdy nowy plik: pełny raport + trend wolnych miejsc + import do bazy.
+- Gdy plik bez zmian: zamknięty Issue informacyjny (nie zaśmieca listy).
+- Gdy nowy plik już znaleziony w tym miesiącu: pomija sprawdzenie.
+- Gdy błąd pobierania: otwarty Issue z alertem.
 """
 
 import os
@@ -19,6 +24,7 @@ REPO = os.environ.get("GITHUB_REPOSITORY", "Kaczor4444/kompas-seniora")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 RAW_DANE_DIR = Path(__file__).parent.parent / "raw_dane" / "malopolskie"
 HASH_FILE = RAW_DANE_DIR / ".wolne_miejsca_hash"
+MONTH_FILE = RAW_DANE_DIR / ".wolne_miejsca_month"   # przechowuje YYYY-MM ostatniego nowego pliku
 LOG_FILE = RAW_DANE_DIR / "wolne_miejsca_log.md"
 
 
@@ -40,6 +46,17 @@ def last_known_hash() -> str | None:
     return HASH_FILE.read_text().strip() if HASH_FILE.exists() else None
 
 
+def already_found_this_month() -> bool:
+    """Czy nowy plik był już pobrany w bieżącym miesiącu?"""
+    if not MONTH_FILE.exists():
+        return False
+    return MONTH_FILE.read_text().strip() == datetime.date.today().strftime("%Y-%m")
+
+
+def mark_found_this_month():
+    MONTH_FILE.write_text(datetime.date.today().strftime("%Y-%m"))
+
+
 def save_file(data: bytes, h: str) -> Path:
     today = datetime.date.today().strftime("%Y-%m-%d")
     path = RAW_DANE_DIR / f"wolne_miejsca_dps_{today}.xlsx"
@@ -49,8 +66,7 @@ def save_file(data: bytes, h: str) -> Path:
 
 
 def parse_xlsx(data: bytes) -> tuple[list[str], list[list], str]:
-    """Zwraca (nagłówki, wiersze_danych, tytuł) z pierwszego arkusza XLSX.
-    Obsługuje format MUW: wiersz 0 = tytuł z datą, wiersz 1+ = nagłówki kolumn."""
+    """Zwraca (nagłówki, wiersze_danych, tytuł) z pierwszego arkusza XLSX."""
     wb = openpyxl.load_workbook(BytesIO(data))
     ws = wb.active
 
@@ -62,10 +78,8 @@ def parse_xlsx(data: bytes) -> tuple[list[str], list[list], str]:
     if not all_rows:
         return [], [], ""
 
-    # Wiersz 0 często zawiera tytuł/datę (np. "Rejestr wolnych miejsc... stan na dzień X")
-    title = next((c for c in all_rows[0] if c), "")
+    title = next((c for row in all_rows[:8] for c in row if "stan na" in c.lower()), "")
 
-    # Szukaj wiersza z właściwymi nagłówkami (zawiera "LP" lub "Powiat")
     header_idx = 0
     for i, row in enumerate(all_rows[:6]):
         if any("lp" in c.lower() or "powiat" in c.lower() for c in row if c):
@@ -78,51 +92,77 @@ def parse_xlsx(data: bytes) -> tuple[list[str], list[list], str]:
 
 
 def find_previous_xlsx() -> Path | None:
-    """Szuka najnowszego poprzedniego pliku XLSX w raw_dane/malopolskie/."""
     files = sorted(RAW_DANE_DIR.glob("wolne_miejsca_dps_*.xlsx"))
     return files[-2] if len(files) >= 2 else (files[0] if files else None)
 
 
-def count_summary(headers: list, rows: list) -> str:
-    """Liczy wolne miejsca tylko z wierszy powiatowych (LP = cyfra) — bez podwójnego liczenia."""
+def get_wolne_total(headers: list, rows: list) -> int | None:
+    """Suma wolnych miejsc z wierszy powiatowych (LP = cyfra) — bez podwójnego liczenia."""
     keywords = ["wolne", "miejsc"]
     col_idx = None
     for i, h in enumerate(headers):
         if any(k in h.lower() for k in keywords):
             col_idx = i
             break
-
     if col_idx is None:
-        return f"Łącznie wierszy danych: **{len(rows)}**"
+        return None
 
     total = 0
-    powiats_with_places = 0
+    for row in rows:
+        lp = row[0].rstrip(". ").strip()
+        if not lp.isdigit():
+            continue
+        val = row[col_idx] if col_idx < len(row) else ""
+        try:
+            total += int(val)
+        except (ValueError, TypeError):
+            pass
+    return total
+
+
+def count_summary(headers: list, rows: list, prev_total: int | None = None) -> str:
+    total = get_wolne_total(headers, rows)
+    powiats_with = 0
     powiats_total = 0
 
+    col_idx = None
+    for i, h in enumerate(headers):
+        if any(k in h.lower() for k in ["wolne", "miejsc"]):
+            col_idx = i
+            break
+
     for row in rows:
-        # Liczymy tylko wiersze powiatów (LP = "1.", "2.", ...) — agregaty bez podwójnego liczenia
         lp = row[0].rstrip(". ").strip()
         if not lp.isdigit():
             continue
         powiats_total += 1
-        val = row[col_idx] if col_idx < len(row) else ""
+        val = row[col_idx] if (col_idx is not None and col_idx < len(row)) else ""
         try:
-            n = int(val)
-            total += n
-            if n > 0:
-                powiats_with_places += 1
+            if int(val) > 0:
+                powiats_with += 1
         except (ValueError, TypeError):
             pass
 
+    if total is None:
+        return f"Łącznie wierszy danych: **{len(rows)}**"
+
+    trend = ""
+    if prev_total is not None:
+        diff = total - prev_total
+        sign = "+" if diff >= 0 else ""
+        arrow = "📈" if diff > 0 else ("📉" if diff < 0 else "➡️")
+        trend = f" {arrow} **{sign}{diff}** vs poprzedni okres"
+
     return (
         f"Liczba powiatów: **{powiats_total}** | "
-        f"Powiaty z wolnymi miejscami: **{powiats_with_places}** | "
-        f"Łączna liczba wolnych miejsc: **{total}**"
+        f"Powiaty z wolnymi miejscami: **{powiats_with}** | "
+        f"Łączna liczba wolnych miejsc: **{total}**{trend}"
     )
 
 
 def build_report(headers: list, rows: list, is_new: bool, xlsx_name: str,
-                 h: str, prev_count: int | None, title: str = "") -> str:
+                 h: str, prev_count: int | None, title: str = "",
+                 prev_total: int | None = None) -> str:
     today = datetime.date.today().strftime("%d.%m.%Y")
     status = "🆕 Nowy plik XLSX — dane zaktualizowane" if is_new else "📄 Plik bez zmian"
 
@@ -138,25 +178,23 @@ def build_report(headers: list, rows: list, is_new: bool, xlsx_name: str,
         f"**Hash:** `{h}`",
         f"**Plik:** `{xlsx_name}`",
         "",
-        count_summary(headers, rows),
+        count_summary(headers, rows, prev_total),
         "",
     ]
 
     if prev_count is not None:
         diff = len(rows) - prev_count
         sign = "+" if diff >= 0 else ""
-        lines.append(f"**Zmiana liczby rekordów względem poprzedniego pliku:** {sign}{diff}")
+        lines.append(f"**Zmiana liczby rekordów:** {sign}{diff}")
         lines.append("")
 
     if rows:
         lines.append("## Dane z pliku")
         lines.append("")
-        # Tabela markdown — GitHub Issue ma limit ~65KB, przy 91 DPS to nie problem
         lines.append("| " + " | ".join(headers) + " |")
         lines.append("|" + "|".join(["---"] * len(headers)) + "|")
         for row in rows:
             padded = row[:len(headers)] + [""] * max(0, len(headers) - len(row))
-            # Zamień nowe linie w komórkach na spację
             clean = [c.replace("\n", " ") for c in padded]
             lines.append("| " + " | ".join(clean) + " |")
     else:
@@ -185,7 +223,7 @@ def update_log(xlsx_path: Path, h: str, issue_url: str | None = None):
             f.write(entry)
 
 
-def create_github_issue(title: str, body: str) -> str | None:
+def create_github_issue(title: str, body: str, auto_close: bool = False) -> str | None:
     if not GITHUB_TOKEN:
         print("Brak GITHUB_TOKEN — pomijam tworzenie Issue")
         return None
@@ -198,72 +236,127 @@ def create_github_issue(title: str, body: str) -> str | None:
         json={"title": title, "body": body, "labels": ["data-monitoring", "wolne-miejsca"]},
         timeout=15,
     )
-    if r.ok:
-        url = r.json()["html_url"]
-        print(f"Issue utworzone: {url}")
-        return url
-    print(f"Błąd tworzenia Issue: {r.status_code} {r.text}")
-    return None
+    if not r.ok:
+        print(f"Błąd tworzenia Issue: {r.status_code} {r.text}")
+        return None
+
+    issue = r.json()
+    url = issue["html_url"]
+    number = issue["number"]
+    print(f"Issue utworzone: {url}")
+
+    if auto_close:
+        rc = requests.patch(
+            f"https://api.github.com/repos/{REPO}/issues/{number}",
+            headers={
+                "Authorization": f"Bearer {GITHUB_TOKEN}",
+                "Accept": "application/vnd.github+json",
+            },
+            json={"state": "closed"},
+            timeout=15,
+        )
+        if rc.ok:
+            print("Issue zamknięte automatycznie.")
+        else:
+            print(f"Błąd zamykania Issue: {rc.status_code}")
+
+    return url
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def main():
     force = os.environ.get("FORCE_CHECK", "false").lower() == "true"
+    today = datetime.date.today().strftime("%d.%m.%Y")
+    now_utc = datetime.datetime.utcnow().strftime("%H:%M UTC")
 
+    # #4 — pomiń jeśli nowy plik już znaleziono w tym miesiącu
+    if already_found_this_month() and not force:
+        print("Nowy plik już pobrany w tym miesiącu — pomijam.")
+        create_github_issue(
+            f"✅ Wolne miejsca DPS {today} — dane już aktualne w tym miesiącu",
+            (
+                f"Sprawdzono {today} o {now_utc}.\n\n"
+                f"Nowy plik XLSX został już pobrany wcześniej w tym miesiącu.\n"
+                f"Następne pełne sprawdzenie: 1. dnia następnego miesiąca.\n\n"
+                f"- **Źródło:** {XLSX_URL}"
+            ),
+            auto_close=True,
+        )
+        sys.exit(0)
+
+    # #1 — błąd pobierania → otwarty Issue z alertem
     print(f"Pobieranie XLSX: {XLSX_URL}")
-    data = download_file(XLSX_URL)
+    try:
+        data = download_file(XLSX_URL)
+    except Exception as e:
+        print(f"❌ Błąd pobierania: {e}")
+        create_github_issue(
+            f"⚠️ Wolne miejsca DPS {today} — błąd pobierania pliku",
+            (
+                f"Sprawdzono {today} o {now_utc}.\n\n"
+                f"**Nie udało się pobrać pliku XLSX z MUW Małopolska.**\n\n"
+                f"```\n{e}\n```\n\n"
+                f"- **URL:** {XLSX_URL}\n\n"
+                f"Sprawdź czy strona MUW jest dostępna. "
+                f"Następna próba: zgodnie z harmonogramem."
+            ),
+        )
+        sys.exit(1)
+
     h = file_hash(data)
     known = last_known_hash()
     is_new = h != known
 
     print(f"Hash: {h} | Poprzedni: {known} | Nowy plik: {is_new}")
 
+    # #3 — brak zmian → zamknięty Issue informacyjny
     if not is_new and not force:
-        print("Plik bez zmian — tworzę Issue informacyjne.")
-        today = datetime.date.today().strftime("%d.%m.%Y")
-        body = (
-            f"Sprawdzono {today} o {datetime.datetime.now().strftime('%H:%M')} UTC.\n\n"
-            f"Plik XLSX nie zmienił się od ostatniego sprawdzenia.\n\n"
-            f"- **Hash (SHA-256):** `{h}`\n"
-            f"- **Źródło:** {XLSX_URL}\n\n"
-            f"Brak nowych danych o wolnych miejscach w DPS Małopolska."
-        )
+        print("Plik bez zmian — tworzę zamknięty Issue informacyjny.")
         create_github_issue(
             f"✅ Wolne miejsca DPS {today} — brak nowego pliku",
-            body,
+            (
+                f"Sprawdzono {today} o {now_utc}.\n\n"
+                f"Plik XLSX nie zmienił się od ostatniego sprawdzenia.\n\n"
+                f"- **Hash (SHA-256):** `{h}`\n"
+                f"- **Źródło:** {XLSX_URL}\n\n"
+                f"Brak nowych danych o wolnych miejscach w DPS Małopolska."
+            ),
+            auto_close=True,
         )
         sys.exit(0)
 
-    # Policz rekordy z poprzedniego pliku (do porównania w raporcie)
+    # Nowy plik — pobierz poprzednie dane do trendu
+    prev_total: int | None = None
     prev_count: int | None = None
     prev_path = find_previous_xlsx()
     if prev_path and prev_path.exists():
         try:
-            _, prev_rows, _ = parse_xlsx(prev_path.read_bytes())
+            prev_headers, prev_rows, _ = parse_xlsx(prev_path.read_bytes())
             prev_count = len(prev_rows)
-            print(f"Poprzedni plik: {prev_path.name} ({prev_count} rekordów)")
+            prev_total = get_wolne_total(prev_headers, prev_rows)
+            print(f"Poprzedni plik: {prev_path.name} ({prev_count} rekordów, {prev_total} wolnych miejsc)")
         except Exception as e:
             print(f"Nie udało się wczytać poprzedniego pliku: {e}")
 
     xlsx_path = save_file(data, h)
+    mark_found_this_month()   # #4
     print(f"Zapisano: {xlsx_path}")
 
     print("Parsowanie XLSX...")
     headers, rows, title = parse_xlsx(data)
-    print(f"Znaleziono {len(rows)} wierszy, {len(headers)} kolumn")
-    if headers:
-        print(f"Kolumny: {headers[:5]}...")  # pierwsze 5 kolumn
+    curr_total = get_wolne_total(headers, rows)
+    print(f"Znaleziono {len(rows)} wierszy | Wolnych miejsc: {curr_total}")
 
-    report = build_report(headers, rows, is_new, xlsx_path.name, h, prev_count, title)
+    # #2 — trend w raporcie
+    report = build_report(headers, rows, is_new, xlsx_path.name, h,
+                          prev_count, title, prev_total)
 
-    today = datetime.date.today().strftime("%d.%m.%Y")
-    title = f"🆕 Wolne miejsca DPS Małopolska {today} — {len(rows)} rekordów"
-
-    issue_url = create_github_issue(title, report)
+    issue_title = f"🆕 Wolne miejsca DPS Małopolska {today} — {curr_total} wolnych miejsc"
+    issue_url = create_github_issue(issue_title, report)
     update_log(xlsx_path, h, issue_url)
 
-    # Importuj dane do bazy
+    # Import do bazy
     print("\nImportuję dane do bazy...")
     import subprocess
     result = subprocess.run(
@@ -273,8 +366,6 @@ def main():
     print(result.stdout)
     if result.returncode != 0:
         print(f"⚠️ Błąd importu: {result.stderr[:500]}")
-
-    print(f"\nRaport:\n{report[:2000]}...")  # print pierwsze 2000 znaków
 
 
 if __name__ == "__main__":

@@ -319,7 +319,7 @@ def generate_sql_patch(diffs: dict, pdf_rows: dict, db_rows: dict) -> str:
     return "\n".join(lines)
 
 
-def create_github_issue(title: str, body: str) -> str | None:
+def create_github_issue(title: str, body: str, auto_close: bool = False) -> str | None:
     if not GITHUB_TOKEN:
         print("Brak GITHUB_TOKEN — pomijam tworzenie Issue")
         return None
@@ -329,13 +329,28 @@ def create_github_issue(title: str, body: str) -> str | None:
         json={"title": title, "body": body, "labels": ["data-monitoring"]},
         timeout=15,
     )
-    if r.ok:
-        url = r.json()["html_url"]
-        print(f"Issue utworzone: {url}")
-        return url
-    else:
+    if not r.ok:
         print(f"Błąd tworzenia Issue: {r.status_code} {r.text}")
         return None
+
+    issue = r.json()
+    url = issue["html_url"]
+    number = issue["number"]
+    print(f"Issue utworzone: {url}")
+
+    if auto_close:
+        rc = requests.patch(
+            f"https://api.github.com/repos/{REPO}/issues/{number}",
+            headers={"Authorization": f"Bearer {GITHUB_TOKEN}", "Accept": "application/vnd.github+json"},
+            json={"state": "closed"},
+            timeout=15,
+        )
+        if rc.ok:
+            print("Issue zamknięte automatycznie.")
+        else:
+            print(f"Błąd zamykania Issue: {rc.status_code}")
+
+    return url
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
@@ -343,19 +358,48 @@ def create_github_issue(title: str, body: str) -> str | None:
 def main():
     import io
 
+    force = os.environ.get("FORCE_COMPARE", "false").lower() == "true"
+    today = datetime.date.today().strftime("%d.%m.%Y")
+    now_utc = datetime.datetime.utcnow().strftime("%H:%M UTC")
+
+    # #1 — błąd pobierania → otwarty Issue z alertem
     print("Pobieranie PDF...")
-    pdf_data = download_pdf(PDF_URL)
+    try:
+        pdf_data = download_pdf(PDF_URL)
+    except Exception as e:
+        print(f"❌ Błąd pobierania: {e}")
+        create_github_issue(
+            f"⚠️ DPS Monitor {today} — błąd pobierania PDF",
+            (
+                f"Sprawdzono {today} o {now_utc}.\n\n"
+                f"**Nie udało się pobrać pliku PDF z MUW Małopolska.**\n\n"
+                f"```\n{e}\n```\n\n"
+                f"- **URL:** {PDF_URL}\n\n"
+                f"Sprawdź czy strona MUW jest dostępna. "
+                f"Następna próba: zgodnie z harmonogramem."
+            ),
+        )
+        sys.exit(1)
+
     h = pdf_hash(pdf_data)
     known = last_known_hash()
     is_new = h != known
-    force = os.environ.get("FORCE_COMPARE", "false").lower() == "true"
 
     print(f"Hash: {h} | Poprzedni: {known} | Nowy: {is_new}")
 
+    # #3 — brak zmian → zamknięty Issue informacyjny
     if not is_new and not force:
-        print("PDF bez zmian. Kończę bez raportu.")
-        title = f"✅ DPS Monitor {datetime.date.today()} — brak zmian w PDF"
-        create_github_issue(title, f"Plik PDF nie zmienił się od ostatniego sprawdzenia (hash: `{h}`).\n\nŹródło: {PDF_URL}")
+        print("PDF bez zmian — tworzę zamknięty Issue informacyjny.")
+        create_github_issue(
+            f"✅ DPS Monitor {today} — brak zmian w PDF",
+            (
+                f"Sprawdzono {today} o {now_utc}.\n\n"
+                f"Plik PDF nie zmienił się od ostatniego sprawdzenia.\n\n"
+                f"- **Hash (SHA-256):** `{h}`\n"
+                f"- **Źródło:** {PDF_URL}"
+            ),
+            auto_close=True,
+        )
         sys.exit(0)
 
     pdf_path = save_pdf(pdf_data, h)
