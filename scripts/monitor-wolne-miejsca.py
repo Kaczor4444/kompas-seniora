@@ -220,7 +220,19 @@ def main():
     print(f"Hash: {h} | Poprzedni: {known} | Nowy plik: {is_new}")
 
     if not is_new and not force:
-        print("Plik bez zmian — kończę bez Issue i bez commita.")
+        print("Plik bez zmian — tworzę Issue informacyjne.")
+        today = datetime.date.today().strftime("%d.%m.%Y")
+        body = (
+            f"Sprawdzono {today} o {datetime.datetime.now().strftime('%H:%M')} UTC.\n\n"
+            f"Plik XLSX nie zmienił się od ostatniego sprawdzenia.\n\n"
+            f"- **Hash (SHA-256):** `{h}`\n"
+            f"- **Źródło:** {XLSX_URL}\n\n"
+            f"Brak nowych danych o wolnych miejscach w DPS Małopolska."
+        )
+        create_github_issue(
+            f"✅ Wolne miejsca DPS {today} — brak nowego pliku",
+            body,
+        )
         sys.exit(0)
 
     # Policz rekordy z poprzedniego pliku (do porównania w raporcie)
