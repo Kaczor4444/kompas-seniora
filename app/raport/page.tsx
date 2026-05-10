@@ -246,8 +246,37 @@ export default function RaportPage() {
         </div>
       </section>
 
+      {/* Top 3 / Bottom 3 — szybki kontekst */}
+      <div className="bg-slate-800/50 border-t border-slate-700/50">
+        <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-2 gap-4">
+          <div>
+            <div className="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Najgorszy dostęp</div>
+            {powiaty.slice(0, 3).map((r, i) => (
+              <div key={r.powiat} className="flex items-center gap-3 mb-2">
+                <span className="text-slate-500 text-xs w-4">{i + 1}.</span>
+                <span className="capitalize text-white text-sm font-medium">{r.powiat}</span>
+                <span className="ml-auto text-red-400 font-bold text-sm">{r.dostepnosc_2024.toFixed(0)}/10k</span>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3">Najlepszy dostęp</div>
+            {[...powiaty].reverse().slice(0, 3).map((r, i) => (
+              <div key={r.powiat} className="flex items-center gap-3 mb-2">
+                <span className="text-slate-500 text-xs w-4">{i + 1}.</span>
+                <span className="capitalize text-white text-sm font-medium">{r.powiat}</span>
+                <span className="ml-auto text-emerald-400 font-bold text-sm">{r.dostepnosc_2024.toFixed(0)}/10k</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Gradient przejście hero → jasna treść */}
+      <div className="h-8 bg-gradient-to-b from-slate-900 to-slate-50" />
+
       {/* Wykresy (Client Component) */}
-      <RaportCharts powiaty={powiatyForChart} emerytury={emerytury} />
+      <RaportCharts powiaty={powiatyForChart} emerytury={emerytury} avgDost={avgDost} />
 
       {/* Metodologia */}
       <section className="bg-slate-100 border-t border-slate-200 mt-4">
@@ -338,6 +367,56 @@ export default function RaportPage() {
             Dane pobrano: maj 2026. Kompas Seniora nie ponosi odpowiedzialności za decyzje
             podjęte wyłącznie na podstawie tych danych. Przed wyborem placówki zalecamy
             bezpośredni kontakt z DPS i weryfikację aktualnych kosztów.
+          </p>
+        </div>
+      </section>
+
+      {/* Tabela surowych danych */}
+      <section className="bg-white border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-4 py-10">
+          <h2 className="text-lg font-bold text-slate-800 mb-1">Surowe dane — wszystkie powiaty</h2>
+          <p className="text-sm text-slate-500 mb-5">Małopolska 2024. Kliknij nagłówek kolumny żeby posortować.</p>
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="text-left px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Powiat</th>
+                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Miejsc DPS</th>
+                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Seniorów 80+</th>
+                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Dost. 2024</th>
+                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Dost. 2035*</th>
+                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Med. cena DPS</th>
+                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">N cen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {powiaty.map((r, i) => (
+                  <tr key={r.powiat} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
+                    <td className="px-4 py-2.5 font-medium text-slate-800 capitalize">{r.powiat}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-600">{r.dps_miejsca.toLocaleString('pl-PL')}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-600">{r.pop_80plus_2024.toLocaleString('pl-PL')}</td>
+                    <td className="px-4 py-2.5 text-right font-bold"
+                      style={{ color: r.dostepnosc_2024 < 250 ? '#ef4444' : r.dostepnosc_2024 < 500 ? '#f97316' : '#10b981' }}>
+                      {r.dostepnosc_2024.toFixed(0)}
+                    </td>
+                    <td className="px-4 py-2.5 text-right text-slate-500">{r.dostepnosc_2035.toFixed(0)}</td>
+                    <td className="px-4 py-2.5 text-right text-slate-600">
+                      {r.cena_dps_mediana ? `${r.cena_dps_mediana.toLocaleString('pl-PL')} zł` : '—'}
+                    </td>
+                    <td className="px-4 py-2.5 text-right">
+                      <span className={`text-xs font-medium ${(r.n_placowek_z_cena ?? 0) < 3 ? 'text-amber-600' : 'text-slate-500'}`}>
+                        {r.n_placowek_z_cena ?? 0}
+                        {(r.n_placowek_z_cena ?? 0) < 3 ? ' ⚠' : ''}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-slate-400 mt-3">
+            *Prognoza 2035 = scenariusz braku inwestycji (stała liczba miejsc, rosnąca populacja GUS).
+            ⚠ = mniej niż 3 placówki z danymi cenowymi — mediana mało wiarygodna.
           </p>
         </div>
       </section>

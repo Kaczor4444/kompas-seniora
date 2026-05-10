@@ -1,36 +1,40 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   LineChart, Line, CartesianGrid, ReferenceLine, Cell,
 } from 'recharts'
 import type { PowiatRow, EmeryRow } from './page'
-import RaportMap from './RaportMap'
+import RaportMap, { COLOR_SCALE, getColorForValue } from './RaportMap'
 
 type Props = {
   powiaty:   (PowiatRow & { powiat: string })[]
   emerytury: EmeryRow[]
+  avgDost:   number
 }
 
 const fmt = (n: number) => n.toLocaleString('pl-PL')
 
-// ---------- Tooltips ----------
+// Miasta na prawach powiatu — wykluczone z dysproporcji
+const MIASTA_POWIAT = ['m. kraków', 'm. tarnów', 'm. nowy sącz']
+const isCity = (p: string) => MIASTA_POWIAT.includes(p.toLowerCase())
+
+// ── Tooltips ─────────────────────────────────────────────────────────────────
 
 function TooltipDostepnosc({ active, payload }: { active?: boolean; payload?: Array<{ payload: PowiatRow }> }) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
-  const level =
-    d.dostepnosc_2024 < 250 ? { label: 'Krytyczny deficyt', color: 'text-red-600' } :
-    d.dostepnosc_2024 < 500 ? { label: 'Niedobór', color: 'text-amber-600' } :
-    { label: 'Relatywnie dobry', color: 'text-emerald-600' }
+  const level = COLOR_SCALE.find(l => d.dostepnosc_2024 < l.max)
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm min-w-[220px]">
-      <div className="font-bold text-slate-900 mb-2 text-base">{d.powiat}</div>
-      <div className={`text-xs font-semibold uppercase tracking-wide mb-3 ${level.color}`}>
-        {level.label}
-      </div>
+      <div className="font-bold text-slate-900 mb-1 text-base">{d.powiat}</div>
+      {level && (
+        <div className="text-xs font-semibold mb-3" style={{ color: level.fill }}>
+          {level.label}
+        </div>
+      )}
       <div className="space-y-1.5 text-slate-600">
         <div className="flex justify-between gap-4">
           <span>Dostępność 2024</span>
@@ -38,9 +42,9 @@ function TooltipDostepnosc({ active, payload }: { active?: boolean; payload?: Ar
         </div>
         <div className="flex justify-between gap-4">
           <span>Prognoza 2035</span>
-          <span className="font-medium text-slate-500">{d.dostepnosc_2035.toFixed(0)} / 10k</span>
+          <span className="text-slate-400">{d.dostepnosc_2035.toFixed(0)} / 10k</span>
         </div>
-        <div className="border-t border-slate-100 pt-1.5 mt-1.5 text-xs text-slate-500">
+        <div className="border-t border-slate-100 pt-1.5 text-xs text-slate-500">
           <div>{fmt(d.dps_miejsca)} miejsc DPS</div>
           <div>{fmt(d.pop_80plus_2024)} seniorów 80+</div>
         </div>
@@ -49,25 +53,33 @@ function TooltipDostepnosc({ active, payload }: { active?: boolean; payload?: Ar
   )
 }
 
-function TooltipLuka({ active, payload }: { active?: boolean; payload?: Array<{ payload: PowiatRow }> }) {
+function TooltipLuka({ active, payload }: { active?: boolean; payload?: Array<{ payload: PowiatRow & { luka_systemowa_rok?: number } }> }) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
+  const smallN = (d.n_placowek_z_cena ?? 0) < 3
   return (
-    <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm min-w-[220px]">
-      <div className="font-bold text-slate-900 mb-2 text-base">{d.powiat}</div>
+    <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm min-w-[240px]">
+      <div className="font-bold text-slate-900 mb-2 text-base">
+        {d.powiat}
+        {smallN && <span className="ml-2 text-xs font-normal text-amber-600">⚠ N={d.n_placowek_z_cena}</span>}
+      </div>
       <div className="space-y-1.5 text-slate-600">
         <div className="flex justify-between gap-4">
-          <span>Luka roczna</span>
+          <span>Luka nominalna/rok</span>
           <span className="font-bold text-red-700">{fmt(d.luka_roczna_zl ?? 0)} zł</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span>Luka miesięczna</span>
-          <span className="font-medium text-red-600">{fmt(d.luka_miesieczna_zl ?? 0)} zł</span>
+          <span>Luka systemowa/rok*</span>
+          <span className="font-bold text-orange-600">{fmt(d.luka_systemowa_rok ?? 0)} zł</span>
         </div>
-        <div className="border-t border-slate-100 pt-1.5 mt-1.5 text-xs text-slate-500">
+        <div className="border-t border-slate-100 pt-1.5 text-xs text-slate-500">
           <div>Mediana kosztu DPS: {fmt(d.cena_dps_mediana ?? 0)} zł/mies.</div>
           <div>Emerytura: {fmt(Math.round(d.emerytura_malopolska))} zł/mies.</div>
+          {smallN && <div className="mt-1 text-amber-600">Mediana z {d.n_placowek_z_cena} placówki</div>}
         </div>
+      </div>
+      <div className="text-xs text-slate-400 mt-2 border-t border-slate-100 pt-2">
+        *luka systemowa = DPS − 70% emerytury (art. 61 ups)
       </div>
     </div>
   )
@@ -87,20 +99,13 @@ function TooltipEmerytura({ active, payload }: { active?: boolean; payload?: Arr
   )
 }
 
-// ---------- Sekcja wykresu — wrapper z animacją wejścia ----------
+// ── Sekcja wykresu z animacją ─────────────────────────────────────────────────
 
-function ChartSection({
-  children,
-  insight,
-  delay = 0,
-}: {
-  children: React.ReactNode
-  insight: string
-  delay?: number
+function ChartSection({ children, insight, delay = 0 }: {
+  children: React.ReactNode; insight: string; delay?: number
 }) {
-  const ref = useRef(null)
+  const ref   = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
-
   return (
     <motion.section
       ref={ref}
@@ -109,212 +114,227 @@ function ChartSection({
       transition={{ duration: 0.5, delay, ease: 'easeOut' }}
       className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
     >
-      {/* Insight bar */}
-      <div className="bg-slate-50 border-b border-slate-200 px-6 py-4">
-        <p className="text-sm font-semibold text-slate-700 leading-snug">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 mb-0.5" />
-          {insight}
-        </p>
+      <div className="border-l-4 border-emerald-500 bg-slate-50 border-b border-slate-200 px-6 py-3">
+        <p className="text-sm font-semibold text-slate-700 leading-snug">{insight}</p>
       </div>
       <div className="p-6">{children}</div>
     </motion.section>
   )
 }
 
-// ---------- Legenda wykresu dostępności ----------
+// ── Wspólna legenda ───────────────────────────────────────────────────────────
 
-function LegendaDostepnosci() {
+function LegendaKolorow({ extra }: { extra?: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mb-4">
-      <span className="flex items-center gap-1.5">
-        <span className="w-3 h-3 rounded-sm bg-red-500 inline-block" />
-        Krytyczny deficyt (&lt;250)
-      </span>
-      <span className="flex items-center gap-1.5">
-        <span className="w-3 h-3 rounded-sm bg-amber-400 inline-block" />
-        Niedobór (250–500)
-      </span>
-      <span className="flex items-center gap-1.5">
-        <span className="w-3 h-3 rounded-sm bg-emerald-500 inline-block" />
-        Relatywnie dobry (&gt;500)
-      </span>
-      <span className="flex items-center gap-1.5">
-        <span className="w-3 h-3 rounded-sm bg-slate-200 inline-block" />
-        Prognoza 2035
-      </span>
+    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mb-4">
+      {COLOR_SCALE.map(({ fill, label }) => (
+        <span key={label} className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: fill }} />
+          {label}
+        </span>
+      ))}
+      {extra}
     </div>
   )
 }
 
-// ---------- Główny komponent ----------
+// ── Główny komponent ─────────────────────────────────────────────────────────
 
-export default function RaportCharts({ powiaty, emerytury }: Props) {
-  const withLuka = powiaty
-    .filter(r => r.luka_roczna_zl !== null)
-    .sort((a, b) => (b.luka_roczna_zl ?? 0) - (a.luka_roczna_zl ?? 0))
+export default function RaportCharts({ powiaty, emerytury, avgDost }: Props) {
+  const [mapYear, setMapYear] = useState<'2024' | '2035'>('2024')
 
-  // Oblicz insight dla wykresu 1
-  const worst = powiaty[0]
-  const best  = powiaty[powiaty.length - 1]
-  const disparity = best && worst
-    ? Math.round(best.dostepnosc_2024 / worst.dostepnosc_2024)
-    : 0
+  // Luka systemowa (art. 61 uos): pensjonariusz płaci max 70% dochodu
+  const powiatyZLuka = powiaty
+    .filter(r => r.luka_roczna_zl !== null && r.cena_dps_mediana !== null)
+    .map(r => ({
+      ...r,
+      luka_systemowa_rok: Math.round(((r.cena_dps_mediana ?? 0) - 0.7 * r.emerytura_malopolska) * 12),
+    }))
+    .sort((a, b) => b.luka_systemowa_rok - a.luka_systemowa_rok)
 
-  // Insight dla wykresu 2
-  const worstLuka = withLuka[0]
-  const lukaTys = worstLuka?.luka_roczna_zl
-    ? Math.round((worstLuka.luka_roczna_zl) / 1000)
-    : 0
+  // Worst/best wykluczając miasta i krakowski
+  const powiatyZiemskie = powiaty.filter(r => !isCity(r.powiat) && r.powiat !== 'krakowski')
+  const worst = powiaty[0]       // najgorszy ogółem (chrzanowski)
+  const best  = powiatyZiemskie[powiatyZiemskie.length - 1]  // najlepszy ziemski (miechowski)
+  const disparity = best && worst ? Math.round(best.dostepnosc_2024 / worst.dostepnosc_2024) : 0
 
-  // Insight dla wykresu 3
+  const worstLuka = powiatyZLuka[0]
   const emFirst = emerytury[0]
   const emLast  = emerytury[emerytury.length - 1]
   const emWzrost = emFirst && emLast
-    ? Math.round((emLast.wartosc_zl / emFirst.wartosc_zl - 1) * 100)
-    : 0
+    ? Math.round((emLast.wartosc_zl / emFirst.wartosc_zl - 1) * 100) : 0
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 space-y-6">
 
-      {/* Mapa choropletyczna */}
+      {/* Mapa + Top/Bottom 5 */}
       <ChartSection
         delay={0}
-        insight="Kolor mapy pokazuje dostępność DPS — czerwony oznacza krytyczny deficyt miejsc względem liczby seniorów 80+."
+        insight={`Czerwone powiaty mają krytyczny deficyt miejsc DPS względem populacji 80+. Kliknij toggle żeby zobaczyć prognozę 2035 — większość regionu pogłębia się.`}
       >
-        <h2 className="text-xl font-bold text-slate-900 mb-1">Mapa dostępności DPS — Małopolska</h2>
-        <p className="text-sm text-slate-500 mb-5">
-          Miejsca DPS na 10 000 mieszkańców w wieku 80+. Najedź na powiat po szczegóły.
-        </p>
-
-        {/* Legenda */}
-        <div className="flex flex-wrap gap-3 text-xs text-slate-500 mb-5">
-          {[
-            { color: '#ef4444', label: 'Krytyczny (<250)' },
-            { color: '#f97316', label: 'Niedobór (250–400)' },
-            { color: '#eab308', label: 'Umiarkowany (400–600)' },
-            { color: '#84cc16', label: 'Dobry (600–900)' },
-            { color: '#10b981', label: 'Bardzo dobry (>900)' },
-          ].map(({ color, label }) => (
-            <span key={label} className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: color }} />
-              {label}
-            </span>
-          ))}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">Mapa dostępności DPS — Małopolska</h2>
+            <p className="text-sm text-slate-500 mt-1">Miejsc DPS na 10 000 mieszkańców 80+. Najedź na powiat po szczegóły.</p>
+          </div>
+          {/* Toggle 2024 / 2035 */}
+          <div className="flex rounded-xl border border-slate-200 overflow-hidden flex-shrink-0 self-start">
+            {(['2024', '2035'] as const).map(y => (
+              <button
+                key={y}
+                onClick={() => setMapYear(y)}
+                className={`px-4 py-1.5 text-sm font-semibold transition-colors ${
+                  mapYear === y
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-white text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                {y}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <RaportMap powiaty={powiaty} />
+        <LegendaKolorow />
+
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Mapa */}
+          <div className="w-full lg:max-w-sm xl:max-w-md flex-shrink-0">
+            <RaportMap powiaty={powiaty} year={mapYear} />
+          </div>
+
+          {/* Top 5 / Bottom 5 */}
+          <div className="flex-1 grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <div className="text-xs font-bold text-red-600 uppercase tracking-wider mb-2">
+                Najgorszy dostęp
+              </div>
+              <div className="space-y-1.5">
+                {powiaty.slice(0, 5).map(r => (
+                  <div key={r.powiat} className="flex items-center justify-between gap-2">
+                    <span className="capitalize text-slate-700 text-xs truncate">{r.powiat}</span>
+                    <span
+                      className="font-bold text-xs px-2 py-0.5 rounded-md text-white flex-shrink-0"
+                      style={{ background: getColorForValue(r.dostepnosc_2024).fill }}
+                    >
+                      {r.dostepnosc_2024.toFixed(0)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-2">
+                Najlepszy dostęp
+              </div>
+              <div className="space-y-1.5">
+                {[...powiaty].reverse().slice(0, 5).map(r => (
+                  <div key={r.powiat} className="flex items-center justify-between gap-2">
+                    <span className="capitalize text-slate-700 text-xs truncate">{r.powiat}</span>
+                    <span
+                      className="font-bold text-xs px-2 py-0.5 rounded-md text-white flex-shrink-0"
+                      style={{ background: getColorForValue(r.dostepnosc_2024).fill }}
+                    >
+                      {r.dostepnosc_2024.toFixed(0)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {mapYear === '2035' && (
+              <div className="col-span-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+                <strong>Scenariusz braku inwestycji 2035</strong> — zakłada stałą liczbę miejsc DPS
+                przy rosnącej populacji 80+. Nie uwzględnia planowanych inwestycji samorządowych.
+              </div>
+            )}
+          </div>
+        </div>
       </ChartSection>
 
-      {/* Wykres 1: Dostępność per powiat */}
+      {/* Wykres 1: Ranking dostępności */}
       <ChartSection
-        delay={0}
+        delay={0.1}
         insight={
           disparity > 0
-            ? `Powiat ${worst?.powiat ?? ''} ma ${disparity}× gorszy dostęp do DPS niż ${best?.powiat ?? ''} — największa dysproporcja w regionie.`
-            : 'Porównanie dostępności DPS dla 22 powiatów Małopolski.'
+            ? `Powiat ${worst?.powiat ?? ''} ma ${disparity}× gorszy dostęp do DPS niż ${best?.powiat ?? ''}. Średnia Małopolska: ${avgDost} miejsc/10k seniorów 80+.`
+            : 'Ranking dostępności DPS dla 22 powiatów Małopolski.'
         }
       >
-        <div className="mb-1">
-          <h2 className="text-xl font-bold text-slate-900">Dostępność DPS — ranking powiatów</h2>
-          <p className="text-sm text-slate-500 mt-1">
-            Liczba miejsc DPS na 10 000 mieszkańców w wieku 80+. Małopolska, 2024.
-          </p>
-        </div>
-        <LegendaDostepnosci />
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={powiaty} layout="vertical" margin={{ left: 90, right: 24, top: 4, bottom: 4 }}>
-            <XAxis
-              type="number"
-              tick={{ fontSize: 11, fill: '#94a3b8' }}
-              tickFormatter={v => `${v}`}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              type="category"
-              dataKey="powiat"
-              tick={{ fontSize: 11, fill: '#64748b' }}
-              width={88}
-              axisLine={false}
-              tickLine={false}
-            />
+        <h2 className="text-xl font-bold text-slate-900 mb-1">Ranking dostępności — 22 powiaty</h2>
+        <p className="text-sm text-slate-500 mb-4">Miejsca DPS na 10 000 mieszkańców w wieku 80+. Małopolska, 2024.</p>
+        <LegendaKolorow extra={
+          <span className="flex items-center gap-1.5 ml-auto">
+            <span className="w-3 h-3 rounded-sm bg-slate-200 inline-block" />Prognoza 2035
+          </span>
+        } />
+        <ResponsiveContainer width="100%" height={560}>
+          <BarChart data={powiaty} layout="vertical" margin={{ left: 92, right: 24, top: 4, bottom: 4 }}>
+            <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }}
+              tickFormatter={v => `${v}/10k`} axisLine={false} tickLine={false} />
+            <YAxis type="category" dataKey="powiat" tick={{ fontSize: 11, fill: '#64748b' }}
+              width={90} axisLine={false} tickLine={false} />
             <Tooltip content={<TooltipDostepnosc />} cursor={{ fill: '#f8fafc' }} />
-            <Bar dataKey="dostepnosc_2024" name="2024" radius={[0, 4, 4, 0]} maxBarSize={16}>
-              {powiaty.map((entry) => (
-                <Cell
-                  key={entry.powiat}
-                  fill={
-                    entry.dostepnosc_2024 < 250 ? '#ef4444' :
-                    entry.dostepnosc_2024 < 500 ? '#f59e0b' :
-                    '#10b981'
-                  }
-                />
+            <ReferenceLine x={avgDost} stroke="#6366f1" strokeDasharray="4 4" strokeWidth={1.5}
+              label={{ value: `śr. ${avgDost}`, position: 'top', fontSize: 10, fill: '#6366f1' }} />
+            <Bar dataKey="dostepnosc_2024" name="2024" radius={[0, 4, 4, 0]} maxBarSize={14}>
+              {powiaty.map(r => (
+                <Cell key={r.powiat} fill={getColorForValue(r.dostepnosc_2024).fill} />
               ))}
             </Bar>
-            <Bar dataKey="dostepnosc_2035" name="Prognoza 2035" fill="#e2e8f0" radius={[0, 4, 4, 0]} maxBarSize={8} />
+            <Bar dataKey="dostepnosc_2035" name="2035" fill="#e2e8f0"
+              radius={[0, 4, 4, 0]} maxBarSize={6} />
           </BarChart>
         </ResponsiveContainer>
         <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
-          Powiaty posortowane rosnąco wg dostępności 2024.
-          Szary pasek = prognoza na rok 2035 przy obecnej liczbie miejsc i rosnącej populacji 80+.
+          Fioletowa linia przerywana = średnia Małopolska ({avgDost}/10k). Szary pasek = prognoza 2035 przy braku nowych inwestycji.
         </p>
       </ChartSection>
 
       {/* Wykres 2: Luka finansowa */}
       <ChartSection
-        delay={0.1}
+        delay={0.15}
         insight={
           worstLuka
-            ? `W powiecie ${worstLuka.powiat} senior lub rodzina musi dopłacić średnio ${lukaTys} tys. zł rocznie ponad kwotę emerytury, żeby pokryć koszt DPS.`
-            : 'Różnica między kosztem DPS a emeryturą ZUS — ile trzeba dopłacić rocznie.'
+            ? `W powiecie ${worstLuka.powiat} luka systemowa (co musi pokryć rodzina lub gmina) wynosi ${fmt(Math.round(worstLuka.luka_systemowa_rok / 1000) * 1000)} zł rocznie.`
+            : 'Różnica między kosztem DPS a maksymalną odpłatnością seniora (70% dochodu).'
         }
       >
-        <div className="mb-4">
-          <h2 className="text-xl font-bold text-slate-900">Luka finansowa — roczna dopłata do DPS</h2>
-          <p className="text-sm text-slate-500 mt-1">
-            Różnica między medianą kosztu DPS a średnią emeryturą ZUS
-            w Małopolsce (4&nbsp;085&nbsp;zł brutto, 2025) × 12 miesięcy.
-          </p>
-        </div>
-        <ResponsiveContainer width="100%" height={340}>
-          <BarChart data={withLuka} layout="vertical" margin={{ left: 90, right: 36, top: 4, bottom: 4 }}>
-            <XAxis
-              type="number"
-              tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
-              tick={{ fontSize: 11, fill: '#94a3b8' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              type="category"
-              dataKey="powiat"
-              tick={{ fontSize: 11, fill: '#64748b' }}
-              width={88}
-              axisLine={false}
-              tickLine={false}
-            />
+        <h2 className="text-xl font-bold text-slate-900 mb-1">Luka finansowa — co musi dopłacić rodzina lub gmina</h2>
+        <p className="text-sm text-slate-500 mb-1">
+          <strong>Luka systemowa</strong> = mediana kosztu DPS − 70% emerytury ZUS (art. 61 ustawy o pomocy społecznej).
+          Pensjonariusz płaci max 70% swojego dochodu — resztę pokrywa rodzina lub gmina/MOPS.
+        </p>
+        <p className="text-xs text-slate-400 mb-4">
+          ⚠ Powiaty z N&lt;3 placówkami z ceną oznaczone są jako niepewne.
+        </p>
+        <ResponsiveContainer width="100%" height={380}>
+          <BarChart data={powiatyZLuka} layout="vertical" margin={{ left: 92, right: 36, top: 4, bottom: 4 }}>
+            <XAxis type="number" tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
+              tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis type="category" dataKey="powiat" tick={{ fontSize: 11, fill: '#64748b' }}
+              width={90} axisLine={false} tickLine={false} />
             <Tooltip content={<TooltipLuka />} cursor={{ fill: '#fef2f2' }} />
-            <Bar dataKey="luka_roczna_zl" name="Luka roczna (zł)" radius={[0, 4, 4, 0]} maxBarSize={18}>
-              {withLuka.map((entry) => (
+            <Bar dataKey="luka_systemowa_rok" name="Luka systemowa (zł/rok)"
+              radius={[0, 4, 4, 0]} maxBarSize={18}>
+              {powiatyZLuka.map(r => (
                 <Cell
-                  key={entry.powiat}
-                  fill={(entry.luka_roczna_zl ?? 0) > 50000 ? '#dc2626' : '#f97316'}
+                  key={r.powiat}
+                  fill={r.luka_systemowa_rok > 50000 ? '#dc2626' : '#f97316'}
+                  opacity={(r.n_placowek_z_cena ?? 0) < 3 ? 0.5 : 1}
                 />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
+        <div className="flex flex-wrap gap-4 text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-red-600 inline-block" />
-            Luka &gt;50 000 zł/rok
+            <span className="w-3 h-3 rounded-sm bg-red-600" />Luka &gt;50 tys. zł/rok
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-orange-400 inline-block" />
-            Luka 20 000–50 000 zł/rok
+            <span className="w-3 h-3 rounded-sm bg-orange-400" />Luka 20–50 tys. zł/rok
           </span>
-          <span className="ml-auto">
-            Powiaty bez danych cenowych pominięte. Źródło cen: MUW Małopolska 2026.
+          <span className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-sm bg-orange-400 opacity-50" />Niepewne (N&lt;3)
           </span>
         </div>
       </ChartSection>
@@ -324,61 +344,32 @@ export default function RaportCharts({ powiaty, emerytury }: Props) {
         delay={0.2}
         insight={
           emFirst && emLast
-            ? `Emerytura w Małopolsce wzrosła o ${emWzrost}% w ciągu 5 lat (${emFirst.rok}–${emLast.rok}), ale wciąż nie nadąża za rosnącymi kosztami pobytu w DPS.`
+            ? `Emerytura w Małopolsce wzrosła o ${emWzrost}% w ciągu ${emLast.rok - emFirst.rok} lat (${emFirst.rok}–${emLast.rok}), ale minimalne koszty DPS (~4 500 zł) dopiero teraz zrównały się z przeciętną emeryturą.`
             : 'Trend przeciętnej emerytury ZUS w Małopolsce.'
         }
       >
-        <div className="mb-4">
-          <h2 className="text-xl font-bold text-slate-900">Trend emerytur ZUS w Małopolsce</h2>
-          <p className="text-sm text-slate-500 mt-1">
-            Przeciętna miesięczna emerytura brutto (z pozarolniczego systemu ubezpieczeń
-            społecznych). Źródło: GUS BDL P2860.
-          </p>
-        </div>
+        <h2 className="text-xl font-bold text-slate-900 mb-1">Trend emerytur ZUS — Małopolska</h2>
+        <p className="text-sm text-slate-500 mb-4">
+          Przeciętna miesięczna emerytura brutto (z pozarolniczego systemu ZUS). Źródło: GUS BDL P2860.
+        </p>
         <ResponsiveContainer width="100%" height={240}>
           <LineChart data={emerytury} margin={{ left: 10, right: 24, top: 10, bottom: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis
-              dataKey="rok"
-              tick={{ fontSize: 11, fill: '#94a3b8' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tickFormatter={v => `${v.toLocaleString('pl-PL')} zł`}
-              tick={{ fontSize: 11, fill: '#94a3b8' }}
-              width={84}
-              domain={['auto', 'auto']}
-              axisLine={false}
-              tickLine={false}
-            />
+            <XAxis dataKey="rok" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={v => `${v.toLocaleString('pl-PL')} zł`}
+              tick={{ fontSize: 11, fill: '#94a3b8' }} width={84}
+              domain={['auto', 'auto']} axisLine={false} tickLine={false} />
             <Tooltip content={<TooltipEmerytura />} cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }} />
-            <ReferenceLine
-              y={4500}
-              stroke="#f97316"
-              strokeDasharray="5 5"
-              strokeWidth={1.5}
-              label={{
-                value: 'min. koszt DPS ~4 500 zł',
-                position: 'insideTopRight',
-                fontSize: 10,
-                fill: '#f97316',
-                offset: 6,
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="wartosc_zl"
-              stroke="#10b981"
-              strokeWidth={2.5}
+            <ReferenceLine y={4500} stroke="#f97316" strokeDasharray="5 5" strokeWidth={1.5}
+              label={{ value: 'min. DPS ~4 500 zł', position: 'insideTopRight', fontSize: 10, fill: '#f97316', offset: 6 }} />
+            <Line type="monotone" dataKey="wartosc_zl" stroke="#10b981" strokeWidth={2.5}
               dot={{ r: 5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
-              activeDot={{ r: 7, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }}
-            />
+              activeDot={{ r: 7, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }} />
           </LineChart>
         </ResponsiveContainer>
         <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
-          Pomarańczowa linia przerywana — orientacyjny minimalny koszt DPS w Małopolsce (~4 500 zł/mies.).
-          Przekroczenie progu przez emeryturę nie oznacza pełnego pokrycia kosztów — większość DPS kosztuje znacznie więcej.
+          Emerytura ZUS brutto. Kwota netto jest niższa — realna luka dla seniora jest zatem większa.
+          Pomarańczowa linia = orientacyjny minimalny koszt DPS w Małopolsce.
         </p>
       </ChartSection>
 
