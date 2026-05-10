@@ -204,60 +204,59 @@ export default function RaportPage() {
           {/* KPI grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
 
-            {/* KPI 1 — średnia dostępność */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
-              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            {/* KPI 1 — średnia */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">
                 Średnia Małopolska
               </div>
               <div className="text-4xl font-black text-white mb-1">{avgDost}</div>
-              <div className="text-slate-400 text-xs leading-relaxed">
-                miejsc DPS<br />na 10 tys. seniorów 80+
+              <div className="text-slate-400 text-xs mt-2 leading-relaxed">
+                miejsc DPS na 10 tys.<br />seniorów 80+
               </div>
             </div>
 
-            {/* KPI 2 — najgorszy powiat */}
-            <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-5">
-              <div className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-2">
+            {/* KPI 2 — najgorszy (jedyny z kolorem alarmowym) */}
+            <div className="bg-red-950/60 border border-red-800/50 rounded-2xl p-5">
+              <div className="text-[10px] font-semibold text-red-300 uppercase tracking-wider mb-3">
                 Najgorszy powiat
               </div>
-              <div className="text-4xl font-black text-red-400 mb-1">
+              <div className="text-4xl font-black text-red-300 mb-1">
                 {Math.round(worst?.dostepnosc_2024 ?? 0)}
               </div>
-              <div className="text-red-400/70 text-xs leading-relaxed">
+              <div className="text-red-300/60 text-xs mt-2 leading-relaxed">
                 miejsc / 10 tys. 80+<br />
-                <span className="font-semibold">{formatPowiat(worst?.powiat ?? '')}</span>
+                <span className="font-semibold text-red-200">{formatPowiat(worst?.powiat ?? '')}</span>
               </div>
             </div>
 
             {/* KPI 3 — emerytura */}
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5">
-              <div className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">
                 Emerytura ZUS 2025
               </div>
-              <div className="text-3xl font-black text-amber-400 mb-1">
+              <div className="text-3xl font-black text-white mb-1">
                 {emerytura2025
                   ? `${emerytura2025.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} zł`
                   : '—'}
               </div>
-              <div className="text-amber-400/70 text-xs leading-relaxed">
+              <div className="text-slate-400 text-xs mt-2 leading-relaxed">
                 średnia brutto<br />Małopolska
               </div>
             </div>
 
-            {/* KPI 4 — luka systemowa (worst wiarygodny powiat ziemski, N≥3) */}
-            <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-5">
-              <div className="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2">
+            {/* KPI 4 — luka systemowa */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">
                 Luka systemowa / rok
               </div>
-              <div className="text-3xl font-black text-orange-400 mb-1">
+              <div className="text-3xl font-black text-white mb-1">
                 {worstLukaKPI
                   ? `${Math.round(worstLukaKPI.luka_systemowa_rok / 1000)} tys. zł`
                   : '—'}
               </div>
-              <div className="text-orange-400/70 text-xs leading-relaxed">
-                co pokrywa rodzina lub gmina<br />
-                <span className="font-semibold capitalize">{worstLukaKPI?.powiat ?? ''}</span>
-                <span className="block mt-1 opacity-60">wg art. 61 ustawy o pomocy społecznej</span>
+              <div className="text-slate-400 text-xs mt-2 leading-relaxed">
+                co dopłaca rodzina lub gmina<br />
+                <span className="font-semibold text-slate-300 capitalize">{worstLukaKPI?.powiat ?? ''}</span>
               </div>
             </div>
 
@@ -265,31 +264,37 @@ export default function RaportPage() {
         </div>
       </section>
 
-      {/* Top 3 / Bottom 3 — tylko powiaty ziemskie (bez miast i outliera krakowskiego) */}
-      <div className="bg-slate-800/50 border-t border-slate-700/50">
-        <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-2 gap-6">
+      {/* Top 3 / Bottom 3 */}
+      <div className="border-t border-slate-700/50">
+        <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-2 gap-8">
           <div>
-            <div className="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Najgorszy dostęp</div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Najgorszy dostęp</span>
+            </div>
             {top3Najgorsze.map((r, i) => (
-              <div key={r.powiat} className="flex items-center gap-3 mb-2">
-                <span className="text-slate-500 text-xs w-4">{i + 1}.</span>
-                <span className="capitalize text-white text-sm font-medium">{formatPowiat(r.powiat)}</span>
-                <span className="ml-auto text-red-400 font-bold text-sm">{r.dostepnosc_2024.toFixed(0)}/10k</span>
+              <div key={r.powiat} className="flex items-center gap-3 py-1.5 border-b border-slate-800/60 last:border-0">
+                <span className="text-slate-600 text-xs w-4 flex-shrink-0">{i + 1}.</span>
+                <span className="capitalize text-slate-200 text-sm">{formatPowiat(r.powiat)}</span>
+                <span className="ml-auto text-slate-300 font-bold text-sm tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
               </div>
             ))}
           </div>
           <div>
-            <div className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3">Najlepszy dostęp</div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Najlepszy dostęp</span>
+            </div>
             {top3Najlepsze.map((r, i) => (
-              <div key={r.powiat} className="flex items-center gap-3 mb-2">
-                <span className="text-slate-500 text-xs w-4">{i + 1}.</span>
-                <span className="capitalize text-white text-sm font-medium">{formatPowiat(r.powiat)}</span>
-                <span className="ml-auto text-emerald-400 font-bold text-sm">{r.dostepnosc_2024.toFixed(0)}/10k</span>
+              <div key={r.powiat} className="flex items-center gap-3 py-1.5 border-b border-slate-800/60 last:border-0">
+                <span className="text-slate-600 text-xs w-4 flex-shrink-0">{i + 1}.</span>
+                <span className="capitalize text-slate-200 text-sm">{formatPowiat(r.powiat)}</span>
+                <span className="ml-auto text-slate-300 font-bold text-sm tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
               </div>
             ))}
           </div>
         </div>
-        <p className="text-center text-xs text-slate-600 pb-4">Ranking tylko dla powiatów ziemskich — bez miast na prawach powiatu i powiatu krakowskiego (obsługuje całe województwo)</p>
+        <p className="text-center text-xs text-slate-600 pb-4 px-4">Powiaty ziemskie — bez miast na prawach powiatu i powiatu krakowskiego</p>
       </div>
 
       {/* Gradient przejście hero → jasna treść */}
