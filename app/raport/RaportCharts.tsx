@@ -344,7 +344,7 @@ export default function RaportCharts({ powiaty, emerytury, avgDost }: Props) {
         delay={0.2}
         insight={
           emFirst && emLast
-            ? `Emerytura w Małopolsce wzrosła o ${emWzrost}% w ciągu ${emLast.rok - emFirst.rok} lat (${emFirst.rok}–${emLast.rok}), ale minimalne koszty DPS (~4 500 zł) dopiero teraz zrównały się z przeciętną emeryturą.`
+            ? `Emerytura w Małopolsce wzrosła o ${emWzrost}% w ciągu ${emLast.rok - emFirst.rok} lat (${emFirst.rok}–${emLast.rok}), ale wciąż nie pokrywa nawet najtańszego DPS w regionie — brakuje ~415 zł miesięcznie.`
             : 'Trend przeciętnej emerytury ZUS w Małopolsce.'
         }
       >
