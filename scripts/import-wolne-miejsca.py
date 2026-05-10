@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Import wolnych miejsc DPS z XLSX MUW Małopolska do bazy danych.
-Matchuje placówki po nazwie (powiaty) lub liczba_miejsc+typ (miasta).
+Matchuje placówki po nazwie (powiaty) lub adresie (Kraków).
 Uruchamiany po wykryciu nowego pliku przez monitor-wolne-miejsca.py.
 
 Użycie:
@@ -27,15 +27,28 @@ DATABASE_URL  = next(
     if line.startswith("DATABASE_URL")
 )
 
-# Ręczne mapowania dla 4 niedopasowanych nazw
+# Mapowania przez podciąg nazwy → docelowa znormalizowana nazwa w DB
 MANUAL_MAPPINGS = {
-    "dom pomocy społecznej prowadzony przez zgromadzenie sióstr najświętszej":
-        "dom pomocy społecznej zakonu przenajświętszej trójcy",
-    "bonifraterska fundacja dobroczynna dom pomocy społecznej":
+    "bonifraterska fundacja dobroczynna":
         "dom pomocy społecznej w konarach",
-    "dom pomocy społecznej miłosierny samarytanin":
+    # Zgromadzenie Sióstr Najświętszej Rodziny z Nazaretu → ul. Lwowska 31, Wadowice
+    "zgromadzenie sióstr najświętszej rodziny z nazaretu":
+        "dom pomocy społecznej w wadowicach",
+    # Cudzysłów '' psuje fuzzy match — klucz bez cudzysłowu
+    "miłosierny samarytanin":
         "dom pomocy społecznej w grabiu",
 }
+
+# Mapowania przez podciąg nazwy → ID w bazie (gdy nazwa DB jest niejednoznaczna)
+MANUAL_MAPPINGS_BY_ID = {
+    "gmina borzęcin":          22,   # DPS-Regionalne Centrum... w Borzęcinie
+    "gmina sękowa":            29,   # DPS w Wapiennem
+    "gmina grybów":            73,   # DPS Biała Niżna 640
+    "miasto i gmina niepołomice": 86, # DPS w Staniątkach
+}
+
+# Powiaty obsługiwane przez matching po adresie (Kraków) lub pojemności (Nowy Sącz, Tarnów)
+CITY_POWIATY = {"m. kraków", "m. nowy sącz", "m. tarnów"}
 
 
 # ── normalizacja ──────────────────────────────────────────────────────────────
@@ -86,19 +99,27 @@ def parse_date_from_title(title: str) -> datetime.date | None:
 
 def parse_xlsx(path: Path) -> tuple[datetime.date | None, list[dict]]:
     """
-    Parsuje XLSX i zwraca (data_stanu, lista wierszy danych).
+    Parsuje XLSX/XLS i zwraca (data_stanu, lista wierszy danych).
     Każdy wiersz: { powiat, nazwa_xlsx, typ, liczba_miejsc, wolne_ogolem,
                     wolne_kobiety, wolne_mezczyzni, oczekujacych, czas_oczekiwania_dni }
     """
-    wb = openpyxl.load_workbook(path)
-    ws = wb.active
-    all_rows = [
-        [str(c).strip() if c is not None else "" for c in row]
-        for row in ws.iter_rows(values_only=True)
-    ]
+    if path.suffix.lower() == '.xls':
+        import pandas as pd
+        df = pd.read_excel(path, header=None)
+        all_rows = [
+            [str(c).strip() if c is not None and str(c) != 'nan' else "" for c in row]
+            for row in df.values.tolist()
+        ]
+    else:
+        wb = openpyxl.load_workbook(path)
+        ws = wb.active
+        all_rows = [
+            [str(c).strip() if c is not None else "" for c in row]
+            for row in ws.iter_rows(values_only=True)
+        ]
 
-    # Tytuł z datą
-    title = next((c for row in all_rows[:3] for c in row if "stan na" in c.lower()), "")
+    # Tytuł z datą (szukaj w pierwszych 8 wierszach - .xls może mieć puste nagłówki)
+    title = next((c for row in all_rows[:8] for c in row if "stan na" in c.lower()), "")
     data_stanu = parse_date_from_title(title)
     print(f"Data stanu: {data_stanu}  (z tytułu: '{title[:60]}')")
 
@@ -156,16 +177,33 @@ def parse_xlsx(path: Path) -> tuple[datetime.date | None, list[dict]]:
 
 # ── matchowanie ───────────────────────────────────────────────────────────────
 
+def norm_ulica(s: str) -> str:
+    """Normalizuj adres do 'ostatnie_słowo_ulicy numer' dla porównania."""
+    s = re.sub(r'\s+', ' ', (s or '').lower().strip())
+    # Usuń prefix: ul., os., al., pl.
+    s = re.sub(r'^(ul\.|os\.|al\.|pl\.)\s*', '', s)
+    # Usuń tytuły i inicjały: dr., prof., im., św., A., J.
+    s = re.sub(r'\b(dr|prof|im|św|o)\b\.?\s*', '', s)
+    s = re.sub(r'\b[a-z]\.\s*', '', s)
+    s = s.strip()
+    # Wyciągnij: ostatnie słowo (≥4 liter) przed numerem + numer
+    m = re.search(r'(\w{4,})\s+(\d+[a-z]?)\b', s)
+    return f"{m.group(1)} {m.group(2)}" if m else s
+
+
 def load_db_facilities(conn) -> list[dict]:
     cur = conn.cursor()
     cur.execute("""
-        SELECT id, nazwa, powiat, liczba_miejsc, profil_opieki
+        SELECT id, nazwa, powiat, ulica, liczba_miejsc, profil_opieki
         FROM "Placowka"
         WHERE typ_placowki = 'DPS' AND wojewodztwo = 'małopolskie'
         ORDER BY id
     """)
     cols = [d[0] for d in cur.description]
     rows = [dict(zip(cols, r)) for r in cur.fetchall()]
+    # Dodaj znormalizowany adres (klucz dla Krakowa)
+    for r in rows:
+        r['ulica_key'] = norm_ulica(r.get('ulica') or '')
     cur.close()
     return rows
 
@@ -174,7 +212,14 @@ def find_best_match_by_name(nazwa_xlsx: str, db: list[dict]) -> tuple[dict | Non
     """Fuzzy match po nazwie — zwraca (db_row, score)."""
     norm_xlsx = norm_name(nazwa_xlsx)
 
-    # Sprawdź ręczne mapowanie
+    # Mapowania przez ID (niejednoznaczne nazwy DB lub Gmina-based)
+    for key, db_id in MANUAL_MAPPINGS_BY_ID.items():
+        if key in norm_xlsx:
+            for d in db:
+                if d['id'] == db_id:
+                    return d, 1.0
+
+    # Mapowania przez nazwę DB
     for key, target in MANUAL_MAPPINGS.items():
         if key in norm_xlsx:
             for d in db:
@@ -191,18 +236,43 @@ def find_best_match_by_name(nazwa_xlsx: str, db: list[dict]) -> tuple[dict | Non
     return best, best_score
 
 
+def extract_xlsx_ulica(xlsx_name: str) -> str:
+    """Wyciągnij adres z długiej nazwy XLSX Krakowa: 'Miasto Kraków ... ul. X N, ...'"""
+    m = re.search(r'(?:ul\.|os\.|al\.)\s+\w[\w\s\.]*?\d+[A-Za-z]?', xlsx_name, re.IGNORECASE)
+    return m.group(0).strip() if m else ""
+
+
+def match_krakow_by_address(xlsx_name: str, db: list[dict]) -> dict | None:
+    """
+    Dla Krakowa: matchuj po adresie (ul./os. + numer).
+    Działa dla obu powiatów: 'm. Kraków' i 'krakowski'.
+    """
+    raw_addr = extract_xlsx_ulica(xlsx_name)
+    if not raw_addr:
+        return None
+    key = norm_ulica(raw_addr)
+    if not key:
+        return None
+
+    krakow_db = [
+        d for d in db
+        if d['powiat'] in ('m. Kraków', 'krakowski')
+    ]
+    candidates = [d for d in krakow_db if d['ulica_key'] == key]
+    if len(candidates) == 1:
+        return candidates[0]
+    if len(candidates) > 1:
+        print(f"  ⚠️  Ambiguous address '{key}': {[d['nazwa'][:30] for d in candidates]}")
+    return None
+
+
 def match_city_by_capacity(group_total: int | None, powiat_norm: str,
                             db: list[dict]) -> dict | None:
-    """
-    Dla miast (Kraków/Nowy Sącz/Tarnów): matchuj po sumie liczba_miejsc grupy.
-    group_total = suma pojemności wszystkich typów opieki w jednej placówce.
-    Zwraca None gdy ambiguous (kilka kandydatów z tą samą pojemnością).
-    """
+    """Dla Nowego Sącza i Tarnowa: matchuj po sumie liczba_miejsc grupy."""
     if group_total is None or group_total == 0:
         return None
 
     city_powiat_map = {
-        "m. kraków": "m. Kraków",
         "m. nowy sącz": "m. Nowy Sącz",
         "m. tarnów": "m. Tarnów",
     }
@@ -274,13 +344,15 @@ def main():
     db = load_db_facilities(conn)
     print(f"DPS w bazie: {len(db)}")
 
-    stats = {"matched_name": 0, "matched_capacity": 0, "no_match": 0}
+    stats = {"matched_name": 0, "matched_address": 0, "matched_capacity": 0, "no_match": 0}
     unmatched = []
 
-    # ── Podziel na placówki poza miastami i miasta ──────────────────────────
-    city_names = {"miasto ", "gmina "}
-    non_city_rows = [r for r in rows if not any(r['nazwa_xlsx'].lower().startswith(c) for c in city_names)]
-    city_rows     = [r for r in rows if     any(r['nazwa_xlsx'].lower().startswith(c) for c in city_names)]
+    # ── Podziel po powiatu: miasta (Kraków/NS/Tarnów) vs reszta ────────────
+    def is_city_row(r: dict) -> bool:
+        return r['powiat'].strip().lower() in CITY_POWIATY
+
+    non_city_rows = [r for r in rows if not is_city_row(r)]
+    city_rows     = [r for r in rows if     is_city_row(r)]
 
     # ── 1. Placówki poza miastami — match po nazwie ─────────────────────────
     matched_cache: dict[str, dict | None] = {}
@@ -307,13 +379,37 @@ def main():
             continue
         upsert_record(conn, db_row['id'], data_stanu, row)
 
-    # ── 2. Miasta — grupuj po kolejności is_new_facility, matchuj po SUMIE pojemności ─
-    # Wiersze dla miast muszą być w oryginalnej kolejności (nie sortowane), bo
-    # is_new_facility=False to kontynuacja poprzedniego wiersza.
-    city_rows_ordered = [r for r in rows if any(r['nazwa_xlsx'].lower().startswith(c) for c in city_names)]
+    # ── 2. Kraków — grupuj po adresie, matchuj po ulicy ────────────────────
+    krakow_rows = [r for r in city_rows if r['powiat'].strip().lower() == "m. kraków"]
+
+    # Grupuj wiersze Krakowa po znormalizowanym adresie (jeden DPS = jeden adres)
+    krakow_groups: dict[str, list[dict]] = {}
+    krakow_order: list[str] = []  # zachowaj kolejność
+    for row in krakow_rows:
+        raw_addr = extract_xlsx_ulica(row['nazwa_xlsx'])
+        addr_key = norm_ulica(raw_addr) if raw_addr else f"__unnamed_{id(row)}"
+        if addr_key not in krakow_groups:
+            krakow_groups[addr_key] = []
+            krakow_order.append(addr_key)
+        krakow_groups[addr_key].append(row)
+
+    for addr_key in krakow_order:
+        group = krakow_groups[addr_key]
+        # Użyj nazwy z pierwszego wiersza do wyciągnięcia adresu
+        db_row = match_krakow_by_address(group[0]['nazwa_xlsx'], db)
+        if db_row:
+            stats["matched_address"] += 1
+            print(f"  ✅ [adres {addr_key}] {db_row['nazwa'][:50]}")
+            for r in group:
+                upsert_record(conn, db_row['id'], data_stanu, r)
+        else:
+            stats["no_match"] += len(group)
+            print(f"  ❌ [adres {addr_key}] brak dopasowania w Krakowie")
+
+    # ── 3. Nowy Sącz i Tarnów — matchuj po SUMIE pojemności ────────────────
+    ns_tarnow_rows = [r for r in city_rows if r['powiat'].strip().lower() in ("m. nowy sącz", "m. tarnów")]
 
     current_group: list[dict] = []
-    current_powiat = ""
 
     def flush_city_group(group: list[dict]):
         if not group:
@@ -330,7 +426,7 @@ def main():
             stats["no_match"] += len(group)
             print(f"  ❌ [pojemność {group_total}] brak dopasowania ({powiat_norm})")
 
-    for row in city_rows_ordered:
+    for row in ns_tarnow_rows:
         if row['is_new_facility']:
             flush_city_group(current_group)
             current_group = [row]
@@ -341,12 +437,13 @@ def main():
     conn.commit()
     conn.close()
 
-    total_imported = stats['matched_name'] + stats['matched_capacity']
+    total_imported = stats['matched_name'] + stats['matched_address'] + stats['matched_capacity']
     print()
     print("=" * 60)
     print(f"✅ Zaimportowano: {total_imported} placówek")
     print(f"   Po nazwie:    {stats['matched_name']}")
-    print(f"   Po pojemności:{stats['matched_capacity']} (miasta)")
+    print(f"   Po adresie:   {stats['matched_address']} (Kraków)")
+    print(f"   Po pojemności:{stats['matched_capacity']} (Nowy Sącz / Tarnów)")
     print(f"   Brak dopasowania: {stats['no_match']}")
     if unmatched:
         print()
