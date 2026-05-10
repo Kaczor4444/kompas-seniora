@@ -309,13 +309,23 @@ export default function RaportPage() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 text-sm text-slate-600 mb-8">
+          <div className="grid md:grid-cols-2 gap-6 text-sm text-slate-600 mb-8">
             <div className="bg-white rounded-xl p-5 border border-slate-200">
               <div className="font-semibold text-slate-800 mb-2">Liczba miejsc DPS</div>
               <p className="leading-relaxed">
                 Baza Kompas Seniora — dane z oficjalnego wykazu DPS Małopolskiego Urzędu
                 Wojewódzkiego (marzec 2026). Uwzględniono wyłącznie placówki typu DPS
                 (Domy Pomocy Społecznej), bez Środowiskowych Domów Samopomocy.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border border-slate-200">
+              <div className="font-semibold text-slate-800 mb-2">Koszty pobytu w DPS</div>
+              <p className="leading-relaxed">
+                Oficjalny miesięczny koszt utrzymania ogłaszany przez Małopolski Urząd Wojewódzki
+                na podstawie art. 60 ust. 2 ustawy o pomocy społecznej — publikowany corocznie
+                do 31 marca, obowiązujący od 1 kwietnia danego roku. Dane za lata 2023–2026
+                z PDF-ów MUW. Nie są to ceny rynkowe ani self-reported — wyłącznie stawki
+                z oficjalnego rejestru.
               </p>
             </div>
             <div className="bg-white rounded-xl p-5 border border-slate-200">
