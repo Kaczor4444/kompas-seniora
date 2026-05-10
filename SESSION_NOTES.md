@@ -2,6 +2,102 @@
 
 ---
 
+## ✅ SESJA #15: 2026-05-10 — Import wolnych miejsc + ulepszenia monitorów
+
+### Co zrobiliśmy:
+
+#### 1. Fix importu wolnych miejsc — 88 placówek, 0 niedopasowanych (było 72/26)
+Commit: `7db704b`
+
+**Naprawione problemy matchowania:**
+- **Gmina Borzęcin/Sękowa/Grybów + Miasto i Gmina Niepołomice** — wchodziły do branchy city_rows (prefix "gmina"/"miasto"), ale `match_city_by_capacity` obsługiwało tylko m. Kraków/NS/Tarnów → brak dopasowania. Fix: detekcja city_rows po powiatu (nie po nazwie), `MANUAL_MAPPINGS_BY_ID` z ID bazy
+- **Kraków** — DPS są w bazie z `powiat='krakowski'`, skrypt szukał tylko w `'m. Kraków'`. Fix: address-based matching po `ul./os. + numer` dla wszystkich krakowskich DPS (oba powiaty). Grupowanie wierszy po adresie zamiast po `is_new_facility` — obsługuje multi-typ DPS
+- **Miłosierny Samarytanin** — cudzysłów `''` psował klucz w MANUAL_MAPPINGS. Fix: klucz `"miłosierny samarytanin"` bez cudzysłowu
+- **Zgromadzenie Sióstr Najświętszej Rodziny** — MANUAL_MAPPING wskazywał na zły DPS (Trójcy zamiast Wadowice ul. Lwowska 31). Naprawione
+- **Plik .xls 2023** — openpyxl nie obsługuje starego formatu. Fix: fallback przez pandas + szukanie tytułu w 8 wierszach (nie 3)
+
+**Wyniki:**
+- 88 placówek dopasowanych (67 po nazwie + 14 Kraków po adresie + 7 NS/Tarnów po pojemności)
+- Historia: **551 rekordów** w `PlacowkaWolneMiejsca` dla 5 dat (2023-04, 2024-02, 2025-05, 2025-10, 2026-04)
+
+#### 2. Cron workflow: 1. i 15. → 8:00 UTC (10:00 polskiego czasu)
+Commity: `97553da`, `8553ec8`
+
+#### 3. Issue przy braku nowego pliku (wolne-miejsca monitor)
+Commit: `2382390`
+- `monitor-dps-pdf.py` już tworzył Issue przy braku zmian — dodano analogicznie do `monitor-wolne-miejsca.py`
+
+#### 4. Cztery ulepszenia monitorów (konsultacja z Opus 4.7)
+Commit: `d368ec3`
+
+| # | Zmiana | Skrypt |
+|---|--------|--------|
+| 1 | Błąd pobierania → otwarty Issue `⚠️` z treścią błędu | oba |
+| 2 | Trend wolnych miejsc w raporcie: `📈 +234 vs poprzedni okres` | wolne-miejsca |
+| 3 | "Brak zmian" → zamknięty Issue (historia jest, lista czysta) | oba |
+| 4 | Gdy nowy plik już pobrany w tym miesiącu → pomija kolejne sprawdzenia + miesięczny marker `.wolne_miejsca_month` | wolne-miejsca |
+
+Cron wolnych miejsc: `1,8,15` każdego miesiąca
+
+#### 5. Stagnacja, walidacja PDF, bezpieczna faza testowa
+Commit: `b87c85c`
+
+**#5 — stagnacja XLSX:**
+- Przy "brak zmian" Issue teraz pokazuje `(dane sprzed X dni)`
+- Jeśli >45 dni bez aktualizacji → otwarty Issue `🟠 brak aktualizacji od X dni`
+
+**#7 — walidacja struktury PDF (gdy MUW zmieni układ kolumn):**
+- <80 lub >105 rekordów → `🔴 anomalia struktury PDF`, exit 1, brak SQL patcha
+- <30% rekordów z emailem lub <70% z nazwą → alert o możliwej zmianie kolumn
+- Nowa funkcja `validate_pdf_rows()` wywoływana przed porównaniem z bazą
+
+**Faza testowa:**
+- Import do bazy wyłączony w `monitor-wolne-miejsca.py` (zakomentowany subprocess)
+- Plan: 2-3 miesiące obserwacji raportów → odkomentować gdy wszystko OK
+
+**Bonusy techniczne:**
+- `datetime.utcnow()` → `datetime.now(timezone.utc)` (deprecated w Python 3.12)
+- `concurrency: group` w obu workflow → brak wyścigów przy równoległych runach
+
+### Commity tej sesji:
+- `7db704b` — fix: import wolnych miejsc — 88 placówek, 0 niedopasowanych
+- `97553da` — chore: workflow cron 2x w miesiącu — 1. i 15.
+- `8553ec8` — chore: workflow cron 10:00 czasu polskiego
+- `2382390` — fix: wolne miejsca monitor — Issue także przy braku nowego pliku
+- `d368ec3` — feat: monitory — 4 ulepszenia
+- `b87c85c` — feat: monitory — stagnacja, walidacja PDF, bezpieczna faza testowa
+
+### Stan bazy po sesji:
+- **DPS Małopolska:** 91 placówek
+- **ŚDS:** 95 placówek
+- **Łącznie:** 186 placówek
+- **PlacowkaWolneMiejsca:** 551 rekordów (5 dat: 2023-04, 2024-02, 2025-05, 2025-10, 2026-04)
+- **PlacowkaCena:** 338 rekordów (2023–2026)
+
+---
+
+## 🚨 TODO — NASTĘPNA SESJA (priorytety)
+
+### KRYTYCZNE — SEO (strona niewidoczna dla Google i AI!)
+1. **`public/robots.txt`** — zmienić z `Disallow: /` na `Allow: /`, `Disallow: /admin/`
+2. **`app/layout.tsx`** — zmienić `robots: { index: false }` na `index: true`
+3. **`app/sitemap.ts`** — dodać dynamiczny sitemap (186 placówek + artykuły)
+
+### CONTENT — Artykuł gotowy do publikacji
+- `drafts/koszty-dps-kto-placi-2026-05-07.md` — ~2800 słów, status: DRAFT
+- Do zrobienia: `/scrub` → `/optimize` → dodać do `src/data/articles.ts` → stworzyć MDX
+
+### MONITORY — Po fazie testowej (lipiec/sierpień 2026)
+- Odkomentować import do bazy w `monitor-wolne-miejsca.py`
+- Dodać `DATABASE_URL` jako secret w GitHub Actions dla wolne-miejsca workflow
+- Rozważyć #2 (trend z bazy), #6 (fallback NS/Tarnów), #8 (walidacja SQL patch)
+
+### INNE
+- Metadata dla 186 placówek (`generateMetadata()` w `/app/placowka/[id]/page.tsx`)
+- Canonical URLs
+
+---
+
 ## ✅ SESJA #14: 2026-05-09 — Wolne miejsca DPS + profil opieki na karcie placówki
 
 ### Co zrobiliśmy:
