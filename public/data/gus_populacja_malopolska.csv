@@ -1,0 +1,617 @@
+teryt_powiat,powiat,rok,typ,miara,populacja,zrodlo_var_id,zrodlo_url,pobrano
+011212001000,Powiat bocheński,2015,historyczny,wiek_poprodukcyjny,17462,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2016,historyczny,wiek_poprodukcyjny,17984,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2017,historyczny,wiek_poprodukcyjny,18531,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2018,historyczny,wiek_poprodukcyjny,19134,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2019,historyczny,wiek_poprodukcyjny,19708,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2020,historyczny,wiek_poprodukcyjny,20255,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2021,historyczny,wiek_poprodukcyjny,20626,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2022,historyczny,wiek_poprodukcyjny,21097,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2023,historyczny,wiek_poprodukcyjny,21561,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2024,historyczny,wiek_poprodukcyjny,21978,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2015,historyczny,wiek_poprodukcyjny,47138,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2016,historyczny,wiek_poprodukcyjny,48758,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2017,historyczny,wiek_poprodukcyjny,50247,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2018,historyczny,wiek_poprodukcyjny,51925,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2019,historyczny,wiek_poprodukcyjny,53620,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2020,historyczny,wiek_poprodukcyjny,56054,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2021,historyczny,wiek_poprodukcyjny,57258,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2022,historyczny,wiek_poprodukcyjny,58662,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2023,historyczny,wiek_poprodukcyjny,60318,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212006000,Powiat krakowski,2024,historyczny,wiek_poprodukcyjny,61687,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2015,historyczny,wiek_poprodukcyjny,10996,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2016,historyczny,wiek_poprodukcyjny,11227,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2017,historyczny,wiek_poprodukcyjny,11401,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2018,historyczny,wiek_poprodukcyjny,11577,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2019,historyczny,wiek_poprodukcyjny,11788,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2020,historyczny,wiek_poprodukcyjny,11963,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2021,historyczny,wiek_poprodukcyjny,12001,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2022,historyczny,wiek_poprodukcyjny,12138,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2023,historyczny,wiek_poprodukcyjny,12319,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212008000,Powiat miechowski,2024,historyczny,wiek_poprodukcyjny,12448,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2015,historyczny,wiek_poprodukcyjny,18900,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2016,historyczny,wiek_poprodukcyjny,19511,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2017,historyczny,wiek_poprodukcyjny,20161,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2018,historyczny,wiek_poprodukcyjny,20890,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2019,historyczny,wiek_poprodukcyjny,21551,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2020,historyczny,wiek_poprodukcyjny,22581,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2021,historyczny,wiek_poprodukcyjny,23089,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2022,historyczny,wiek_poprodukcyjny,23662,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2023,historyczny,wiek_poprodukcyjny,24390,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212009000,Powiat myślenicki,2024,historyczny,wiek_poprodukcyjny,25021,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2015,historyczny,wiek_poprodukcyjny,8606,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2016,historyczny,wiek_poprodukcyjny,8774,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2017,historyczny,wiek_poprodukcyjny,8920,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2018,historyczny,wiek_poprodukcyjny,9161,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2019,historyczny,wiek_poprodukcyjny,9297,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2020,historyczny,wiek_poprodukcyjny,9497,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2021,historyczny,wiek_poprodukcyjny,9586,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2022,historyczny,wiek_poprodukcyjny,9700,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2023,historyczny,wiek_poprodukcyjny,9823,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212014000,Powiat proszowicki,2024,historyczny,wiek_poprodukcyjny,10010,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2015,historyczny,wiek_poprodukcyjny,19655,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2016,historyczny,wiek_poprodukcyjny,20367,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2017,historyczny,wiek_poprodukcyjny,21130,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2018,historyczny,wiek_poprodukcyjny,21972,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2019,historyczny,wiek_poprodukcyjny,22778,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2020,historyczny,wiek_poprodukcyjny,24024,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2021,historyczny,wiek_poprodukcyjny,24597,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2022,historyczny,wiek_poprodukcyjny,25237,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2023,historyczny,wiek_poprodukcyjny,25909,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212019000,Powiat wielicki,2024,historyczny,wiek_poprodukcyjny,26468,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2015,historyczny,wiek_poprodukcyjny,168373,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2016,historyczny,wiek_poprodukcyjny,173425,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2017,historyczny,wiek_poprodukcyjny,177436,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2018,historyczny,wiek_poprodukcyjny,181160,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2019,historyczny,wiek_poprodukcyjny,184173,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2020,historyczny,wiek_poprodukcyjny,178586,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2021,historyczny,wiek_poprodukcyjny,178979,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2022,historyczny,wiek_poprodukcyjny,179622,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2023,historyczny,wiek_poprodukcyjny,180689,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212161000,Powiat m. Kraków,2024,historyczny,wiek_poprodukcyjny,181951,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2015,historyczny,wiek_poprodukcyjny,19466,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2016,historyczny,wiek_poprodukcyjny,19983,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2017,historyczny,wiek_poprodukcyjny,20480,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2018,historyczny,wiek_poprodukcyjny,21027,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2019,historyczny,wiek_poprodukcyjny,21585,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2020,historyczny,wiek_poprodukcyjny,22072,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2021,historyczny,wiek_poprodukcyjny,22343,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2022,historyczny,wiek_poprodukcyjny,22782,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2023,historyczny,wiek_poprodukcyjny,23222,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212205000,Powiat gorlicki,2024,historyczny,wiek_poprodukcyjny,23690,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2015,historyczny,wiek_poprodukcyjny,18990,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2016,historyczny,wiek_poprodukcyjny,19444,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2017,historyczny,wiek_poprodukcyjny,19875,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2018,historyczny,wiek_poprodukcyjny,20374,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2019,historyczny,wiek_poprodukcyjny,20837,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2020,historyczny,wiek_poprodukcyjny,21427,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2021,historyczny,wiek_poprodukcyjny,21756,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2022,historyczny,wiek_poprodukcyjny,22290,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2023,historyczny,wiek_poprodukcyjny,22906,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212207000,Powiat limanowski,2024,historyczny,wiek_poprodukcyjny,23530,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2015,historyczny,wiek_poprodukcyjny,30723,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2016,historyczny,wiek_poprodukcyjny,31443,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2017,historyczny,wiek_poprodukcyjny,32250,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2018,historyczny,wiek_poprodukcyjny,33106,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2019,historyczny,wiek_poprodukcyjny,33976,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2020,historyczny,wiek_poprodukcyjny,34986,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2021,historyczny,wiek_poprodukcyjny,35666,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2022,historyczny,wiek_poprodukcyjny,36579,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2023,historyczny,wiek_poprodukcyjny,37575,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212210000,Powiat nowosądecki,2024,historyczny,wiek_poprodukcyjny,38800,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2015,historyczny,wiek_poprodukcyjny,16127,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2016,historyczny,wiek_poprodukcyjny,16637,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2017,historyczny,wiek_poprodukcyjny,17118,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2018,historyczny,wiek_poprodukcyjny,17642,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2019,historyczny,wiek_poprodukcyjny,18097,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2020,historyczny,wiek_poprodukcyjny,18174,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2021,historyczny,wiek_poprodukcyjny,18355,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2022,historyczny,wiek_poprodukcyjny,18777,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2023,historyczny,wiek_poprodukcyjny,19228,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2024,historyczny,wiek_poprodukcyjny,19578,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2015,historyczny,wiek_poprodukcyjny,26465,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2016,historyczny,wiek_poprodukcyjny,27153,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2017,historyczny,wiek_poprodukcyjny,28059,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2018,historyczny,wiek_poprodukcyjny,28867,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2019,historyczny,wiek_poprodukcyjny,29586,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2020,historyczny,wiek_poprodukcyjny,29894,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2021,historyczny,wiek_poprodukcyjny,30176,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2022,historyczny,wiek_poprodukcyjny,30588,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2023,historyczny,wiek_poprodukcyjny,31074,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212303000,Powiat chrzanowski,2024,historyczny,wiek_poprodukcyjny,31519,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2015,historyczny,wiek_poprodukcyjny,23708,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2016,historyczny,wiek_poprodukcyjny,24545,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2017,historyczny,wiek_poprodukcyjny,25368,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2018,historyczny,wiek_poprodukcyjny,26091,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2019,historyczny,wiek_poprodukcyjny,26656,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2020,historyczny,wiek_poprodukcyjny,27080,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2021,historyczny,wiek_poprodukcyjny,27275,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2022,historyczny,wiek_poprodukcyjny,27659,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2023,historyczny,wiek_poprodukcyjny,28078,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212312000,Powiat olkuski,2024,historyczny,wiek_poprodukcyjny,28395,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2015,historyczny,wiek_poprodukcyjny,31011,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2016,historyczny,wiek_poprodukcyjny,31989,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2017,historyczny,wiek_poprodukcyjny,32793,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2018,historyczny,wiek_poprodukcyjny,33621,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2019,historyczny,wiek_poprodukcyjny,34359,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2020,historyczny,wiek_poprodukcyjny,34872,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2021,historyczny,wiek_poprodukcyjny,35103,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2022,historyczny,wiek_poprodukcyjny,35581,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2023,historyczny,wiek_poprodukcyjny,36213,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212313000,Powiat oświęcimski,2024,historyczny,wiek_poprodukcyjny,36795,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2015,historyczny,wiek_poprodukcyjny,27782,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2016,historyczny,wiek_poprodukcyjny,28563,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2017,historyczny,wiek_poprodukcyjny,29256,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2018,historyczny,wiek_poprodukcyjny,29965,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2019,historyczny,wiek_poprodukcyjny,30700,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2020,historyczny,wiek_poprodukcyjny,31374,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2021,historyczny,wiek_poprodukcyjny,31774,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2022,historyczny,wiek_poprodukcyjny,32397,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2023,historyczny,wiek_poprodukcyjny,33024,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212318000,Powiat wadowicki,2024,historyczny,wiek_poprodukcyjny,33653,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2015,historyczny,wiek_poprodukcyjny,15683,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2016,historyczny,wiek_poprodukcyjny,16056,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2017,historyczny,wiek_poprodukcyjny,16464,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2018,historyczny,wiek_poprodukcyjny,16933,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2019,historyczny,wiek_poprodukcyjny,17358,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2020,historyczny,wiek_poprodukcyjny,17719,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2021,historyczny,wiek_poprodukcyjny,17938,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2022,historyczny,wiek_poprodukcyjny,18311,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2023,historyczny,wiek_poprodukcyjny,18715,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212402000,Powiat brzeski,2024,historyczny,wiek_poprodukcyjny,19091,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2015,historyczny,wiek_poprodukcyjny,10256,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2016,historyczny,wiek_poprodukcyjny,10417,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2017,historyczny,wiek_poprodukcyjny,10669,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2018,historyczny,wiek_poprodukcyjny,10907,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2019,historyczny,wiek_poprodukcyjny,11120,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2020,historyczny,wiek_poprodukcyjny,11441,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2021,historyczny,wiek_poprodukcyjny,11515,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2022,historyczny,wiek_poprodukcyjny,11703,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2023,historyczny,wiek_poprodukcyjny,11943,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212404000,Powiat dąbrowski,2024,historyczny,wiek_poprodukcyjny,12227,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2015,historyczny,wiek_poprodukcyjny,32954,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2016,historyczny,wiek_poprodukcyjny,33717,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2017,historyczny,wiek_poprodukcyjny,34602,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2018,historyczny,wiek_poprodukcyjny,35517,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2019,historyczny,wiek_poprodukcyjny,36380,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2020,historyczny,wiek_poprodukcyjny,37149,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2021,historyczny,wiek_poprodukcyjny,37651,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2022,historyczny,wiek_poprodukcyjny,38332,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2023,historyczny,wiek_poprodukcyjny,39358,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212416000,Powiat tarnowski,2024,historyczny,wiek_poprodukcyjny,40385,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2015,historyczny,wiek_poprodukcyjny,25025,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2016,historyczny,wiek_poprodukcyjny,25838,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2017,historyczny,wiek_poprodukcyjny,26558,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2018,historyczny,wiek_poprodukcyjny,27246,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2019,historyczny,wiek_poprodukcyjny,27843,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2020,historyczny,wiek_poprodukcyjny,27901,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2021,historyczny,wiek_poprodukcyjny,28017,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2022,historyczny,wiek_poprodukcyjny,28279,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2023,historyczny,wiek_poprodukcyjny,28674,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212463000,Powiat m. Tarnów,2024,historyczny,wiek_poprodukcyjny,29117,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2015,historyczny,wiek_poprodukcyjny,31278,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2016,historyczny,wiek_poprodukcyjny,32022,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2017,historyczny,wiek_poprodukcyjny,32883,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2018,historyczny,wiek_poprodukcyjny,33740,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2019,historyczny,wiek_poprodukcyjny,34664,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2020,historyczny,wiek_poprodukcyjny,35108,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2021,historyczny,wiek_poprodukcyjny,35568,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2022,historyczny,wiek_poprodukcyjny,36378,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2023,historyczny,wiek_poprodukcyjny,37344,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216911000,Powiat nowotarski,2024,historyczny,wiek_poprodukcyjny,38321,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2015,historyczny,wiek_poprodukcyjny,14674,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2016,historyczny,wiek_poprodukcyjny,15005,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2017,historyczny,wiek_poprodukcyjny,15372,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2018,historyczny,wiek_poprodukcyjny,15617,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2019,historyczny,wiek_poprodukcyjny,15984,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2020,historyczny,wiek_poprodukcyjny,16285,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2021,historyczny,wiek_poprodukcyjny,16436,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2022,historyczny,wiek_poprodukcyjny,16798,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2023,historyczny,wiek_poprodukcyjny,17119,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216915000,Powiat suski,2024,historyczny,wiek_poprodukcyjny,17436,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2015,historyczny,wiek_poprodukcyjny,12715,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2016,historyczny,wiek_poprodukcyjny,13004,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2017,historyczny,wiek_poprodukcyjny,13373,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2018,historyczny,wiek_poprodukcyjny,13706,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2019,historyczny,wiek_poprodukcyjny,14029,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2020,historyczny,wiek_poprodukcyjny,13960,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2021,historyczny,wiek_poprodukcyjny,14067,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2022,historyczny,wiek_poprodukcyjny,14336,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2023,historyczny,wiek_poprodukcyjny,14716,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011216917000,Powiat tatrzański,2024,historyczny,wiek_poprodukcyjny,15065,72293,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2577,2026-05-10
+011212001000,Powiat bocheński,2015,historyczny,80plus,3763,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2016,historyczny,80plus,3822,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2017,historyczny,80plus,3914,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2018,historyczny,80plus,3944,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2019,historyczny,80plus,4024,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2020,historyczny,80plus,4008,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2021,historyczny,80plus,3934,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2022,historyczny,80plus,3854,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2023,historyczny,80plus,3870,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2024,historyczny,80plus,3926,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2015,historyczny,80plus,10154,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2016,historyczny,80plus,10377,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2017,historyczny,80plus,10515,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2018,historyczny,80plus,10650,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2019,historyczny,80plus,10879,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2020,historyczny,80plus,10854,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2021,historyczny,80plus,10641,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2022,historyczny,80plus,10472,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2023,historyczny,80plus,10544,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212006000,Powiat krakowski,2024,historyczny,80plus,10668,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2015,historyczny,80plus,2540,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2016,historyczny,80plus,2515,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2017,historyczny,80plus,2480,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2018,historyczny,80plus,2507,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2019,historyczny,80plus,2521,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2020,historyczny,80plus,2472,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2021,historyczny,80plus,2406,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2022,historyczny,80plus,2312,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2023,historyczny,80plus,2356,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212008000,Powiat miechowski,2024,historyczny,80plus,2425,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2015,historyczny,80plus,4153,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2016,historyczny,80plus,4254,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2017,historyczny,80plus,4339,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2018,historyczny,80plus,4469,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2019,historyczny,80plus,4588,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2020,historyczny,80plus,4684,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2021,historyczny,80plus,4525,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2022,historyczny,80plus,4408,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2023,historyczny,80plus,4359,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212009000,Powiat myślenicki,2024,historyczny,80plus,4278,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2015,historyczny,80plus,1933,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2016,historyczny,80plus,1922,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2017,historyczny,80plus,1928,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2018,historyczny,80plus,1917,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2019,historyczny,80plus,1929,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2020,historyczny,80plus,1876,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2021,historyczny,80plus,1826,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2022,historyczny,80plus,1767,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2023,historyczny,80plus,1761,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212014000,Powiat proszowicki,2024,historyczny,80plus,1795,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2015,historyczny,80plus,4115,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2016,historyczny,80plus,4170,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2017,historyczny,80plus,4246,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2018,historyczny,80plus,4320,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2019,historyczny,80plus,4383,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2020,historyczny,80plus,4536,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2021,historyczny,80plus,4385,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2022,historyczny,80plus,4308,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2023,historyczny,80plus,4293,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212019000,Powiat wielicki,2024,historyczny,80plus,4341,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2015,historyczny,80plus,37492,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2016,historyczny,80plus,38902,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2017,historyczny,80plus,39772,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2018,historyczny,80plus,40378,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2019,historyczny,80plus,41181,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2020,historyczny,80plus,39653,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2021,historyczny,80plus,39131,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2022,historyczny,80plus,38673,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2023,historyczny,80plus,39090,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212161000,Powiat m. Kraków,2024,historyczny,80plus,40355,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2015,historyczny,80plus,4422,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2016,historyczny,80plus,4577,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2017,historyczny,80plus,4663,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2018,historyczny,80plus,4795,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2019,historyczny,80plus,4920,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2020,historyczny,80plus,4914,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2021,historyczny,80plus,4761,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2022,historyczny,80plus,4583,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2023,historyczny,80plus,4517,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212205000,Powiat gorlicki,2024,historyczny,80plus,4505,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2015,historyczny,80plus,4317,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2016,historyczny,80plus,4473,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2017,historyczny,80plus,4610,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2018,historyczny,80plus,4719,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2019,historyczny,80plus,4827,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2020,historyczny,80plus,4865,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2021,historyczny,80plus,4709,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2022,historyczny,80plus,4622,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2023,historyczny,80plus,4577,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212207000,Powiat limanowski,2024,historyczny,80plus,4614,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2015,historyczny,80plus,7024,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2016,historyczny,80plus,7291,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2017,historyczny,80plus,7450,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2018,historyczny,80plus,7679,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2019,historyczny,80plus,7801,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2020,historyczny,80plus,7774,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2021,historyczny,80plus,7492,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2022,historyczny,80plus,7313,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2023,historyczny,80plus,7419,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212210000,Powiat nowosądecki,2024,historyczny,80plus,7488,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2015,historyczny,80plus,3020,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2016,historyczny,80plus,3176,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2017,historyczny,80plus,3310,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2018,historyczny,80plus,3423,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2019,historyczny,80plus,3563,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2020,historyczny,80plus,3562,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2021,historyczny,80plus,3514,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2022,historyczny,80plus,3508,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2023,historyczny,80plus,3613,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2024,historyczny,80plus,3713,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2015,historyczny,80plus,5439,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2016,historyczny,80plus,5685,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2017,historyczny,80plus,5882,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2018,historyczny,80plus,5995,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2019,historyczny,80plus,6170,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2020,historyczny,80plus,6117,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2021,historyczny,80plus,6059,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2022,historyczny,80plus,5979,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2023,historyczny,80plus,5953,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212303000,Powiat chrzanowski,2024,historyczny,80plus,5903,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2015,historyczny,80plus,5116,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2016,historyczny,80plus,5272,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2017,historyczny,80plus,5358,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2018,historyczny,80plus,5474,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2019,historyczny,80plus,5520,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2020,historyczny,80plus,5490,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2021,historyczny,80plus,5302,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2022,historyczny,80plus,5126,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2023,historyczny,80plus,5120,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212312000,Powiat olkuski,2024,historyczny,80plus,5091,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2015,historyczny,80plus,6405,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2016,historyczny,80plus,6818,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2017,historyczny,80plus,6989,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2018,historyczny,80plus,7274,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2019,historyczny,80plus,7476,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2020,historyczny,80plus,7445,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2021,historyczny,80plus,7351,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2022,historyczny,80plus,7239,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2023,historyczny,80plus,7198,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212313000,Powiat oświęcimski,2024,historyczny,80plus,7261,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2015,historyczny,80plus,6054,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2016,historyczny,80plus,6205,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2017,historyczny,80plus,6321,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2018,historyczny,80plus,6369,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2019,historyczny,80plus,6418,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2020,historyczny,80plus,6414,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2021,historyczny,80plus,6258,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2022,historyczny,80plus,6141,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2023,historyczny,80plus,6100,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212318000,Powiat wadowicki,2024,historyczny,80plus,6118,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2015,historyczny,80plus,3459,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2016,historyczny,80plus,3568,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2017,historyczny,80plus,3660,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2018,historyczny,80plus,3774,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2019,historyczny,80plus,3814,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2020,historyczny,80plus,3781,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2021,historyczny,80plus,3642,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2022,historyczny,80plus,3548,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2023,historyczny,80plus,3578,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212402000,Powiat brzeski,2024,historyczny,80plus,3601,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2015,historyczny,80plus,2476,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2016,historyczny,80plus,2578,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2017,historyczny,80plus,2613,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2018,historyczny,80plus,2666,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2019,historyczny,80plus,2663,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2020,historyczny,80plus,2742,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2021,historyczny,80plus,2611,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2022,historyczny,80plus,2479,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2023,historyczny,80plus,2421,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212404000,Powiat dąbrowski,2024,historyczny,80plus,2472,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2015,historyczny,80plus,7893,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2016,historyczny,80plus,8209,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2017,historyczny,80plus,8435,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2018,historyczny,80plus,8653,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2019,historyczny,80plus,8810,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2020,historyczny,80plus,8758,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2021,historyczny,80plus,8462,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2022,historyczny,80plus,8245,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2023,historyczny,80plus,8236,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212416000,Powiat tarnowski,2024,historyczny,80plus,8341,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2015,historyczny,80plus,5098,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2016,historyczny,80plus,5385,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2017,historyczny,80plus,5627,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2018,historyczny,80plus,5820,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2019,historyczny,80plus,6100,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2020,historyczny,80plus,6136,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2021,historyczny,80plus,6001,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2022,historyczny,80plus,5882,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2023,historyczny,80plus,5932,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212463000,Powiat m. Tarnów,2024,historyczny,80plus,6133,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2015,historyczny,80plus,6554,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2016,historyczny,80plus,6872,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2017,historyczny,80plus,7152,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2018,historyczny,80plus,7423,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2019,historyczny,80plus,7672,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2020,historyczny,80plus,7663,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2021,historyczny,80plus,7608,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2022,historyczny,80plus,7557,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2023,historyczny,80plus,7684,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216911000,Powiat nowotarski,2024,historyczny,80plus,7821,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2015,historyczny,80plus,3321,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2016,historyczny,80plus,3424,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2017,historyczny,80plus,3511,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2018,historyczny,80plus,3561,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2019,historyczny,80plus,3634,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2020,historyczny,80plus,3591,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2021,historyczny,80plus,3514,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2022,historyczny,80plus,3487,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2023,historyczny,80plus,3439,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216915000,Powiat suski,2024,historyczny,80plus,3378,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2015,historyczny,80plus,2795,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2016,historyczny,80plus,2909,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2017,historyczny,80plus,3012,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2018,historyczny,80plus,3091,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2019,historyczny,80plus,3138,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2020,historyczny,80plus,3003,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2021,historyczny,80plus,2962,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2022,historyczny,80plus,2960,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2023,historyczny,80plus,3013,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011216917000,Powiat tatrzański,2024,historyczny,80plus,3064,76024+76025,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137,2026-05-10
+011212001000,Powiat bocheński,2025,prognoza,65plus,19200,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212006000,Powiat krakowski,2025,prognoza,65plus,53684,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212008000,Powiat miechowski,2025,prognoza,65plus,11028,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212009000,Powiat myślenicki,2025,prognoza,65plus,21735,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212014000,Powiat proszowicki,2025,prognoza,65plus,8825,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212019000,Powiat wielicki,2025,prognoza,65plus,23294,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212161000,Powiat m. Kraków,2025,prognoza,65plus,159267,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212205000,Powiat gorlicki,2025,prognoza,65plus,20672,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212207000,Powiat limanowski,2025,prognoza,65plus,20305,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212210000,Powiat nowosądecki,2025,prognoza,65plus,33346,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2025,prognoza,65plus,16937,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212303000,Powiat chrzanowski,2025,prognoza,65plus,27685,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212312000,Powiat olkuski,2025,prognoza,65plus,24893,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212313000,Powiat oświęcimski,2025,prognoza,65plus,32157,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212318000,Powiat wadowicki,2025,prognoza,65plus,29370,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212402000,Powiat brzeski,2025,prognoza,65plus,16560,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212404000,Powiat dąbrowski,2025,prognoza,65plus,10586,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212416000,Powiat tarnowski,2025,prognoza,65plus,34696,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212463000,Powiat m. Tarnów,2025,prognoza,65plus,25163,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216911000,Powiat nowotarski,2025,prognoza,65plus,32832,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216915000,Powiat suski,2025,prognoza,65plus,15297,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216917000,Powiat tatrzański,2025,prognoza,65plus,12807,1722486,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212001000,Powiat bocheński,2030,prognoza,65plus,20754,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212006000,Powiat krakowski,2030,prognoza,65plus,58333,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212008000,Powiat miechowski,2030,prognoza,65plus,11403,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212009000,Powiat myślenicki,2030,prognoza,65plus,24296,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212014000,Powiat proszowicki,2030,prognoza,65plus,9256,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212019000,Powiat wielicki,2030,prognoza,65plus,25635,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212161000,Powiat m. Kraków,2030,prognoza,65plus,157478,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212205000,Powiat gorlicki,2030,prognoza,65plus,22381,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212207000,Powiat limanowski,2030,prognoza,65plus,22864,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212210000,Powiat nowosądecki,2030,prognoza,65plus,37843,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2030,prognoza,65plus,17877,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212303000,Powiat chrzanowski,2030,prognoza,65plus,29063,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212312000,Powiat olkuski,2030,prognoza,65plus,25400,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212313000,Powiat oświęcimski,2030,prognoza,65plus,33689,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212318000,Powiat wadowicki,2030,prognoza,65plus,31908,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212402000,Powiat brzeski,2030,prognoza,65plus,18134,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212404000,Powiat dąbrowski,2030,prognoza,65plus,11547,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212416000,Powiat tarnowski,2030,prognoza,65plus,38600,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212463000,Powiat m. Tarnów,2030,prognoza,65plus,25425,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216911000,Powiat nowotarski,2030,prognoza,65plus,35919,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216915000,Powiat suski,2030,prognoza,65plus,16696,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216917000,Powiat tatrzański,2030,prognoza,65plus,13697,1722531,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212001000,Powiat bocheński,2035,prognoza,65plus,21727,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212006000,Powiat krakowski,2035,prognoza,65plus,62300,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212008000,Powiat miechowski,2035,prognoza,65plus,11453,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212009000,Powiat myślenicki,2035,prognoza,65plus,25989,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212014000,Powiat proszowicki,2035,prognoza,65plus,9497,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212019000,Powiat wielicki,2035,prognoza,65plus,27895,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212161000,Powiat m. Kraków,2035,prognoza,65plus,155205,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212205000,Powiat gorlicki,2035,prognoza,65plus,23252,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212207000,Powiat limanowski,2035,prognoza,65plus,24836,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212210000,Powiat nowosądecki,2035,prognoza,65plus,41395,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2035,prognoza,65plus,18097,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212303000,Powiat chrzanowski,2035,prognoza,65plus,29133,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212312000,Powiat olkuski,2035,prognoza,65plus,25058,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212313000,Powiat oświęcimski,2035,prognoza,65plus,34369,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212318000,Powiat wadowicki,2035,prognoza,65plus,33695,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212402000,Powiat brzeski,2035,prognoza,65plus,19270,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212404000,Powiat dąbrowski,2035,prognoza,65plus,12313,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212416000,Powiat tarnowski,2035,prognoza,65plus,41754,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212463000,Powiat m. Tarnów,2035,prognoza,65plus,25089,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216911000,Powiat nowotarski,2035,prognoza,65plus,38512,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216915000,Powiat suski,2035,prognoza,65plus,17761,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216917000,Powiat tatrzański,2035,prognoza,65plus,14211,1722576,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212001000,Powiat bocheński,2040,prognoza,65plus,23035,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212006000,Powiat krakowski,2040,prognoza,65plus,68532,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212008000,Powiat miechowski,2040,prognoza,65plus,11668,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212009000,Powiat myślenicki,2040,prognoza,65plus,28169,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212014000,Powiat proszowicki,2040,prognoza,65plus,9802,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212019000,Powiat wielicki,2040,prognoza,65plus,31118,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212161000,Powiat m. Kraków,2040,prognoza,65plus,160322,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212205000,Powiat gorlicki,2040,prognoza,65plus,24156,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212207000,Powiat limanowski,2040,prognoza,65plus,26894,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212210000,Powiat nowosądecki,2040,prognoza,65plus,45020,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2040,prognoza,65plus,18496,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212303000,Powiat chrzanowski,2040,prognoza,65plus,29531,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212312000,Powiat olkuski,2040,prognoza,65plus,25519,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212313000,Powiat oświęcimski,2040,prognoza,65plus,35321,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212318000,Powiat wadowicki,2040,prognoza,65plus,35887,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212402000,Powiat brzeski,2040,prognoza,65plus,20609,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212404000,Powiat dąbrowski,2040,prognoza,65plus,13081,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212416000,Powiat tarnowski,2040,prognoza,65plus,44880,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212463000,Powiat m. Tarnów,2040,prognoza,65plus,25042,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216911000,Powiat nowotarski,2040,prognoza,65plus,41314,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216915000,Powiat suski,2040,prognoza,65plus,18916,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216917000,Powiat tatrzański,2040,prognoza,65plus,14797,1722621,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212001000,Powiat bocheński,2025,prognoza,80plus,3983,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212006000,Powiat krakowski,2025,prognoza,80plus,10760,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212008000,Powiat miechowski,2025,prognoza,80plus,2494,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212009000,Powiat myślenicki,2025,prognoza,80plus,4440,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212014000,Powiat proszowicki,2025,prognoza,80plus,1856,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212019000,Powiat wielicki,2025,prognoza,80plus,4527,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212161000,Powiat m. Kraków,2025,prognoza,80plus,39499,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212205000,Powiat gorlicki,2025,prognoza,80plus,4588,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212207000,Powiat limanowski,2025,prognoza,80plus,4587,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212210000,Powiat nowosądecki,2025,prognoza,80plus,7396,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2025,prognoza,80plus,3697,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212303000,Powiat chrzanowski,2025,prognoza,80plus,5984,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212312000,Powiat olkuski,2025,prognoza,80plus,5097,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212313000,Powiat oświęcimski,2025,prognoza,80plus,7268,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212318000,Powiat wadowicki,2025,prognoza,80plus,6223,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212402000,Powiat brzeski,2025,prognoza,80plus,3615,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212404000,Powiat dąbrowski,2025,prognoza,80plus,2444,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212416000,Powiat tarnowski,2025,prognoza,80plus,8255,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212463000,Powiat m. Tarnów,2025,prognoza,80plus,6028,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216911000,Powiat nowotarski,2025,prognoza,80plus,7672,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216915000,Powiat suski,2025,prognoza,80plus,3404,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216917000,Powiat tatrzański,2025,prognoza,80plus,2907,1722487,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212001000,Powiat bocheński,2030,prognoza,80plus,5057,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212006000,Powiat krakowski,2030,prognoza,80plus,13872,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212008000,Powiat miechowski,2030,prognoza,80plus,3179,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212009000,Powiat myślenicki,2030,prognoza,80plus,5455,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212014000,Powiat proszowicki,2030,prognoza,80plus,2379,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212019000,Powiat wielicki,2030,prognoza,80plus,5971,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212161000,Powiat m. Kraków,2030,prognoza,80plus,47059,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212205000,Powiat gorlicki,2030,prognoza,80plus,5489,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212207000,Powiat limanowski,2030,prognoza,80plus,5417,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212210000,Powiat nowosądecki,2030,prognoza,80plus,8718,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2030,prognoza,80plus,4743,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212303000,Powiat chrzanowski,2030,prognoza,80plus,7322,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212312000,Powiat olkuski,2030,prognoza,80plus,6536,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212313000,Powiat oświęcimski,2030,prognoza,80plus,8597,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212318000,Powiat wadowicki,2030,prognoza,80plus,7632,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212402000,Powiat brzeski,2030,prognoza,80plus,4437,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212404000,Powiat dąbrowski,2030,prognoza,80plus,2800,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212416000,Powiat tarnowski,2030,prognoza,80plus,9328,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212463000,Powiat m. Tarnów,2030,prognoza,80plus,7177,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216911000,Powiat nowotarski,2030,prognoza,80plus,9040,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216915000,Powiat suski,2030,prognoza,80plus,4098,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216917000,Powiat tatrzański,2030,prognoza,80plus,3418,1722532,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212001000,Powiat bocheński,2035,prognoza,80plus,6458,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212006000,Powiat krakowski,2035,prognoza,80plus,18239,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212008000,Powiat miechowski,2035,prognoza,80plus,3941,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212009000,Powiat myślenicki,2035,prognoza,80plus,7207,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212014000,Powiat proszowicki,2035,prognoza,80plus,3007,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212019000,Powiat wielicki,2035,prognoza,80plus,8137,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212161000,Powiat m. Kraków,2035,prognoza,80plus,55411,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212205000,Powiat gorlicki,2035,prognoza,80plus,6840,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212207000,Powiat limanowski,2035,prognoza,80plus,6503,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212210000,Powiat nowosądecki,2035,prognoza,80plus,10623,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2035,prognoza,80plus,5803,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212303000,Powiat chrzanowski,2035,prognoza,80plus,9210,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212312000,Powiat olkuski,2035,prognoza,80plus,8315,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212313000,Powiat oświęcimski,2035,prognoza,80plus,10510,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212318000,Powiat wadowicki,2035,prognoza,80plus,9691,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212402000,Powiat brzeski,2035,prognoza,80plus,5506,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212404000,Powiat dąbrowski,2035,prognoza,80plus,3397,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212416000,Powiat tarnowski,2035,prognoza,80plus,11312,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212463000,Powiat m. Tarnów,2035,prognoza,80plus,8563,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216911000,Powiat nowotarski,2035,prognoza,80plus,10834,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216915000,Powiat suski,2035,prognoza,80plus,5132,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216917000,Powiat tatrzański,2035,prognoza,80plus,4177,1722577,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212001000,Powiat bocheński,2040,prognoza,80plus,7482,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212006000,Powiat krakowski,2040,prognoza,80plus,21602,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212008000,Powiat miechowski,2040,prognoza,80plus,4319,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212009000,Powiat myślenicki,2040,prognoza,80plus,8853,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212014000,Powiat proszowicki,2040,prognoza,80plus,3435,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212019000,Powiat wielicki,2040,prognoza,80plus,9725,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212161000,Powiat m. Kraków,2040,prognoza,80plus,58575,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212205000,Powiat gorlicki,2040,prognoza,80plus,8048,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212207000,Powiat limanowski,2040,prognoza,80plus,7881,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212210000,Powiat nowosądecki,2040,prognoza,80plus,13013,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212262000,Powiat m. Nowy Sącz,2040,prognoza,80plus,6579,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212303000,Powiat chrzanowski,2040,prognoza,80plus,10740,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212312000,Powiat olkuski,2040,prognoza,80plus,9381,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212313000,Powiat oświęcimski,2040,prognoza,80plus,12260,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212318000,Powiat wadowicki,2040,prognoza,80plus,11556,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212402000,Powiat brzeski,2040,prognoza,80plus,6352,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212404000,Powiat dąbrowski,2040,prognoza,80plus,3997,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212416000,Powiat tarnowski,2040,prognoza,80plus,13541,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011212463000,Powiat m. Tarnów,2040,prognoza,80plus,9392,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216911000,Powiat nowotarski,2040,prognoza,80plus,12450,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216915000,Powiat suski,2040,prognoza,80plus,6012,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10
+011216917000,Powiat tatrzański,2040,prognoza,80plus,4764,1722622,https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/4359,2026-05-10

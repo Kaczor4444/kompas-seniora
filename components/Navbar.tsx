@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Search, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Heart } from 'lucide-react';
+import { Search, BookOpen, Menu, X, ChevronDown, Mail, ChevronRight, Heart, BarChart2 } from 'lucide-react';
 import QuestionnaireIcon from './icons/QuestionnaireIcon';
 import AccountingCalculatorIcon from './icons/AccountingCalculatorIcon';
 import { getFavoritesCount } from '@/src/utils/favorites';
@@ -319,6 +319,10 @@ export default function Navbar() {
                 <NavLink isHighContrast={isHighContrast} icon={<Heart size={18} />} text="Ulubione" badge={favoritesCount > 0 ? favoritesCount.toString() : undefined} isActive={isActive('/ulubione')} />
               </Link>
 
+              <Link href="/raport">
+                <NavLink isHighContrast={isHighContrast} icon={<BarChart2 size={18} />} text="Raport" isActive={isActive('/raport')} />
+              </Link>
+
               <div
                 className="relative h-full flex items-center"
                 onMouseEnter={() => setIsGuidesHovered(true)}
@@ -446,6 +450,10 @@ export default function Navbar() {
                 className="w-full block"
               >
                 <MobileNavLink isHighContrast={isHighContrast} icon={<Heart size={20} />} text="Ulubione" badge={favoritesCount > 0 ? favoritesCount.toString() : undefined} isActive={isActive('/ulubione')} />
+              </Link>
+
+              <Link href="/raport" onClick={() => setIsOpen(false)} className="w-full block">
+                <MobileNavLink isHighContrast={isHighContrast} icon={<BarChart2 size={20} />} text="Raport" isActive={isActive('/raport')} />
               </Link>
 
               {/* Poradniki - główny link */}
