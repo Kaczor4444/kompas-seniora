@@ -2,8 +2,8 @@ name: Monitor wolnych miejsc DPS — Małopolska
 
 on:
   schedule:
-    # 1. i 15. każdego miesiąca o 9:00 UTC
-    - cron: '0 9 1,15 * *'
+    # 1. i 15. każdego miesiąca o 8:00 czasu polskiego (6:00 UTC latem / 7:00 UTC zimą)
+    - cron: '0 6 1,15 * *'
   workflow_dispatch:
     inputs:
       force:
