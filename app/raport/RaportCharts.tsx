@@ -7,6 +7,7 @@ import {
   LineChart, Line, CartesianGrid, ReferenceLine, Cell,
 } from 'recharts'
 import type { PowiatRow, EmeryRow } from './page'
+import RaportMap from './RaportMap'
 
 type Props = {
   powiaty:   (PowiatRow & { powiat: string })[]
@@ -174,6 +175,35 @@ export default function RaportCharts({ powiaty, emerytury }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 space-y-6">
+
+      {/* Mapa choropletyczna */}
+      <ChartSection
+        delay={0}
+        insight="Kolor mapy pokazuje dostępność DPS — czerwony oznacza krytyczny deficyt miejsc względem liczby seniorów 80+."
+      >
+        <h2 className="text-xl font-bold text-slate-900 mb-1">Mapa dostępności DPS — Małopolska</h2>
+        <p className="text-sm text-slate-500 mb-5">
+          Miejsca DPS na 10 000 mieszkańców w wieku 80+. Najedź na powiat po szczegóły.
+        </p>
+
+        {/* Legenda */}
+        <div className="flex flex-wrap gap-3 text-xs text-slate-500 mb-5">
+          {[
+            { color: '#ef4444', label: 'Krytyczny (<250)' },
+            { color: '#f97316', label: 'Niedobór (250–400)' },
+            { color: '#eab308', label: 'Umiarkowany (400–600)' },
+            { color: '#84cc16', label: 'Dobry (600–900)' },
+            { color: '#10b981', label: 'Bardzo dobry (>900)' },
+          ].map(({ color, label }) => (
+            <span key={label} className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: color }} />
+              {label}
+            </span>
+          ))}
+        </div>
+
+        <RaportMap powiaty={powiaty} />
+      </ChartSection>
 
       {/* Wykres 1: Dostępność per powiat */}
       <ChartSection
