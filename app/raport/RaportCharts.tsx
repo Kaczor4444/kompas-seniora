@@ -434,6 +434,9 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
         </ResponsiveContainer>
         <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
           Fioletowa linia przerywana = średnia Małopolska ({avgDost}/10k). Szary pasek = prognoza 2035 przy braku nowych inwestycji.
+          Ranking nie uwzględnia profilu placówek — DPS dla osób w podeszłym wieku, przewlekle chorych, z niepełnosprawnością intelektualną
+          czy zaburzeniami psychicznymi to różne typy opieki. Rodzina szukająca miejsca dla osoby z demencją
+          zobaczy inną mapę dostępności niż pokazuje ten wskaźnik.
         </p>
       </ChartSection>
 
@@ -505,7 +508,9 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
             </div>
             <p className="text-xs text-slate-400 mt-2">
               * m. Kraków korzysta częściowo z miejsc w powiecie krakowskim (DPS ponadlokalne) — realny deficyt metropolitalny jest niższy.
-              Cel 556/10k = utrzymanie obecnej średniej regionalnej, nie osiągnięcie standardów OECD.
+              Cel 556/10k = utrzymanie <em>obecnej średniej regionalnej</em> — nie jest to norma WHO, standard OECD ani wskaźnik oparty
+              na faktycznych potrzebach zdrowotnych. Sama obecna średnia może być niewystarczająca. Liczba 3 135 nowych miejsc
+              to scenariusz poglądowy, nie kosztorys inwestycyjny.
             </p>
           </ChartSection>
         )

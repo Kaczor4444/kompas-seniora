@@ -334,13 +334,17 @@ export default function RaportPage() {
           {/* Benchmark międzynarodowy */}
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-sm text-slate-700 mb-6">
             <div className="font-semibold text-emerald-800 mb-2">📊 Kontekst: Polska na tle OECD i Eurostatu</div>
-            <p className="text-slate-600 leading-relaxed">
+            <p className="text-slate-600 leading-relaxed mb-2">
               Według danych Eurostatu (hlth_rs_bdsns, 2022) Polska ma <strong>214 łóżek opieki długoterminowej na 100 tys. mieszkańców</strong> —
               wobec 1 420 w Holandii, ~600 w Niemczech i mediany UE ~500.
               Wg OECD Health Statistics przeciętna krajów OECD to ok. 50 miejsc / 1 000 seniorów w wieku 65+;
               Polska osiąga ok. 12 — czterokrotnie poniżej średniej.
-              Małopolska (556 miejsc / 10 tys. seniorów 80+) dotyczy węższej grupy wiekowej, więc wskaźniki nie są bezpośrednio porównywalne,
-              ale kierunek jest zgodny: Polska należy do krajów o najniższej instytucjonalnej dostępności opieki w UE.
+            </p>
+            <p className="text-amber-700 text-xs bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              <strong>Uwaga metodologiczna:</strong> porównania nie są bezpośrednio równoważne — wskaźniki Eurostatu, OECD i niniejszego raportu
+              używają różnych mianowników (wszyscy mieszkańcy / seniorzy 65+ / seniorzy 80+) i różnych definicji opieki długoterminowej.
+              Dane traktować jako <em>ilustrację kierunku</em>, nie jako precyzyjne zestawienie. Polska konsekwentnie plasuje się
+              w dolnej ćwiartce krajów UE niezależnie od zastosowanego wskaźnika.
             </p>
             <p className="text-xs text-slate-400 mt-2">
               Źródła: Eurostat hlth_rs_bdsns; OECD Health Statistics 2024; Raport BGK i KIDO (2024) — deficyt 124 tys. miejsc do 2040 r.
