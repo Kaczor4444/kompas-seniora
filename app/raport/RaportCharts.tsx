@@ -6,14 +6,15 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   LineChart, Line, CartesianGrid, ReferenceLine, Cell,
 } from 'recharts'
-import type { PowiatRow, EmeryRow, CenaDpsRow } from './page'
+import type { PowiatRow, EmeryRow, CenaDpsRow, WojRow } from './page'
 import RaportMap, { COLOR_SCALE, getColorForValue } from './RaportMap'
 
 type Props = {
-  powiaty:   (PowiatRow & { powiat: string })[]
-  emerytury: EmeryRow[]
-  avgDost:   number
-  cenaDps:   CenaDpsRow[]
+  powiaty:      (PowiatRow & { powiat: string })[]
+  emerytury:    EmeryRow[]
+  avgDost:      number
+  cenaDps:      CenaDpsRow[]
+  wojewodztwa:  WojRow[]
 }
 
 const fmt = (n: number) => n.toLocaleString('pl-PL')
@@ -91,6 +92,33 @@ function TooltipLuka({ active, payload }: { active?: boolean; payload?: Array<{ 
 }
 
 type ScenariuszRow = PowiatRow & { deficit: number; cost_mln: number; isOutlier: boolean }
+
+function TooltipWoj({ active, payload }: { active?: boolean; payload?: Array<{ payload: WojRow }> }) {
+  if (!active || !payload?.length) return null
+  const d = payload[0].payload
+  const isMalopolska = d.wojewodztwo.toLowerCase().includes('małopol')
+  return (
+    <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm min-w-[240px]">
+      <div className={`font-bold mb-2 text-base ${isMalopolska ? 'text-emerald-700' : 'text-slate-900'}`}>
+        {d.wojewodztwo}{isMalopolska ? ' ← nasz raport' : ''}
+      </div>
+      <div className="space-y-1.5 text-slate-600">
+        <div className="flex justify-between gap-4">
+          <span>Miejsca stacjonarne / 10k seniorów 80+</span>
+          <span className="font-bold text-slate-900">{fmt(d.wskaznik_10k)}</span>
+        </div>
+        <div className="border-t border-slate-100 pt-1.5 text-xs text-slate-500 space-y-0.5">
+          <div>Łącznie miejsca (GUS): {fmt(d.miejsca_stacjonarne)}</div>
+          <div>Liczba DPS: {d.liczba_dps}</div>
+          <div>Seniorów 80+: {fmt(d.pop_80plus)}</div>
+        </div>
+      </div>
+      <p className="text-xs text-amber-600 mt-2 border-t border-slate-100 pt-2">
+        GUS liczy DPS + ŚDS + inne stacjonarne — nie tylko DPS
+      </p>
+    </div>
+  )
+}
 
 function TooltipScenariusz({ active, payload }: { active?: boolean; payload?: Array<{ payload: ScenariuszRow }> }) {
   if (!active || !payload?.length) return null
@@ -258,7 +286,7 @@ function LegendaKolorow({ extra }: { extra?: React.ReactNode }) {
 
 // ── Główny komponent ─────────────────────────────────────────────────────────
 
-export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: Props) {
+export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps, wojewodztwa }: Props) {
   const [mapYear, setMapYear] = useState<'2024' | '2035'>('2024')
 
   // Outlierzy wykluczeni z analiz porównawczych
@@ -439,6 +467,51 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
           zobaczy inną mapę dostępności niż pokazuje ten wskaźnik.
         </p>
       </ChartSection>
+
+      {/* Wykres: Małopolska na tle Polski */}
+      {(() => {
+        const avgWoj = Math.round(wojewodztwa.reduce((s, r) => s + r.wskaznik_10k, 0) / wojewodztwa.length)
+        const rankMalopolska = wojewodztwa.findIndex(r => r.wojewodztwo.toLowerCase().includes('małopol')) + 1
+        return (
+          <ChartSection
+            delay={0.11}
+            insight={`Małopolska zajmuje ${rankMalopolska}. miejsce z 16 województw pod względem dostępności stacjonarnej pomocy społecznej (${wojewodztwa.find(r => r.wojewodztwo.toLowerCase().includes('małopol'))?.wskaznik_10k}/10k seniorów 80+). Uwaga: GUS liczy DPS + ŚDS i inne typy — wskaźnik jest wyższy niż w tym raporcie.`}
+          >
+            <h2 className="text-xl font-bold text-slate-900 mb-1">Małopolska na tle Polski — 2024</h2>
+            <p className="text-sm text-slate-500 mb-1">
+              Miejsca w stacjonarnych zakładach pomocy społecznej na 10 000 mieszkańców w wieku 80+. Źródło: GUS BDL 2024.
+            </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 text-xs text-amber-800 mb-4">
+              <strong>Uwaga:</strong> GUS wlicza DPS, ŚDS, noclegownie i inne typy stacjonarne — szerszy zakres niż ten raport (tylko DPS).
+              Wskaźnik dla Małopolski wg GUS: <strong>{wojewodztwa.find(r => r.wojewodztwo.toLowerCase().includes('małopol'))?.wskaznik_10k}/10k</strong>,
+              wg tego raportu (DPS only): <strong>556/10k</strong>. Porównanie dotyczy tego samego wskaźnika GUS dla wszystkich województw.
+            </div>
+            <ResponsiveContainer width="100%" height={380}>
+              <BarChart data={wojewodztwa} layout="vertical" margin={{ left: 130, right: 40, top: 4, bottom: 4 }}>
+                <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }}
+                  tickFormatter={v => `${v}/10k`} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="wojewodztwo" tick={{ fontSize: 11, fill: '#64748b' }}
+                  width={128} axisLine={false} tickLine={false} />
+                <Tooltip content={<TooltipWoj />} cursor={{ fill: '#f8fafc' }} />
+                <ReferenceLine x={avgWoj} stroke="#6366f1" strokeDasharray="4 4" strokeWidth={1.5}
+                  label={{ value: `śr. Polska ${avgWoj}`, position: 'top', fontSize: 10, fill: '#6366f1' }} />
+                <Bar dataKey="wskaznik_10k" name="Miejsca / 10k seniorów 80+" radius={[0, 4, 4, 0]} maxBarSize={16}>
+                  {wojewodztwa.map(r => (
+                    <Cell
+                      key={r.wojewodztwo}
+                      fill={r.wojewodztwo.toLowerCase().includes('małopol') ? '#10b981' : '#94a3b8'}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
+              Dane GUS BDL, zmienna 10412 (miejsca łącznie z filiami), populacja 80+ = zmienne 76024+76025. Stan: 2024.
+              Fioletowa linia = średnia Polska ({avgWoj}/10k).
+            </p>
+          </ChartSection>
+        )
+      })()}
 
       {/* Wykres: Scenariusz inwestycyjny */}
       {(() => {

@@ -54,6 +54,27 @@ export type CenaDpsRow = {
   emerytura:    number | null
 }
 
+export type WojRow = {
+  wojewodztwo:          string
+  miejsca_stacjonarne:  number
+  liczba_dps:           number
+  pop_80plus:           number
+  wskaznik_10k:         number
+}
+
+function loadWojewodztwa(): WojRow[] {
+  const file = path.join(process.cwd(), 'data', 'gus_stacjonarne_wojewodztwa.csv')
+  const content = fs.readFileSync(file, 'utf-8')
+  const { data } = parse(content, { header: true, skipEmptyLines: true })
+  return (data as Record<string, string>[]).map(r => ({
+    wojewodztwo:         r.wojewodztwo,
+    miejsca_stacjonarne: Number(r.miejsca_stacjonarne),
+    liczba_dps:          Number(r.liczba_dps),
+    pop_80plus:          Number(r.pop_80plus),
+    wskaznik_10k:        Number(r.wskaznik_10k),
+  }))
+}
+
 function loadSaturation(): PowiatRow[] {
   const file = path.join(process.cwd(), 'data', 'wskaznik_nasycenia_malopolska.csv')
   const content = fs.readFileSync(file, 'utf-8')
@@ -128,9 +149,10 @@ function formatPowiat(s: string) {
 }
 
 export default function RaportPage() {
-  const powiaty   = loadSaturation()
-  const emerytury = loadEmerytury()
-  const cenaDps   = loadCenaDps()
+  const powiaty      = loadSaturation()
+  const emerytury    = loadEmerytury()
+  const cenaDps      = loadCenaDps()
+  const wojewodztwa  = loadWojewodztwa()
 
   const emerytura2025 = emerytury.find(e => e.rok === 2025)?.wartosc_zl ?? 0
   const totalMiejsc = powiaty.reduce((s, r) => s + r.dps_miejsca, 0)
@@ -304,7 +326,7 @@ export default function RaportPage() {
       <div className="h-8 bg-gradient-to-b from-slate-900 to-slate-50" />
 
       {/* Wykresy (Client Component) */}
-      <RaportCharts powiaty={powiatyForChart} emerytury={emerytury} avgDost={avgDost} cenaDps={cenaDps} />
+      <RaportCharts powiaty={powiatyForChart} emerytury={emerytury} avgDost={avgDost} cenaDps={cenaDps} wojewodztwa={wojewodztwa} />
 
       {/* Metodologia */}
       <section className="bg-slate-100 border-t border-slate-200 mt-4">
