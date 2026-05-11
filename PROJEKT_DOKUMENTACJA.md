@@ -1,7 +1,31 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-05-08 (sesja #12 - Synchronizacja bazy DPS + Monitor PDF)
+> Ostatnia aktualizacja: 2026-05-11 (sesja #13 - Raport DPS v1 + punkt zwrotny projektu: kalkulator jako krok zero)
+
+---
+
+## 🎯 NOWY KIERUNEK PROJEKTU (2026-05-11)
+
+### Kluczowa obserwacja o ścieżce użytkownika
+
+Szukający DPS widzi cenę "7 500 zł/mies" i myśli **"za drogo"** → wychodzi. Nie wie że:
+- Senior płaci **max 70% dochodu** (art. 61 ups) = np. ~2 450 zł przy emeryturze 3 500 zł
+- Reszta to problem gminy/rodziny (zależy od sytuacji)
+- Dopiero pytanie "ile MY musimy dołożyć?" jest właściwe
+
+**Problem:** `koszt utrzymania MUW ≠ cena którą płaci rodzina`
+
+**Co to zmienia:** Kalkulator (już istniejący na `/kalkulator`) powinien być **krokiem zero** w ścieżce użytkownika — nie zakopany osobno, ale wbudowany w wyniki wyszukiwania i karty placówek.
+
+**Żaden konkurent w Polsce nie ma kalkulatora DPS.** To nasza przewaga.
+
+### Do implementacji w następnej sesji:
+- [ ] Mini-kalkulator na karcie każdej placówki z ceną: "wpisz emeryturę → zobaczysz swoją dopłatę"
+- [ ] Kalkulator jako pierwszy krok przed wynikami wyszukiwania (lub nad nimi)
+- [ ] Logika: `emerytura × 70% = wkład seniora; koszt DPS - wkład seniora = dopłata rodziny/gminy`
+
+**Tag git:** `v1-raport-metodologia` — stan przed redesignem kalkulatora (można wrócić przez `git checkout v1-raport-metodologia`)
 
 ---
 
@@ -865,6 +889,7 @@ Chroniony przez:
 - Strony placówek
 - Ulubione + notatki + oceny + porównanie + sharing
 - Kalkulator 70/30 z MOPS contact + tracking zdarzeń
+- **Raport `/raport`** — analiza dostępności DPS Małopolska 2026 (9 wykresów, mapa, tabela, print CSS, PDF)
 - Asystent (Doradca) 4-krokowy + tracking zdarzeń
 - Panel dostępności (12 opcji)
 - Artykuły MDX (5 kategorii)
@@ -921,6 +946,37 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 ---
 
 ## 16. HISTORIA ZMIAN (changelog sesji)
+
+### Sesja #13 — 2026-05-11
+
+**Temat:** Raport dostępności DPS v1 — poprawki metodologiczne + punkt zwrotny projektu.
+
+**Tag git:** `v1-raport-metodologia` (commit `96a5102` → `dc97b26`)
+
+**Nowe funkcje:**
+- Strona `/raport` — kompletny raport z 9 wykresami, mapą, tabelą
+- Scenariusz inwestycyjny: 17 powiatów, ~3 135 nowych miejsc, ~1,25–2,8 mld zł
+- Ranking 16 województw (GUS BDL zmienna 10412 + populacja 80+)
+- `@media print` CSS — wykresy nie rozdzielane, tabela pełna, Framer Motion opacity fix
+- Puppeteer PDF generator (`/tmp/generate-pdf.js`)
+
+**Poprawki metodologiczne (odpowiedź na 4 recenzje AI):**
+- KPI 4: "Luka 63k" → "132% emerytury" (brutto/netto)
+- Emerytura netto ~87% jako linia przerywana na wykresach
+- Benchmark OECD z disclaimerem metodologicznym
+- KRUS w powiatach wiejskich — emerytury 30–40% niższe
+- Mediana vs średnia — profesjonalne wyjaśnienie w metodologii
+- Callout: "Raport pokazuje rozmieszczenie infrastruktury — nie mierzy zapotrzebowania"
+- Sekcja "Czy więcej DPS to jedyne rozwiązanie?" (deinstytucjonalizacja, RPDI)
+- 98,3% obłożenie DPS (kwiecień 2026), % emerytury per powiat w tabeli
+
+**Nowe dane:**
+- `data/gus_stacjonarne_wojewodztwa.csv` — 16 województw, miejsca/10k seniorów 80+
+- Wolne miejsca MUW: 5 snapshotów 2023–2026 w `raw_dane/wolne miejsca w dps/`
+
+**Punkt zwrotny:** Decyzja o redesignie ścieżki użytkownika — kalkulator jako krok zero. Szczegóły: sekcja "🎯 NOWY KIERUNEK" powyżej.
+
+---
 
 ### Sesja #9 — 2026-03-17
 
