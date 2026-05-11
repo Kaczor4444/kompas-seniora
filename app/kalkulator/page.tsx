@@ -196,6 +196,11 @@ function KalkulatorContent() {
   const [selectedPowiat, setSelectedPowiat] = useState<string | null>(null);
   const [showAllFacilities, setShowAllFacilities] = useState(false);
 
+  // Family obligation checker state
+  const [showFamilyCalc, setShowFamilyCalc] = useState(false);
+  const [familyIncome, setFamilyIncome] = useState('');
+  const [familyPersons, setFamilyPersons] = useState('1');
+
   // Favorites & comparison state
   const [savedIds, setSavedIds] = useState<number[]>([]);
   const [compareIds, setCompareIds] = useState<number[]>([]);
@@ -251,9 +256,14 @@ function KalkulatorContent() {
     );
   };
 
-  // Legal thresholds (300% kryterium dochodowego)
-  const THRESHOLD_SINGLE = 2328;
-  const THRESHOLD_FAMILY = 1800;
+  // Legal thresholds (300% kryterium dochodowego, 2026)
+  const THRESHOLD_SINGLE = 3030;   // 300% × 1010 zł (osoba samotna)
+  const THRESHOLD_FAMILY = 2469;   // 300% × 823 zł (na osobę w rodzinie)
+
+  const checkFamilyObligation = (inc: number, persons: number) => {
+    const threshold = persons === 1 ? THRESHOLD_SINGLE : THRESHOLD_FAMILY * persons;
+    return { isExempt: inc <= threshold, threshold };
+  };
 
   // Validation
   const validateInputs = (): string | null => {
@@ -702,6 +712,172 @@ function KalkulatorContent() {
                   Symulacja wg ustawy o pomocy społecznej. MOPS rozpatruje każdą sprawę indywidualnie — nie jest to decyzja administracyjna.
                 </p>
               </section>
+
+              {/* ── Who covers the gap? ── */}
+              {result.facilitiesWithPrices.length > 0 && (() => {
+                const cheapest = [...result.facilitiesWithPrices].sort((a, b) => a.koszt_pobytu! - b.koszt_pobytu!)[0];
+                const gap = cheapest.koszt_pobytu! - result.maxContribution;
+                const familyIncNum = parseFloat(familyIncome);
+                const familyPerNum = parseInt(familyPersons);
+                const familyCheck = familyIncNum > 0 ? checkFamilyObligation(familyIncNum, familyPerNum) : null;
+
+                return (
+                  <section>
+                    <div className="flex items-center gap-4 mb-8">
+                      <span className="px-4 py-1.5 bg-blue-100 rounded-full text-[11px] font-black text-blue-700 uppercase tracking-widest">Kto płaci różnicę</span>
+                      <div className="h-px flex-1 bg-stone-200" />
+                    </div>
+
+                    {gap <= 0 ? (
+                      <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-200 flex items-center gap-4">
+                        <CheckCircle2 className="text-emerald-600 flex-shrink-0" size={28} />
+                        <div>
+                          <p className="font-black text-emerald-900 text-lg">Senior pokrywa koszt w całości</p>
+                          <p className="text-emerald-700 text-sm mt-1">
+                            Przy dochodzie {formatCurrency(result.income)} emerytura wystarczy na najtańszy DPS w okolicy ({formatCurrency(cheapest.koszt_pobytu!)}/mc). Gmina ani rodzina nie muszą dopłacać.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Gap visualization */}
+                        <div className="bg-white border border-stone-200 rounded-2xl p-8 mb-6">
+                          <p className="text-slate-600 text-sm mb-5">
+                            Najtańszy DPS w okolicy kosztuje <strong className="text-slate-900">{formatCurrency(cheapest.koszt_pobytu!)}</strong>/mc.
+                            Senior (70% emerytury) pokrywa <strong className="text-emerald-700">{formatCurrency(result.maxContribution)}</strong>.
+                            Brakuje <strong className="text-rose-600">{formatCurrency(gap)}</strong>.
+                          </p>
+                          <div className="w-full h-10 rounded-xl overflow-hidden flex text-[11px] font-black uppercase tracking-wider">
+                            <div
+                              className="bg-emerald-600 text-white flex items-center justify-center"
+                              style={{ width: `${(result.maxContribution / cheapest.koszt_pobytu!) * 100}%` }}
+                            >
+                              Senior
+                            </div>
+                            <div
+                              className="bg-amber-400 text-slate-900 flex items-center justify-center"
+                              style={{ width: `${(gap / cheapest.koszt_pobytu!) * 100}%` }}
+                            >
+                              Rodzina / Gmina
+                            </div>
+                          </div>
+                          <div className="flex justify-between text-xs text-slate-400 mt-2">
+                            <span>{formatCurrency(result.maxContribution)}</span>
+                            <span>{formatCurrency(gap)}</span>
+                          </div>
+                        </div>
+
+                        {/* Who pays explanation */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                          <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Gmina (zawsze)</p>
+                            <p className="text-sm text-slate-700 leading-relaxed">
+                              Gmina jest <strong>ostatecznym gwarantem</strong> — pokrywa całą resztę, której nie może zapłacić ani senior, ani rodzina (art. 61 ust. 2 ups).
+                            </p>
+                          </div>
+                          <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Rodzina (warunkowo)</p>
+                            <p className="text-sm text-slate-700 leading-relaxed">
+                              Małżonek, dzieci i wnuki są zobowiązani <strong>tylko jeśli ich dochód przekracza</strong> 300% kryterium. Poniżej progu — <strong>są zwolnieni</strong>.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Optional family income checker */}
+                        <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 mb-6">
+                          <button
+                            onClick={() => setShowFamilyCalc(prev => !prev)}
+                            className="w-full flex items-center justify-between gap-3 text-left"
+                          >
+                            <div>
+                              <p className="font-black text-slate-900 text-sm">Sprawdź czy rodzina musi dopłacać</p>
+                              <p className="text-xs text-slate-500 mt-0.5">Podaj łączny dochód rodziny — sprawdzimy próg ustawowy</p>
+                            </div>
+                            <ChevronRight className={`text-slate-400 transition-transform flex-shrink-0 ${showFamilyCalc ? 'rotate-90' : ''}`} size={18} />
+                          </button>
+
+                          {showFamilyCalc && (
+                            <div className="mt-5 pt-5 border-t border-slate-100">
+                              <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Łączny dochód rodziny</label>
+                                  <div className="relative">
+                                    <input
+                                      type="number"
+                                      value={familyIncome}
+                                      onChange={(e) => setFamilyIncome(e.target.value)}
+                                      placeholder="np. 6000"
+                                      min="0"
+                                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-xl font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all"
+                                    />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">PLN</span>
+                                  </div>
+                                  <p className="text-xs text-slate-400 mt-1">Netto miesięcznie (łącznie wszystkich)</p>
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Osób w rodzinie</label>
+                                  <select
+                                    value={familyPersons}
+                                    onChange={(e) => setFamilyPersons(e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-xl font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all"
+                                  >
+                                    {[1,2,3,4,5].map(n => (
+                                      <option key={n} value={n}>{n} {n === 1 ? 'osoba' : n < 5 ? 'osoby' : 'osób'}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+
+                              {familyCheck && (
+                                <div className={`rounded-xl p-4 border ${familyCheck.isExempt ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+                                  <div className="flex items-start gap-3">
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${familyCheck.isExempt ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                      {familyCheck.isExempt ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                                    </div>
+                                    <div>
+                                      {familyCheck.isExempt ? (
+                                        <>
+                                          <p className="font-black text-emerald-900 text-sm">Rodzina jest zwolniona z dopłaty</p>
+                                          <p className="text-xs text-emerald-700 mt-1">
+                                            Dochód {formatCurrency(familyIncNum)} jest poniżej ustawowego progu {formatCurrency(familyCheck.threshold)} dla {familyPerNum === 1 ? 'singla' : `${familyPerNum} osób`}. Gmina pokryje całą różnicę.
+                                          </p>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <p className="font-black text-amber-900 text-sm">Rodzina może być zobowiązana do dopłaty</p>
+                                          <p className="text-xs text-amber-800 mt-1">
+                                            Dochód {formatCurrency(familyIncNum)} przekracza próg {formatCurrency(familyCheck.threshold)}. MOPS ustala kwotę indywidualnie — masz prawo wnioskować o obniżkę (art. 64 ups: choroba, bezrobocie, niepełnosprawność).
+                                          </p>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Key legal facts */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="flex items-start gap-2 p-3 bg-stone-50 rounded-xl border border-stone-100">
+                            <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-xs text-slate-600"><strong>Rodzeństwo</strong> nie jest zobowiązane — zamknięty katalog art. 61 ups</p>
+                          </div>
+                          <div className="flex items-start gap-2 p-3 bg-stone-50 rounded-xl border border-stone-100">
+                            <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-xs text-slate-600"><strong>Nieruchomości</strong> nie są liczone — tylko bieżący dochód</p>
+                          </div>
+                          <div className="flex items-start gap-2 p-3 bg-stone-50 rounded-xl border border-stone-100">
+                            <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-xs text-slate-600"><strong>Art. 64</strong> — zwolnienie przy chorobie, bezrobociu, niepełnosprawności</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </section>
+                );
+              })()}
 
               {/* ── Legal thresholds ── */}
               <section className="bg-slate-800 rounded-2xl p-8 lg:p-10 text-white">
