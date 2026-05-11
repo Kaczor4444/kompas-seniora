@@ -323,6 +323,7 @@ export default function RaportPage() {
               <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>Przeciętna emerytura ZUS brutto w Małopolsce w 2025 r.: <strong>4 085 zł</strong> — wzrost o 23% od 2023 r. Źródło: GUS BDL P2860.</li>
               <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>W 8 z 22 powiatów Małopolski wskaźnik dostępności DPS wynosi poniżej 400 miejsc / 10 tys. seniorów 80+ (kategoria „niedobór"). Źródło: obliczenia własne na danych MUW + GUS.</li>
               <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>Polska ma ok. 214 łóżek opieki długoterminowej / 100 tys. mieszkańców — wobec mediany UE ~500 (Eurostat 2022). Źródło: Eurostat hlth_rs_bdsns.</li>
+              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>W kwietniu 2026 r. w Małopolsce wolnych było <strong>101 z 6 013 miejsc DPS</strong> (obłożenie ~98,3%) — 167 osób oczekiwało na umieszczenie. Źródło: Rejestr wolnych miejsc MUW Małopolska, 30.04.2026.</li>
             </ul>
             <p className="text-xs text-slate-500 mt-3">Dane do weryfikacji dostępne w CSV poniżej. Metodologia i zastrzeżenia — sekcja poniżej.</p>
           </div>
@@ -429,6 +430,29 @@ export default function RaportPage() {
             </ul>
           </div>
 
+          <div className="bg-white rounded-xl p-5 border border-slate-200 text-sm text-slate-600 mb-4">
+            <div className="font-semibold text-slate-700 mb-2">Skala kolorystyczna wskaźnika dostępności</div>
+            <p className="text-slate-500 text-xs mb-2">
+              Progi nie są normami prawnymi ani standardami OECD/WHO — odzwierciedlają rozkład wskaźnika w 22 powiatach Małopolski.
+              Wartość referencyjna to obecna średnia regionalna: <strong>556 miejsc / 10 tys. seniorów 80+</strong>.
+            </p>
+            <div className="flex flex-wrap gap-3 text-xs">
+              {[
+                { color: '#dc2626', label: 'Krytyczny', range: '< 250', desc: 'poniżej 45% średniej' },
+                { color: '#f97316', label: 'Niedobór', range: '250–400', desc: '45–72% średniej' },
+                { color: '#f59e0b', label: 'Umiarkowany', range: '400–600', desc: 'ok. średniej ±10%' },
+                { color: '#22c55e', label: 'Dobry', range: '600–900', desc: '108–162% średniej' },
+                { color: '#10b981', label: 'Bardzo dobry', range: '> 900', desc: 'powyżej 162% średniej' },
+              ].map(({ color, label, range, desc }) => (
+                <div key={label} className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: color }} />
+                  <span className="font-medium text-slate-700">{label}</span>
+                  <span className="text-slate-400">{range} ({desc})</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <p className="text-xs text-slate-400">
             Dane pobrano: maj 2026. Kompas Seniora nie ponosi odpowiedzialności za decyzje
             podjęte wyłącznie na podstawie tych danych. Przed wyborem placówki zalecamy
@@ -452,6 +476,7 @@ export default function RaportPage() {
                   <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Dost. 2024</th>
                   <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Dost. 2035*</th>
                   <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Med. cena DPS</th>
+                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">% emerytury</th>
                   <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">N cen</th>
                 </tr>
               </thead>
@@ -469,6 +494,18 @@ export default function RaportPage() {
                     <td className={`px-4 py-2.5 text-right ${r.cena_dps_mediana && (r.n_placowek_z_cena ?? 0) < 3 ? 'text-amber-600' : 'text-slate-600'}`}>
                       {r.cena_dps_mediana
                         ? `${r.cena_dps_mediana.toLocaleString('pl-PL')} zł${(r.n_placowek_z_cena ?? 0) === 1 ? ' (jedyna)' : ''}`
+                        : '—'
+                      }
+                    </td>
+                    <td className={`px-4 py-2.5 text-right font-medium ${
+                      r.cena_dps_mediana
+                        ? r.cena_dps_mediana / r.emerytura_malopolska > 1.5 ? 'text-red-600'
+                        : r.cena_dps_mediana / r.emerytura_malopolska > 1.2 ? 'text-orange-500'
+                        : 'text-slate-600'
+                        : 'text-slate-400'
+                    }`}>
+                      {r.cena_dps_mediana
+                        ? `${Math.round(r.cena_dps_mediana / r.emerytura_malopolska * 100)}%`
                         : '—'
                       }
                     </td>
