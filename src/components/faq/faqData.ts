@@ -97,7 +97,7 @@ export const allFAQData: FAQItem[] = [
   {
     id: 'czas-oczekiwania',
     question: 'Jak długo trwa oczekiwanie na miejsce w DPS?',
-    answer: 'Czas oczekiwania jest różny i zależy od **dostępności wolnych miejsc** oraz pilności przypadku. Może trwać od kilku tygodni do kilku miesięcy — w Małopolsce w 2026 r. na liście oczekujących jest ok. 167 osób przy 101 wolnych miejscach. W nagłych sytuacjach zdrowotnych czas może zostać skrócony.',
+    answer: 'Czas oczekiwania jest różny i zależy od **dostępności wolnych miejsc** oraz pilności przypadku. W Małopolsce jest łącznie **6 013 miejsc** w publicznych DPS — stan na 30 kwietnia 2026 r.: **101 wolnych miejsc** przy 167 osobach na liście oczekujących. Dane aktualizujemy co miesiąc, ale sytuacja zmienia się szybko — **warto dzwonić bezpośrednio do placówki**, bo wolne miejsce może pojawić się w każdej chwili. W nagłych sytuacjach zdrowotnych MOPS może przyspieszyć procedurę.',
     category: 'formalnosci'
   },
   {
