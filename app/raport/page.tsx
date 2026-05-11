@@ -48,6 +48,12 @@ export type EmeryRow = {
   wartosc_zl: number
 }
 
+export type CenaDpsRow = {
+  rok:          number
+  min_cena_dps: number | null
+  emerytura:    number | null
+}
+
 function loadSaturation(): PowiatRow[] {
   const file = path.join(process.cwd(), 'data', 'wskaznik_nasycenia_malopolska.csv')
   const content = fs.readFileSync(file, 'utf-8')
@@ -71,6 +77,40 @@ function loadSaturation(): PowiatRow[] {
     .sort((a, b) => a.dostepnosc_2024 - b.dostepnosc_2024)
 }
 
+function loadCenaDps(): CenaDpsRow[] {
+  // Łączy min ceny DPS per rok z emeryturami — dla wykresu porównawczego
+  const cenyFile = path.join(process.cwd(), 'data', 'gus_min_cena_dps.csv')
+  const emeryFile = path.join(process.cwd(), 'data', 'gus_emerytury_wojewodztwa.csv')
+
+  const cenyCsv = parse(fs.readFileSync(cenyFile, 'utf-8'), { header: true, skipEmptyLines: true })
+  const emeryCsv = parse(fs.readFileSync(emeryFile, 'utf-8'), { header: true, skipEmptyLines: true })
+
+  const emeryByRok: Record<number, number> = {}
+  for (const r of emeryCsv.data as Record<string, string>[]) {
+    if (r.wojewodztwo?.includes('MAŁOPOL') && r.wskaznik === 'emerytura_zus') {
+      emeryByRok[Number(r.rok)] = Number(r.wartosc_zl)
+    }
+  }
+
+  const lata = new Set<number>()
+  const cenyByRok: Record<number, number> = {}
+  for (const r of cenyCsv.data as Record<string, string>[]) {
+    const rok = Number(r.rok)
+    lata.add(rok)
+    cenyByRok[rok] = Number(r.min_cena_dps)
+  }
+  Object.keys(emeryByRok).forEach(r => lata.add(Number(r)))
+
+  return [...lata]
+    .filter(rok => rok >= 2023)
+    .sort()
+    .map(rok => ({
+      rok,
+      min_cena_dps: cenyByRok[rok] ?? null,
+      emerytura:    emeryByRok[rok] ?? null,
+    }))
+}
+
 function loadEmerytury(): EmeryRow[] {
   const file = path.join(process.cwd(), 'data', 'gus_emerytury_wojewodztwa.csv')
   const content = fs.readFileSync(file, 'utf-8')
@@ -90,6 +130,7 @@ function formatPowiat(s: string) {
 export default function RaportPage() {
   const powiaty   = loadSaturation()
   const emerytury = loadEmerytury()
+  const cenaDps   = loadCenaDps()
 
   const emerytura2025 = emerytury.find(e => e.rok === 2025)?.wartosc_zl ?? 0
   const totalMiejsc = powiaty.reduce((s, r) => s + r.dps_miejsca, 0)
@@ -251,7 +292,7 @@ export default function RaportPage() {
       <div className="h-8 bg-gradient-to-b from-slate-900 to-slate-50" />
 
       {/* Wykresy (Client Component) */}
-      <RaportCharts powiaty={powiatyForChart} emerytury={emerytury} avgDost={avgDost} />
+      <RaportCharts powiaty={powiatyForChart} emerytury={emerytury} avgDost={avgDost} cenaDps={cenaDps} />
 
       {/* Metodologia */}
       <section className="bg-slate-100 border-t border-slate-200 mt-4">

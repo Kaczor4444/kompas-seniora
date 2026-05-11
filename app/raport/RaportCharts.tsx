@@ -6,13 +6,14 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   LineChart, Line, CartesianGrid, ReferenceLine, Cell,
 } from 'recharts'
-import type { PowiatRow, EmeryRow } from './page'
+import type { PowiatRow, EmeryRow, CenaDpsRow } from './page'
 import RaportMap, { COLOR_SCALE, getColorForValue } from './RaportMap'
 
 type Props = {
   powiaty:   (PowiatRow & { powiat: string })[]
   emerytury: EmeryRow[]
   avgDost:   number
+  cenaDps:   CenaDpsRow[]
 }
 
 const fmt = (n: number) => n.toLocaleString('pl-PL')
@@ -85,6 +86,48 @@ function TooltipLuka({ active, payload }: { active?: boolean; payload?: Array<{ 
   )
 }
 
+function TooltipCenaDps({ active, payload }: { active?: boolean; payload?: Array<{ payload: CenaDpsRow; dataKey: string; value: number; color: string }> }) {
+  if (!active || !payload?.length) return null
+  const rok = payload[0].payload.rok
+  const dps = payload[0].payload.min_cena_dps
+  const em  = payload[0].payload.emerytura
+  const luka = dps && em ? dps - em : null
+  return (
+    <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm min-w-[210px]">
+      <div className="font-bold text-slate-900 mb-2">{rok}</div>
+      <div className="space-y-1.5">
+        {dps && (
+          <div className="flex justify-between gap-4">
+            <span className="flex items-center gap-1.5 text-slate-600">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0" />Najtańszy DPS
+            </span>
+            <span className="font-bold text-slate-900">{fmt(dps)} zł</span>
+          </div>
+        )}
+        {em && (
+          <div className="flex justify-between gap-4">
+            <span className="flex items-center gap-1.5 text-slate-600">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" />Emerytura ZUS
+            </span>
+            <span className="font-bold text-slate-900">{fmt(Math.round(em))} zł</span>
+          </div>
+        )}
+        {luka && (
+          <div className="flex justify-between gap-4 border-t border-slate-100 pt-1.5 mt-1">
+            <span className="text-slate-500 text-xs">Luka</span>
+            <span className="font-bold text-red-600 text-xs">+{fmt(Math.round(luka))} zł/mies.</span>
+          </div>
+        )}
+        {!em && (
+          <div className="text-xs text-slate-400 border-t border-slate-100 pt-1.5 mt-1">
+            Dane GUS o emeryturach za {rok} jeszcze niedostępne
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function TooltipEmerytura({ active, payload }: { active?: boolean; payload?: Array<{ payload: EmeryRow }> }) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
@@ -140,7 +183,7 @@ function LegendaKolorow({ extra }: { extra?: React.ReactNode }) {
 
 // ── Główny komponent ─────────────────────────────────────────────────────────
 
-export default function RaportCharts({ powiaty, emerytury, avgDost }: Props) {
+export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: Props) {
   const [mapYear, setMapYear] = useState<'2024' | '2035'>('2024')
 
   // Outlierzy wykluczeni z analiz porównawczych
@@ -169,8 +212,87 @@ export default function RaportCharts({ powiaty, emerytury, avgDost }: Props) {
   const emWzrost = emFirst && emLast
     ? Math.round((emLast.wartosc_zl / emFirst.wartosc_zl - 1) * 100) : 0
 
+  // Luka per rok dla insight
+  const lukaData = cenaDps.filter(r => r.min_cena_dps && r.emerytura)
+  const lukaRast = lukaData.length >= 2
+    ? Math.round((lukaData[lukaData.length-1].min_cena_dps! - lukaData[lukaData.length-1].emerytura!)
+      - (lukaData[0].min_cena_dps! - lukaData[0].emerytura!))
+    : 0
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 space-y-6">
+
+      {/* Wykres: najtańszy DPS vs emerytura */}
+      <ChartSection
+        delay={0}
+        insight={
+          lukaRast > 0
+            ? `Luka między najtańszym DPS a emeryturą wzrosła o ${fmt(lukaRast)} zł/mies. w ciągu 2 lat (2023–2025) — mimo wzrostu emerytur o 23%.`
+            : 'Porównanie najtańszego kosztu DPS z przeciętną emeryturą ZUS w Małopolsce.'
+        }
+      >
+        <h2 className="text-xl font-bold text-slate-900 mb-1">Najtańszy DPS vs emerytura — Małopolska</h2>
+        <p className="text-sm text-slate-500 mb-4">
+          Oficjalny minimalny koszt utrzymania DPS (MUW Małopolska) vs przeciętna emerytura ZUS brutto.
+          Dane 2023–2025 wspólne dla obu linii; 2026 tylko dla DPS (GUS nie opublikował jeszcze emerytur za 2026).
+        </p>
+        <div className="flex flex-wrap gap-4 text-xs text-slate-500 mb-4">
+          <span className="flex items-center gap-1.5">
+            <span className="w-4 h-0.5 bg-red-500 inline-block rounded" />Najtańszy DPS (oficjalny koszt MUW)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-4 h-0.5 bg-emerald-500 inline-block rounded" />Emerytura ZUS brutto (GUS BDL)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-4 h-0.5 bg-red-300 inline-block rounded border-dashed border-t border-red-300" style={{borderStyle:'dashed'}} />2026 DPS (brak danych GUS o emeryturze)
+          </span>
+        </div>
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={cenaDps} margin={{ left: 10, right: 24, top: 10, bottom: 4 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            <XAxis dataKey="rok" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis
+              tickFormatter={v => `${(v/1000).toFixed(1)}k zł`}
+              tick={{ fontSize: 11, fill: '#94a3b8' }}
+              width={64} domain={[2500, 6500]}
+              axisLine={false} tickLine={false}
+            />
+            <Tooltip content={<TooltipCenaDps />} cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }} />
+            {/* Obszar luki */}
+            <ReferenceLine
+              y={0} stroke="transparent"
+              label={{ value: '', position: 'insideLeft' }}
+            />
+            <Line
+              type="monotone" dataKey="min_cena_dps" name="Najtańszy DPS"
+              stroke="#ef4444" strokeWidth={2.5}
+              dot={(props: any) => {
+                const { cx, cy, payload } = props
+                if (!payload.min_cena_dps) return <g key={`dot-dps-${payload.rok}`} />
+                const isDashed = !payload.emerytura
+                return (
+                  <circle key={`dot-dps-${payload.rok}`} cx={cx} cy={cy} r={5}
+                    fill={isDashed ? '#fca5a5' : '#ef4444'}
+                    stroke="white" strokeWidth={2} />
+                )
+              }}
+              strokeDasharray={(d: any) => d?.emerytura ? '0' : '6 3'}
+              connectNulls
+            />
+            <Line
+              type="monotone" dataKey="emerytura" name="Emerytura ZUS"
+              stroke="#10b981" strokeWidth={2.5}
+              dot={{ r: 5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
+              connectNulls
+            />
+          </LineChart>
+        </ResponsiveContainer>
+        <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
+          Emerytura podana w kwocie brutto (netto jest niższa — realna luka większa).
+          Najtańszy DPS to placówka z najniższym oficjalnym kosztem utrzymania w danym roku —
+          może być inny powiat w każdym roku. Źródło cen: PDF MUW Małopolska.
+        </p>
+      </ChartSection>
 
       {/* Mapa + Top/Bottom 5 */}
       <ChartSection
