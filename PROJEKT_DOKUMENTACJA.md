@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-05-11 (sesja #13 - Raport DPS v1 + punkt zwrotny projektu: kalkulator jako krok zero)
+> Ostatnia aktualizacja: 2026-05-11 (sesja #14 - Redesign kalkulatora + FAQ DPS)
 
 ---
 
@@ -946,6 +946,26 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 ---
 
 ## 16. HISTORIA ZMIAN (changelog sesji)
+
+### Sesja #14 — 2026-05-11
+
+**Temat:** Redesign kalkulatora DPS + rozbudowa FAQ.
+
+**Commity:** `f2b7592` → `02414c3`
+
+**Nowe funkcje:**
+- `/kalkulator` — kompletny rewrite: live kalkulator 4-kartowy (Senior / Małżonek / Dzieci / Gmina), układ 2-kolumnowy, badge "Przelicza na bieżąco", logika port 1:1 z JS stasik-kancelaria.pl, przycisk "Użyj ceny ↑" na kartach DPS
+- `faqData.ts` — 3 nowe pytania (rodzeństwo nie płaci, progi 300%, ZOL vs DPS), 4 poprawki błędów merytorycznych (koszt ustala powiat nie MOPS, ceny prywatnych, opis kalkulatora, hierarchia zobowiązanych), naprawa miniFAQData na `.find()` po id
+- `koszty-opieki.mdx` — FAQ rozszerzony z 6 do 13 pytań (synowa/zięć, dzieci za granicą, po śmierci, dwie metody MOPS, darowizna, odmowa umowy, ZOL vs DPS)
+
+**Różnicowanie wizualne od stasik-kancelaria.pl:**
+- Liczby w wynikach → `font-mono` (Geist Mono)
+- Inputy → `font-bold` zamiast `font-black`
+- Badge zmieniony na inny tekst
+
+**SEO research:** FAQ rich results martwe od 7 maja 2026. FAQPage schema nadal wartościowa — 3,2× więcej w AI Overviews. Decyzja: zostawiamy.
+
+---
 
 ### Sesja #13 — 2026-05-11
 
