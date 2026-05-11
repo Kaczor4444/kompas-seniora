@@ -1,110 +1,43 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { ArrowLeft, Calculator, AlertCircle, Phone, MapPin, CheckCircle2, Search, Heart, ArrowLeftRight, ChevronRight, X } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Phone, MapPin, CheckCircle2, Search, Heart, ArrowLeftRight, ChevronRight, X, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
 import { getGminaForCity } from '@/lib/city-to-gmina';
 import { addFavorite, removeFavorite, isFavorite, getFavorites } from '@/src/utils/favorites';
 
-// Locative case (miejscownik) for Polish city names
 const cityLocative: Record<string, string> = {
-  'kraków': 'Krakowie',
-  'nowy sącz': 'Nowym Sączu',
-  'tarnów': 'Tarnowie',
-  'bochnia': 'Bochni',
-  'brzesko': 'Brzesku',
-  'chrzanów': 'Chrzanowie',
-  'dąbrowa tarnowska': 'Dąbrowie Tarnowskiej',
-  'gorlice': 'Gorlicach',
-  'limanowa': 'Limanowej',
-  'miechów': 'Miechowie',
-  'myślenice': 'Myślenicach',
-  'nowy targ': 'Nowym Targu',
-  'olkusz': 'Olkuszu',
-  'oświęcim': 'Oświęcimiu',
-  'proszowice': 'Proszowicach',
-  'sucha beskidzka': 'Suchej Beskidzkiej',
-  'zakopane': 'Zakopanem',
-  'wadowice': 'Wadowicach',
-  'wieliczka': 'Wieliczce',
+  'kraków': 'Krakowie', 'nowy sącz': 'Nowym Sączu', 'tarnów': 'Tarnowie',
+  'bochnia': 'Bochni', 'brzesko': 'Brzesku', 'chrzanów': 'Chrzanowie',
+  'dąbrowa tarnowska': 'Dąbrowie Tarnowskiej', 'gorlice': 'Gorlicach',
+  'limanowa': 'Limanowej', 'miechów': 'Miechowie', 'myślenice': 'Myślenicach',
+  'nowy targ': 'Nowym Targu', 'olkusz': 'Olkuszu', 'oświęcim': 'Oświęcimiu',
+  'proszowice': 'Proszowicach', 'sucha beskidzka': 'Suchej Beskidzkiej',
+  'zakopane': 'Zakopanem', 'wadowice': 'Wadowicach', 'wieliczka': 'Wieliczce',
   'bielsko-biała': 'Bielsku-Białej',
-  'klucze': 'Kluczach',
-  'bukowno': 'Bukownie',
-  'wolbrom': 'Wolbromiu',
-  'bolesław': 'Bolesławiu',
-  'trzyciąż': 'Trzyciążu',
 };
+const toCityLocative = (c: string) =>
+  cityLocative[c.toLowerCase().trim()] ?? c.charAt(0).toUpperCase() + c.slice(1);
 
-const toCityLocative = (city: string): string => {
-  const key = city.toLowerCase().trim();
-  return cityLocative[key] ?? city.charAt(0).toUpperCase() + city.slice(1);
-};
-
-// Dopełniacz powiatu: "z powiatu krakowskiego", "olkuskiego" itp.
 const powiatGenitiveMap: Record<string, string> = {
-  // Małopolskie
-  'krakowski':    'krakowskiego',
-  'bocheński':    'bocheńskiego',
-  'brzeski':      'brzeskiego',
-  'chrzanowski':  'chrzanowskiego',
-  'dąbrowski':    'dąbrowskiego',
-  'gorlicki':     'gorlickiego',
-  'limanowski':   'limanowskiego',
-  'miechowski':   'miechowskiego',
-  'myślenicki':   'myślenickiego',
-  'nowosądecki':  'nowosądeckiego',
-  'nowotarski':   'nowotarskiego',
-  'olkuski':      'olkuskiego',
-  'oświęcimski':  'oświęcimskiego',
-  'proszowicki':  'proszowickiego',
-  'suski':        'suskiego',
-  'tarnowski':    'tarnowskiego',
-  'tatrzański':   'tatrzańskiego',
-  'wadowicki':    'wadowickiego',
-  'wielicki':     'wielickiego',
-  // Miasta na prawach powiatu
-  'm. kraków':    'Krakowa',
-  'm. tarnów':    'Tarnowa',
+  'krakowski': 'krakowskiego', 'bocheński': 'bocheńskiego', 'brzeski': 'brzeskiego',
+  'chrzanowski': 'chrzanowskiego', 'dąbrowski': 'dąbrowskiego', 'gorlicki': 'gorlickiego',
+  'limanowski': 'limanowskiego', 'miechowski': 'miechowskiego', 'myślenicki': 'myślenickiego',
+  'nowosądecki': 'nowosądeckiego', 'nowotarski': 'nowotarskiego', 'olkuski': 'olkuskiego',
+  'oświęcimski': 'oświęcimskiego', 'proszowicki': 'proszowickiego', 'suski': 'suskiego',
+  'tarnowski': 'tarnowskiego', 'tatrzański': 'tatrzańskiego', 'wadowicki': 'wadowickiego',
+  'wielicki': 'wielickiego', 'm. kraków': 'Krakowa', 'm. tarnów': 'Tarnowa',
   'm. nowy sącz': 'Nowego Sącza',
-  // Śląskie
-  'bielski':      'bielskiego',
-  'cieszyński':   'cieszyńskiego',
-  'pszczyński':   'pszczyńskiego',
-  'żywiecki':     'żywieckiego',
-  'będziński':    'będzińskiego',
-  'bieruńsko-lędziński': 'bieruńsko-lędzińskiego',
-  'gliwicki':     'gliwickiego',
-  'kłobucki':     'kłobuckiego',
-  'lubliniecki':  'lublinieckiego',
-  'mikołowski':   'mikołowskiego',
-  'myszkowski':   'myszkowskiego',
-  'raciborski':   'raciborskiego',
-  'rybnicki':     'rybnickiego',
-  'tarnogórski':  'tarnogórskiego',
-  'wodzisławski': 'wodzisławskiego',
-  'zawierciański':'zawierciańskiego',
-  'częstochowski':'częstochowskiego',
-  // Inne
-  'lubelski':     'lubelskiego',
-  'łódzki':       'łódzkiego',
-  'warszawski':   'warszawskiego',
-  'poznański':    'poznańskiego',
-  'wrocławski':   'wrocławskiego',
+};
+const toPowiatGenitive = (p: string) => {
+  const k = p.toLowerCase().trim();
+  if (powiatGenitiveMap[k]) return powiatGenitiveMap[k];
+  if (/[kszcń]ki$/.test(k)) return k.slice(0, -1) + 'iego';
+  return p;
 };
 
-const toPowiatGenitive = (powiat: string): string => {
-  const key = powiat.toLowerCase().trim();
-  if (powiatGenitiveMap[key]) return powiatGenitiveMap[key];
-  // Reguła automatyczna: przymiotniki na -ki/-cki/-ski/-ński → zamień końcowe "i" na "iego"
-  if (/[kszcń]ki$/.test(key)) {
-    return key.slice(0, -1) + 'iego';
-  }
-  return powiat;
-};
-
-// Types
 interface Facility {
   id: number;
   nazwa: string;
@@ -116,27 +49,17 @@ interface Facility {
   profil_opieki?: string;
 }
 
-interface CalculationResult {
-  income: number;
-  maxContribution: number;
-  remainingFunds: number;
-  contributionPercent: number;
+interface LookupResult {
   city: string;
-  wojewodztwo: string;
   facilities: Facility[];
   facilitiesWithPrices: Facility[];
-  facilitiesWithoutPrices: Facility[];
-  affordableFacilities: Facility[];
-  needsSubsidy: Facility[];
-  hasAffordable: boolean;
-  allNeedSubsidy: boolean;
   mopsContact: MopsContact | null;
   mopsFallbackUsed: boolean;
   mopsFallbackCity?: string;
-  powiatFallbackUsed: boolean;   // DPS z powiatu, nie z miasta
-  powiatFallbackName?: string;   // nazwa powiatu gdy fallback
-  ambiguousPowiaty?: string[];          // wiele powiatów dla tej samej nazwy miasta
-  mopsPerPowiat?: Record<string, MopsContact | null>; // MOPS dla każdego powiatu przy wieloznaczności
+  powiatFallbackUsed: boolean;
+  powiatFallbackName?: string;
+  ambiguousPowiaty?: string[];
+  mopsPerPowiat?: Record<string, MopsContact | null>;
 }
 
 interface MopsContact {
@@ -153,59 +76,85 @@ interface MopsContact {
   verified: boolean;
 }
 
-function getIncomeBracket(income: number): string {
-  if (income <= 1500) return 'do 1500';
-  if (income <= 2500) return '1500-2500';
-  if (income <= 3500) return '2500-3500';
-  if (income <= 5000) return '3500-5000';
-  return 'powyżej 5000';
-}
+const fmt = (n: number) =>
+  new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(n);
 
 async function trackAppEvent(eventType: string, metadata: Record<string, unknown>) {
   try {
-    const language = typeof navigator !== 'undefined' ? navigator.language : undefined;
     await fetch('/api/analytics/app-track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eventType, metadata, language }),
+      body: JSON.stringify({ eventType, metadata, language: navigator?.language }),
     });
-  } catch { /* silent fail */ }
+  } catch { /* silent */ }
 }
+
+// ─── Field sub-components ────────────────────────────────────────────────────
+
+function CalcField({ label, help, children }: { label: string; help: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500">{label}</label>
+      {children}
+      <p className="text-xs text-slate-400 leading-relaxed">{help}</p>
+    </div>
+  );
+}
+
+function NumInput({ value, onChange, placeholder, min = '0', max, step = '100' }: {
+  value: string; onChange: (v: string) => void; placeholder?: string;
+  min?: string; max?: string; step?: string;
+}) {
+  return (
+    <input
+      type="number"
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      min={min} max={max} step={step}
+      inputMode="numeric"
+      className="w-full bg-stone-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-xl font-black text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300"
+    />
+  );
+}
+
+// ─── Result card ─────────────────────────────────────────────────────────────
+
+function ResultCard({ label, value, accent }: { label: string; value: number; accent?: 'green' | 'blue' | 'amber' }) {
+  const bg = accent === 'green' ? 'bg-emerald-600' : accent === 'blue' ? 'bg-blue-600' : accent === 'amber' ? 'bg-amber-500' : 'bg-white/10';
+  return (
+    <div className={`${bg} rounded-xl p-4`}>
+      <div className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-1.5">{label}</div>
+      <div className="text-2xl font-black text-white">{fmt(value)}</div>
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 
 function KalkulatorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Track calculator start once per session
-  useEffect(() => {
-    if (typeof sessionStorage !== 'undefined' && !sessionStorage.getItem('kalkulator-started')) {
-      sessionStorage.setItem('kalkulator-started', '1');
-      trackAppEvent('calculator_start', {});
-    }
-  }, []);
+  // Calculator inputs (live, no API)
+  const [dpsCost, setDpsCost] = useState(searchParams.get('cost') || '6000');
+  const [seniorIncome, setSeniorIncome] = useState(searchParams.get('income') || '3500');
+  const [spouseIncome, setSpouseIncome] = useState('0');
+  const [numChildren, setNumChildren] = useState('2');
+  const [childSituation, setChildSituation] = useState<'rodzina' | 'samotnie'>('rodzina');
+  const [childHouseholdIncome, setChildHouseholdIncome] = useState('8000');
+  const [childHouseholdPersons, setChildHouseholdPersons] = useState('3');
 
-  // Form state — pre-fill z URL params (przekierowanie z hero kalkulatora)
-  const [income, setIncome] = useState<string>(() => searchParams.get('income') || '3500');
-  const [wojewodztwo, setWojewodztwo] = useState<string>('małopolskie');
-  const [city, setCity] = useState<string>(() => searchParams.get('city') || '');
-  
-  // Result state
-  const [result, setResult] = useState<CalculationResult | null>(null);
+  // DPS lookup state
+  const [city, setCity] = useState(searchParams.get('city') || '');
+  const [lookupResult, setLookupResult] = useState<LookupResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
+  const [lookupError, setLookupError] = useState('');
   const [selectedPowiat, setSelectedPowiat] = useState<string | null>(null);
   const [showAllFacilities, setShowAllFacilities] = useState(false);
-
-  // Family obligation checker state
-  const [showFamilyCalc, setShowFamilyCalc] = useState(false);
-  const [familyIncome, setFamilyIncome] = useState('');
-  const [familyPersons, setFamilyPersons] = useState('1');
-
-  // Favorites & comparison state
   const [savedIds, setSavedIds] = useState<number[]>([]);
   const [compareIds, setCompareIds] = useState<number[]>([]);
 
-  // Sync savedIds from localStorage on mount and on changes
   useEffect(() => {
     const sync = () => setSavedIds(getFavorites().map(f => f.id));
     sync();
@@ -213,1035 +162,634 @@ function KalkulatorContent() {
     return () => window.removeEventListener('favoritesChanged', sync);
   }, []);
 
-  // Auto-trigger kalkulacji gdy przekierowano z hero kalkulatora (oba params obecne)
-  useEffect(() => {
-    const incomeParam = searchParams.get('income');
-    const cityParam = searchParams.get('city');
-    if (incomeParam && cityParam && parseFloat(incomeParam) > 0) {
-      const timer = setTimeout(() => {
-        handleCalculate();
-      }, 500);
-      return () => clearTimeout(timer);
+  // ── Live calculation (1:1 port z JS stasik-kancelaria.pl) ─────────────────
+  const PROG_SAMOTNY = 3030;   // 300% × 1 010 zł
+  const PROG_RODZINA = 2469;   // 300% × 823 zł, per osoba
+
+  const koszt       = Math.max(0, parseFloat(dpsCost) || 0);
+  const incSenior   = Math.max(0, parseFloat(seniorIncome) || 0);
+  const incSpouse   = Math.max(0, parseFloat(spouseIncome) || 0);
+  const nKids       = Math.max(0, parseInt(numChildren) || 0);
+  const incChild    = Math.max(0, parseFloat(childHouseholdIncome) || 0);
+  const nPersons    = childSituation === 'samotnie' ? 1 : Math.max(1, parseInt(childHouseholdPersons) || 1);
+
+  const oplataSeniora = koszt > 0 ? Math.min(incSenior * 0.7, koszt) : 0;
+  const po1           = Math.max(0, koszt - oplataSeniora);
+
+  const oplataM = (incSpouse > PROG_SAMOTNY && po1 > 0)
+    ? Math.min(incSpouse - PROG_SAMOTNY, po1) : 0;
+  const po2 = Math.max(0, po1 - oplataM);
+
+  const prog300Dz    = childSituation === 'samotnie' ? PROG_SAMOTNY : PROG_RODZINA * nPersons;
+  const nadwyzkaDz   = Math.max(0, incChild - prog300Dz);
+  const oplataD      = (nKids > 0 && po2 > 0 && nadwyzkaDz > 0)
+    ? Math.min(nadwyzkaDz * nKids, po2) : 0;
+
+  const oplataGminy  = koszt > 0 ? Math.max(0, koszt - oplataSeniora - oplataM - oplataD) : 0;
+
+  const dochodNaOsobe  = incChild / nPersons;
+  const progNaOsobe    = childSituation === 'samotnie' ? PROG_SAMOTNY : PROG_RODZINA;
+  const dzieciZwolnione = nKids > 0 && dochodNaOsobe <= progNaOsobe;
+
+  let calcWarning = '';
+  if (koszt === 0) {
+    calcWarning = '';
+  } else if (oplataSeniora >= koszt) {
+    calcWarning = `Mieszkaniec pokrywa pełny koszt z własnego dochodu (70% × ${fmt(incSenior)} ≥ ${fmt(koszt)}). Rodzina ani gmina nie dopłacają.`;
+  } else if (dzieciZwolnione) {
+    calcWarning = `Dochód na osobę w gospodarstwie dziecka (${fmt(dochodNaOsobe)}) nie przekracza progu 300% kryterium (${fmt(progNaOsobe)} zł). Dzieci są zwolnione z dopłaty — resztę pokrywa gmina (art. 61 ust. 2 ups).`;
+  } else if (nKids === 0) {
+    calcWarning = `Brak zstępnych zobowiązanych — pozostałą część kosztu pokrywa gmina (po wpłacie mieszkańca${oplataM > 0 ? ' i małżonka' : ''}).`;
+  }
+
+  // ── MOPS fetch helpers ────────────────────────────────────────────────────
+
+  const fetchMopsContact = async (cityName: string): Promise<MopsContact | null> => {
+    try {
+      const res = await fetch(`/api/mops?city=${encodeURIComponent(cityName.toLowerCase())}`);
+      return res.ok ? await res.json() : null;
+    } catch { return null; }
+  };
+
+  const fetchMopsWithFallback = async (cityName: string, powiatName: string) => {
+    let mops = await fetchMopsContact(cityName);
+    if (mops) return { mops, usedFallback: false };
+
+    const norm = cityName.toLowerCase().trim()
+      .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e').replace(/ł/g,'l')
+      .replace(/ń/g,'n').replace(/ó/g,'o').replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z')
+      .replace(/\s+/g,'-');
+    const gminaCity = getGminaForCity(norm);
+    if (gminaCity && gminaCity !== norm) {
+      mops = await fetchMopsContact(gminaCity);
+      if (mops) return { mops, usedFallback: true, fallbackCity: gminaCity };
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // celowo uruchamiane raz po mount
+
+    const fallbackCity = mapPowiatToCity(powiatName);
+    if (fallbackCity) {
+      mops = await fetchMopsContact(fallbackCity);
+      if (mops) return { mops, usedFallback: true, fallbackCity };
+    }
+    return { mops: null, usedFallback: false };
+  };
+
+  // ── DPS lookup ────────────────────────────────────────────────────────────
+
+  const handleLookup = async () => {
+    if (!city.trim() || city.trim().length < 2) {
+      setLookupError('Proszę podać nazwę miasta lub gminy.');
+      return;
+    }
+    setLookupError('');
+    setLookupResult(null);
+    setShowAllFacilities(false);
+    setSelectedPowiat(null);
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(city)}&woj=ma%C5%82opolskie&typ=DPS`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const facilities: Facility[] = data.results || [];
+
+      if (facilities.length === 0) {
+        setLookupError(`Nie znaleźliśmy DPS w okolicy "${city}". Spróbuj wpisać inne miasto lub powiat.`);
+        setLoading(false);
+        return;
+      }
+
+      const withPrices = facilities.filter(f => f.koszt_pobytu && f.koszt_pobytu > 0);
+      const uniquePowiaty = [...new Set(facilities.map(f => f.powiat))];
+      const powiatName = facilities[0]?.powiat || '';
+      const { mops, usedFallback, fallbackCity } = await fetchMopsWithFallback(city, powiatName);
+
+      let mopsPerPowiat: Record<string, MopsContact | null> | undefined;
+      if (uniquePowiaty.length > 1) {
+        const entries = await Promise.all(
+          uniquePowiaty.map(async p => [p, (await fetchMopsWithFallback(city, p)).mops] as [string, MopsContact | null])
+        );
+        mopsPerPowiat = Object.fromEntries(entries);
+      }
+
+      const powiatFallbackUsed = !!(data.terytSuggestion?.found && facilities.length > 0);
+
+      setLookupResult({
+        city,
+        facilities,
+        facilitiesWithPrices: withPrices,
+        mopsContact: mops,
+        mopsFallbackUsed: usedFallback,
+        mopsFallbackCity: fallbackCity,
+        powiatFallbackUsed,
+        powiatFallbackName: powiatFallbackUsed ? (facilities[0]?.powiat || undefined) : undefined,
+        ambiguousPowiaty: uniquePowiaty.length > 1 ? uniquePowiaty : undefined,
+        mopsPerPowiat,
+      });
+
+      if (uniquePowiaty.length > 1) {
+        const topPowiat = data.terytSuggestion?.powiat;
+        if (topPowiat && uniquePowiaty.includes(topPowiat)) setSelectedPowiat(topPowiat);
+      }
+
+      // Pre-fill dpsCost with cheapest facility found
+      if (withPrices.length > 0) {
+        const cheapest = Math.min(...withPrices.map(f => f.koszt_pobytu!));
+        setDpsCost(String(cheapest));
+      }
+
+      trackAppEvent('calculator_lookup', { city, facilities_found: facilities.length });
+    } catch {
+      setLookupError('Wystąpił błąd. Spróbuj ponownie.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleFavorite = (facility: Facility) => {
     if (isFavorite(facility.id)) {
       removeFavorite(facility.id);
     } else {
       addFavorite({
-        id: facility.id,
-        nazwa: facility.nazwa,
-        miejscowosc: facility.miejscowosc,
-        powiat: facility.powiat,
-        typ_placowki: facility.typ_placowki,
-        koszt_pobytu: facility.koszt_pobytu,
-        telefon: facility.telefon ?? null,
-        ulica: null,
-        kod_pocztowy: null,
-        email: null,
-        www: null,
-        liczba_miejsc: null,
-        profil_opieki: facility.profil_opieki ?? null,
+        id: facility.id, nazwa: facility.nazwa, miejscowosc: facility.miejscowosc,
+        powiat: facility.powiat, typ_placowki: facility.typ_placowki,
+        koszt_pobytu: facility.koszt_pobytu, telefon: facility.telefon ?? null,
+        ulica: null, kod_pocztowy: null, email: null, www: null,
+        liczba_miejsc: null, profil_opieki: facility.profil_opieki ?? null,
         addedAt: new Date().toISOString(),
       });
     }
     window.dispatchEvent(new Event('favoritesChanged'));
   };
 
-  const toggleCompare = (id: number) => {
-    setCompareIds(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : prev.length >= 3 ? prev : [...prev, id]
-    );
-  };
+  const toggleCompare = (id: number) =>
+    setCompareIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : prev.length >= 3 ? prev : [...prev, id]);
 
-  // Legal thresholds (300% kryterium dochodowego, 2026)
-  const THRESHOLD_SINGLE = 3030;   // 300% × 1010 zł (osoba samotna)
-  const THRESHOLD_FAMILY = 2469;   // 300% × 823 zł (na osobę w rodzinie)
-
-  const checkFamilyObligation = (inc: number, persons: number) => {
-    const threshold = persons === 1 ? THRESHOLD_SINGLE : THRESHOLD_FAMILY * persons;
-    return { isExempt: inc <= threshold, threshold };
-  };
-
-  // Validation
-  const validateInputs = (): string | null => {
-    const incomeNum = parseFloat(income);
-    
-    if (!income || isNaN(incomeNum)) {
-      return 'Proszę podać dochód miesięczny';
-    }
-    
-    if (incomeNum <= 0) {
-      return 'Dochód musi być większy niż 0 zł';
-    }
-    
-    if (incomeNum > 50000) {
-      return 'Proszę podać realistyczny dochód (maksymalnie 50 000 zł)';
-    }
-    
-    if (!city || city.trim().length < 2) {
-      return 'Proszę podać nazwę miasta lub gminy';
-    }
-    
-    return null;
-  };
-
-  // Fetch MOPS contact from API - ZWRACA dane zamiast tylko setować state
-  const fetchMopsContact = async (cityName: string): Promise<MopsContact | null> => {
-    try {
-      console.log('🔍 Fetching MOPS for city:', cityName);
-      console.log('🔍 Normalized city:', cityName.toLowerCase());
-      
-      const response = await fetch(`/api/mops?city=${encodeURIComponent(cityName.toLowerCase())}`);
-      console.log('🔍 Response status:', response.status);
-      console.log('🔍 Response OK?:', response.ok);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ MOPS data received:', data);
-        return data;
-      } else {
-        console.log('❌ MOPS not found - status:', response.status);
-        const errorData = await response.json();
-        console.log('❌ Error details:', errorData);
-        return null;
-      }
-    } catch (error) {
-      console.error('❌ Error fetching MOPS:', error);
-      return null;
-    }
-  };
-
-  // ✅ NOWA FUNKCJA - Fetch MOPS z fallbackiem do powiatu
-  const fetchMopsWithFallback = async (
-    cityName: string, 
-    powiatName: string
-  ): Promise<{ 
-    mops: MopsContact | null; 
-    usedFallback: boolean; 
-    fallbackCity?: string 
-  }> => {
-    console.log('🔍 Starting MOPS search with fallback...');
-    console.log('   City:', cityName);
-    console.log('   Powiat:', powiatName);
-    
-    // KROK 1: Szukaj MOPS dla dokładnej miejscowości
-    let mops = await fetchMopsContact(cityName);
-    
-    if (mops) {
-      console.log('✅ Found MOPS for exact city:', cityName);
-      return { mops, usedFallback: false };
-    }
-    
-    // KROK 2: Fallback - sprawdź gminę miejscowości
-    const normalizedCityName = cityName.toLowerCase().trim()
-      .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e')
-      .replace(/ł/g,'l').replace(/ń/g,'n').replace(/ó/g,'o')
-      .replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z')
-      .replace(/\s+/g,'-');
-    const gminaCity = getGminaForCity(normalizedCityName);
-    if (gminaCity && gminaCity !== normalizedCityName) {
-      console.log('🔄 Trying gmina fallback:', gminaCity);
-      mops = await fetchMopsContact(gminaCity);
-      if (mops) {
-        console.log('✅ Found MOPS via gmina:', gminaCity);
-        return { mops, usedFallback: true, fallbackCity: gminaCity };
-      }
-    }
-
-    // KROK 3: Fallback - mapuj powiat → miasto powiatowe
-    console.log('⚠️ No MOPS for city or gmina, trying fallback to powiat...');
-    const fallbackCity = mapPowiatToCity(powiatName);
-    
-    if (!fallbackCity) {
-      console.log('❌ No mapping found for powiat:', powiatName);
-      return { mops: null, usedFallback: false };
-    }
-    
-    console.log('🔄 Mapped powiat to city:', fallbackCity);
-    mops = await fetchMopsContact(fallbackCity);
-    
-    if (mops) {
-      console.log('✅ Found MOPS via fallback:', fallbackCity);
-      return { mops, usedFallback: true, fallbackCity };
-    }
-    
-    console.log('❌ No MOPS found even with fallback');
-    return { mops: null, usedFallback: false };
-  };
-
-  // Main calculation function
-  const handleCalculate = async () => {
-    // Reset previous state
-    setError('');
-    setResult(null);
-    setShowAllFacilities(false);
-    setSelectedPowiat(null);
-    
-    // Validate
-    const validationError = validateInputs();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-    
-    setLoading(true);
-    
-    try {
-      const incomeNum = parseFloat(income);
-      const maxContribution = incomeNum * 0.7;
-      const remainingFunds = incomeNum * 0.3;
-      
-      // Fetch DPS facilities only (typ=DPS ensures TERYT fallback fires when city has no DPS)
-      const response = await fetch(
-        `/api/search?q=${encodeURIComponent(city)}&woj=${encodeURIComponent(wojewodztwo)}&typ=DPS`
-      );
-
-      if (!response.ok) {
-        throw new Error('Nie udało się pobrać danych placówek');
-      }
-
-      const data = await response.json();
-      const dpsFacilities: Facility[] = data.results || [];
-      // powiatFallbackUsed: TERYT rozszerzył zapytanie na powiat (brak DPS w mieście)
-      const powiatFallbackUsed = !!(data.terytSuggestion?.found && dpsFacilities.length > 0);
-      const powiatFallbackName: string | undefined = powiatFallbackUsed
-        ? (dpsFacilities[0]?.powiat || undefined)
-        : undefined;
-
-      // Wykryj wieloznaczność: ta sama nazwa miasta w kilku powiatach
-      const uniquePowiaty = [...new Set(dpsFacilities.map(f => f.powiat))];
-      const ambiguousPowiaty = uniquePowiaty.length > 1 ? uniquePowiaty : undefined;
-
-      if (dpsFacilities.length === 0) {
-        trackAppEvent('calculator_no_results', { city, wojewodztwo });
-        setError(`Nie znaleźliśmy domów pomocy społecznej (DPS) w okolicy "${city}". Spróbuj wpisać inne miasto lub powiat.`);
-        setLoading(false);
-        return;
-      }
-
-      // Separate facilities with and without prices
-      const facilitiesWithPrices = dpsFacilities.filter(f => f.koszt_pobytu && f.koszt_pobytu > 0);
-      const facilitiesWithoutPrices = dpsFacilities.filter(f => !f.koszt_pobytu || f.koszt_pobytu === 0);
-
-      // Categorize facilities with prices
-      const affordableFacilities = facilitiesWithPrices.filter(f => f.koszt_pobytu! <= maxContribution);
-      const needsSubsidy = facilitiesWithPrices.filter(f => f.koszt_pobytu! > maxContribution);
-
-      // Fetch MOPS contact z fallbackiem na powiat
-      const powiatName = dpsFacilities[0]?.powiat || '';
-      const { mops: fetchedMopsContact, usedFallback, fallbackCity } = await fetchMopsWithFallback(
-        city,
-        powiatName
-      );
-
-      // Przy wieloznaczności: pobierz MOPS dla każdego powiatu z osobna
-      let mopsPerPowiat: Record<string, MopsContact | null> | undefined;
-      if (ambiguousPowiaty) {
-        const entries = await Promise.all(
-          ambiguousPowiaty.map(async (p) => {
-            const { mops } = await fetchMopsWithFallback(city, p);
-            return [p, mops] as [string, MopsContact | null];
-          })
-        );
-        mopsPerPowiat = Object.fromEntries(entries);
-      }
-      
-      const calculationResult: CalculationResult = {
-        income: incomeNum,
-        maxContribution,
-        remainingFunds,
-        contributionPercent: 70,
-        city,
-        wojewodztwo,
-        facilities: dpsFacilities,
-        facilitiesWithPrices,
-        facilitiesWithoutPrices,
-        affordableFacilities,
-        needsSubsidy,
-        hasAffordable: affordableFacilities.length > 0,
-        allNeedSubsidy: facilitiesWithPrices.length > 0 && affordableFacilities.length === 0,
-        mopsContact: fetchedMopsContact,
-        mopsFallbackUsed: usedFallback,
-        mopsFallbackCity: fallbackCity,
-        powiatFallbackUsed,
-        powiatFallbackName,
-        ambiguousPowiaty,
-        mopsPerPowiat,
-      };
-
-      setResult(calculationResult);
-
-      // Auto-preselektuj powiat z TERYT topMatch gdy wieloznaczność
-      if (ambiguousPowiaty) {
-        const terytTopPowiat = data.terytSuggestion?.powiat;
-        if (terytTopPowiat && ambiguousPowiaty.includes(terytTopPowiat)) {
-          setSelectedPowiat(terytTopPowiat);
-        }
-      }
-
-      trackAppEvent('calculator_result', {
-        income_bracket: getIncomeBracket(incomeNum),
-        powiat: dpsFacilities[0]?.powiat || city,
-        facilities_found: dpsFacilities.length,
-        affordable_found: affordableFacilities.length,
-        has_affordable: affordableFacilities.length > 0,
-      });
-
-      // Scroll to results
-      setTimeout(() => {
-        document.getElementById('results-section')?.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }, 100);
-      
-    } catch (err) {
-      console.error('Calculation error:', err);
-      setError('Wystąpił błąd podczas obliczania. Spróbuj ponownie.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Format currency
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('pl-PL', {
-      style: 'currency',
-      currency: 'PLN',
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
-
-  // Navigate to search with budget filter
-  const navigateToSearch = () => {
-    if (!result) return;
-    const params = new URLSearchParams({
-      q:    result.city,
-      woj:  result.wojewodztwo,
-      type: 'dps',
-    });
-    if (selectedPowiat) params.set('powiat', selectedPowiat);
-    router.push(`/search?${params.toString()}`);
-  };
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-stone-50 pb-24">
-      <div className="max-w-[1000px] mx-auto px-6 py-12">
+      <div className="max-w-[1100px] mx-auto px-6 py-12">
 
-        {/* Back link */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-700 transition-colors mb-10"
-        >
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-700 transition-colors mb-10">
           <ArrowLeft size={14} /> Strona główna
         </Link>
 
         {/* Header */}
-        <div className="mb-12">
-          <div className="flex items-center gap-4 mb-6">
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-4">
             <span className="h-px w-10 bg-emerald-600" />
             <span className="text-[11px] font-black uppercase tracking-[0.3em] text-emerald-700">Analiza Finansowa</span>
           </div>
-          <h1 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight mb-4">
-            Symulator Opłat DPS
+          <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-3">
+            Kalkulator opłat DPS 2026
           </h1>
-          <p className="text-slate-500 text-lg max-w-2xl leading-relaxed">
-            Sprawdź orientacyjny podział kosztów według zasady 70/30 oraz wysokość dopłaty gminy dla Twojej lokalizacji.
+          <p className="text-slate-500 text-base max-w-2xl leading-relaxed">
+            Art.&nbsp;61 ustawy o pomocy społecznej.{' '}
+            <strong className="text-slate-700">Kolejność:</strong> mieszkaniec (do 70% dochodu) → małżonek → dzieci/wnuki → gmina.
+            Każdy zobowiązany płaci najwyżej <strong className="text-slate-700">nadwyżkę dochodu ponad 300% kryterium</strong>{' '}
+            (3&nbsp;030&nbsp;zł osoba samotna / 2&nbsp;469&nbsp;zł na osobę w rodzinie, kryteria 2026).
           </p>
         </div>
 
-        {/* Disclaimer */}
-        <div className="flex items-start gap-3 mb-10 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-          <AlertCircle size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-800 leading-relaxed">
-            <strong>Tylko orientacyjna symulacja</strong> — nie decyzja urzędowa. MOPS rozpatruje każdą sprawę
-            indywidualnie, biorąc pod uwagę sytuację rodzinną i majątkową.
-          </p>
-        </div>
+        {/* ── 2-column layout: form + sticky results ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start mb-16">
 
-        {/* Form Card */}
-        <div className="bg-white border border-slate-300 rounded-2xl p-8 lg:p-12 mb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          {/* ── LEFT: Form ── */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 space-y-7">
 
-            {/* Income */}
-            <div className="space-y-3">
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 block ml-1">
-                Dochód netto (emerytura/renta)
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={income}
-                  onChange={(e) => setIncome(e.target.value)}
-                  placeholder="np. 3500"
-                  min="0" max="50000" step="100"
-                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-400"
-                />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[11px] font-black text-slate-400 uppercase pointer-events-none">PLN</span>
-              </div>
-              <p className="text-xs text-slate-400 ml-1">Emerytura, renta + zasiłek pielęgnacyjny</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <CalcField
+                label="Miesięczny koszt utrzymania w DPS (zł)"
+                help="Ustala wójt/burmistrz. W 2026 r. średnio 5 000–7 500 zł. Możesz pobrać z wyszukiwarki poniżej."
+              >
+                <NumInput value={dpsCost} onChange={setDpsCost} placeholder="6000" min="0" max="20000" />
+              </CalcField>
+              <CalcField
+                label="Dochód netto mieszkańca DPS (zł)"
+                help="Emerytura, renta, inne świadczenia po odliczeniu składek zdrowotnych. Mieszkaniec płaci max 70% tego dochodu."
+              >
+                <NumInput value={seniorIncome} onChange={setSeniorIncome} placeholder="3500" />
+              </CalcField>
             </div>
 
-            {/* City */}
-            <div className="space-y-3">
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 block ml-1">
-                Twoje miasto / gmina
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="np. Kraków, Wieliczka..."
-                  className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-6 py-4 text-2xl font-black text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-400"
-                />
-                <MapPin className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={20} />
-              </div>
-              <div>
-                <select
-                  value={wojewodztwo}
-                  onChange={(e) => setWojewodztwo(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-sm text-slate-500 outline-none ml-1"
+            <CalcField
+              label="Dochód netto małżonka mieszkańca (zł, opcjonalnie)"
+              help="Małżonek jest pierwszy w kolejności po mieszkańcu (art. 61 ust. 1 pkt 2). Dopłaca nadwyżkę ponad 3 030 zł. Wpisz 0 jeśli brak małżonka."
+            >
+              <NumInput value={spouseIncome} onChange={setSpouseIncome} placeholder="0" />
+            </CalcField>
+
+            <CalcField
+              label="Liczba dzieci (zstępnych) zobowiązanych"
+              help="Dzieci, wnuki, prawnuki mieszkańca. Przyjmujemy, że wszyscy mają dochód na podobnym poziomie. Wpisz 0 jeśli brak."
+            >
+              <NumInput value={numChildren} onChange={setNumChildren} placeholder="0" min="0" max="10" step="1" />
+            </CalcField>
+
+            {nKids > 0 && (
+              <>
+                <CalcField
+                  label="Sytuacja rodzinna dziecka"
+                  help="Wpływa na próg obowiązku: 3 030 zł (samotne) lub 2 469 zł/os. w rodzinie."
                 >
-                  <option value="małopolskie">Województwo: Małopolskie</option>
-                </select>
-              </div>
+                  <select
+                    value={childSituation}
+                    onChange={e => setChildSituation(e.target.value as 'rodzina' | 'samotnie')}
+                    className="w-full bg-stone-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-base font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all"
+                  >
+                    <option value="rodzina">Dziecko ma rodzinę (małżonek, dzieci)</option>
+                    <option value="samotnie">Dziecko gospodaruje samotnie</option>
+                  </select>
+                </CalcField>
+
+                <CalcField
+                  label={childSituation === 'samotnie' ? 'Dochód netto dziecka (zł)' : 'Łączny dochód netto gospodarstwa dziecka (zł)'}
+                  help={childSituation === 'samotnie'
+                    ? `Próg obowiązku: 3 030 zł. Poniżej tego → dziecko zwolnione z dopłaty. Nie wliczamy 800+.`
+                    : `Łączny dochód netto (dziecko + małżonek + wnuki). Próg: 2 469 zł/os. w rodzinie. Nie wliczamy 800+.`}
+                >
+                  <NumInput value={childHouseholdIncome} onChange={setChildHouseholdIncome} placeholder="8000" step="500" />
+                </CalcField>
+
+                {childSituation === 'rodzina' && (
+                  <CalcField
+                    label="Liczba osób w gospodarstwie dziecka"
+                    help="Dziecko + małżonek + osoby na utrzymaniu (wnuki itp.). Używane do wyliczenia dochodu na osobę."
+                  >
+                    <NumInput value={childHouseholdPersons} onChange={setChildHouseholdPersons} placeholder="3" min="1" max="10" step="1" />
+                  </CalcField>
+                )}
+              </>
+            )}
+
+            {/* Legal notes */}
+            <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                'Rodzeństwo NIE jest zobowiązane — zamknięty katalog art. 61',
+                'Nieruchomości nie wchodzą w obliczenia — tylko bieżący dochód',
+                'Art. 64 ups — zwolnienie przy chorobie, bezrobociu, niepełnosprawności',
+              ].map(note => (
+                <div key={note} className="flex items-start gap-2 text-xs text-slate-500">
+                  <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                  <span>{note}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {error && (
-            <div className="p-4 bg-rose-50 text-rose-600 text-sm font-bold rounded-xl mb-6 flex items-center gap-3 border border-rose-200">
-              <AlertCircle size={16} /> {error}
+          {/* ── RIGHT: Live results (sticky) ── */}
+          <div className="lg:sticky lg:top-6">
+            <div className="bg-slate-900 rounded-2xl p-6 text-white">
+
+              {/* Header */}
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                  Podział opłaty miesięcznej
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400">
+                  <Zap size={9} className="fill-current" />
+                  Na żywo
+                </span>
+              </div>
+
+              {/* Total */}
+              <div className="mb-5">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Koszt całkowity</div>
+                <div className="text-5xl font-black text-white tracking-tight">{fmt(koszt)}</div>
+              </div>
+
+              {/* 4 cards */}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <ResultCard label="Mieszkaniec DPS" value={oplataSeniora} accent="green" />
+                <ResultCard label="Małżonek" value={oplataM} />
+                <ResultCard label={`Dzieci (×${nKids})`} value={oplataD} accent="amber" />
+                <ResultCard label="Gmina" value={oplataGminy} accent="blue" />
+              </div>
+
+              {/* Warning */}
+              {calcWarning && (
+                <div className="bg-white/8 border border-white/10 rounded-xl p-3 mb-4 text-xs text-slate-300 leading-relaxed">
+                  {calcWarning}
+                </div>
+              )}
+
+              {/* Disclaimer */}
+              <p className="text-[10px] text-slate-500 leading-relaxed">
+                <strong className="text-slate-400">Uwaga — dwie metody.</strong> Kalkulator stosuje metodę całkowitej nadwyżki
+                gospodarstwa (dochód rodziny − 300%&nbsp;×&nbsp;kryterium&nbsp;×&nbsp;liczba&nbsp;osób) — metoda większości MOPS/GOPS.
+                WSA&nbsp;w&nbsp;Łodzi (II&nbsp;SA/Łd&nbsp;499/20) i WSA&nbsp;w&nbsp;Opolu uznały metodę per-capita za korzystniejszą
+                dla rodziny. Realna decyzja MOPS uwzględnia sytuację każdej osoby indywidualnie.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── DPS Lookup section ── */}
+        <div className="border-t-2 border-slate-200 pt-12">
+          <div className="flex items-center gap-4 mb-4">
+            <span className="h-px w-10 bg-emerald-600" />
+            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-emerald-700">Wyszukiwarka DPS</span>
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 mb-2">Znajdź DPS w Twojej okolicy</h2>
+          <p className="text-slate-500 text-sm mb-8 max-w-xl">
+            Podaj miasto — wyszukamy publiczne DPS w Małopolsce i automatycznie podstawimy
+            najtańszą cenę do kalkulatora powyżej.
+          </p>
+
+          <div className="flex gap-3 mb-4 max-w-lg">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={city}
+                onChange={e => setCity(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleLookup()}
+                placeholder="np. Kraków, Wieliczka, Nowy Sącz…"
+                className="w-full bg-white border-2 border-slate-300 rounded-xl px-5 py-4 text-base font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-400"
+              />
+              <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+            </div>
+            <button
+              onClick={handleLookup}
+              disabled={loading || !city.trim()}
+              className={`px-7 py-4 rounded-xl font-black text-[12px] uppercase tracking-widest transition-all active:scale-[0.98] flex items-center gap-2 ${
+                !loading && city.trim()
+                  ? 'bg-slate-900 hover:bg-emerald-600 text-white'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              {loading
+                ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                : <><Search size={15} /> Szukaj</>
+              }
+            </button>
+          </div>
+
+          {lookupError && (
+            <div className="flex items-center gap-2 p-4 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700 font-bold mb-6 max-w-lg">
+              <AlertCircle size={15} /> {lookupError}
             </div>
           )}
 
-          <button
-            onClick={handleCalculate}
-            disabled={loading || !income || !city}
-            className={`w-full font-black text-[12px] uppercase tracking-[0.3em] py-5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-3
-              ${!loading && income && city
-                ? 'bg-slate-900 hover:bg-emerald-600 text-white'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <><Calculator size={18} /> Oblicz symulację</>
-            )}
-          </button>
-        </div>
+          {lookupResult && (() => {
+            const activeFacilities = selectedPowiat
+              ? lookupResult.facilities.filter(f => f.powiat === selectedPowiat)
+              : lookupResult.facilities;
+            const activeMops = selectedPowiat && lookupResult.mopsPerPowiat
+              ? lookupResult.mopsPerPowiat[selectedPowiat]
+              : lookupResult.mopsContact;
+            const activeFallbackCity = selectedPowiat ? undefined : lookupResult.mopsFallbackCity;
+            const activeFallbackUsed = selectedPowiat ? false : lookupResult.mopsFallbackUsed;
 
-        {/* ── RESULTS ── */}
-        {result && (() => {
-          const activeFacilities = selectedPowiat
-            ? result.facilities.filter(f => f.powiat === selectedPowiat)
-            : result.facilities;
-          const activeMops = selectedPowiat && result.mopsPerPowiat
-            ? result.mopsPerPowiat[selectedPowiat]
-            : result.mopsContact;
-          const activeMopsFallbackUsed = selectedPowiat ? false : result.mopsFallbackUsed;
-          const activeMopsFallbackCity = selectedPowiat ? undefined : result.mopsFallbackCity;
+            return (
+              <div className="space-y-12 mt-6">
 
-          return (
-            <div id="results-section" className="space-y-20">
-
-              {/* ── 70/30 split ── */}
-              <section>
-                <div className="flex items-center gap-4 mb-8">
-                  <span className="px-4 py-1.5 bg-emerald-100 rounded-full text-[11px] font-black text-emerald-700 uppercase tracking-widest">Szczegóły symulacji</span>
-                  <div className="h-px flex-1 bg-stone-200" />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                  {/* Senior contribution */}
-                  <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
-                        <CheckCircle2 size={20} />
-                      </div>
-                      <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Wkład Seniora (70%)</span>
-                    </div>
-                    <div className="text-4xl lg:text-5xl font-black text-emerald-800 leading-none tracking-tight mb-3">
-                      {formatCurrency(result.maxContribution)}
-                    </div>
-                    <p className="text-emerald-700 text-sm leading-relaxed border-t border-emerald-100 pt-3">
-                      Kwota wynikająca wprost z ustawy (70% dochodu). Jest potrącana automatycznie na rzecz DPS.
+                {/* Powiat selector */}
+                {lookupResult.ambiguousPowiaty && (
+                  <section>
+                    <p className="text-sm text-slate-600 mb-3">
+                      Miejscowość <strong>{lookupResult.city}</strong> występuje w kilku powiatach — wybierz właściwy:
                     </p>
-                  </div>
+                    <div className="flex flex-wrap gap-2">
+                      {lookupResult.ambiguousPowiaty.map(p => (
+                        <button
+                          key={p}
+                          onClick={() => setSelectedPowiat(p)}
+                          className={`px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wider border-2 transition-all ${
+                            selectedPowiat === p
+                              ? 'bg-slate-900 text-white border-slate-900'
+                              : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-500 hover:text-emerald-700'
+                          }`}
+                        >
+                          powiat {p}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                )}
 
-                  {/* Pocket money */}
-                  <div className="bg-white rounded-2xl p-6 border border-stone-200">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-amber-400 text-white flex items-center justify-center flex-shrink-0">
-                        <Heart size={20} />
-                      </div>
-                      <span className="text-[11px] font-black text-amber-600 uppercase tracking-widest">Zostaje &quot;Na rękę&quot; (30%)</span>
-                    </div>
-                    <div className="text-4xl lg:text-5xl font-black text-slate-900 leading-none tracking-tight mb-3">
-                      {formatCurrency(result.remainingFunds)}
-                    </div>
-                    <div className="text-xs text-slate-500 border-t border-stone-100 pt-3">
-                      <p className="font-black uppercase tracking-widest text-[10px] mb-2">Budżet na potrzeby własne:</p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 font-bold">Leki</span>
-                        <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 font-bold">Higiena</span>
-                        <span className="inline-flex items-center gap-1 bg-stone-50 px-2 py-1 rounded-lg text-stone-600 border border-stone-200 font-bold">Telefon</span>
-                      </div>
-                      {result.remainingFunds < 300 && (
-                        <div className="mt-3 text-amber-700 flex items-start gap-1.5 font-bold bg-amber-50 p-2 rounded-lg border border-amber-100">
-                          <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
-                          Uwaga: ta kwota może nie wystarczyć na leki nierefundowane.
-                        </div>
+                {/* Facility list */}
+                <section>
+                  <div className="flex justify-between items-end mb-6">
+                    <div>
+                      <h3 className="text-xl font-black text-slate-900">
+                        {lookupResult.powiatFallbackUsed
+                          ? `Najbliższe DPS w okolicy ${lookupResult.city}`
+                          : `DPS w ${toCityLocative(lookupResult.city)}`}
+                      </h3>
+                      {lookupResult.powiatFallbackUsed && lookupResult.powiatFallbackName && !lookupResult.ambiguousPowiaty && (
+                        <p className="text-sm text-slate-500 mt-1">
+                          Brak DPS bezpośrednio w {lookupResult.city} — pokazujemy placówki z powiatu <strong>{toPowiatGenitive(lookupResult.powiatFallbackName)}</strong>.
+                        </p>
                       )}
                     </div>
+                    <button
+                      onClick={() => router.push(`/search?q=${encodeURIComponent(lookupResult.city)}&woj=ma%C5%82opolskie&typ=dps`)}
+                      className="text-[11px] font-black text-emerald-700 uppercase tracking-widest flex items-center gap-1 hover:text-slate-900 transition-colors shrink-0 ml-4"
+                    >
+                      Pokaż w wyszukiwarce <ChevronRight size={13} />
+                    </button>
                   </div>
-                </div>
 
-                <div className="w-full h-14 bg-stone-100 rounded-xl overflow-hidden flex">
-                  <div className="h-full bg-emerald-600 flex items-center justify-center" style={{ width: '70%' }}>
-                    <span className="text-white text-[11px] font-black uppercase tracking-widest">Koszt pobytu</span>
-                  </div>
-                  <div className="h-full flex-1 flex items-center justify-center">
-                    <span className="text-stone-400 text-[11px] font-black uppercase tracking-widest">Kwota wolna</span>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-400 mt-4 italic">
-                  Symulacja wg ustawy o pomocy społecznej. MOPS rozpatruje każdą sprawę indywidualnie — nie jest to decyzja administracyjna.
-                </p>
-              </section>
+                  <div className="space-y-3">
+                    {(showAllFacilities ? activeFacilities : activeFacilities.slice(0, 6)).map(facility => {
+                      const hasPrice = !!facility.koszt_pobytu;
+                      const seniorMax = incSenior * 0.7;
+                      const gap = hasPrice ? facility.koszt_pobytu! - seniorMax : 0;
+                      const isCovered = hasPrice && gap <= 0;
 
-              {/* ── Who covers the gap? ── */}
-              {result.facilitiesWithPrices.length > 0 && (() => {
-                const cheapest = [...result.facilitiesWithPrices].sort((a, b) => a.koszt_pobytu! - b.koszt_pobytu!)[0];
-                const gap = cheapest.koszt_pobytu! - result.maxContribution;
-                const familyIncNum = parseFloat(familyIncome);
-                const familyPerNum = parseInt(familyPersons);
-                const familyCheck = familyIncNum > 0 ? checkFamilyObligation(familyIncNum, familyPerNum) : null;
-
-                return (
-                  <section>
-                    <div className="flex items-center gap-4 mb-8">
-                      <span className="px-4 py-1.5 bg-blue-100 rounded-full text-[11px] font-black text-blue-700 uppercase tracking-widest">Kto płaci różnicę</span>
-                      <div className="h-px flex-1 bg-stone-200" />
-                    </div>
-
-                    {gap <= 0 ? (
-                      <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-200 flex items-center gap-4">
-                        <CheckCircle2 className="text-emerald-600 flex-shrink-0" size={28} />
-                        <div>
-                          <p className="font-black text-emerald-900 text-lg">Senior pokrywa koszt w całości</p>
-                          <p className="text-emerald-700 text-sm mt-1">
-                            Przy dochodzie {formatCurrency(result.income)} emerytura wystarczy na najtańszy DPS w okolicy ({formatCurrency(cheapest.koszt_pobytu!)}/mc). Gmina ani rodzina nie muszą dopłacać.
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Gap visualization */}
-                        <div className="bg-white border border-stone-200 rounded-2xl p-8 mb-6">
-                          <p className="text-slate-600 text-sm mb-5">
-                            Najtańszy DPS w okolicy kosztuje <strong className="text-slate-900">{formatCurrency(cheapest.koszt_pobytu!)}</strong>/mc.
-                            Senior (70% emerytury) pokrywa <strong className="text-emerald-700">{formatCurrency(result.maxContribution)}</strong>.
-                            Brakuje <strong className="text-rose-600">{formatCurrency(gap)}</strong>.
-                          </p>
-                          <div className="w-full h-10 rounded-xl overflow-hidden flex text-[11px] font-black uppercase tracking-wider">
-                            <div
-                              className="bg-emerald-600 text-white flex items-center justify-center"
-                              style={{ width: `${(result.maxContribution / cheapest.koszt_pobytu!) * 100}%` }}
-                            >
-                              Senior
+                      return (
+                        <div
+                          key={facility.id}
+                          className="bg-white border border-stone-200 rounded-2xl p-5 lg:p-6 hover:border-emerald-300 transition-all flex flex-col sm:flex-row justify-between items-start gap-5"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                              <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700">DPS</span>
+                              <span className="text-[11px] text-slate-400 font-bold uppercase">{facility.miejscowosc}, pow. {facility.powiat}</span>
                             </div>
-                            <div
-                              className="bg-amber-400 text-slate-900 flex items-center justify-center"
-                              style={{ width: `${(gap / cheapest.koszt_pobytu!) * 100}%` }}
-                            >
-                              Rodzina / Gmina
-                            </div>
+                            <h4 className="text-lg font-black text-slate-900 leading-tight mb-1.5">{facility.nazwa}</h4>
+                            {facility.telefon && (
+                              <a href={`tel:${facility.telefon.replace(/\s/g,'')}`} className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 transition-colors">
+                                <Phone size={10} /> {facility.telefon}
+                              </a>
+                            )}
                           </div>
-                          <div className="flex justify-between text-xs text-slate-400 mt-2">
-                            <span>{formatCurrency(result.maxContribution)}</span>
-                            <span>{formatCurrency(gap)}</span>
-                          </div>
-                        </div>
 
-                        {/* Who pays explanation */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                          <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Gmina (zawsze)</p>
-                            <p className="text-sm text-slate-700 leading-relaxed">
-                              Gmina jest <strong>ostatecznym gwarantem</strong> — pokrywa całą resztę, której nie może zapłacić ani senior, ani rodzina (art. 61 ust. 2 ups).
-                            </p>
-                          </div>
-                          <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Rodzina (warunkowo)</p>
-                            <p className="text-sm text-slate-700 leading-relaxed">
-                              Małżonek, dzieci i wnuki są zobowiązani <strong>tylko jeśli ich dochód przekracza</strong> 300% kryterium. Poniżej progu — <strong>są zwolnieni</strong>.
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Optional family income checker */}
-                        <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 mb-6">
-                          <button
-                            onClick={() => setShowFamilyCalc(prev => !prev)}
-                            className="w-full flex items-center justify-between gap-3 text-left"
-                          >
-                            <div>
-                              <p className="font-black text-slate-900 text-sm">Sprawdź czy rodzina musi dopłacać</p>
-                              <p className="text-xs text-slate-500 mt-0.5">Podaj łączny dochód rodziny — sprawdzimy próg ustawowy</p>
-                            </div>
-                            <ChevronRight className={`text-slate-400 transition-transform flex-shrink-0 ${showFamilyCalc ? 'rotate-90' : ''}`} size={18} />
-                          </button>
-
-                          {showFamilyCalc && (
-                            <div className="mt-5 pt-5 border-t border-slate-100">
-                              <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Łączny dochód rodziny</label>
-                                  <div className="relative">
-                                    <input
-                                      type="number"
-                                      value={familyIncome}
-                                      onChange={(e) => setFamilyIncome(e.target.value)}
-                                      placeholder="np. 6000"
-                                      min="0"
-                                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-xl font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all"
-                                    />
-                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">PLN</span>
-                                  </div>
-                                  <p className="text-xs text-slate-400 mt-1">Netto miesięcznie (łącznie wszystkich)</p>
-                                </div>
-                                <div>
-                                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Osób w rodzinie</label>
-                                  <select
-                                    value={familyPersons}
-                                    onChange={(e) => setFamilyPersons(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-xl font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all"
-                                  >
-                                    {[1,2,3,4,5].map(n => (
-                                      <option key={n} value={n}>{n} {n === 1 ? 'osoba' : n < 5 ? 'osoby' : 'osób'}</option>
-                                    ))}
-                                  </select>
-                                </div>
+                          <div className="w-full sm:w-auto sm:min-w-[200px] bg-stone-50 rounded-xl p-4 border border-stone-100 flex-shrink-0">
+                            {!hasPrice ? (
+                              <div className="text-sm font-bold text-slate-400 mb-3">Cena na zapytanie</div>
+                            ) : isCovered ? (
+                              <div className="text-sm font-black text-emerald-600 flex items-center gap-1.5 mb-3">
+                                <CheckCircle2 size={14} /> Pokryte z emerytury
                               </div>
+                            ) : (
+                              <div className="mb-3">
+                                <div className="text-xs font-black text-slate-900">{fmt(facility.koszt_pobytu!)}<span className="text-slate-400 font-normal">/mc</span></div>
+                                <div className="text-xs text-rose-600 font-bold mt-0.5">Brakuje: {fmt(gap)}</div>
+                              </div>
+                            )}
 
-                              {familyCheck && (
-                                <div className={`rounded-xl p-4 border ${familyCheck.isExempt ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
-                                  <div className="flex items-start gap-3">
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${familyCheck.isExempt ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                                      {familyCheck.isExempt ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                                    </div>
-                                    <div>
-                                      {familyCheck.isExempt ? (
-                                        <>
-                                          <p className="font-black text-emerald-900 text-sm">Rodzina jest zwolniona z dopłaty</p>
-                                          <p className="text-xs text-emerald-700 mt-1">
-                                            Dochód {formatCurrency(familyIncNum)} jest poniżej ustawowego progu {formatCurrency(familyCheck.threshold)} dla {familyPerNum === 1 ? 'singla' : `${familyPerNum} osób`}. Gmina pokryje całą różnicę.
-                                          </p>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <p className="font-black text-amber-900 text-sm">Rodzina może być zobowiązana do dopłaty</p>
-                                          <p className="text-xs text-amber-800 mt-1">
-                                            Dochód {formatCurrency(familyIncNum)} przekracza próg {formatCurrency(familyCheck.threshold)}. MOPS ustala kwotę indywidualnie — masz prawo wnioskować o obniżkę (art. 64 ups: choroba, bezrobocie, niepełnosprawność).
-                                          </p>
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
+                            {hasPrice && !isCovered && (
+                              <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden flex mb-3">
+                                <div className="bg-emerald-500 h-full" style={{ width: `${Math.min(100, (seniorMax / facility.koszt_pobytu!) * 100)}%` }} />
+                                <div className="bg-amber-400 h-full" style={{ width: `${Math.min(100, (Math.max(0,gap) / facility.koszt_pobytu!) * 100)}%` }} />
+                              </div>
+                            )}
+
+                            <div className="flex items-center gap-2">
+                              {hasPrice && (
+                                <button
+                                  onClick={() => setDpsCost(String(facility.koszt_pobytu))}
+                                  title="Podstaw tę cenę do kalkulatora"
+                                  className="flex-1 py-1.5 px-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wider transition-all text-center"
+                                >
+                                  Użyj ceny ↑
+                                </button>
                               )}
+                              <button onClick={() => toggleCompare(facility.id)} title="Porównaj"
+                                className={`p-1.5 rounded-lg border-2 transition-all ${compareIds.includes(facility.id) ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-200 text-slate-400 hover:border-slate-400'}`}>
+                                <ArrowLeftRight size={13} />
+                              </button>
+                              <button onClick={() => toggleFavorite(facility)} title="Ulubione"
+                                className={`p-1.5 rounded-lg border-2 transition-all ${savedIds.includes(facility.id) ? 'text-emerald-600 border-emerald-200' : 'border-slate-200 text-slate-400 hover:border-slate-400'}`}>
+                                <Heart size={13} className={savedIds.includes(facility.id) ? 'fill-current' : ''} />
+                              </button>
+                              <Link href={`/placowka/${facility.id}`}
+                                className="text-[10px] font-black text-slate-700 border-b-2 border-slate-300 hover:text-emerald-600 hover:border-emerald-500 transition-all pb-0.5 uppercase tracking-wide">
+                                Szczegóły
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {!showAllFacilities && activeFacilities.length > 6 && (
+                    <button
+                      onClick={() => setShowAllFacilities(true)}
+                      className="mt-4 w-full py-4 border-2 border-slate-200 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-700 transition-all"
+                    >
+                      Pokaż więcej ({activeFacilities.length - 6} kolejnych)
+                    </button>
+                  )}
+                </section>
+
+                {/* MOPS */}
+                {(!lookupResult.ambiguousPowiaty || selectedPowiat) && (
+                  <section>
+                    <h3 className="text-xl font-black text-slate-900 mb-5">Właściwy ośrodek pomocy społecznej</h3>
+                    {activeMops ? (
+                      <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden max-w-xl">
+                        <div className="bg-emerald-600 px-6 py-4 flex items-center gap-3">
+                          <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                            <Phone className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-emerald-100 text-[10px] font-black uppercase tracking-widest">Wniosek o dopłatę gminy</p>
+                            <h4 className="text-white font-black text-base leading-tight">{activeMops.name}</h4>
+                          </div>
+                        </div>
+                        <div className="p-5 space-y-3">
+                          {activeFallbackUsed && activeFallbackCity && (
+                            <div className="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-xl text-sm text-amber-900">
+                              Dla miejscowości <strong>{lookupResult.city}</strong> właściwym ośrodkiem jest {activeMops.typ} w <strong>{toCityLocative(activeFallbackCity)}</strong>.
                             </div>
                           )}
-                        </div>
-
-                        {/* Key legal facts */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          <div className="flex items-start gap-2 p-3 bg-stone-50 rounded-xl border border-stone-100">
-                            <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                            <p className="text-xs text-slate-600"><strong>Rodzeństwo</strong> nie jest zobowiązane — zamknięty katalog art. 61 ups</p>
-                          </div>
-                          <div className="flex items-start gap-2 p-3 bg-stone-50 rounded-xl border border-stone-100">
-                            <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                            <p className="text-xs text-slate-600"><strong>Nieruchomości</strong> nie są liczone — tylko bieżący dochód</p>
-                          </div>
-                          <div className="flex items-start gap-2 p-3 bg-stone-50 rounded-xl border border-stone-100">
-                            <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                            <p className="text-xs text-slate-600"><strong>Art. 64</strong> — zwolnienie przy chorobie, bezrobociu, niepełnosprawności</p>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </section>
-                );
-              })()}
-
-              {/* ── Legal thresholds ── */}
-              <section className="bg-slate-800 rounded-2xl p-8 lg:p-10 text-white">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3">Ustawowe progi dochodowe</h3>
-                <p className="text-slate-300 text-sm mb-8 max-w-2xl leading-relaxed">
-                  Ustawa o pomocy społecznej określa tzw. „bezpieczniki finansowe". Poniżej tych kwot gmina zazwyczaj <strong className="text-white">nie powinna</strong> żądać dopłaty od rodziny, ale każda sprawa jest badana indywidualnie.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div className="bg-white/10 rounded-xl p-5 border border-white/10">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Dla osoby samotnej</span>
-                    <span className="text-2xl font-black text-blue-300">~{THRESHOLD_SINGLE} zł <span className="text-sm font-normal text-white">netto</span></span>
-                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">Ustawowy próg zwolnienia (300% kryterium).</p>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-5 border border-white/10">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Dla osoby w rodzinie</span>
-                    <span className="text-2xl font-black text-blue-300">~{THRESHOLD_FAMILY} zł <span className="text-sm font-normal text-white">netto/os.</span></span>
-                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">Ustawowy próg zwolnienia na osobę (300% kryterium).</p>
-                  </div>
-                </div>
-                <div className="p-3 bg-red-900/30 border border-red-500/30 rounded-lg text-xs text-red-200 flex items-start gap-2">
-                  <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-                  <p><strong>Ważne:</strong> Nawet jeśli Twój dochód jest wyższy, dopłata nie jest automatyczna! Jej wysokość ustala się w drodze umowy z kierownikiem ośrodka pomocy. Masz prawo do negocjacji, jeśli ponosisz inne wysokie koszty życiowe.</p>
-                </div>
-              </section>
-
-              {/* ── Powiat selector ── */}
-              {result.ambiguousPowiaty && (
-                <section>
-                  <div className="flex items-center gap-4 mb-6">
-                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Wybierz powiat</span>
-                    <div className="h-px flex-1 bg-slate-100" />
-                  </div>
-                  <p className="text-sm text-slate-600 mb-4">
-                    Miejscowość <strong>{result.city}</strong> występuje w kilku powiatach — wybierz właściwy, żeby zobaczyć odpowiednie DPS i MOPS:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {result.ambiguousPowiaty.map(p => (
-                      <button
-                        key={p}
-                        onClick={() => setSelectedPowiat(p)}
-                        className={`px-5 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider border-2 transition-all ${
-                          selectedPowiat === p
-                            ? 'bg-slate-900 text-white border-slate-900'
-                            : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-600 hover:text-emerald-700'
-                        }`}
-                      >
-                        powiat {p}
-                      </button>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* ── MOPS ── */}
-              {(!result.ambiguousPowiaty || selectedPowiat) && (
-                <section>
-                  <div className="flex items-center gap-4 mb-8">
-                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Właściwy ośrodek pomocy</span>
-                    <div className="h-px flex-1 bg-slate-100" />
-                  </div>
-
-                  {activeMops ? (
-                    <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-                      {/* Header */}
-                      <div className="bg-emerald-600 px-6 py-4 flex items-center gap-3">
-                        <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Phone className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-emerald-100 text-[10px] font-black uppercase tracking-widest">Kluczowy kontakt</p>
-                          <h3 className="text-white font-black text-lg leading-tight">Wniosek o dopłatę gminy</h3>
-                        </div>
-                      </div>
-                      <div className="p-6">
-                        {activeMopsFallbackUsed && activeMopsFallbackCity && (
-                          <div className="bg-amber-50 border-l-4 border-amber-400 p-3 mb-5 rounded-r-xl text-sm">
-                            <p className="text-amber-900">
-                              Dla miejscowości <strong>{result.city}</strong> właściwym ośrodkiem pomocy społecznej jest {activeMops.typ} w <strong>{toCityLocative(activeMopsFallbackCity)}</strong> — tam złożysz wniosek o dopłatę do DPS.
-                            </p>
-                          </div>
-                        )}
-                        <p className="text-lg font-black text-slate-900 mb-5">{activeMops.name}</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-                          <a
-                            href={`tel:${activeMops.phone.replace(/\s/g, '')}`}
-                            className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors group"
-                          >
+                          <a href={`tel:${activeMops.phone.replace(/\s/g,'')}`}
+                            className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors">
                             <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <Phone size={15} />
+                              <Phone size={14} />
                             </div>
                             <div>
                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Telefon</p>
                               <p className="text-sm font-bold text-slate-800">{activeMops.phone}</p>
                             </div>
                           </a>
-                          <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMops.address)}`}
+                          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMops.address)}`}
                             target="_blank" rel="noopener noreferrer"
-                            className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors group"
-                          >
-                            <div className="w-8 h-8 bg-stone-200 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
-                              <MapPin size={15} />
+                            className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors">
+                            <div className="w-8 h-8 bg-stone-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <MapPin size={14} className="text-slate-500" />
                             </div>
                             <div>
                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Adres</p>
                               <p className="text-sm text-slate-700">{activeMops.address}</p>
                             </div>
                           </a>
-                          {activeMops.email && (
-                            <a
-                              href={`mailto:${activeMops.email}`}
-                              className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors group"
-                            >
-                              <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Search size={15} />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email</p>
-                                <p className="text-sm text-slate-800 truncate">{activeMops.email}</p>
-                              </div>
-                            </a>
-                          )}
                           {activeMops.website && (
-                            <a
-                              href={activeMops.website}
-                              target="_blank" rel="noopener noreferrer"
-                              className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors group"
-                            >
+                            <a href={activeMops.website} target="_blank" rel="noopener noreferrer"
+                              className="flex items-center gap-3 bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-200 rounded-xl px-4 py-3 transition-colors">
                               <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <ChevronRight size={15} />
+                                <ChevronRight size={14} />
                               </div>
-                              <div className="min-w-0">
+                              <div>
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Strona www</p>
-                                <p className="text-sm text-emerald-600 truncate">{activeMops.website.replace(/^https?:\/\//, '')}</p>
+                                <p className="text-sm text-emerald-600 truncate">{activeMops.website.replace(/^https?:\/\//,'')}</p>
                               </div>
                             </a>
                           )}
                         </div>
-                        <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-start gap-2">
-                          <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-emerald-800">
-                            Zadzwoń i umów się na rozmowę z pracownikiem socjalnym. To pierwszy krok do uzyskania dopłaty gminy do kosztów DPS.
-                          </p>
-                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="bg-white border-2 border-slate-300 rounded-2xl p-8">
-                      <p className="text-sm text-slate-500 mb-5">
-                        Nie mamy jeszcze danych kontaktowych dla powiatu <strong>{activeFacilities[0]?.powiat || result.city}</strong> w naszej bazie.
-                        Skontaktuj się bezpośrednio — to pierwszy krok do złożenia wniosku o dopłatę gminy.
-                      </p>
-                      <a
-                        href={`https://www.google.com/search?q=MOPS+${encodeURIComponent(result.city)}`}
-                        target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all"
-                      >
-                        <Search size={15} /> Szukaj MOPS {result.city} w Google
-                      </a>
-                      <p className="text-xs text-slate-400 mt-4">
-                        Możesz też zadzwonić do Urzędu Gminy lub Starostwa Powiatowego — skierują Cię do właściwego ośrodka.
-                      </p>
-                    </div>
-                  )}
-                </section>
-              )}
-
-              {/* ── Facilities ── */}
-              <section>
-                <div className="flex justify-between items-end mb-8">
-                  <div>
-                    <div className="flex items-center gap-4 mb-2">
-                      <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-                        {result.powiatFallbackUsed ? 'DPS w okolicy' : 'Placówki w'}
-                      </span>
-                      <div className="h-px flex-1 bg-slate-100 w-16" />
-                    </div>
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-                      {result.powiatFallbackUsed
-                        ? `Najbliższe DPS w okolicy ${result.city}`
-                        : `DPS w ${toCityLocative(result.city)}`}
-                    </h3>
-                    <p className="text-slate-500 text-sm mt-1">
-                      {activeFacilities.length}{' '}
-                      {activeFacilities.length === 1 ? 'placówka' : activeFacilities.length < 5 ? 'placówki' : 'placówek'} — analiza pokrycia kosztów dla Twojego dochodu
-                    </p>
-                  </div>
-                  <button
-                    onClick={navigateToSearch}
-                    className="text-[11px] font-black text-emerald-700 uppercase tracking-widest flex items-center gap-2 hover:text-slate-900 transition-colors shrink-0 ml-4"
-                  >
-                    Pokaż w wyszukiwarce <ChevronRight size={14} />
-                  </button>
-                </div>
-
-                {result.powiatFallbackUsed && result.powiatFallbackName && !result.ambiguousPowiaty && (
-                  <p className="text-sm text-slate-500 mb-6">
-                    Miejscowość <strong>{result.city}</strong> nie ma własnego DPS.
-                    Poniżej pokazujemy placówki z powiatu <strong>{toPowiatGenitive(result.powiatFallbackName)}</strong>.
-                  </p>
-                )}
-
-                <div className="space-y-4">
-                  {(showAllFacilities ? activeFacilities : activeFacilities.slice(0, 5)).map((facility) => {
-                    const hasPrice = facility.koszt_pobytu && facility.koszt_pobytu > 0;
-                    const gap = hasPrice ? facility.koszt_pobytu! - result.maxContribution : 0;
-                    const isCovered = hasPrice && gap <= 0;
-
-                    return (
-                      <div key={facility.id} className="bg-white border border-stone-200 rounded-2xl p-6 lg:p-8 hover:border-emerald-400 transition-all flex flex-col md:flex-row justify-between items-start gap-6">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-2 flex-wrap">
-                            <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg ${
-                              facility.typ_placowki === 'DPS' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'
-                            }`}>
-                              {facility.typ_placowki}
-                            </span>
-                            <span className="text-[11px] font-bold text-slate-400 uppercase">{facility.miejscowosc}, pow. {facility.powiat}</span>
-                          </div>
-                          <h4 className="text-xl font-black text-slate-900 mb-2 leading-tight">{facility.nazwa}</h4>
-                          {hasPrice && (
-                            <div className="text-sm font-bold text-slate-500">
-                              Pełny koszt: <span className="text-slate-900">{formatCurrency(facility.koszt_pobytu!)}</span> / mc
-                            </div>
-                          )}
-                          {facility.telefon && (
-                            <a
-                              href={`tel:${facility.telefon.replace(/\s/g, '')}`}
-                              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 mt-2 transition-colors"
-                            >
-                              <Phone size={11} /> {facility.telefon}
-                            </a>
-                          )}
-                        </div>
-
-                        <div className="w-full md:w-auto bg-stone-50 rounded-xl p-4 flex-shrink-0 md:min-w-[220px] border border-stone-100">
-                          {!hasPrice ? (
-                            <span className="text-sm font-bold text-slate-400">Cena na zapytanie</span>
-                          ) : isCovered ? (
-                            <span className="text-sm font-black text-emerald-600 flex items-center gap-2 uppercase tracking-tight mb-3">
-                              <CheckCircle2 size={16} /> W pełni pokryte
-                            </span>
-                          ) : (
-                            <div className="mb-3">
-                              <div className="text-sm font-black text-rose-600 uppercase tracking-tighter">Brakuje: {formatCurrency(gap)}</div>
-                              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Dopłata gminy/rodziny</div>
-                            </div>
-                          )}
-
-                          {/* Gap bar */}
-                          {hasPrice && !isCovered && (
-                            <div className="mb-3">
-                              <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden flex">
-                                <div className="bg-emerald-600 h-full" style={{ width: `${(result.maxContribution / facility.koszt_pobytu!) * 100}%` }} />
-                                <div className="bg-amber-400 h-full" style={{ width: `${(gap / facility.koszt_pobytu!) * 100}%` }} />
-                              </div>
-                              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                                <span>Senior</span>
-                                <span>Gmina *</span>
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="flex items-center gap-2 mt-1">
-                            <button
-                              onClick={() => toggleCompare(facility.id)}
-                              title={compareIds.includes(facility.id) ? 'Usuń z porównania' : 'Dodaj do porównania'}
-                              className={`p-2 rounded-lg border-2 transition-all ${
-                                compareIds.includes(facility.id)
-                                  ? 'bg-slate-900 text-white border-slate-900'
-                                  : 'border-slate-300 text-slate-400 hover:border-slate-500'
-                              }`}
-                            >
-                              <ArrowLeftRight size={14} />
-                            </button>
-                            <button
-                              onClick={() => toggleFavorite(facility)}
-                              title={savedIds.includes(facility.id) ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
-                              className={`p-2 rounded-lg border-2 transition-all ${
-                                savedIds.includes(facility.id)
-                                  ? 'text-emerald-600 border-emerald-200'
-                                  : 'border-slate-300 text-slate-400 hover:border-slate-500'
-                              }`}
-                            >
-                              <Heart size={14} className={savedIds.includes(facility.id) ? 'fill-current' : ''} />
-                            </button>
-                            <Link
-                              href={`/placowka/${facility.id}`}
-                              className="text-[11px] font-black text-slate-900 border-b-2 border-slate-900 hover:text-emerald-600 hover:border-emerald-600 transition-all pb-0.5 uppercase tracking-wider"
-                            >
-                              Szczegóły
-                            </Link>
-                          </div>
-                        </div>
+                    ) : (
+                      <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-xl">
+                        <p className="text-sm text-slate-500 mb-4">Brak danych kontaktowych dla tego powiatu w naszej bazie.</p>
+                        <a href={`https://www.google.com/search?q=MOPS+${encodeURIComponent(lookupResult.city)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-5 py-3 border-2 border-slate-300 rounded-xl text-sm font-bold text-slate-700 hover:border-emerald-500 hover:text-emerald-700 transition-all">
+                          <Search size={14} /> Szukaj MOPS {lookupResult.city} w Google
+                        </a>
                       </div>
-                    );
-                  })}
-                </div>
-
-                {!showAllFacilities && activeFacilities.length > 5 && (
-                  <button
-                    onClick={() => setShowAllFacilities(true)}
-                    className="mt-6 w-full py-4 border-2 border-slate-300 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:border-emerald-600 hover:text-emerald-700 transition-all"
-                  >
-                    Pokaż więcej ({activeFacilities.length - 5} kolejnych placówek)
-                  </button>
+                    )}
+                  </section>
                 )}
-              </section>
+              </div>
+            );
+          })()}
+        </div>
 
-              {/* ── Expert note ── */}
-              <section className="bg-emerald-900 text-white rounded-2xl p-8 lg:p-10 flex flex-col md:flex-row gap-8 items-center">
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center shrink-0">
-                  <AlertCircle size={28} className="text-emerald-400" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-xl font-black mb-2 uppercase tracking-tight">Potrzebujesz pomocy urzędowej?</h4>
-                  <p className="text-emerald-100 text-sm leading-relaxed opacity-80">
-                    Ostateczna decyzja o odpłatności zawsze należy do MOPS / GOPS. Pracownik socjalny przeprowadzi wywiad środowiskowy i ustali dokładne kwoty dopłat na podstawie Twojej indywidualnej sytuacji majątkowej. Nie traktuj tego wyniku jako ostatecznego wymiaru opłat.
-                  </p>
-                </div>
-                <a
-                  href="/asystent?start=true"
-                  className="bg-emerald-500 hover:bg-emerald-400 text-white font-black text-[12px] uppercase tracking-widest px-8 py-4 rounded-xl transition-all shrink-0 active:scale-95"
-                >
-                  Zapytaj AI
-                </a>
-              </section>
+        {/* Expert note */}
+        <div className="mt-16 bg-emerald-900 text-white rounded-2xl p-8 flex flex-col md:flex-row gap-6 items-center">
+          <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center shrink-0">
+            <AlertCircle size={24} className="text-emerald-400" />
+          </div>
+          <div className="flex-1">
+            <h4 className="text-lg font-black mb-1.5 uppercase tracking-tight">Potrzebujesz pomocy urzędowej?</h4>
+            <p className="text-emerald-100 text-sm leading-relaxed opacity-80">
+              Ostateczna decyzja o odpłatności zawsze należy do MOPS/GOPS. Pracownik socjalny przeprowadzi
+              wywiad środowiskowy i ustali dokładne kwoty na podstawie Twojej indywidualnej sytuacji.
+              Nie traktuj tego wyniku jako decyzji administracyjnej.
+            </p>
+          </div>
+          <a href="/asystent?start=true"
+            className="bg-emerald-500 hover:bg-emerald-400 text-white font-black text-[12px] uppercase tracking-widest px-8 py-4 rounded-xl transition-all shrink-0 active:scale-95">
+            Zapytaj AI
+          </a>
+        </div>
 
-              {/* ── Comparison bar ── */}
-              {compareIds.length > 0 && (
-                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl">
-                  <div className="bg-slate-900 text-white rounded-2xl px-5 py-4 shadow-2xl flex items-center gap-4">
-                    <div className="flex-1">
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Porównanie</p>
-                      <p className="text-sm font-bold">
-                        {compareIds.length} / 3 placówk{compareIds.length === 1 ? 'a' : 'i'}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => router.push(`/ulubione/porownaj?ids=${compareIds.join(',')}`)}
-                      disabled={compareIds.length < 2}
-                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
-                        compareIds.length >= 2
-                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                          : 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                      }`}
-                    >
-                      Porównaj <ChevronRight size={16} />
-                    </button>
-                    <button
-                      onClick={() => setCompareIds([])}
-                      className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white"
-                      title="Wyczyść"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                </div>
-              )}
-
+        {/* Comparison bar */}
+        {compareIds.length > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl">
+            <div className="bg-slate-900 text-white rounded-2xl px-5 py-4 shadow-2xl flex items-center gap-4">
+              <div className="flex-1">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-0.5">Porównanie</p>
+                <p className="text-sm font-bold">{compareIds.length} / 3 placówk{compareIds.length === 1 ? 'a' : 'i'}</p>
+              </div>
+              <button
+                onClick={() => router.push(`/ulubione/porownaj?ids=${compareIds.join(',')}`)}
+                disabled={compareIds.length < 2}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
+                  compareIds.length >= 2 ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                }`}
+              >
+                Porównaj <ChevronRight size={15} />
+              </button>
+              <button onClick={() => setCompareIds([])} className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white">
+                <X size={15} />
+              </button>
             </div>
-          );
-        })()}
-
+          </div>
+        )}
       </div>
     </div>
   );
