@@ -466,14 +466,14 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
         return (
           <ChartSection
             delay={0.12}
-            insight={`Żeby każdy powiat Małopolski osiągnął obecną średnią regionalną (${TARGET}/10k) do 2035 roku — biorąc pod uwagę prognozy demograficzne GUS — potrzeba ok. ${fmt(deficitBezKrakowa)} nowych miejsc DPS (bez m. Krakowa). Szacowany koszt: ~${costBezKrakowa.toLocaleString('pl-PL')} mln zł.`}
+            insight={`Żeby każdy powiat Małopolski osiągnął obecną średnią regionalną (${TARGET}/10k) do 2035 roku — biorąc pod uwagę prognozy demograficzne GUS — potrzeba ok. ${fmt(deficitBezKrakowa)} nowych miejsc DPS (bez m. Krakowa). Szacowany koszt: ~${costBezKrakowa.toLocaleString('pl-PL')}–${Math.round(deficitBezKrakowa * 900_000 / 1_000_000).toLocaleString('pl-PL')} mln zł (przy 400–900 tys. zł/miejsce).`}
           >
             <h2 className="text-xl font-bold text-slate-900 mb-1">Scenariusz inwestycyjny — ile nowych miejsc do 2035</h2>
             <p className="text-sm text-slate-500 mb-1">
               Liczba miejsc DPS potrzebna w każdym powiecie, by osiągnąć obecną średnią Małopolski ({TARGET}/10k seniorów 80+) przy prognozowanym wzroście populacji 80+ do 2035 r. (GUS).
             </p>
             <p className="text-xs text-slate-400 mb-4">
-              Szacowany koszt budowy: 400 tys. zł / miejsce (na podstawie KPO D4.1.1 — łóżka opieki długoterminowej). Rzeczywisty koszt dla nowych budynków DPS może być wyższy.
+              Szacowany koszt budowy: <strong className="text-slate-600">400–900 tys. zł / miejsce</strong> — dolna granica na podstawie KPO D4.1.1 (łóżka opieki długoterminowej w szpitalach powiatowych), górna granica dla nowych budynków DPS (grunt, standard energetyczny, kadry, wyposażenie).
             </p>
             <ResponsiveContainer width="100%" height={Math.max(300, scenariuszData.length * 28)}>
               <BarChart data={scenariuszData} layout="vertical" margin={{ left: 92, right: 80, top: 4, bottom: 4 }}>

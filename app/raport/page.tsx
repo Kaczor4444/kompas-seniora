@@ -243,8 +243,11 @@ export default function RaportPage() {
           </h1>
 
           <p className="text-slate-300 text-lg max-w-2xl mb-2">
-            Kompleksowa analiza 22 powiatów — wskaźniki nasycenia, luka finansowa
+            Analiza publicznej sieci DPS w 22 powiatach — wskaźniki nasycenia, luka finansowa
             i trendy cenowe Domów Pomocy Społecznej.
+          </p>
+          <p className="text-amber-400/80 text-xs max-w-2xl mb-1">
+            ⚠ Raport obejmuje wyłącznie publiczne DPS z rejestru MUW. Nie uwzględnia prywatnych domów opieki, ZOL/ZPO ani opieki domowej.
           </p>
           <p className="text-slate-500 text-sm mb-10">
             Metodologia: liczba miejsc DPS (MUW Małopolska, marzec 2026) na 10 000 mieszkańców
@@ -524,6 +527,34 @@ export default function RaportPage() {
             *Prognoza 2035 = scenariusz braku inwestycji (stała liczba miejsc, rosnąca populacja GUS).
             ⚠ = mniej niż 3 placówki z danymi cenowymi — mediana mało wiarygodna.
           </p>
+        </div>
+      </section>
+
+      {/* Czy więcej DPS to jedyne rozwiązanie? */}
+      <section className="bg-slate-50 border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-4 py-10">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-1 h-6 bg-amber-400 rounded-full" />
+            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+              Kontekst strategiczny
+            </h2>
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200 p-6 text-sm text-slate-600 leading-relaxed">
+            <div className="font-semibold text-slate-800 text-base mb-3">Czy budowa nowych DPS to jedyne rozwiązanie?</div>
+            <p className="mb-3">
+              Raport mierzy dostępność <strong>publicznej infrastruktury DPS</strong> — i pokazuje realny deficyt miejsc względem rosnącej populacji 80+.
+              Nie jest to jednak jedyna możliwa odpowiedź na wyzwanie starzejącego się społeczeństwa.
+            </p>
+            <p className="mb-3">
+              Nowoczesna polityka senioralna w Europie coraz częściej stawia na <strong>deinstytucjonalizację</strong> — czyli przenoszenie opieki z dużych placówek do środowiska lokalnego:
+              usługi opiekuńcze w domu, mieszkania wspomagane, dzienne centra aktywności, teleopieka.
+              Małopolska realizuje ten kierunek przez <strong>Regionalny Plan Deinstytucjonalizacji 2026–2028</strong> (ROPS Małopolska).
+            </p>
+            <p className="text-slate-500">
+              Dane z niniejszego raportu pokazują skalę wyzwania infrastrukturalnego — bez przesądzania, jaka kombinacja odpowiedzi (nowe DPS, opieka domowa, sektor prywatny, polityka mieszkaniowa)
+              będzie właściwa dla każdego powiatu. To decyzja samorządów, nie statystyki.
+            </p>
+          </div>
         </div>
       </section>
 
