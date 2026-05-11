@@ -271,6 +271,9 @@ export default function RaportPage() {
           <p className="text-amber-400/80 text-xs max-w-2xl mb-1">
             ⚠ Raport obejmuje wyłącznie publiczne DPS z rejestru MUW. Nie uwzględnia prywatnych domów opieki, ZOL/ZPO ani opieki domowej.
           </p>
+          <p className="text-slate-400 text-xs max-w-2xl mb-1 italic">
+            Raport pokazuje rozmieszczenie publicznej infrastruktury DPS względem liczby mieszkańców 80+ — nie mierzy całkowitego zapotrzebowania na opiekę senioralną.
+          </p>
           <p className="text-slate-500 text-sm mb-10">
             Metodologia: liczba miejsc DPS (MUW Małopolska, marzec 2026) na 10 000 mieszkańców
             w wieku 80+ (GUS BDL 2024). Ceny i luka finansowa dla {totalZCena} z {totalPlacowek} placówek
@@ -409,7 +412,7 @@ export default function RaportPage() {
             </div>
             <div className="bg-white rounded-xl p-5 border border-slate-200">
               <div className="font-semibold text-slate-800 mb-2">Emerytura ZUS</div>
-              <p className="leading-relaxed">
+              <p className="leading-relaxed mb-2">
                 GUS BDL, P2860 — przeciętna miesięczna emerytura brutto z pozarolniczego
                 systemu ZUS, Małopolskie 2025.{' '}
                 <a
@@ -420,6 +423,18 @@ export default function RaportPage() {
                 >
                   Źródło GUS BDL
                 </a>
+              </p>
+              <p className="text-xs text-slate-500 leading-relaxed mb-1">
+                <strong className="text-slate-600">Ograniczenie:</strong> Raport operuje przeciętną emeryturą brutto.
+                Mediana byłaby statystycznie trafniejsza — rozkład świadczeń jest prawostronnie skośny,
+                co powoduje że średnia zawyża typowe świadczenie. Mediana emerytur ZUS per województwo
+                nie jest publikowana w dostępnych zbiorach GUS BDL.
+              </p>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                <strong className="text-slate-600">KRUS:</strong> Dane dotyczą wyłącznie systemu ZUS.
+                W powiatach wiejskich (limanowski, nowotarski, gorlicki) emerytury rolnicze KRUS są
+                przeciętnie o 30–40% niższe niż ZUS — realna luka finansowa w tych powiatach
+                jest wyższa niż wykazana.
               </p>
             </div>
           </div>
