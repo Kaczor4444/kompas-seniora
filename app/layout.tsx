@@ -202,6 +202,11 @@ export default async function RootLayout({
         {/* Footer */}
         <Footer />
         
+        {/* Stopka widoczna tylko przy druku / PDF */}
+        <div className="hidden print:block fixed bottom-0 left-0 right-0 text-center text-[9px] text-slate-400 py-1 border-t border-slate-200 bg-white">
+          www.kompas-seniora.pl
+        </div>
+
         {/* Cookie Banner (bottom - ładuje się ostatni) */}
         <CookieBanner />
 

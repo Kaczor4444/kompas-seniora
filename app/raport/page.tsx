@@ -161,6 +161,15 @@ export default function RaportPage() {
     .sort((a, b) => b.luka_systemowa_rok - a.luka_systemowa_rok)
   const worstLukaKPI = powiatyRzetelneLuka[0]
 
+  // KPI 4 — stosunek kosztu najtańszego DPS do przeciętnej emerytury (brutto i netto)
+  const cena2025 = cenaDps.find(r => r.rok === 2025)
+  const dpsRatioBrutto = cena2025?.min_cena_dps && emerytura2025 > 0
+    ? Math.round(cena2025.min_cena_dps / emerytura2025 * 100)
+    : 0
+  const dpsRatioNetto = cena2025?.min_cena_dps && emerytura2025 > 0
+    ? Math.round(cena2025.min_cena_dps / (emerytura2025 * 0.871) * 100)
+    : 0
+
   // Top 3 najgorsze / najlepsze — powiaty ziemskie (bez outlierów w zestawieniu)
   const top3Najgorsze = powiatyZiemskie.slice(0, 3)
   const top3Najlepsze = [...powiatyZiemskie].reverse().slice(0, 3)
@@ -249,8 +258,8 @@ export default function RaportPage() {
             worstValue={Math.round(worst?.dostepnosc_2024 ?? 0)}
             worstPowiat={formatPowiat(worst?.powiat ?? '')}
             emerytura2025={Math.round(emerytura2025)}
-            lukaValue={worstLukaKPI?.luka_systemowa_rok ?? 0}
-            lukaPowiat={worstLukaKPI?.powiat ?? ''}
+            dpsRatioBrutto={dpsRatioBrutto}
+            dpsRatioNetto={dpsRatioNetto}
           />
         </div>
       </section>
@@ -303,6 +312,35 @@ export default function RaportPage() {
             <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
               Źródła i metodologia
             </h2>
+          </div>
+
+          {/* Dla mediów */}
+          <div className="bg-slate-800 rounded-xl p-5 text-sm mb-6">
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Dla mediów — fakty weryfikowalne</div>
+            <ul className="space-y-2 text-slate-200">
+              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>W powiecie chrzanowskim na 10 tys. seniorów 80+ przypada <strong>171 miejsc w DPS</strong> — najmniej w Małopolsce. Źródło: MUW Małopolska, marzec 2026; GUS BDL 2024.</li>
+              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>Najniższy oficjalny koszt utrzymania w DPS w Małopolsce w 2025 r. wyniósł <strong>5 391 zł/mies.</strong> — o 28% więcej niż w 2023 r. Źródło: PDF MUW (art. 60 ups).</li>
+              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>Przeciętna emerytura ZUS brutto w Małopolsce w 2025 r.: <strong>4 085 zł</strong> — wzrost o 23% od 2023 r. Źródło: GUS BDL P2860.</li>
+              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>W 8 z 22 powiatów Małopolski wskaźnik dostępności DPS wynosi poniżej 400 miejsc / 10 tys. seniorów 80+ (kategoria „niedobór"). Źródło: obliczenia własne na danych MUW + GUS.</li>
+              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>Polska ma ok. 214 łóżek opieki długoterminowej / 100 tys. mieszkańców — wobec mediany UE ~500 (Eurostat 2022). Źródło: Eurostat hlth_rs_bdsns.</li>
+            </ul>
+            <p className="text-xs text-slate-500 mt-3">Dane do weryfikacji dostępne w CSV poniżej. Metodologia i zastrzeżenia — sekcja poniżej.</p>
+          </div>
+
+          {/* Benchmark międzynarodowy */}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-sm text-slate-700 mb-6">
+            <div className="font-semibold text-emerald-800 mb-2">📊 Kontekst: Polska na tle OECD i Eurostatu</div>
+            <p className="text-slate-600 leading-relaxed">
+              Według danych Eurostatu (hlth_rs_bdsns, 2022) Polska ma <strong>214 łóżek opieki długoterminowej na 100 tys. mieszkańców</strong> —
+              wobec 1 420 w Holandii, ~600 w Niemczech i mediany UE ~500.
+              Wg OECD Health Statistics przeciętna krajów OECD to ok. 50 miejsc / 1 000 seniorów w wieku 65+;
+              Polska osiąga ok. 12 — czterokrotnie poniżej średniej.
+              Małopolska (556 miejsc / 10 tys. seniorów 80+) dotyczy węższej grupy wiekowej, więc wskaźniki nie są bezpośrednio porównywalne,
+              ale kierunek jest zgodny: Polska należy do krajów o najniższej instytucjonalnej dostępności opieki w UE.
+            </p>
+            <p className="text-xs text-slate-400 mt-2">
+              Źródła: Eurostat hlth_rs_bdsns; OECD Health Statistics 2024; Raport BGK i KIDO (2024) — deficyt 124 tys. miejsc do 2040 r.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 text-sm text-slate-600 mb-8">
@@ -366,10 +404,12 @@ export default function RaportPage() {
                 Powiat krakowski jest wyłączony z KPI dysproporcji.
               </li>
               <li>
-                <strong className="text-slate-600">Luka finansowa to koszt utrzymania</strong>,
-                nie faktyczna dopłata rodziny. Gmina/MOPS może dofinansować pobyt do
-                wysokości dochodu seniora — faktyczna dopłata rodziny jest zazwyczaj niższa.
-                Raport pokazuje skalę problemu systemowego, nie indywidualny rachunek.
+                <strong className="text-slate-600">„Koszt ponad emeryturę" to różnica finansowania systemu</strong>,
+                nie kwota którą zawsze płaci rodzina. Na podstawie art. 61 ustawy o pomocy społecznej
+                pensjonariusz wnosi max 70% dochodu, a <em>pozostałą część pokrywa gmina</em> (jeśli rodzina
+                nie ma możliwości finansowych). Faktyczna dopłata rodziny zależy od jej sytuacji majątkowej
+                i decyzji MOPS. Raport pokazuje skalę obciążenia systemu, nie indywidualny rachunek.
+                * Wskaźnik KPI oparty na powiecie z N≥3 placówkami z ceną (limanowski, N=5).
               </li>
               <li>
                 Emerytura podana jest w kwocie <strong className="text-slate-600">brutto</strong>.
@@ -426,8 +466,11 @@ export default function RaportPage() {
                       {r.dostepnosc_2024.toFixed(0)}
                     </td>
                     <td className="px-4 py-2.5 text-right text-slate-500">{r.dostepnosc_2035.toFixed(0)}</td>
-                    <td className="px-4 py-2.5 text-right text-slate-600">
-                      {r.cena_dps_mediana ? `${r.cena_dps_mediana.toLocaleString('pl-PL')} zł` : '—'}
+                    <td className={`px-4 py-2.5 text-right ${r.cena_dps_mediana && (r.n_placowek_z_cena ?? 0) < 3 ? 'text-amber-600' : 'text-slate-600'}`}>
+                      {r.cena_dps_mediana
+                        ? `${r.cena_dps_mediana.toLocaleString('pl-PL')} zł${(r.n_placowek_z_cena ?? 0) === 1 ? ' (jedyna)' : ''}`
+                        : '—'
+                      }
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       <span className={`text-xs font-medium ${(r.n_placowek_z_cena ?? 0) < 3 ? 'text-amber-600' : 'text-slate-500'}`}>

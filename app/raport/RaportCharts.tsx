@@ -22,6 +22,10 @@ const fmt = (n: number) => n.toLocaleString('pl-PL')
 const MIASTA_POWIAT = ['m. kraków', 'm. tarnów', 'm. nowy sącz']
 const isCity = (p: string) => MIASTA_POWIAT.includes(p.toLowerCase())
 
+// Szacowany współczynnik netto/brutto dla przeciętnej emerytury ZUS w Małopolsce (~4 085 zł brutto 2025):
+// składka zdrowotna 9% (~368 zł) + podatek PIT 12% ponad kwotę wolną (~160 zł) ≈ 87% brutto
+const NETTO_RATIO = 0.871
+
 // ── Tooltips ─────────────────────────────────────────────────────────────────
 
 function TooltipDostepnosc({ active, payload }: { active?: boolean; payload?: Array<{ payload: PowiatRow }> }) {
@@ -86,14 +90,60 @@ function TooltipLuka({ active, payload }: { active?: boolean; payload?: Array<{ 
   )
 }
 
+type ScenariuszRow = PowiatRow & { deficit: number; cost_mln: number; isOutlier: boolean }
+
+function TooltipScenariusz({ active, payload }: { active?: boolean; payload?: Array<{ payload: ScenariuszRow }> }) {
+  if (!active || !payload?.length) return null
+  const d = payload[0].payload
+  return (
+    <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm min-w-[260px]">
+      <div className="font-bold text-slate-900 mb-2 text-base">
+        {d.powiat}
+        {d.isOutlier && <span className="ml-2 text-xs font-normal text-slate-400">*</span>}
+      </div>
+      <div className="space-y-1.5 text-slate-600">
+        <div className="flex justify-between gap-4">
+          <span>Dostępność 2024</span>
+          <span className="font-bold text-slate-900">{d.dostepnosc_2024.toFixed(0)} / 10k</span>
+        </div>
+        <div className="flex justify-between gap-4">
+          <span>Projekcja 2035 (bez inwestycji)</span>
+          <span className="text-red-600 font-bold">{d.dostepnosc_2035.toFixed(0)} / 10k</span>
+        </div>
+        <div className="flex justify-between gap-4">
+          <span>Cel (śr. Małopolski)</span>
+          <span className="text-emerald-600 font-semibold">556 / 10k</span>
+        </div>
+        <div className="border-t border-slate-100 pt-1.5 space-y-1">
+          <div className="flex justify-between gap-4">
+            <span className="font-semibold text-slate-700">Potrzeba nowych miejsc</span>
+            <span className="font-bold text-slate-900">+{fmt(d.deficit)}</span>
+          </div>
+          <div className="flex justify-between gap-4 text-xs">
+            <span className="text-slate-500">Szac. koszt</span>
+            <span className="font-semibold text-slate-700">~{fmt(d.cost_mln)} mln zł</span>
+          </div>
+        </div>
+      </div>
+      {d.isOutlier && (
+        <p className="text-xs text-slate-400 mt-2 border-t border-slate-100 pt-2">
+          * m. Kraków korzysta częściowo z miejsc DPS w powiecie krakowskim — realny deficyt metropolitalny jest niższy.
+        </p>
+      )}
+    </div>
+  )
+}
+
 function TooltipCenaDps({ active, payload }: { active?: boolean; payload?: Array<{ payload: CenaDpsRow; dataKey: string; value: number; color: string }> }) {
   if (!active || !payload?.length) return null
   const rok = payload[0].payload.rok
   const dps = payload[0].payload.min_cena_dps
   const em  = payload[0].payload.emerytura
-  const luka = dps && em ? dps - em : null
+  const emNetto  = em ? Math.round(em * NETTO_RATIO) : null
+  const luka     = dps && em ? dps - em : null
+  const lukaNetto = dps && emNetto ? dps - emNetto : null
   return (
-    <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm min-w-[210px]">
+    <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm min-w-[220px]">
       <div className="font-bold text-slate-900 mb-2">{rok}</div>
       <div className="space-y-1.5">
         {dps && (
@@ -107,15 +157,33 @@ function TooltipCenaDps({ active, payload }: { active?: boolean; payload?: Array
         {em && (
           <div className="flex justify-between gap-4">
             <span className="flex items-center gap-1.5 text-slate-600">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" />Emerytura ZUS
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" />Emerytura brutto
             </span>
             <span className="font-bold text-slate-900">{fmt(Math.round(em))} zł</span>
           </div>
         )}
-        {luka && (
-          <div className="flex justify-between gap-4 border-t border-slate-100 pt-1.5 mt-1">
-            <span className="text-slate-500 text-xs">Luka</span>
-            <span className="font-bold text-red-600 text-xs">+{fmt(Math.round(luka))} zł/mies.</span>
+        {emNetto && (
+          <div className="flex justify-between gap-4">
+            <span className="flex items-center gap-1.5 text-slate-500">
+              <span className="w-2.5 h-2.5 rounded-full border-2 border-emerald-500 flex-shrink-0" />Emerytura netto (szac.)
+            </span>
+            <span className="text-slate-700">{fmt(emNetto)} zł</span>
+          </div>
+        )}
+        {(luka || lukaNetto) && (
+          <div className="border-t border-slate-100 pt-1.5 mt-1 space-y-1">
+            {luka && (
+              <div className="flex justify-between gap-4">
+                <span className="text-slate-500 text-xs">Luka (brutto)</span>
+                <span className="font-bold text-red-500 text-xs">+{fmt(Math.round(luka))} zł/mies.</span>
+              </div>
+            )}
+            {lukaNetto && (
+              <div className="flex justify-between gap-4">
+                <span className="text-slate-500 text-xs">Luka (netto)</span>
+                <span className="font-bold text-red-700 text-xs">+{fmt(Math.round(lukaNetto))} zł/mies.</span>
+              </div>
+            )}
           </div>
         )}
         {!em && (
@@ -131,12 +199,19 @@ function TooltipCenaDps({ active, payload }: { active?: boolean; payload?: Array
 function TooltipEmerytura({ active, payload }: { active?: boolean; payload?: Array<{ payload: EmeryRow }> }) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
+  const netto = Math.round(d.wartosc_zl * NETTO_RATIO)
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-sm">
-      <div className="font-bold text-slate-900 mb-1">{d.rok}</div>
-      <div className="flex items-center gap-2 text-emerald-700">
-        <div className="w-3 h-3 rounded-full bg-emerald-500 flex-shrink-0" />
-        <span>Emerytura ZUS: <span className="font-bold">{fmt(d.wartosc_zl)} zł</span></span>
+      <div className="font-bold text-slate-900 mb-2">{d.rok}</div>
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-2 text-emerald-700">
+          <div className="w-3 h-3 rounded-full bg-emerald-500 flex-shrink-0" />
+          <span>Brutto: <span className="font-bold">{fmt(d.wartosc_zl)} zł</span></span>
+        </div>
+        <div className="flex items-center gap-2 text-emerald-600">
+          <div className="w-3 h-3 rounded-full border-2 border-emerald-500 flex-shrink-0" />
+          <span>Netto (szac.): <span className="font-bold">{fmt(netto)} zł</span></span>
+        </div>
       </div>
     </div>
   )
@@ -214,85 +289,27 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
 
   // Luka per rok dla insight
   const lukaData = cenaDps.filter(r => r.min_cena_dps && r.emerytura)
-  const lukaRast = lukaData.length >= 2
-    ? Math.round((lukaData[lukaData.length-1].min_cena_dps! - lukaData[lukaData.length-1].emerytura!)
-      - (lukaData[0].min_cena_dps! - lukaData[0].emerytura!))
+  const dpsGrowthPct = lukaData.length >= 2
+    ? Math.round((lukaData[lukaData.length-1].min_cena_dps! / lukaData[0].min_cena_dps! - 1) * 100)
     : 0
+  const emGrowthPct = lukaData.length >= 2
+    ? Math.round((lukaData[lukaData.length-1].emerytura! / lukaData[0].emerytura! - 1) * 100)
+    : 0
+  const yearFirst = lukaData[0]?.rok
+  const yearLast  = lukaData[lukaData.length - 1]?.rok
+
+  // Dane z emeryturą netto (szacowane)
+  const cenaDpsWithNetto = cenaDps.map(r => ({
+    ...r,
+    emerytura_netto: r.emerytura ? Math.round(r.emerytura * NETTO_RATIO) : null,
+  }))
+  const emeryturyWithNetto = emerytury.map(r => ({
+    ...r,
+    wartosc_netto: Math.round(r.wartosc_zl * NETTO_RATIO),
+  }))
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 space-y-6">
-
-      {/* Wykres: najtańszy DPS vs emerytura */}
-      <ChartSection
-        delay={0}
-        insight={
-          lukaRast > 0
-            ? `Luka między najtańszym DPS a emeryturą wzrosła o ${fmt(lukaRast)} zł/mies. w ciągu 2 lat (2023–2025) — mimo wzrostu emerytur o 23%.`
-            : 'Porównanie najtańszego kosztu DPS z przeciętną emeryturą ZUS w Małopolsce.'
-        }
-      >
-        <h2 className="text-xl font-bold text-slate-900 mb-1">Najtańszy DPS vs emerytura — Małopolska</h2>
-        <p className="text-sm text-slate-500 mb-4">
-          Oficjalny minimalny koszt utrzymania DPS (MUW Małopolska) vs przeciętna emerytura ZUS brutto.
-          Dane 2023–2025 wspólne dla obu linii; 2026 tylko dla DPS (GUS nie opublikował jeszcze emerytur za 2026).
-        </p>
-        <div className="flex flex-wrap gap-4 text-xs text-slate-500 mb-4">
-          <span className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 bg-red-500 inline-block rounded" />Najtańszy DPS (oficjalny koszt MUW)
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 bg-emerald-500 inline-block rounded" />Emerytura ZUS brutto (GUS BDL)
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 bg-red-300 inline-block rounded border-dashed border-t border-red-300" style={{borderStyle:'dashed'}} />2026 DPS (brak danych GUS o emeryturze)
-          </span>
-        </div>
-        <ResponsiveContainer width="100%" height={260}>
-          <LineChart data={cenaDps} margin={{ left: 10, right: 24, top: 10, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis dataKey="rok" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-            <YAxis
-              tickFormatter={v => `${(v/1000).toFixed(1)}k zł`}
-              tick={{ fontSize: 11, fill: '#94a3b8' }}
-              width={64} domain={[2500, 6500]}
-              axisLine={false} tickLine={false}
-            />
-            <Tooltip content={<TooltipCenaDps />} cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }} />
-            {/* Obszar luki */}
-            <ReferenceLine
-              y={0} stroke="transparent"
-              label={{ value: '', position: 'insideLeft' }}
-            />
-            <Line
-              type="monotone" dataKey="min_cena_dps" name="Najtańszy DPS"
-              stroke="#ef4444" strokeWidth={2.5}
-              dot={(props: any) => {
-                const { cx, cy, payload } = props
-                if (!payload.min_cena_dps) return <g key={`dot-dps-${payload.rok}`} />
-                const isDashed = !payload.emerytura
-                return (
-                  <circle key={`dot-dps-${payload.rok}`} cx={cx} cy={cy} r={5}
-                    fill={isDashed ? '#fca5a5' : '#ef4444'}
-                    stroke="white" strokeWidth={2} />
-                )
-              }}
-              strokeDasharray={(d: any) => d?.emerytura ? '0' : '6 3'}
-              connectNulls
-            />
-            <Line
-              type="monotone" dataKey="emerytura" name="Emerytura ZUS"
-              stroke="#10b981" strokeWidth={2.5}
-              dot={{ r: 5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
-              connectNulls
-            />
-          </LineChart>
-        </ResponsiveContainer>
-        <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
-          Emerytura podana w kwocie brutto (netto jest niższa — realna luka większa).
-          Najtańszy DPS to placówka z najniższym oficjalnym kosztem utrzymania w danym roku —
-          może być inny powiat w każdym roku. Źródło cen: PDF MUW Małopolska.
-        </p>
-      </ChartSection>
 
       {/* Mapa + Top/Bottom 5 */}
       <ChartSection
@@ -337,7 +354,7 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
                 Najgorszy dostęp
               </div>
               <div className="space-y-1.5">
-                {powiaty.slice(0, 5).map(r => (
+                {powiatyZiemskie.slice(0, 5).map(r => (
                   <div key={r.powiat} className="flex items-center justify-between gap-2">
                     <span className="capitalize text-slate-700 text-xs truncate">{r.powiat}</span>
                     <span
@@ -355,7 +372,7 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
                 Najlepszy dostęp
               </div>
               <div className="space-y-1.5">
-                {[...powiaty].reverse().slice(0, 5).map(r => (
+                {[...powiatyZiemskie].reverse().slice(0, 5).map(r => (
                   <div key={r.powiat} className="flex items-center justify-between gap-2">
                     <span className="capitalize text-slate-700 text-xs truncate">{r.powiat}</span>
                     <span
@@ -374,6 +391,9 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
                 przy rosnącej populacji 80+. Nie uwzględnia planowanych inwestycji samorządowych.
               </div>
             )}
+            <p className="col-span-2 text-xs text-slate-400 text-center">
+              Powiaty ziemskie — bez miast na prawach powiatu i powiatu krakowskiego
+            </p>
           </div>
         </div>
       </ChartSection>
@@ -416,6 +436,80 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
           Fioletowa linia przerywana = średnia Małopolska ({avgDost}/10k). Szary pasek = prognoza 2035 przy braku nowych inwestycji.
         </p>
       </ChartSection>
+
+      {/* Wykres: Scenariusz inwestycyjny */}
+      {(() => {
+        const TARGET = 556
+        const COST_PER_PLACE = 400_000
+        const OUTLIER_POWIAT = 'm. kraków'
+
+        const scenariuszData: ScenariuszRow[] = powiaty
+          .map(r => {
+            const target = Math.round(r.pop_80plus_prog2035 * TARGET / 10_000)
+            const deficit = Math.max(0, target - r.dps_miejsca)
+            return {
+              ...r,
+              deficit,
+              cost_mln: Math.round(deficit * COST_PER_PLACE / 1_000_000),
+              isOutlier: r.powiat.toLowerCase() === OUTLIER_POWIAT,
+            }
+          })
+          .filter(r => r.deficit > 0)
+          .sort((a, b) => b.deficit - a.deficit)
+
+        const totalDeficit = scenariuszData.reduce((s, r) => s + r.deficit, 0)
+        const totalCost    = scenariuszData.reduce((s, r) => s + r.cost_mln, 0)
+        const withoutKrakow = scenariuszData.filter(r => !r.isOutlier)
+        const deficitBezKrakowa = withoutKrakow.reduce((s, r) => s + r.deficit, 0)
+        const costBezKrakowa    = withoutKrakow.reduce((s, r) => s + r.cost_mln, 0)
+
+        return (
+          <ChartSection
+            delay={0.12}
+            insight={`Żeby każdy powiat Małopolski osiągnął obecną średnią regionalną (${TARGET}/10k) do 2035 roku — biorąc pod uwagę prognozy demograficzne GUS — potrzeba ok. ${fmt(deficitBezKrakowa)} nowych miejsc DPS (bez m. Krakowa). Szacowany koszt: ~${costBezKrakowa.toLocaleString('pl-PL')} mln zł.`}
+          >
+            <h2 className="text-xl font-bold text-slate-900 mb-1">Scenariusz inwestycyjny — ile nowych miejsc do 2035</h2>
+            <p className="text-sm text-slate-500 mb-1">
+              Liczba miejsc DPS potrzebna w każdym powiecie, by osiągnąć obecną średnią Małopolski ({TARGET}/10k seniorów 80+) przy prognozowanym wzroście populacji 80+ do 2035 r. (GUS).
+            </p>
+            <p className="text-xs text-slate-400 mb-4">
+              Szacowany koszt budowy: 400 tys. zł / miejsce (na podstawie KPO D4.1.1 — łóżka opieki długoterminowej). Rzeczywisty koszt dla nowych budynków DPS może być wyższy.
+            </p>
+            <ResponsiveContainer width="100%" height={Math.max(300, scenariuszData.length * 28)}>
+              <BarChart data={scenariuszData} layout="vertical" margin={{ left: 92, right: 80, top: 4, bottom: 4 }}>
+                <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }}
+                  tickFormatter={v => `${v}`} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="powiat" tick={{ fontSize: 11, fill: '#64748b' }}
+                  width={90} axisLine={false} tickLine={false} />
+                <Tooltip content={<TooltipScenariusz />} cursor={{ fill: '#f8fafc' }} />
+                <Bar dataKey="deficit" name="Nowe miejsca" radius={[0, 4, 4, 0]} maxBarSize={16}
+                  label={{ position: 'right', fontSize: 10, fill: '#64748b',
+                    formatter: (v: number) => `~${Math.round(v * COST_PER_PLACE / 1_000_000)} mln zł` }}>
+                  {scenariuszData.map(r => (
+                    <Cell
+                      key={r.powiat}
+                      fill={r.isOutlier ? '#94a3b8' : r.deficit > 400 ? '#dc2626' : r.deficit > 150 ? '#f97316' : '#f59e0b'}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="flex flex-wrap gap-4 text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-red-600" />Duży deficyt (&gt;400 miejsc)</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-orange-400" />Średni deficyt (150–400)</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-amber-400" />Mały deficyt (&lt;150)</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-slate-300" />m. Kraków*</span>
+              <span className="ml-auto font-medium text-slate-500">
+                Łącznie (bez m. Krakowa): {fmt(deficitBezKrakowa)} miejsc · ~{costBezKrakowa.toLocaleString('pl-PL')} mln zł
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-2">
+              * m. Kraków korzysta częściowo z miejsc w powiecie krakowskim (DPS ponadlokalne) — realny deficyt metropolitalny jest niższy.
+              Cel 556/10k = utrzymanie obecnej średniej regionalnej, nie osiągnięcie standardów OECD.
+            </p>
+          </ChartSection>
+        )
+      })()}
 
       {/* Wykres 2: Luka finansowa */}
       <ChartSection
@@ -476,11 +570,20 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
         }
       >
         <h2 className="text-xl font-bold text-slate-900 mb-1">Trend emerytur ZUS — Małopolska</h2>
-        <p className="text-sm text-slate-500 mb-4">
+        <p className="text-sm text-slate-500 mb-2">
           Przeciętna miesięczna emerytura brutto (z pozarolniczego systemu ZUS). Źródło: GUS BDL P2860.
         </p>
+        <div className="flex flex-wrap gap-4 text-xs text-slate-500 mb-4">
+          <span className="flex items-center gap-1.5">
+            <span className="w-4 h-0.5 bg-emerald-500 inline-block rounded" />Emerytura brutto (GUS BDL)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg width="16" height="4" className="flex-shrink-0"><line x1="0" y1="2" x2="16" y2="2" stroke="#10b981" strokeWidth="1.5" strokeDasharray="4 3"/></svg>
+            Emerytura netto (szac. ~87%)
+          </span>
+        </div>
         <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={emerytury} margin={{ left: 10, right: 24, top: 10, bottom: 4 }}>
+          <LineChart data={emeryturyWithNetto} margin={{ left: 10, right: 24, top: 10, bottom: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis dataKey="rok" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
             <YAxis tickFormatter={v => `${v.toLocaleString('pl-PL')} zł`}
@@ -489,14 +592,101 @@ export default function RaportCharts({ powiaty, emerytury, avgDost, cenaDps }: P
             <Tooltip content={<TooltipEmerytura />} cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }} />
             <ReferenceLine y={4500} stroke="#f97316" strokeDasharray="5 5" strokeWidth={1.5}
               label={{ value: 'min. DPS ~4 500 zł', position: 'insideTopRight', fontSize: 10, fill: '#f97316', offset: 6 }} />
-            <Line type="monotone" dataKey="wartosc_zl" stroke="#10b981" strokeWidth={2.5}
+            <Line type="monotone" dataKey="wartosc_zl" name="Emerytura brutto"
+              stroke="#10b981" strokeWidth={2.5}
               dot={{ r: 5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
               activeDot={{ r: 7, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }} />
+            <Line type="monotone" dataKey="wartosc_netto" name="Emerytura netto (szac.)"
+              stroke="#10b981" strokeWidth={1.5} strokeDasharray="5 4"
+              dot={false} />
           </LineChart>
         </ResponsiveContainer>
         <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
-          Emerytura ZUS brutto. Kwota netto jest niższa — realna luka dla seniora jest zatem większa.
+          Linia ciągła = emerytura brutto. Linia przerywana = szacowane netto (~87% brutto, po podatku PIT i składce zdrowotnej 9%) — to kwota faktycznie dostępna seniora.
           Pomarańczowa linia = orientacyjny minimalny koszt DPS w Małopolsce.
+          Dla porównania: skumulowana inflacja CPI w latach 2021–2024 wyniosła ok. 35% (GUS) — nominalny wzrost emerytur o 68% przekłada się na realny wzrost o ok. 24%.
+        </p>
+      </ChartSection>
+
+      {/* Wykres: najtańszy DPS vs emerytura */}
+      <ChartSection
+        delay={0}
+        insight={
+          dpsGrowthPct > 0 && yearFirst && yearLast
+            ? `Najtańszy dostępny DPS w Małopolsce podrożał o ${dpsGrowthPct}% w latach ${yearFirst}–${yearLast} (nominalnie). Emerytura ZUS wzrosła w tym czasie o ${emGrowthPct}% — DPS drożeje szybciej.`
+            : 'Porównanie najniższego oficjalnego kosztu DPS (MUW Małopolska) z przeciętną emeryturą ZUS.'
+        }
+      >
+        <h2 className="text-xl font-bold text-slate-900 mb-1">Najtańszy DPS vs emerytura — Małopolska</h2>
+        <p className="text-sm text-slate-500 mb-4">
+          Oficjalny minimalny koszt utrzymania DPS (MUW Małopolska) vs przeciętna emerytura ZUS.
+          Dane 2023–2025 wspólne dla obu linii; 2026 tylko dla DPS (GUS nie opublikował jeszcze emerytur za 2026).
+        </p>
+        <div className="flex flex-wrap gap-4 text-xs text-slate-500 mb-4">
+          <span className="flex items-center gap-1.5">
+            <span className="w-4 h-0.5 bg-red-500 inline-block rounded" />Najtańszy DPS (oficjalny koszt MUW)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-4 h-0.5 bg-emerald-500 inline-block rounded" />Emerytura ZUS brutto (GUS BDL)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg width="16" height="4" className="flex-shrink-0"><line x1="0" y1="2" x2="16" y2="2" stroke="#10b981" strokeWidth="1.5" strokeDasharray="4 3"/></svg>
+            Emerytura netto (szac. ~87% brutto)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg width="16" height="4" className="flex-shrink-0"><line x1="0" y1="2" x2="16" y2="2" stroke="#fca5a5" strokeWidth="1.5" strokeDasharray="5 3"/></svg>
+            2026 DPS (brak danych GUS o emeryturze)
+          </span>
+        </div>
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={cenaDpsWithNetto} margin={{ left: 10, right: 24, top: 10, bottom: 4 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            <XAxis dataKey="rok" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis
+              tickFormatter={v => `${(v/1000).toFixed(1)}k zł`}
+              tick={{ fontSize: 11, fill: '#94a3b8' }}
+              width={64} domain={[2500, 6500]}
+              axisLine={false} tickLine={false}
+            />
+            <Tooltip content={<TooltipCenaDps />} cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }} />
+            <ReferenceLine
+              y={0} stroke="transparent"
+              label={{ value: '', position: 'insideLeft' }}
+            />
+            <Line
+              type="monotone" dataKey="min_cena_dps" name="Najtańszy DPS"
+              stroke="#ef4444" strokeWidth={2.5}
+              dot={(props: any) => {
+                const { cx, cy, payload } = props
+                if (!payload.min_cena_dps) return <g key={`dot-dps-${payload.rok}`} />
+                const isDashed = !payload.emerytura
+                return (
+                  <circle key={`dot-dps-${payload.rok}`} cx={cx} cy={cy} r={5}
+                    fill={isDashed ? '#fca5a5' : '#ef4444'}
+                    stroke="white" strokeWidth={2} />
+                )
+              }}
+              strokeDasharray={(d: any) => d?.emerytura ? '0' : '6 3'}
+              connectNulls
+            />
+            <Line
+              type="monotone" dataKey="emerytura" name="Emerytura brutto"
+              stroke="#10b981" strokeWidth={2.5}
+              dot={{ r: 5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
+              connectNulls
+            />
+            <Line
+              type="monotone" dataKey="emerytura_netto" name="Emerytura netto (szac.)"
+              stroke="#10b981" strokeWidth={1.5} strokeDasharray="5 4"
+              dot={false}
+              connectNulls
+            />
+          </LineChart>
+        </ResponsiveContainer>
+        <p className="text-xs text-slate-400 mt-3 border-t border-slate-100 pt-3">
+          Linia ciągła = emerytura brutto. Linia przerywana = szacowane netto (~87% brutto, po podatku PIT i składce zdrowotnej) —
+          realna kwota do dyspozycji seniora jest niższa, więc faktyczna luka jest większa niż wykazana.
+          Najtańszy DPS to placówka z najniższym oficjalnym kosztem utrzymania w danym roku — może być inny powiat w każdym roku. Źródło cen: PDF MUW Małopolska.
         </p>
       </ChartSection>
 

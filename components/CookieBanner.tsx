@@ -101,6 +101,8 @@ export default function CookieBanner() {
   return (
     <AnimatePresence>
       {showBanner && (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        <div className="print:hidden">
         <>
           {/* Lighter backdrop */}
           <motion.div
@@ -278,6 +280,7 @@ export default function CookieBanner() {
             </div>
           </motion.div>
         </>
+        </div>
       )}
     </AnimatePresence>
   );

@@ -8,8 +8,8 @@ type Props = {
   worstValue:       number
   worstPowiat:      string
   emerytura2025:    number
-  lukaValue:        number
-  lukaPowiat:       string
+  dpsRatioBrutto:   number
+  dpsRatioNetto:    number
 }
 
 const card = {
@@ -17,7 +17,7 @@ const card = {
   show:   { opacity: 1, y: 0 },
 }
 
-export default function KpiHero({ avgDost, worstValue, worstPowiat, emerytura2025, lukaValue, lukaPowiat }: Props) {
+export default function KpiHero({ avgDost, worstValue, worstPowiat, emerytura2025, dpsRatioBrutto, dpsRatioNetto }: Props) {
   return (
     <motion.div
       className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"
@@ -71,19 +71,19 @@ export default function KpiHero({ avgDost, worstValue, worstPowiat, emerytura202
         </div>
       </motion.div>
 
-      {/* KPI 4 — luka */}
+      {/* KPI 4 — stosunek DPS do emerytury */}
       <motion.div variants={card} transition={{ duration: 0.45, ease: 'easeOut' }}
         className="bg-slate-800 border border-slate-600 rounded-2xl p-5"
       >
         <div className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-3">
-          Luka systemowa / rok
+          Najtańszy DPS 2025
         </div>
-        <div className="text-3xl font-black text-white mb-1">
-          <AnimatedCounter value={Math.round(lukaValue / 1000)} suffix=" tys. zł" duration={1.5} />
+        <div className="text-4xl font-black text-white mb-1">
+          <AnimatedCounter value={dpsRatioBrutto} suffix="%" duration={1.5} />
         </div>
         <div className="text-slate-300 text-xs mt-2 leading-relaxed">
-          co dopłaca rodzina lub gmina<br />
-          <span className="font-semibold text-white capitalize">{lukaPowiat}</span>
+          średniej emerytury brutto<br />
+          <span className="text-slate-400">netto: ~{dpsRatioNetto}% (po podatku)</span>
         </div>
       </motion.div>
     </motion.div>

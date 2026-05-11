@@ -165,7 +165,7 @@ export default function FloatingCookieButton() {
   };
 
   return (
-    <>
+    <div className="print:hidden">
       {/* Modal with smooth animations */}
       {showModal && (
         <div
@@ -332,6 +332,6 @@ export default function FloatingCookieButton() {
           animation: scaleOut 0.2s ease-out;
         }
       `}</style>
-    </>
+    </div>
   );
 }

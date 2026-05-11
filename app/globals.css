@@ -651,3 +651,73 @@ body.accessibility-tooltips [title]::after {
 .animate-hand-wave {
   animation: hand-wave 0.6s ease-in-out 2;
 }
+
+/* ─── Print / PDF styles ─────────────────────────────────────────── */
+@page {
+  /* Usuwa domyślny nagłówek/stopkę przeglądarki (URL, numer strony) */
+  margin: 18mm 10mm 14mm 10mm;
+}
+
+@media print {
+  /* Elementy UI ukryte przy druku */
+  nav, [class*="fixed"] {
+    display: none !important;
+  }
+
+  /* Brak marginesów na body */
+  body {
+    padding-top: 0 !important;
+  }
+
+  /* Sekcje i karty — nie rozdzielaj między stronami */
+  section,
+  .rounded-2xl,
+  .recharts-wrapper {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    overflow: visible !important;
+  }
+
+  /* Odstępy między sekcjami żeby nie zaczynały się od samego brzegu */
+  section + section,
+  .space-y-6 > * + * {
+    margin-top: 6mm !important;
+  }
+
+  /* Siatki kart (metodologia, KPI) */
+  .grid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Szeroka tabela danych — nie ucinaj kolumn */
+  .overflow-x-auto {
+    overflow: visible !important;
+  }
+
+  table {
+    font-size: 10px !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    padding: 3px 6px !important;
+    white-space: nowrap;
+  }
+
+  /* Wymuś widoczność elementów animowanych przez Framer Motion
+     (inView nie odpala przy print — wykresy zostają na opacity:0) */
+  *[style*="opacity"],
+  *[style*="transform"],
+  section, div, article {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  /* Zachowaj kolory tła (wykresy, nagłówki) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
