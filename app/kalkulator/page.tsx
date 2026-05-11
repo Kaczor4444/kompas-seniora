@@ -113,7 +113,7 @@ function NumInput({ value, onChange, placeholder, min = '0', max, step = '100' }
       placeholder={placeholder}
       min={min} max={max} step={step}
       inputMode="numeric"
-      className="w-full bg-stone-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-xl font-black text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300"
+      className="w-full bg-stone-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-xl font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300"
     />
   );
 }
@@ -124,8 +124,8 @@ function ResultCard({ label, value, accent }: { label: string; value: number; ac
   const bg = accent === 'green' ? 'bg-emerald-600' : accent === 'blue' ? 'bg-blue-600' : accent === 'amber' ? 'bg-amber-500' : 'bg-white/10';
   return (
     <div className={`${bg} rounded-xl p-4`}>
-      <div className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-1.5">{label}</div>
-      <div className="text-2xl font-black text-white">{fmt(value)}</div>
+      <div className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-1.5">{label}</div>
+      <div className="text-2xl font-bold font-mono text-white">{fmt(value)}</div>
     </div>
   );
 }
@@ -448,14 +448,14 @@ function KalkulatorContent() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400">
                   <Zap size={9} className="fill-current" />
-                  Na żywo
+                  Przelicza na bieżąco
                 </span>
               </div>
 
               {/* Total */}
               <div className="mb-5">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Koszt całkowity</div>
-                <div className="text-5xl font-black text-white tracking-tight">{fmt(koszt)}</div>
+                <div className="text-5xl font-bold font-mono text-white">{fmt(koszt)}</div>
               </div>
 
               {/* 4 cards */}
