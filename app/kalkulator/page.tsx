@@ -543,11 +543,8 @@ function KalkulatorContent() {
               )}
 
               {/* Disclaimer */}
-              <p className="text-[10px] text-slate-500 leading-relaxed">
-                <strong className="text-slate-400">Uwaga — dwie metody.</strong> Kalkulator stosuje metodę całkowitej nadwyżki
-                gospodarstwa (dochód rodziny − 300%&nbsp;×&nbsp;kryterium&nbsp;×&nbsp;liczba&nbsp;osób) — metoda większości MOPS/GOPS.
-                WSA&nbsp;w&nbsp;Łodzi (II&nbsp;SA/Łd&nbsp;499/20) i WSA&nbsp;w&nbsp;Opolu uznały metodę per-capita za korzystniejszą
-                dla rodziny. Realna decyzja MOPS uwzględnia sytuację każdej osoby indywidualnie.
+              <p className="text-[10px] text-slate-500 leading-relaxed mt-4">
+                Wynik orientacyjny. Ostateczną kwotę ustala MOPS indywidualnie po przeprowadzeniu wywiadu środowiskowego.
               </p>
             </div>
           </div>
