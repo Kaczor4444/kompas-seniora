@@ -287,8 +287,14 @@ function KalkulatorContent() {
         return;
       }
 
-      const withPrices = facilities.filter(f => f.koszt_pobytu && f.koszt_pobytu > 0);
-      const uniquePowiaty = [...new Set(facilities.map(f => f.powiat))];
+      const withPrices = facilities
+        .filter(f => f.koszt_pobytu && f.koszt_pobytu > 0)
+        .sort((a, b) => a.koszt_pobytu! - b.koszt_pobytu!);
+      const sorted = [
+        ...withPrices,
+        ...facilities.filter(f => !f.koszt_pobytu || f.koszt_pobytu === 0),
+      ];
+      const uniquePowiaty = [...new Set(sorted.map(f => f.powiat))];
       const powiatName = facilities[0]?.powiat || '';
       const { mops, usedFallback, fallbackCity } = await fetchMopsWithFallback(city, powiatName);
 
@@ -304,7 +310,7 @@ function KalkulatorContent() {
 
       setLookupResult({
         city,
-        facilities,
+        facilities: sorted,
         facilitiesWithPrices: withPrices,
         mopsContact: mops,
         mopsFallbackUsed: usedFallback,
@@ -514,14 +520,14 @@ function KalkulatorContent() {
               {/* 4 wiersze z paskiem proporcji */}
               <div className="space-y-4 mb-5">
                 {([
-                  { label: 'Mieszkaniec DPS', value: oplataSeniora, color: 'bg-emerald-500' },
-                  { label: 'Małżonek',         value: oplataM,       color: 'bg-blue-400'   },
-                  { label: `Dzieci (×${nKids})`, value: oplataD,     color: 'bg-amber-400'  },
-                  { label: 'Gmina',             value: oplataGminy,   color: 'bg-slate-400'  },
-                ] as { label: string; value: number; color: string }[]).map(({ label, value, color }) => {
+                  { key: 'senior',  label: 'Mieszkaniec DPS',       value: oplataSeniora, color: 'bg-emerald-500' },
+                  { key: 'malzon',  label: 'Małżonek',              value: oplataM,       color: 'bg-blue-400'   },
+                  { key: 'dzieci',  label: `Dzieci (×${nKids})`,    value: oplataD,       color: 'bg-amber-400'  },
+                  { key: 'gmina',   label: 'Gmina',                 value: oplataGminy,   color: 'bg-slate-400'  },
+                ] as { key: string; label: string; value: number; color: string }[]).map(({ key, label, value, color }) => {
                   const pct = koszt > 0 ? (value / koszt) * 100 : 0;
                   return (
-                    <div key={label}>
+                    <div key={key}>
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
                         <span className="text-base font-bold font-mono text-white tabular-nums">
