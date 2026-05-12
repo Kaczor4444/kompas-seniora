@@ -493,7 +493,7 @@ function KalkulatorContent() {
             <div className="bg-slate-900 rounded-2xl p-6 text-white">
 
               {/* Header */}
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between mb-4">
                 <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
                   Podział opłaty miesięcznej
                 </span>
@@ -503,18 +503,40 @@ function KalkulatorContent() {
                 </span>
               </div>
 
-              {/* Total */}
-              <div className="mb-5">
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Koszt całkowity</div>
-                <div className="text-5xl font-bold font-mono text-white"><AnimatedNumber value={koszt} /></div>
+              {/* Display — duży ekran, liczba wyrównana do prawej */}
+              <div className="bg-black/30 rounded-xl px-5 py-4 mb-5 text-right">
+                <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">koszt całkowity / mc</div>
+                <div className="text-5xl font-bold font-mono text-white leading-none">
+                  <AnimatedNumber value={koszt} />
+                </div>
               </div>
 
-              {/* 4 cards */}
-              <div className="grid grid-cols-2 gap-3 mb-5">
-                <ResultCard label="Mieszkaniec DPS" value={oplataSeniora} accent="green" />
-                <ResultCard label="Małżonek" value={oplataM} />
-                <ResultCard label={`Dzieci (×${nKids})`} value={oplataD} accent="amber" />
-                <ResultCard label="Gmina" value={oplataGminy} accent="blue" />
+              {/* 4 wiersze z paskiem proporcji */}
+              <div className="space-y-4 mb-5">
+                {([
+                  { label: 'Mieszkaniec DPS', value: oplataSeniora, color: 'bg-emerald-500' },
+                  { label: 'Małżonek',         value: oplataM,       color: 'bg-blue-400'   },
+                  { label: `Dzieci (×${nKids})`, value: oplataD,     color: 'bg-amber-400'  },
+                  { label: 'Gmina',             value: oplataGminy,   color: 'bg-slate-400'  },
+                ] as { label: string; value: number; color: string }[]).map(({ label, value, color }) => {
+                  const pct = koszt > 0 ? (value / koszt) * 100 : 0;
+                  return (
+                    <div key={label}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+                        <span className="text-base font-bold font-mono text-white tabular-nums">
+                          <AnimatedNumber value={value} />
+                        </span>
+                      </div>
+                      <div className="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className={`${color} h-full rounded-full transition-[width] duration-[350ms] ease-out`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Warning */}
