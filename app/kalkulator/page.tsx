@@ -338,17 +338,34 @@ function KalkulatorContent() {
         <div className="mb-10">
           <div className="flex items-center gap-4 mb-4">
             <span className="h-px w-10 bg-emerald-600" />
-            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-emerald-700">Analiza Finansowa</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-emerald-700">Kalkulator kosztów</span>
           </div>
           <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-3">
-            Kalkulator opłat DPS 2026
+            Ile naprawdę zapłaci Twoja rodzina?
           </h1>
-          <p className="text-slate-500 text-base max-w-2xl leading-relaxed">
-            Art.&nbsp;61 ustawy o pomocy społecznej.{' '}
-            <strong className="text-slate-700">Kolejność:</strong> mieszkaniec (do 70% dochodu) → małżonek → dzieci/wnuki → gmina.
-            Każdy zobowiązany płaci najwyżej <strong className="text-slate-700">nadwyżkę dochodu ponad 300% kryterium</strong>{' '}
-            (3&nbsp;030&nbsp;zł osoba samotna / 2&nbsp;469&nbsp;zł na osobę w rodzinie, kryteria 2026).
+          <p className="text-slate-500 text-base max-w-2xl leading-relaxed mb-8">
+            Cena widoczna na karcie DPS to koszt utrzymania placówki — nie kwota z Twojego konta.
+            Senior płaci najwyżej <strong className="text-slate-700">70% swojej emerytury</strong>.
+            Rodzina dopłaca tylko wtedy, gdy jej dochód przekracza ustawowy próg —
+            w przeciwnym razie brakującą kwotę <strong className="text-slate-700">pokrywa gmina</strong>.
           </p>
+
+          {/* 3-step explainer */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl">
+            {[
+              { step: '1', title: 'Senior płaci z emerytury', desc: 'Maksymalnie 70% dochodu — ustawowa granica, której MOPS nie może przekroczyć.' },
+              { step: '2', title: 'Rodzina dopłaca nadwyżkę', desc: 'Tylko jeśli dochód przekracza 3 030 zł (singiel) lub 2 469 zł/os. w rodzinie.' },
+              { step: '3', title: 'Gmina pokrywa resztę', desc: 'Jeśli suma seniora i rodziny nie pokrywa kosztu — gmina dopłaca z urzędu.' },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="flex gap-3">
+                <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">{step}</div>
+                <div>
+                  <p className="text-sm font-black text-slate-900 mb-0.5">{title}</p>
+                  <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* ── 2-column layout: form + sticky results ── */}
