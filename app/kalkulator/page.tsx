@@ -182,6 +182,8 @@ function KalkulatorContent() {
   const [lookupResult, setLookupResult] = useState<LookupResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [lookupError, setLookupError] = useState('');
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState('');
   const [selectedPowiat, setSelectedPowiat] = useState<string | null>(null);
   const [showAllFacilities, setShowAllFacilities] = useState(false);
   const [savedIds, setSavedIds] = useState<number[]>([]);
@@ -264,6 +266,56 @@ function KalkulatorContent() {
     }
     return { mops: null, usedFallback: false };
   };
+
+  const handleGeolocate = () => {
+    if (!navigator.geolocation) {
+      setGeoError('Twoja przeglądarka nie obsługuje geolokalizacji.');
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError('');
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pl`,
+            { headers: { 'User-Agent': 'KompasSeniora/1.0' } }
+          );
+          const data = await res.json();
+          const detected =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.village ||
+            data.address?.municipality ||
+            '';
+          if (detected) {
+            setCity(detected);
+            // krótkie opóźnienie żeby React zdążył zaktualizować city przed wywołaniem lookup
+            setTimeout(() => {
+              setGeoLoading(false);
+            }, 100);
+          } else {
+            setGeoError('Nie udało się określić miejscowości. Wpisz ją ręcznie.');
+            setGeoLoading(false);
+          }
+        } catch {
+          setGeoError('Błąd geolokalizacji. Spróbuj ponownie.');
+          setGeoLoading(false);
+        }
+      },
+      (err) => {
+        setGeoLoading(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoError('Dostęp do lokalizacji zablokowany — włącz w ustawieniach przeglądarki.');
+        } else {
+          setGeoError('Nie można określić lokalizacji. Wpisz miasto ręcznie.');
+        }
+      },
+      { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
+    );
+  };
+
 
   // ── DPS lookup ────────────────────────────────────────────────────────────
 
@@ -562,7 +614,7 @@ function KalkulatorContent() {
             podstawimy najtańszą cenę do kalkulatora powyżej.
           </p>
 
-          <div className="flex gap-3 mb-4 max-w-lg">
+          <div className="flex gap-3 mb-2 max-w-lg">
             <div className="relative flex-1">
               <input
                 type="text"
@@ -588,6 +640,22 @@ function KalkulatorContent() {
                 : <><Search size={15} /> Szukaj</>
               }
             </button>
+          </div>
+
+          {/* Geolokalizacja */}
+          <div className="flex items-center gap-3 mb-4 max-w-lg">
+            <button
+              onClick={handleGeolocate}
+              disabled={geoLoading}
+              className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-emerald-600 transition-colors disabled:opacity-50"
+            >
+              {geoLoading
+                ? <div className="w-3.5 h-3.5 border-2 border-slate-400/30 border-t-slate-400 rounded-full animate-spin" />
+                : <MapPin size={14} />
+              }
+              {geoLoading ? 'Wykrywam lokalizację…' : 'Szukaj w mojej okolicy'}
+            </button>
+            {geoError && <span className="text-xs text-rose-500">{geoError}</span>}
           </div>
 
           {lookupError && (
