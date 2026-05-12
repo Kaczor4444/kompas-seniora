@@ -374,6 +374,11 @@ function KalkulatorContent() {
           {/* ── LEFT: Form ── */}
           <div className="bg-white border border-slate-200 rounded-2xl p-8 space-y-7">
 
+            <div className="flex items-center gap-2 text-xs text-slate-400 -mb-2">
+              <Zap size={11} className="text-emerald-500 flex-shrink-0" />
+              <span>Zmień dowolną wartość — wyniki po prawej przeliczają się natychmiast</span>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <CalcField
                 label="Miesięczny koszt utrzymania w DPS (zł)"
