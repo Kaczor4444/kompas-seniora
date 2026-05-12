@@ -543,8 +543,8 @@ function KalkulatorContent() {
               )}
 
               {/* Disclaimer */}
-              <p className="text-[10px] text-slate-500 leading-relaxed mt-4">
-                Wynik orientacyjny. Ostateczną kwotę ustala MOPS indywidualnie po przeprowadzeniu wywiadu środowiskowego.
+              <p className="text-xs text-slate-400 leading-relaxed mt-4">
+                Wynik orientacyjny. Ostateczną kwotę ustala MOPS/GOPS indywidualnie po przeprowadzeniu wywiadu środowiskowego.
               </p>
             </div>
           </div>
