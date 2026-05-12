@@ -498,9 +498,9 @@ function KalkulatorContent() {
                 <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
                   Podział opłaty miesięcznej
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400">
-                  <Zap size={9} className="fill-current" />
-                  Przelicza na bieżąco
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                 </span>
               </div>
 
