@@ -166,6 +166,9 @@ function KalkulatorContent() {
   const searchParams = useSearchParams();
 
   // Calculator inputs (live, no API)
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const interact = (setter: (v: string) => void) => (v: string) => { setter(v); setHasInteracted(true); };
+
   const [dpsCost, setDpsCost] = useState(searchParams.get('cost') || '6000');
   const [seniorIncome, setSeniorIncome] = useState(searchParams.get('income') || '3500');
   const [spouseIncome, setSpouseIncome] = useState('0');
@@ -414,7 +417,7 @@ function KalkulatorContent() {
                 label="Miesięczny koszt utrzymania w DPS (zł)"
                 help="Ustala wójt/burmistrz. W 2026 r. średnio 5 000–7 500 zł. Możesz pobrać z wyszukiwarki poniżej."
               >
-                <NumInput value={dpsCost} onChange={setDpsCost} placeholder="6000" min="0" max="20000" />
+                <NumInput value={dpsCost} onChange={interact(setDpsCost)} placeholder="6000" min="0" max="20000" />
               </CalcField>
               <CalcField
                 label="Dochód netto mieszkańca DPS (zł)"
@@ -446,7 +449,7 @@ function KalkulatorContent() {
                 >
                   <select
                     value={childSituation}
-                    onChange={e => setChildSituation(e.target.value as 'rodzina' | 'samotnie')}
+                    onChange={e => { setChildSituation(e.target.value as 'rodzina' | 'samotnie'); setHasInteracted(true); }}
                     className="w-full bg-stone-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-base font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all"
                   >
                     <option value="rodzina">Dziecko ma rodzinę (małżonek, dzieci)</option>
@@ -499,8 +502,8 @@ function KalkulatorContent() {
                   Podział opłaty miesięcznej
                 </span>
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                  {hasInteracted && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />}
+                  <span className={`relative inline-flex rounded-full h-2.5 w-2.5 transition-colors duration-300 ${hasInteracted ? 'bg-emerald-500' : 'bg-slate-600'}`} />
                 </span>
               </div>
 
