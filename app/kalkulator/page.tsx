@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { ArrowLeft, AlertCircle, Phone, MapPin, CheckCircle2, Search, Heart, ArrowLeftRight, ChevronRight, X, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -79,6 +79,35 @@ interface MopsContact {
 const fmt = (n: number) =>
   new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(n);
 
+// Animowany licznik — nakręca się od aktualnej wartości do nowej (350ms, ease-out)
+function AnimatedNumber({ value }: { value: number }) {
+  const [display, setDisplay] = useState(value);
+  const displayRef = useRef(value);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const from = displayRef.current;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    const startTime = performance.now();
+    const duration = 350;
+
+    const tick = () => {
+      const t = Math.min((performance.now() - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // cubic ease-out
+      const current = Math.round(from + (value - from) * eased);
+      displayRef.current = current;
+      setDisplay(current);
+      if (t < 1) rafRef.current = requestAnimationFrame(tick);
+      else rafRef.current = null;
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [value]);
+
+  return <>{fmt(display)}</>;
+}
+
 async function trackAppEvent(eventType: string, metadata: Record<string, unknown>) {
   try {
     await fetch('/api/analytics/app-track', {
@@ -125,7 +154,7 @@ function ResultCard({ label, value, accent }: { label: string; value: number; ac
   return (
     <div className={`${bg} rounded-xl p-4`}>
       <div className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-1.5">{label}</div>
-      <div className="text-2xl font-bold font-mono text-white">{fmt(value)}</div>
+      <div className="text-2xl font-bold font-mono text-white"><AnimatedNumber value={value} /></div>
     </div>
   );
 }
@@ -477,7 +506,7 @@ function KalkulatorContent() {
               {/* Total */}
               <div className="mb-5">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Koszt całkowity</div>
-                <div className="text-5xl font-bold font-mono text-white">{fmt(koszt)}</div>
+                <div className="text-5xl font-bold font-mono text-white"><AnimatedNumber value={koszt} /></div>
               </div>
 
               {/* 4 cards */}
