@@ -496,43 +496,27 @@ function KalkulatorContent() {
           <div className="lg:sticky lg:top-6">
             <div className="bg-slate-900 rounded-2xl p-6 text-white">
 
-              {/* Header */}
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-                  Podział opłaty miesięcznej
-                </span>
-                <span className="relative flex h-2.5 w-2.5">
-                  {hasInteracted && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />}
-                  <span className={`relative inline-flex rounded-full h-2.5 w-2.5 transition-colors duration-300 ${hasInteracted ? 'bg-emerald-500' : 'bg-slate-600'}`} />
-                </span>
-              </div>
-
-              {/* Display — duży ekran, liczba wyrównana do prawej */}
-              <div className="bg-black/30 rounded-xl px-5 py-4 mb-5 text-right">
-                <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">koszt całkowity / mc</div>
-                <div className="text-5xl font-bold font-mono text-white leading-none">
-                  <AnimatedNumber value={koszt} />
-                </div>
-              </div>
-
-              {/* 4 wiersze z paskiem proporcji */}
-              <div className="space-y-4 mb-5">
+              {/* 4 wiersze — styl rachunku */}
+              <div className="space-y-0 mb-2">
                 {([
-                  { key: 'senior',  label: 'Mieszkaniec DPS',       value: oplataSeniora, color: 'bg-emerald-500' },
-                  { key: 'malzon',  label: 'Małżonek',              value: oplataM,       color: 'bg-blue-400'   },
-                  { key: 'dzieci',  label: `Dzieci (×${nKids})`,    value: oplataD,       color: 'bg-amber-400'  },
-                  { key: 'gmina',   label: 'Gmina',                 value: oplataGminy,   color: 'bg-slate-400'  },
-                ] as { key: string; label: string; value: number; color: string }[]).map(({ key, label, value, color }) => {
+                  { key: 'senior', label: 'Mieszkaniec DPS',    value: oplataSeniora, color: 'bg-emerald-500', dot: 'bg-emerald-500' },
+                  { key: 'malzon', label: 'Małżonek',           value: oplataM,       color: 'bg-blue-400',   dot: 'bg-blue-400'   },
+                  { key: 'dzieci', label: `Dzieci (×${nKids})`, value: oplataD,       color: 'bg-amber-400',  dot: 'bg-amber-400'  },
+                  { key: 'gmina',  label: 'Gmina',              value: oplataGminy,   color: 'bg-slate-500',  dot: 'bg-slate-500'  },
+                ] as { key: string; label: string; value: number; color: string; dot: string }[]).map(({ key, label, value, color, dot }) => {
                   const pct = koszt > 0 ? (value / koszt) * 100 : 0;
                   return (
-                    <div key={key}>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
-                        <span className="text-base font-bold font-mono text-white tabular-nums">
+                    <div key={key} className="py-3 border-b border-slate-800">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
+                          <span className="text-sm text-slate-300">{label}</span>
+                        </div>
+                        <span className="text-sm font-bold font-mono text-white tabular-nums">
                           <AnimatedNumber value={value} />
                         </span>
                       </div>
-                      <div className="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+                      <div className="w-full h-0.5 bg-slate-800 rounded-full overflow-hidden">
                         <div
                           className={`${color} h-full rounded-full transition-[width] duration-[350ms] ease-out`}
                           style={{ width: `${pct}%` }}
@@ -541,6 +525,14 @@ function KalkulatorContent() {
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Suma na dole — jak w rachunku */}
+              <div className="flex items-center justify-between pt-4">
+                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Łącznie / mc</span>
+                <span className="text-3xl font-bold font-mono text-white">
+                  <AnimatedNumber value={koszt} />
+                </span>
               </div>
 
               {/* Warning */}
