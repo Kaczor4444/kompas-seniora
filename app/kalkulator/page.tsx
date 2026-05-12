@@ -558,8 +558,8 @@ function KalkulatorContent() {
           </div>
           <h2 className="text-2xl font-black text-slate-900 mb-2">Znajdź DPS w Twojej okolicy</h2>
           <p className="text-slate-500 text-sm mb-8 max-w-xl">
-            Podaj miasto — wyszukamy publiczne DPS w Małopolsce i automatycznie podstawimy
-            najtańszą cenę do kalkulatora powyżej.
+            Podaj miasto lub miejscowość — znajdziemy publiczne DPS w powiecie i automatycznie
+            podstawimy najtańszą cenę do kalkulatora powyżej.
           </p>
 
           <div className="flex gap-3 mb-4 max-w-lg">
