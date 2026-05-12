@@ -184,6 +184,7 @@ function KalkulatorContent() {
   const [lookupError, setLookupError] = useState('');
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState('');
+  const [showGeoSuggestion, setShowGeoSuggestion] = useState(false);
   const [selectedPowiat, setSelectedPowiat] = useState<string | null>(null);
   const [showAllFacilities, setShowAllFacilities] = useState(false);
   const [savedIds, setSavedIds] = useState<number[]>([]);
@@ -614,17 +615,41 @@ function KalkulatorContent() {
             podstawimy najtańszą cenę do kalkulatora powyżej.
           </p>
 
-          <div className="flex gap-3 mb-2 max-w-lg">
+          <div className="flex gap-3 mb-4 max-w-lg">
             <div className="relative flex-1">
               <input
                 type="text"
                 value={city}
-                onChange={e => setCity(e.target.value)}
+                onChange={e => { setCity(e.target.value); if (e.target.value) setShowGeoSuggestion(false); }}
+                onFocus={() => { if (!city.trim()) setShowGeoSuggestion(true); }}
+                onBlur={() => setTimeout(() => setShowGeoSuggestion(false), 150)}
                 onKeyDown={e => e.key === 'Enter' && handleLookup()}
                 placeholder="np. Kraków, Wieliczka, Nowy Sącz…"
                 className="w-full bg-white border-2 border-slate-300 rounded-xl px-5 py-4 text-base font-bold text-slate-900 outline-none focus:border-emerald-500 transition-all placeholder:text-slate-400"
               />
               <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+
+              {/* Dropdown geolokalizacji */}
+              {showGeoSuggestion && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                  <button
+                    onMouseDown={e => { e.preventDefault(); handleGeolocate(); setShowGeoSuggestion(false); }}
+                    className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors text-left"
+                  >
+                    {geoLoading
+                      ? <div className="w-4 h-4 border-2 border-slate-300 border-t-emerald-500 rounded-full animate-spin flex-shrink-0" />
+                      : <MapPin size={16} className="text-emerald-600 flex-shrink-0" />
+                    }
+                    <span className="text-sm font-bold text-slate-700">
+                      {geoLoading ? 'Wykrywam lokalizację…' : 'Szukaj w mojej okolicy'}
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              {geoError && (
+                <p className="absolute top-full left-0 mt-2 text-xs text-rose-500">{geoError}</p>
+              )}
             </div>
             <button
               onClick={handleLookup}
@@ -640,22 +665,6 @@ function KalkulatorContent() {
                 : <><Search size={15} /> Szukaj</>
               }
             </button>
-          </div>
-
-          {/* Geolokalizacja */}
-          <div className="flex items-center gap-3 mb-4 max-w-lg">
-            <button
-              onClick={handleGeolocate}
-              disabled={geoLoading}
-              className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-emerald-600 transition-colors disabled:opacity-50"
-            >
-              {geoLoading
-                ? <div className="w-3.5 h-3.5 border-2 border-slate-400/30 border-t-slate-400 rounded-full animate-spin" />
-                : <MapPin size={14} />
-              }
-              {geoLoading ? 'Wykrywam lokalizację…' : 'Szukaj w mojej okolicy'}
-            </button>
-            {geoError && <span className="text-xs text-rose-500">{geoError}</span>}
           </div>
 
           {lookupError && (
