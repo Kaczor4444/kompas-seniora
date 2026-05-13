@@ -17,13 +17,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(allMops);
     }
 
-    // Normalize city name for search (lowercase only, keep Polish characters)
-    const normalizedCity = city.toLowerCase().trim();
+    // Normalize city — DB stores stripped names (myslenice, not myślenice)
+    const normalizedCity = city.toLowerCase().trim()
+      .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e')
+      .replace(/ł/g,'l').replace(/ń/g,'n').replace(/ó/g,'o')
+      .replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z');
 
-    // Find MOPS by city
+    // Find MOPS by city (normalized) or by display name containing the query
     const mops = await prisma.mopsContact.findFirst({
       where: {
-        city: normalizedCity
+        OR: [
+          { city: normalizedCity },
+          { city: city.toLowerCase().trim() },
+        ]
       }
     });
 

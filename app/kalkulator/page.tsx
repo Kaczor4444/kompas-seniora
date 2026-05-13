@@ -338,7 +338,7 @@ function KalkulatorContent() {
       const facilities: Facility[] = data.results || [];
 
       if (facilities.length === 0) {
-        setLookupError(`Nie znaleźliśmy DPS w okolicy "${city}". Spróbuj wpisać inne miasto lub powiat.`);
+        setLookupError(`Nie znaleźliśmy placówek DPS w pobliżu "${city}". Sprawdź czy miejscowość jest w Małopolsce — obsługujemy tylko to województwo.`);
         setLoading(false);
         return;
       }
