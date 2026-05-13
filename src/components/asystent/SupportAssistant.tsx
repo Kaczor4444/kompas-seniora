@@ -86,6 +86,10 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
   const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid'>('idle');
   // Resolved powiat name from TERYT (e.g. "olkuski" for city "Olkusz")
   const [resolvedPowiat, setResolvedPowiat] = useState<string>('');
+  // Geolocation dropdown
+  const [showGeoSuggestion, setShowGeoSuggestion] = useState(false);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState('');
 
   useEffect(() => {
     if (prefilledLocation) {
@@ -166,6 +170,34 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     } catch (e) {
       console.error('Cannot save checklist to localStorage', e);
     }
+  };
+
+  const handleGeolocate = () => {
+    if (!navigator.geolocation) { setGeoError('Przeglądarka nie obsługuje geolokalizacji.'); return; }
+    setGeoLoading(true); setGeoError('');
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pl`,
+            { headers: { 'User-Agent': 'KompasSeniora/1.0' } }
+          );
+          const data = await res.json();
+          const detected = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality || '';
+          if (detected) { setAnswers(prev => ({ ...prev, location: detected })); }
+          else { setGeoError('Nie udało się określić miejscowości.'); }
+        } catch { setGeoError('Błąd geolokalizacji.'); }
+        finally { setGeoLoading(false); }
+      },
+      (err) => {
+        setGeoLoading(false);
+        setGeoError(err.code === err.PERMISSION_DENIED
+          ? 'Dostęp zablokowany — włącz lokalizację w przeglądarce.'
+          : 'Nie można określić lokalizacji.');
+      },
+      { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
+    );
   };
 
   const handleNext = (step: Step) => {
@@ -497,19 +529,44 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                 )}
 
                 <div className="space-y-3">
-                  <div className={`flex items-center bg-white border-2 rounded-2xl p-2 transition-all group shadow-sm ${validationState === 'invalid' ? 'border-amber-200 focus-within:border-amber-400 focus-within:ring-4 focus-within:ring-amber-50' : 'border-stone-200 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-primary-50'}`}>
-                     <div className={`px-5 transition-colors ${validationState === 'invalid' ? 'text-amber-500' : 'text-slate-300 group-focus-within:text-primary-500'}`}>
+                  <div className="relative">
+                    <div className={`flex items-center bg-white border-2 rounded-2xl p-2 transition-all group shadow-sm ${validationState === 'invalid' ? 'border-amber-200 focus-within:border-amber-400 focus-within:ring-4 focus-within:ring-amber-50' : 'border-stone-200 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-primary-50'}`}>
+                      <div className={`px-5 transition-colors ${validationState === 'invalid' ? 'text-amber-500' : 'text-slate-300 group-focus-within:text-primary-500'}`}>
                         <MapPin size={24} />
-                     </div>
-                     <input 
-                        type="text" 
-                        value={answers.location} 
-                        onChange={e => setAnswers({...answers, location: e.target.value})} 
-                        placeholder="Wpisz miasto lub powiat..." 
+                      </div>
+                      <input
+                        type="text"
+                        value={answers.location}
+                        onChange={e => { setAnswers({...answers, location: e.target.value}); if (e.target.value) setShowGeoSuggestion(false); }}
+                        onFocus={() => { if (!answers.location.trim()) setShowGeoSuggestion(true); }}
+                        onBlur={() => setTimeout(() => setShowGeoSuggestion(false), 150)}
+                        placeholder="Wpisz miasto lub powiat..."
                         autoComplete="off"
                         spellCheck="false"
-                        className="flex-1 py-5 pr-8 bg-transparent text-lg font-bold outline-none placeholder:text-stone-300 placeholder:font-medium" 
-                     />
+                        className="flex-1 py-5 pr-8 bg-transparent text-lg font-bold outline-none placeholder:text-stone-300 placeholder:font-medium"
+                      />
+                    </div>
+
+                    {showGeoSuggestion && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                        <button
+                          onMouseDown={e => { e.preventDefault(); setShowGeoSuggestion(false); handleGeolocate(); }}
+                          className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors text-left"
+                        >
+                          {geoLoading
+                            ? <div className="w-4 h-4 border-2 border-slate-200 border-t-emerald-500 rounded-full animate-spin flex-shrink-0" />
+                            : <MapPin size={16} className="text-emerald-600 flex-shrink-0" />
+                          }
+                          <span className="text-sm font-bold text-slate-700">
+                            {geoLoading ? 'Wykrywam lokalizację…' : 'Szukaj w mojej okolicy'}
+                          </span>
+                        </button>
+                      </div>
+                    )}
+
+                    {geoError && (
+                      <p className="text-xs text-rose-500 mt-1 px-2">{geoError}</p>
+                    )}
                   </div>
                   
                   <div className="min-h-[24px] px-2">
