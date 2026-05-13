@@ -165,3 +165,20 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 ```
+
+---
+
+## Bonus: PDF z listą OPS Małopolska (BIP)
+
+**URL:** `https://bip.malopolska.pl/api/files/3559651`  
+**Plik:** `data/ops_malopolska_bip_2026-05-13.pdf` (15 stron, 876 KB)
+
+Zawiera listę wszystkich jednostek pomocy społecznej w Małopolsce z podziałem na powiaty i gminy — w kontekście przeciwdziałania przemocy domowej. Mimo specyficznego kontekstu, dane kontaktowe (email, telefon, adres) są ogólne dla całej placówki.
+
+**Wynik użycia:**
+- Wyciągnięto 346 unikalnych emaili
+- Dopasowano 64 z 66 rekordów bez emaila w naszej bazie
+- Wgrano automatycznie 48 pewnych dopasowań
+- 16 wymaga ręcznej weryfikacji (PCPR zamiast GOPS, inne miasto w domenie)
+
+**Wzorzec URL pliku:** `https://bip.malopolska.pl/api/files/{ID}` — warto szukać podobnych plików dla innych województw.
