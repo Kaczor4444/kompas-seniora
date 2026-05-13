@@ -431,7 +431,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 >
                   {isGeoLoading
                     ? <div className="w-4 h-4 border-2 border-slate-200 border-t-emerald-500 rounded-full animate-spin flex-shrink-0" />
-                    : <Navigation size={15} className="text-emerald-600 flex-shrink-0" />
+                    : <MapPin size={15} className="text-emerald-600 flex-shrink-0" />
                   }
                   <span className="text-sm font-bold text-slate-700">
                     {isGeoLoading ? 'Wykrywam lokalizację…' : 'Szukaj w mojej okolicy'}
