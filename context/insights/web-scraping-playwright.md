@@ -178,7 +178,8 @@ Nie trzeba szukać nowego linku każdego roku — wystarczy sprawdzić nagłówe
 | Plik | URL | Last-Modified | Stan |
 |------|-----|---------------|------|
 | Wykaz DPS | `https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf` | 27.03.2026 | ✅ aktualny |
-| Wykaz ŚDS | `https://www.malopolska.uw.gov.pl/doc/WYKAZ%20SRODOWISKOWYCH%20DOM%C3%93W%20SAMOPOMOCY%20W%20MA%C5%81OPOLSCE.xls` | 03.04.2017 | ❌ od 9 lat nieaktualizowany |
+| Wykaz ŚDS (stary .xls) | `https://www.malopolska.uw.gov.pl/doc/WYKAZ%20SRODOWISKOWYCH%20DOM%C3%93W%20SAMOPOMOCY%20W%20MA%C5%81OPOLSCE.xls` | 03.04.2017 | ❌ stary, nieaktualizowany |
+| **Wykaz ŚDS (nowy .xlsx)** | `https://www.malopolska.uw.gov.pl/doc/Wykaz%20%C5%9Brodowiskowych%20dom%C3%B3w%20samopomocy.xlsx` | **04.05.2026** | ✅ aktualny, stabilny URL |
 
 ### Sprawdzenie czy plik jest nowszy (bez pobierania)
 
@@ -195,29 +196,53 @@ Jeśli data nowsza niż `data_zrodla_dane` w naszej bazie → warto pobrać i pr
 - Przetestowany skrypt: `data/wykaz_dps_malopolska_2026.pdf` + Python fitz
 - Struktura: l.p. | powiat | nazwa i adres | email | typ | liczba miejsc
 
+### Co dał wykaz ŚDS 2026 (90 rekordów, 0 emaili — ale inne dane)
+
+**⚠️ Uwaga: format zmieniony w 2026 — email zastąpiony przez ePUAP i eDoręczenia!**
+
+Struktura pliku .xlsx (3 sekcje):
+- 58 ŚDS gminnych (l.p. 1–58)
+- 29 ŚDS powiatowych (l.p. 59–87) 
+- 2 Kluby Samopomocy (osobna tabela)
+
+Co zawiera 2026 (czego nie ma 2017):
+- **Kolumna `Publiczne`** (1 = gmina/powiat, puste = organizacja)
+- **Typ D** (nowy — dla osób ze spektrum autyzmu)
+- **Miejsca `Za życiem`** — podopieczni z orzeczeniem (wyższa dotacja)
+- **ePUAP slug** (do korespondencji oficjalnej)
+- **eDoręczenia** AE:PL-... 
+- **Powiat w nawiasach** obok gminy — łatwe dopasowanie
+
+Brak: adres email (nie da się zaktualizować emaili z tego pliku).
+
+Plik: `data/wykaz_sds_malopolska_2026.xlsx`
+
+**Wynik użycia (maj 2026):**
+- Znaleziono 2 ŚDS brakujące w bazie: **Brzeźnica** (wadowicki), **Uście Gorlickie** (gorlicki)
+- Znaleziono 3 błędy nazw w DB (przez cross-check telefonów):
+  - id=7: Dobroczyce → **Dobczyce** ✓ naprawione
+  - id=107: Mszana Górna → **Mszana Dolna** ✓ naprawione  
+  - id=122: Rzepiennik Biskupi → **Rzepiennik Strzyżewski** ✓ naprawione
+
 ### Co dał wykaz ŚDS 2017 (76 rekordów, 76 emaili)
 
 - Uzupełnił 7 z 10 brakujących emaili ŚDS → 92/95 ŚDS ma email
 - 3 rekordy bez dopasowania (Marchocice, Rzepiennik Biskupi, Winiary) — nowsze placówki spoza 2017
 - Plik: `data/wykaz_sds_malopolska.xls`, kolumna 7 = email
 
-### Strategia rocznej aktualizacji (na 2027 i kolejne lata)
+### Strategia rocznej aktualizacji ŚDS (na 2027 i kolejne lata)
 
 ```bash
-# 1. Sprawdź czy DPS PDF jest nowszy
+# DPS — sprawdź czy PDF jest nowszy
 curl -sI "https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf" | grep Last-Modified
+# Jeśli nowszy: pobierz i przepuść przez skrypt fitz
+# oficjalne_id = l.p. z PDF → dopasowanie 1:1, zero fuzzy matching
 
-# 2. Pobierz jeśli nowszy
-curl -sL "https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf" -o data/wykaz_dps_{ROK}.pdf
-
-# 3. Wyciągnij emaile (Python fitz)
-# Struktura stała: l.p. jako "N." na początku linii, email w tej samej sekcji
-
-# 4. Dopasuj przez oficjalne_id (l.p. w PDF = oficjalne_id w DB)
-# UWAGA: oficjalne_id są wypełnione dla wszystkich 89 DPS — dopasowanie 1:1
-
-# 5. Dla ŚDS: szukaj zaktualizowanego XLS lub nowego formatu
-# URL ŚDS od 2017 nie zmieniał się — MUW może mieć nowszy w innym miejscu
+# ŚDS — dwa URL, użyj nowszego
+curl -sI "https://www.malopolska.uw.gov.pl/doc/Wykaz%20%C5%9Brodowiskowych%20dom%C3%B3w%20samopomocy.xlsx" | grep Last-Modified
+# ⚠️ XLSX 2026 NIE MA emaili — tylko ePUAP + telefony
+# Do emaili: użyj starego .xls (2017) lub BIP per-placówka
+# Do weryfikacji czy ŚDS istnieje + telefon: użyj nowego .xlsx (2026)
 ```
 
 ### Dla ŚDS — alternatywne źródła nowszych danych
