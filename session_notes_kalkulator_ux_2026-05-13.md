@@ -145,3 +145,33 @@ Zastosowania w projekcie:
 3. Fallback dla monitora wolnych miejsc DPS jeśli MUW zmieni stronę
 
 Ostatnia aktualizacja: 2026-05-13 (wieczór)
+
+---
+
+## ➕ Uzupełnienie 2 — baza DPS/ŚDS (sesja #15, część 3)
+
+### Wykazy MUW — emaile + weryfikacja danych
+
+**DPS — 89/89 z emailem ✅**
+- Pobrano `wykaz dps.pdf` z malopolska.uw.gov.pl (Last-Modified 27.03.2026, stały URL)
+- Uzupełniono 2 brakujące emaile: DPS Diana Kasina Wielka, DPS Muszyna
+- oficjalne_id wypełnione dla wszystkich 89 → roczna aktualizacja przez l.p. bez fuzzy matching
+
+**ŚDS — 97 rekordów, 92 z emailem**
+- Stary XLS (2017): uzupełniono 7 emaili (Miłocice, Miechów, Raciechowice, Lubień, Pałecznica, Proszowice, Tarnów)
+- Nowy XLSX 2026 (`Wykaz Środowiskowych domów samopomocy.xlsx`, Last-Modified 04.05.2026):
+  - **Brak emaili** — format zmieniony na ePUAP/eDoręczenia
+  - Cross-check telefonów → wykryto 3 błędy nazw w DB:
+    - id=7: Dobroczyce → **Dobczyce** ✓
+    - id=107: Mszana Górna → **Mszana Dolna** ✓
+    - id=122: Rzepiennik Biskupi → **Rzepiennik Strzyżewski** ✓
+  - Znaleziono 2 brakujące ŚDS → dodano do bazy:
+    - **id=199** ŚDS Kossowa (gmina Brzeźnica, wadowicki), 30 miejsc, A/B/C/D
+    - **id=200** ŚDS Wysowa-Zdrój (gmina Uście Gorlickie, gorlicki), 15 miejsc, A/C
+
+**Stan końcowy bazy:**
+- DPS: 89 rekordów, 89/89 emaili (100%)
+- ŚDS: 97 rekordów, 92/97 emaili (95%)
+- Pliki źródłowe: `data/wykaz_dps_malopolska_2026.pdf`, `data/wykaz_sds_malopolska.xls`, `data/wykaz_sds_malopolska_2026.xlsx`
+
+**Commity sesji (część 3):** `267ca1e` → `af8ed5b` (push do main)
