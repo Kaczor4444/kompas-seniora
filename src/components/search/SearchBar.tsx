@@ -126,6 +126,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const [cityInput, setCityInput] = useState(initialQuery);
   const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>(initialType);
   const [isGeoLoading, setIsGeoLoading] = useState(false);
+  const [showGeoSuggestion, setShowGeoSuggestion] = useState(false);
 
   // Autocomplete state
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -395,7 +396,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               ref={inputRef}
               type="text"
               value={cityInput}
-              onChange={(e) => setCityInput(e.target.value)}
+              onChange={(e) => { setCityInput(e.target.value); if (e.target.value) setShowGeoSuggestion(false); }}
+              onFocus={() => { if (!cityInput.trim()) setShowGeoSuggestion(true); }}
+              onBlur={() => setTimeout(() => setShowGeoSuggestion(false), 150)}
               onKeyDown={handleKeyDown}
               placeholder="Gdzie szukasz opieki?"
               enterKeyHint="search"
@@ -418,6 +421,23 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 onShowAllClick={handleShowAllClick}
                 onMouseEnter={setHighlightedIndex}
               />
+            )}
+
+            {showGeoSuggestion && !showDropdown && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                <button
+                  onMouseDown={e => { e.preventDefault(); setShowGeoSuggestion(false); handleGeolocation(); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors text-left"
+                >
+                  {isGeoLoading
+                    ? <div className="w-4 h-4 border-2 border-slate-200 border-t-emerald-500 rounded-full animate-spin flex-shrink-0" />
+                    : <Navigation size={15} className="text-emerald-600 flex-shrink-0" />
+                  }
+                  <span className="text-sm font-bold text-slate-700">
+                    {isGeoLoading ? 'Wykrywam lokalizację…' : 'Szukaj w mojej okolicy'}
+                  </span>
+                </button>
+              </div>
             )}
           </div>
 
@@ -460,19 +480,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </div>
       )}
 
-      {/* Geolocation */}
-      {!compact && (
-        <button
-          onClick={handleGeolocation}
-          disabled={isGeoLoading}
-          className="inline-flex items-center gap-2 text-[11px] font-black uppercase text-slate-400 tracking-widest hover:text-emerald-700 transition-colors group disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Navigation size={13} className="text-emerald-500 group-hover:animate-bounce" />
-          <span className="underline decoration-dotted underline-offset-4 decoration-2">
-            {isGeoLoading ? 'Wyszukiwanie...' : 'Namierz moją lokalizację'}
-          </span>
-        </button>
-      )}
     </div>
   );
 };
