@@ -168,6 +168,68 @@ jobs:
 
 ---
 
+## Wykazy MUW Małopolska — coroczna aktualizacja danych DPS/ŚDS
+
+**Kluczowe odkrycie (2026-05-13):** MUW Małopolska używa **stałych URL** i nadpisuje pliki przy aktualizacji.  
+Nie trzeba szukać nowego linku każdego roku — wystarczy sprawdzić nagłówek `Last-Modified`.
+
+### URL-e produkcyjne
+
+| Plik | URL | Last-Modified | Stan |
+|------|-----|---------------|------|
+| Wykaz DPS | `https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf` | 27.03.2026 | ✅ aktualny |
+| Wykaz ŚDS | `https://www.malopolska.uw.gov.pl/doc/WYKAZ%20SRODOWISKOWYCH%20DOM%C3%93W%20SAMOPOMOCY%20W%20MA%C5%81OPOLSCE.xls` | 03.04.2017 | ❌ od 9 lat nieaktualizowany |
+
+### Sprawdzenie czy plik jest nowszy (bez pobierania)
+
+```bash
+curl -sI "https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf" | grep Last-Modified
+# Last-Modified: Fri, 27 Mar 2026 14:24:03 GMT
+```
+
+Jeśli data nowsza niż `data_zrodla_dane` w naszej bazie → warto pobrać i przetworzyć.
+
+### Co dał wykaz DPS 2026 (91 rekordów, 92 emaili)
+
+- Uzupełnił emaile dla wszystkich 89 DPS w bazie (wcześniej 2 brakowały)
+- Przetestowany skrypt: `data/wykaz_dps_malopolska_2026.pdf` + Python fitz
+- Struktura: l.p. | powiat | nazwa i adres | email | typ | liczba miejsc
+
+### Co dał wykaz ŚDS 2017 (76 rekordów, 76 emaili)
+
+- Uzupełnił 7 z 10 brakujących emaili ŚDS → 92/95 ŚDS ma email
+- 3 rekordy bez dopasowania (Marchocice, Rzepiennik Biskupi, Winiary) — nowsze placówki spoza 2017
+- Plik: `data/wykaz_sds_malopolska.xls`, kolumna 7 = email
+
+### Strategia rocznej aktualizacji (na 2027 i kolejne lata)
+
+```bash
+# 1. Sprawdź czy DPS PDF jest nowszy
+curl -sI "https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf" | grep Last-Modified
+
+# 2. Pobierz jeśli nowszy
+curl -sL "https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf" -o data/wykaz_dps_{ROK}.pdf
+
+# 3. Wyciągnij emaile (Python fitz)
+# Struktura stała: l.p. jako "N." na początku linii, email w tej samej sekcji
+
+# 4. Dopasuj przez oficjalne_id (l.p. w PDF = oficjalne_id w DB)
+# UWAGA: oficjalne_id są wypełnione dla wszystkich 89 DPS — dopasowanie 1:1
+
+# 5. Dla ŚDS: szukaj zaktualizowanego XLS lub nowego formatu
+# URL ŚDS od 2017 nie zmieniał się — MUW może mieć nowszy w innym miejscu
+```
+
+### Dla ŚDS — alternatywne źródła nowszych danych
+
+Skoro XLS MUW ma dane z 2017, opcje na aktualne emaile ŚDS:
+1. **ROPS Małopolska** (`rops.malopolska.pl`) — prowadzi rejestr ŚDS
+2. **BIP Małopolska** — każde ŚDS ma profil pod `bip.malopolska.pl/{slug}`
+3. **Strony gminy** — ŚDS gminne są na stronach urzędów gmin
+4. **Kontakt telefoniczny** — dla 3 brakujących (Marchocice, Rzepiennik Biskupi, Winiary)
+
+---
+
 ## Bonus: PDF z listą OPS Małopolska (BIP)
 
 **URL:** `https://bip.malopolska.pl/api/files/3559651`  
@@ -275,9 +337,45 @@ Nie wszystkie emaile z PDF są emailami GOPS. Filtruj:
 
 Gdy będziemy dodawać kolejne województwa lub typy placówek do bazy:
 
-| Cel | Źródło PDF |
-|-----|-----------|
-| DPS innych województw | MUW danego województwa (wykaz DPS) |
-| ŚDS całej Polski | ROPS + MRPiPS |
-| PCPR (20 powiatów Małopolski) | Ten sam PDF — gotowe |
+| Cel | Źródło |
+|-----|--------|
+| DPS innych województw | `{woj}.uw.gov.pl/doc/wykaz dps.pdf` — ten sam wzorzec |
+| ŚDS całej Polski | ROPS + MRPiPS (centralny rejestr) |
+| PCPR (20 powiatów Małopolski) | BIP PDF `bip.malopolska.pl/api/files/3559651` — gotowe |
 | Noclegownie / schroniska | Podobny raport ROPS |
+
+---
+
+## Wzorzec MUW dla innych województw
+
+Każde MUW prowadzi rejestr DPS. URL pattern jest analogiczny:
+
+| Województwo | MUW URL | Status |
+|-------------|---------|--------|
+| **Małopolskie** | `malopolska.uw.gov.pl/doc/wykaz dps.pdf` | ✅ działa, Last-Modified 27.03.2026 |
+| Śląskie | `katowice.uw.gov.pl` | do sprawdzenia |
+| Mazowieckie | `mazowieckie.uw.gov.pl` | do sprawdzenia |
+| Łódzkie | `lodz.uw.gov.pl` | do sprawdzenia |
+| Podkarpackie | `rzeszow.uw.gov.pl` | do sprawdzenia |
+
+### Jak znaleźć dla nowego województwa
+
+```bash
+# Opcja 1: bezpośredni strzał
+curl -sI "https://{woj}.uw.gov.pl/doc/wykaz%20dps.pdf" | grep -E "HTTP|Last-Modified"
+
+# Opcja 2: Google
+# site:{woj}.uw.gov.pl "wykaz" "dom pomocy" filetype:pdf
+
+# Opcja 3: strona MUW → Pomoc społeczna → DPS → wykaz
+```
+
+### Co zrobić gdy rozszerzamy na nowe województwo
+
+1. Sprawdź URL wzorcem MUW → pobierz PDF
+2. Sprawdź strukturę (może różnić się od Małopolski)  
+3. Wyciągnij emaile przez fitz + regex
+4. Dopasuj do bazy po nazwie DPS lub miejscowości
+5. `oficjalne_id` = l.p. z PDF — wpisz żeby umożliwić przyszłą aktualizację 1:1
+
+**Czas na nowe województwo (mając już skrypt):** ~2-3 godziny.
