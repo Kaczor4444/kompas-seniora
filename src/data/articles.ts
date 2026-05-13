@@ -83,6 +83,15 @@ export const sections: Section[] = [
         featuredOrder: 4,
         isActive: true,
       },
+      {
+        slug: 'uslugi-opiekuncze',
+        sectionId: 'wybor-opieki',
+        category: 'Wybór opieki',
+        badge: 'NOWE',
+        thumbnail: '/images/senior_opiekunka.webp',
+        featuredOrder: 5,
+        isActive: true,
+      },
       // WKRÓTCE - odkomentuj gdy artykuł będzie gotowy
       // {
       //   slug: 'opieka-dzienna-calodobowa',
