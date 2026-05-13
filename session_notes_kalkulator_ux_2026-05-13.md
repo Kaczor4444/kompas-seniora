@@ -174,4 +174,99 @@ Ostatnia aktualizacja: 2026-05-13 (wieczór)
 - ŚDS: 97 rekordów, 92/97 emaili (95%)
 - Pliki źródłowe: `data/wykaz_dps_malopolska_2026.pdf`, `data/wykaz_sds_malopolska.xls`, `data/wykaz_sds_malopolska_2026.xlsx`
 
-**Commity sesji (część 3):** `267ca1e` → `af8ed5b` (push do main)
+**Commity sesji (część 3):** `267ca1e` → `82323e6` (push do main)
+
+---
+
+## 📋 GOPS/MOPS — 67 rekordów bez emaila do ręcznego sprawdzenia
+
+Kolejność: zadzwoń lub wejdź na stronę gminy. Telefony są w bazie.
+
+| ID | Miejscowość | Telefon |
+|----|-------------|---------|
+| 187 | Alwernia | 12 283 11 15 |
+| 242 | Brzeźnica | 33 879 20 29 |
+| 233 | Budzów | 33 876 77 52 |
+| 234 | Bystra-Sidzina | 18 268 12 20 |
+| 215 | Chełmiec | 18 440 46 27 |
+| 221 | Czarny Dunajec | 18 544 72 89 |
+| 182 | Czchów | 14 663 65 65 |
+| 222 | Maniowy | 18 275 08 83 |
+| 210 | Dobczyce | 12 372 17 14 |
+| 189 | Dąbrowa Tarnowska | 14 642 29 15 |
+| 183 | Wola Dębińska | 14 631 85 92 |
+| 247 | Gdów | 12 251 48 32 |
+| 224 | Nowy Targ (miasto) | 18 265 55 87 |
+| 237 | Tarnów (gmina) | 14 688 01 54 |
+| 184 | Gnojnik | 14 686 97 20 |
+| 207 | Gołcza | 12 388 64 11 |
+| 216 | Gródek nad Dunajcem | 18 440 10 96 |
+| 198 | Wawrzeńczyce | 12 287 40 03 |
+| 199 | Iwanowice | 12 388 41 22 |
+| 185 | Iwkowa | 14 684 40 20 |
+| 223 | Jabłonka | 18 261 11 47 |
+| 203 | Kamienica | 18 332 30 67 |
+| 230 | Koniusza | 12 386 90 32 |
+| 231 | Koszyce | 41 351 40 48 |
+| 208 | Kozłów | 41 384 10 33 |
+| 243 | Lanckorona | 33 876 35 91 |
+| 194 | Lipinki | 13 447 78 92 |
+| 238 | Lisia Góra | 14 678 45 68 |
+| 235 | Maków Podhalański | 33 877 15 54 |
+| 196 | Moszczenica | 18 354-xx-xx |
+| 190 | Mędrzechów | 14 644 24 23 |
+| 218 | Nawojowa | 18 445 70 68 |
+| 180 | Niegowić | — |
+| 232 | Nowe Brzesko | 12 385 26 55 |
+| 220 | Nowy Targ (gmina) | 18 266 25 93 |
+| 191 | Olesno | 14 641 10 82 |
+| 239 | Pleśna | 14 679 81 70 |
+| 228 | Polanka Wielka | 33 848 80 19 |
+| 229 | Przeciszów | 33 841 32 80 |
+| 211 | Raciechowice | 12 372 52 11 |
+| 192 | Radgoszcz | 14 641 46 60 |
+| 197 | Ropa | 18 353 40 14 |
+| 219 | Rytro | 18 448 64 64 |
+| 240 | Rzepiennik Strzyżewski | 14 653 15 19 |
+| 181 | Rzezawa | 14 685 85 55 |
+| 212 | Siepraw | 12 372 18 25 |
+| 201 | Skawina | 12 276 21 37 |
+| 200 | Skała | 12 389 14 37 |
+| 225 | Spytkowice | 18 265 35 68 |
+| 236 | Stryszawa | 33 876 77 24 |
+| 193 | Szczucin | 14 643 64 18 |
+| 186 | Szczurowa | 14 671 31 20 |
+| 209 | Słaboszów | 41 384 71 72 |
+| 213 | Tokarnia | 12 274 70 63 |
+| 245 | Tomice | 33 823 26 47 |
+| 188 | Trzebinia | 32 612 15 10 |
+| 226 | Trzyciąż | 12 389 49 34 |
+| 248 | Trąbki | — |
+| 205 | Tymbark | 18 332 53 22 |
+| 246 | Wieliczka | 12 278 45 61 |
+| 202 | Szyce | 12 419 11 01 |
+| 214 | Wiśniowa | 12 271 40 86 |
+| 227 | Wolbrom | 32 644 10 75 |
+| 241 | Zakopane | 18 201 47 33 |
+| 217 | Łososina Dolna | 18 444 80 02 |
+| 204 | Łukowica | 18 333 50 66 |
+| 195 | Łużna | 18 354 30 41 |
+
+> Tip: Playwright może pomóc przy BIP-ach. Dla stron statycznych gmin — curl + regex.  
+> Skrypt wzorcowy: `context/insights/web-scraping-playwright.md`
+
+---
+
+## 🔲 TODO przyszłe — GitHub Action dla ŚDS
+
+**Do zrobienia później** (brakuje tokenów): GitHub Action cron sprawdzający co kwartał czy `wykaz_sds_malopolska_2026.xlsx` ma nową datę `Last-Modified` i automatycznie importuje zmiany.
+
+URL do monitorowania:
+```
+https://www.malopolska.uw.gov.pl/doc/Wykaz%20%C5%9Brodowiskowych%20dom%C3%B3w%20samopomocy.xlsx
+```
+
+Analogicznie dla DPS:
+```
+https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf
+```
