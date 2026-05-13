@@ -962,6 +962,13 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 
 **Nadal krytyczne:** SEO blokada (robots.txt + layout.tsx) — nienaprawiona od sesji #12.
 
+**Dodatkowe (wieczór 2026-05-13):**
+- Fix API `/api/mops` — normalizacja polskich znaków (myślenice→myslenice)
+- 6 rekordów GOPS/MOPS zaktualizowanych ręcznie (email, www, telefon)
+- `data/mops_niekompletne_2026-05-13.csv` — 86 rekordów do uzupełnienia
+- Playwright przetestowany na BIP-ach — działa, wyciąga JS-rendered content
+- Nowy insight: `context/insights/web-scraping-playwright.md`
+
 ---
 
 ### Sesja #14 — 2026-05-11

@@ -110,4 +110,38 @@ Lista DPS po wyszukaniu sortuje od najtańszej ceny. Placówki bez ceny na końc
 - [ ] Mini-kalkulator na karcie placówki `/placowka/[id]`
 - [ ] Przetestować geo na iOS Safari (różne zachowanie permissions)
 
-Ostatnia aktualizacja: 2026-05-13
+---
+
+## ➕ Uzupełnienie (wieczór 2026-05-13)
+
+### GOPS/MOPS — weryfikacja i aktualizacja danych
+
+**Bug w API `/api/mops`:** DB przechowuje znormalizowane nazwy bez polskich znaków (`myslenice`), API szukało z polskimi (`myślenice`). Naprawiono normalizację — Myślenice, Niepołomice itp. teraz działają.
+
+**Zaktualizowano 6 rekordów ręcznie:**
+
+| ID | Miejscowość | Co dodano |
+|----|-------------|-----------|
+| 187 | Alwernia | email, www, nowa nazwa (MGOPS → CUS), tel |
+| 168 | Biały Dunajec | email, www (portal gminy), poprawiony tel |
+| 99 | Biecz | email, www mgops.biecz.pl |
+| 145 | Bolesław olkuski | email, www gminaboleslaw.pl |
+| 97 | Bolesław dąbrowski | www BIP, email (Playwright!), poprawiony tel |
+| 206 | Charsznica | email, www, pełny adres, verified |
+
+**Eksport niekompletnych:** `data/mops_niekompletne_2026-05-13.csv` — 86 rekordów bez emaila lub www.
+
+**Playwright — nowy insight:**
+
+BIP-y (`bip.malopolska.pl`) renderują JS — `curl` daje pusty HTML. Playwright (headless Chromium) wykonuje JS i wyciąga treść. Przetestowano na GOPS Bolesław dąbrowski:
+- `curl` → brak danych
+- `Playwright` → `gops@boleslaw.com.pl` ✅
+
+Pełna dokumentacja: `context/insights/web-scraping-playwright.md`
+
+Zastosowania w projekcie:
+1. Monitor GOPS/MOPS co miesiąc (planowane)
+2. Auto-uzupełnianie 86 brakujących rekordów
+3. Fallback dla monitora wolnych miejsc DPS jeśli MUW zmieni stronę
+
+Ostatnia aktualizacja: 2026-05-13 (wieczór)
