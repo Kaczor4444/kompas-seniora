@@ -182,3 +182,102 @@ Zawiera listę wszystkich jednostek pomocy społecznej w Małopolsce z podziałe
 - 16 wymaga ręcznej weryfikacji (PCPR zamiast GOPS, inne miasto w domenie)
 
 **Wzorzec URL pliku:** `https://bip.malopolska.pl/api/files/{ID}` — warto szukać podobnych plików dla innych województw.
+
+### Co jeszcze jest w tym PDF
+
+Poza GOPS/MOPS dokument zawiera:
+
+| Typ placówki | Liczba | Wartość dla projektu |
+|---|---|---|
+| **PCPR** (Powiatowe Centrum Pomocy Rodzinie) | 24 | Kluczowe — PCPR koordynuje kierowanie do DPS. Warto dodać do bazy jako osobny typ. |
+| **OIK** (Ośrodek Interwencji Kryzysowej) | 30 | Pomocne gdy rodzina jest w kryzysie — można linkować z kalkulatora |
+| Punkty konsultacyjne | ~40 | Mniej istotne dla nas |
+
+PCPR z emailami wyciągnięte z PDF:
+
+```
+Brzesko:     pcpr@pcprbrzesko.pl
+Dąbrowa Tn.: pcpr@pcprdt.pl
+Limanowa:    pcpr@powiat.limanowski.pl
+Miechów:     sekretariat@pcprmiechow.pl
+Nowy Sącz:   pk@pcpr-ns.pl
+Gorlice:     sekretariat@pcpr.gorlice.pl
+Myślenice:   kontakt@interwencjamyslenicki.pl
+```
+
+---
+
+## Jak znaleźć podobny PDF dla innych województw
+
+Każde województwo prowadzi **rejestr jednostek przeciwdziałania przemocy** i publikuje go jako PDF w BIP. To roczne zestawienie zawsze ma pełną listę OPS/PCPR z danymi kontaktowymi.
+
+### Strategia szukania
+
+**1. Google File Search:**
+```
+site:bip.{woj}.pl "lista jednostek" "ośrodek pomocy społecznej" filetype:pdf
+site:bip.slaskie.pl "wykaz" "ops" filetype:pdf
+```
+
+**2. Bezpośrednio przez BIP API:**
+```
+# Małopolska — działający wzorzec:
+https://bip.malopolska.pl/api/files/{ID}
+
+# Inne województwa do sprawdzenia:
+https://bip.slaskie.pl/api/files/{ID}
+https://bip.mazowsze.pl/api/files/{ID}
+https://bip.lodzkie.eu/api/files/{ID}
+https://bip.kujawsko-pomorskie.pl/api/files/{ID}
+```
+
+ID trzeba odgadnąć lub znaleźć przez wyszukiwarkę BIP danego województwa. Warto szukać ID bliskie 3559651 (Małopolska 2025) — inne województwa publikowały podobne pliki mniej więcej w tym samym czasie.
+
+**3. Strona ROPS (Regionalny Ośrodek Polityki Społecznej):**
+
+Każde województwo ma ROPS który zbiera te dane. Np.:
+- Małopolska: `rops.malopolska.pl`
+- Śląskie: `rops-katowice.pl`
+- Mazowieckie: `mcps.com.pl`
+
+Szukaj sekcji "przeciwdziałanie przemocy" → "baza danych" lub "wykaz placówek".
+
+### Schemat działania przy nowym województwie
+
+```python
+# 1. Pobierz PDF
+curl -sL "https://bip.{woj}.pl/api/files/{ID}" -o ops_{woj}.pdf
+
+# 2. Wyciągnij tekst
+import fitz
+doc = fitz.open(f'ops_{woj}.pdf')
+text = ''.join(page.get_text() for page in doc)
+
+# 3. Wyciągnij emaile per placówka
+# (skrypt w data/scripts/ — do napisania)
+
+# 4. Dopasuj do bazy po nazwie gminy
+# (ten sam algorytm co dla Małopolski)
+
+# 5. Wgraj pewne, oznacz do weryfikacji
+```
+
+### Jakość danych — co sprawdzić przed wgraniem
+
+Nie wszystkie emaile z PDF są emailami GOPS. Filtruj:
+- ✅ Domena zawiera nazwę gminy/miasta (`gops@gnojnik.pl`)
+- ✅ Prefix to `gops@`, `mops@`, `ops@`, `mgops@`
+- ⚠️ Sprawdź ręcznie: `pcpr@...`, `oik@...`, `opieka@...`
+- ❌ Odrzuć: `gmail.com`, `wp.pl`, `interia.pl`, `op.pl` — osobiste/tymczasowe
+- ❌ Odrzuć gdy domena to inne miasto niż szukane
+
+### Możliwe zastosowania poza GOPS/MOPS
+
+Gdy będziemy dodawać kolejne województwa lub typy placówek do bazy:
+
+| Cel | Źródło PDF |
+|-----|-----------|
+| DPS innych województw | MUW danego województwa (wykaz DPS) |
+| ŚDS całej Polski | ROPS + MRPiPS |
+| PCPR (20 powiatów Małopolski) | Ten sam PDF — gotowe |
+| Noclegownie / schroniska | Podobny raport ROPS |
