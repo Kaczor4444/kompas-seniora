@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-05-11 (sesja #14 - Redesign kalkulatora + FAQ DPS)
+> Ostatnia aktualizacja: 2026-05-13 (sesja #15 - UX kalkulatora + geolokalizacja + treści)
 
 ---
 
@@ -946,6 +946,23 @@ ADMIN_PASSWORD=       # (lub inna forma auth admin)
 ---
 
 ## 16. HISTORIA ZMIAN (changelog sesji)
+
+### Sesja #15 — 2026-05-13
+
+**Temat:** UX kalkulatora + geolokalizacja + nowy artykuł.
+
+**Commity:** `7c279c8` → `740155f`
+
+**Zmiany:**
+- `/kalkulator` — nowy nagłówek (perspektywa rodziny), animowane liczniki (AnimatedNumber + requestAnimationFrame), panel wyników w stylu rachunku (suma na dole), pulsująca kropka live (szara→zielona po interakcji), sortowanie DPS od najtańszej
+- Geolokalizacja jako dropdown suggestion w 3 miejscach: kalkulator, SearchBar (strona główna), asystent — usunięto osobne przyciski
+- Nowy artykuł: `uslugi-opiekuncze.mdx` — opieka domowa jako alternatywa DPS (gap vs gov.pl)
+- `koszty-opieki.mdx` — FAQ: świadczenie pielęgnacyjne 3 386 zł (2026) z linkiem gov.pl
+- Usunięto treści skopiowane ze stasik-kancelaria.pl (nagłówek, disclaimer)
+
+**Nadal krytyczne:** SEO blokada (robots.txt + layout.tsx) — nienaprawiona od sesji #12.
+
+---
 
 ### Sesja #14 — 2026-05-11
 
