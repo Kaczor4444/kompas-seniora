@@ -7,13 +7,15 @@
 
 - **Provider**: PostgreSQL (Neon)
 - **Połączenie**: `.env` → `DATABASE_URL`
-- **Total rekordów**: **184 placówki** (produkcja, stan: marzec 2026)
-  - DPS: 89
-  - ŚDS: 95
-  - Małopolskie: 180
+- **Total rekordów**: **299 placówek** (produkcja, stan: maj 2026)
+  - DPS: 95
+  - ŚDS: 97
+  - Klub Senior+: 79
+  - Dzienny Dom Senior+: 28
+  - Małopolskie: ~295
   - Śląskie: 4
-  - Z ceną: 90 (49%)
-  - Z geolokalizacją: 184 (100%)
+  - Z ceną: ~90 (tylko DPS, ~30%)
+  - Z geolokalizacją: 299 (100%)
 - **SQLite (`prisma/dev.db`)**: NIEUŻYWANY - tylko stare testowe dane (36 rekordów)
 
 **Aby zmodyfikować dane produkcyjne:**
@@ -96,14 +98,14 @@ kompas-seniora/
 
 ### Główne tabele:
 
-#### `Placowka` (184 rekordy - wszystkie DPS i ŚDS z Małopolski)
+#### `Placowka` (299 rekordów - DPS, ŚDS, Klub Senior+, Dzienny Dom Senior+ z Małopolski)
 Główna tabela z placówkami opieki.
 
 **Kluczowe pola:**
 - `miejscowosc` - nazwa miasta/wsi
 - `powiat` - nazwa powiatu (21 powiatów w Małopolsce)
 - `wojewodztwo` - województwo
-- `typ_placowki` - "DPS" lub "ŚDS"
+- `typ_placowki` - "DPS", "ŚDS", "Klub Senior+" lub "Dzienny Dom Senior+"
 - `koszt_pobytu` - cena miesięczna (49% ma cenę)
 - `profil_opieki` - CSV string (A, B, C...)
 - `latitude`, `longitude` - geolokalizacja (100% pokrycie)
@@ -111,6 +113,8 @@ Główna tabela z placówkami opieki.
 **Weryfikacja z oficjalnym wykazem (NEW - 2026-03-16):**
 - `oficjalne_id` - numer l.p. z oficjalnego wykazu wojewódzkiego (Int?)
 - `nazwa_oficjalna` - pełna nazwa z PDF (nazwa + adres + kod pocztowy) (String?)
+- `rok_powstania` - rok powstania ośrodka (Int?, tylko Senior+)
+- `jst_nazwa` - Jednostka Samorządu Terytorialnego prowadząca ośrodek (String?, tylko Senior+)
 - **Status weryfikacji DPS**: 36/85 wypełnione (42%)
   - Skrypt auto-fill: 31 DPS
   - Ręcznie: 5 DPS (l.p. 1-5)
@@ -285,7 +289,7 @@ const mapCityCountyToPowiat = (powiat: string): string => {
 ### Funkcje:
 1. **Lista placówek** z filtrowaniem:
    - Wyszukiwanie (nazwa, miejscowość, ulica)
-   - Filtry: typ (DPS/ŚDS), województwo, status weryfikacji
+   - Filtry: typ (DPS/ŚDS/Klub Senior+/Dzienny Dom Senior+), województwo, status weryfikacji
    - Geolokalizacja (tylko z GPS)
    - **Sortowanie** (klikalne nagłówki):
      - ID bazy danych ↕
@@ -352,7 +356,7 @@ cat .env | grep DATABASE_URL
 ### Ile rekordów w produkcji?
 ```bash
 npx prisma studio
-# Otwórz model "Placowka" → powinno być 184 (89 DPS + 95 ŚDS)
+# Otwórz model "Placowka" → powinno być 299 (95 DPS + 97 ŚDS + 79 Klub Senior+ + 28 DDS)
 ```
 
 ### Test wyszukiwania
@@ -365,6 +369,14 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **2991097** (2026-05-16): feat: Ośrodki Senior+ — pełna integracja (baza, UI, monitoring)
+  - Prisma: dodano `rok_powstania` i `jst_nazwa` do modelu Placowka
+  - Import: 107 ośrodków (79 Klub Senior+ + 28 Dzienny Dom Senior+) z geolokalizacją
+  - SearchBar/SearchResults/FilterPanel: nowe chipsy i filtry typów Senior+
+  - FacilityMap: złoty marker (#f59e0b) + amber badge dla Senior+
+  - GitHub Action: `senior-plus-monitor.yml` (cron 1. każdego miesiąca)
+  - `scripts/monitor-senior-plus.py` + `scripts/import-senior-plus.py`
+  - **⚠️ TODO:** Dodać `DATABASE_URL` jako secret w GitHub Repo Settings → Secrets
 - **d48e3ec** (2026-04-22): feat: Dodano Organization schema i AI bot tracking
   - **Organization + LocalBusiness JSON-LD** w `app/layout.tsx` (SEO structured data)
   - **AI Bot Tracking System:**
@@ -468,23 +480,22 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ---
 
-## 🚨 KRYTYCZNE TODO - NASTĘPNA SESJA (2026-04-22)
+## 🚨 KRYTYCZNE TODO - NASTĘPNA SESJA
 
-**PROBLEM:** Strona jest **całkowicie zablokowana** dla crawlerów!
+### ❌ SEO — strona nadal niewidoczna dla Google i AI!
+1. **`public/robots.txt`** → `Disallow: /` (blokuje wszystko) → zmienić na `Allow: /`, `Disallow: /admin/`
+2. **`app/layout.tsx:65-72`** → `robots: { index: false }` → zmienić na `index: true, follow: true`
+3. **`app/sitemap.ts`** → dodać dynamiczny sitemap (299 placówek + artykuły)
 
-### Podwójna blokada:
-1. **`public/robots.txt`** → `Disallow: /` (blokuje wszystko)
-2. **`app/layout.tsx:65-72`** → `robots: { index: false, follow: false }` (druga blokada)
+### ⚠️ Senior+ GitHub Action — wymaga secretu!
+- Dodać `DATABASE_URL` jako secret w GitHub → Settings → Secrets → Actions
+- Bez tego cron `senior-plus-monitor.yml` nie zaimportuje nowych danych do bazy
 
-### Quick fix (30 min):
-1. Naprawić robots.txt → `Allow: /`, `Disallow: /admin/`
-2. Zmienić robots meta → `index: true, follow: true`
-3. Dodać dynamiczny sitemap.ts (184 placówki + 30 artykułów)
-
-**Po naprawie:** Strona widoczna dla Google i AI botów! 🚀
-
-**Pełny raport SEO:** Zobacz `PROJEKT_DOKUMENTACJA.md` sekcja "KRYTYCZNE - DO NAPRAWY W NASTĘPNEJ SESJI"
+### 🔧 Senior+ — poprawki jakości danych
+- Pole `powiat` dla Senior+ jest teraz = JST (np. "Andrychów"), nie nazwa powiatu
+- Należy uzupełnić mapowanie JST → powiat (np. "Andrychów" → "wadowicki")
+- Skrypt: `scripts/import-senior-plus.py` → funkcja `get_powiat_from_jst()`
 
 ---
 
-Ostatnia aktualizacja: 2026-04-22
+Ostatnia aktualizacja: 2026-05-16

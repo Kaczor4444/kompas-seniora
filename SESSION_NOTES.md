@@ -2,6 +2,48 @@
 
 ---
 
+## ✅ SESJA #17: 2026-05-16 — Ośrodki Senior+ (pełna integracja)
+
+> Szczegóły: `session_notes_senior_plus_2026-05-16.md`
+
+### Co zrobiliśmy:
+
+#### 1. Nowe typy placówek: Klub Senior+ i Dzienny Dom Senior+
+Commit: `2991097`
+
+**Źródło danych:** [Wykaz MUW Małopolska XLSX](https://www.malopolska.uw.gov.pl/Docs/Wykaz%20funkcjonuj%C4%85cych%20o%C5%9Brodk%C3%B3w%20Senior%20w%20Ma%C5%82opolsce.xlsx)
+
+- **107 ośrodków** zaimportowanych (79 Klub Senior+ + 28 Dzienny Dom Senior+)
+- Geolokalizacja 100% przez Nominatim OSM
+- Nowe pola w `Placowka`: `rok_powstania` (Int?) i `jst_nazwa` (String?)
+- Total bazy po imporcie: **299 placówek**
+
+#### 2. Integracja z wyszukiwarką i mapą
+- `SearchBar`: chipsy "Klub Senior+" i "DD Senior+" obok DPS/ŚDS
+- `SearchResults`: nowe typy w filtrach, ukryty filtr ceny dla Senior+
+- `FilterPanel`: rozszerzony dropdown typ_placowki
+- `FacilityMap`: złoty marker (#f59e0b) + amber badge w popupie
+
+#### 3. GitHub Action — monitoring miesięczny
+- `.github/workflows/senior-plus-monitor.yml` — cron 1. każdego miesiąca, 9:30 UTC
+- `scripts/monitor-senior-plus.py` — detekcja zmian hash, upsert do bazy, GitHub Issue
+- `scripts/import-senior-plus.py` — jednorazowy import z geokodowaniem
+
+### Commity tej sesji:
+- `2991097` — feat: Ośrodki Senior+ — pełna integracja (baza, UI, monitoring)
+
+### Decyzje projektowe:
+- Senior+ w tej samej tabeli `Placowka` (nie osobna) — łatwiejsza integracja z wyszukiwarką i mapą
+- Typ_placowki jako string → elastyczne rozszerzanie bez migracji
+- Pole `powiat` dla Senior+ = JST (np. "Andrychów") zamiast powiatu admin — do poprawy
+
+### Stan danych po sesji:
+- **Placowka:** 299 rekordów (95 DPS + 97 ŚDS + 79 KS + 28 DDS)
+- **Senior+ z geo:** 107/107 (100%)
+- **Senior+ z ceną:** 0 (Senior+ są bezpłatne)
+
+---
+
 ## ✅ SESJA #16: 2026-05-10 — GUS BDL + wskaźnik nasycenia DPS + koncepcja raportu
 
 ### Co zrobiliśmy:

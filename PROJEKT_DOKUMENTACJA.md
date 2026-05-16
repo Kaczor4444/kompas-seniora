@@ -1,7 +1,7 @@
 # KOMPAS SENIORA - Dokumentacja Referencyjna Projektu
 
 > Plik do użycia jako kontekst na początku nowych sesji Claude Code.
-> Ostatnia aktualizacja: 2026-05-13 (sesja #15 - UX kalkulatora + geolokalizacja + treści)
+> Ostatnia aktualizacja: 2026-05-16 (sesja #17 - Ośrodki Senior+ — pełna integracja)
 
 ---
 
@@ -55,7 +55,7 @@ robots: {
 - Zero ruchu organicznego z Google
 - Boty AI (ChatGPT, Perplexity) nie mogą czytać artykułów
 - Strona nie pojawi się w wynikach wyszukiwania
-- 184 placówki + 30 artykułów = niewidoczne
+- 299 placówek + 30 artykułów = niewidoczne
 
 ---
 
