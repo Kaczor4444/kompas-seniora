@@ -141,9 +141,13 @@ export default function SearchResults({
 
   // ===== STATE =====
   const [cityInput, setCityInput] = useState(query || "");
-  const [selectedType, setSelectedType] = useState(
-    () => type === 'dps' ? 'DPS' : type === 'sds' ? 'ŚDS' : (type || 'all')
-  );
+  const [selectedType, setSelectedType] = useState(() => {
+    if (type === 'dps') return 'DPS';
+    if (type === 'sds') return 'ŚDS';
+    if (type === 'klub-senior') return 'Klub Senior+';
+    if (type === 'dzienny-dom-senior') return 'Dzienny Dom Senior+';
+    return type || 'all';
+  });
   const [selectedVoivodeship, setSelectedVoivodeship] = useState(
     activeFilters?.wojewodztwo || "Wszystkie"
   );
@@ -727,7 +731,7 @@ export default function SearchResults({
           <div className="max-w-2xl">
             <SearchBar
               initialQuery={cityInput}
-              initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
+              initialType={(['DPS', 'ŚDS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
               compact={true}
               onQueryChange={setCurrentQuery}
               disableAutocomplete={true}
@@ -809,18 +813,24 @@ export default function SearchResults({
               {/* Type Filter */}
               <div>
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Typ placówki</label>
-                <div className="flex gap-2">
-                  {['all', 'DPS', 'ŚDS'].map((type) => (
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: 'all', label: 'Wszystkie' },
+                    { value: 'DPS', label: 'DPS' },
+                    { value: 'ŚDS', label: 'ŚDS' },
+                    { value: 'Klub Senior+', label: 'Klub Senior+' },
+                    { value: 'Dzienny Dom Senior+', label: 'DD Senior+' },
+                  ].map(({ value, label }) => (
                     <button
-                      key={type}
-                      onClick={() => setSelectedType(type)}
-                      className={`flex-1 px-3 py-2 rounded-lg font-black text-[11px] uppercase tracking-wider transition-all ${
-                        selectedType === type
+                      key={value}
+                      onClick={() => setSelectedType(value)}
+                      className={`px-3 py-2 rounded-lg font-black text-[11px] uppercase tracking-wider transition-all ${
+                        selectedType === value
                           ? 'bg-slate-900 text-white'
                           : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
                       }`}
                     >
-                      {type === 'all' ? 'Wszystkie' : type}
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -898,8 +908,8 @@ export default function SearchResults({
                 </div>
               )}
 
-              {/* Price Filter - tylko dla DPS (ŚDS jest bezpłatny) */}
-              {selectedType !== 'ŚDS' && (
+              {/* Price Filter - tylko dla DPS (ŚDS i Senior+ są bezpłatne) */}
+              {selectedType !== 'ŚDS' && selectedType !== 'Klub Senior+' && selectedType !== 'Dzienny Dom Senior+' && (
                 <div>
                   <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
                     Cena do: <span className="text-slate-900">{priceLimit} zł</span>
@@ -1123,7 +1133,11 @@ export default function SearchResults({
                         type: fac.typ_placowki as 'DPS' | 'ŚDS',
                         city: fac.miejscowosc || '',
                         powiat: fac.powiat || '',
-                        category: fac.typ_placowki === 'DPS' ? 'Dom Pomocy Społecznej' : 'Środowiskowy Dom Samopomocy',
+                        category: fac.typ_placowki === 'DPS'
+                          ? 'Dom Pomocy Społecznej'
+                          : fac.typ_placowki === 'ŚDS'
+                          ? 'Środowiskowy Dom Samopomocy'
+                          : fac.typ_placowki,
                         price: fac.koszt_pobytu ?? null,
                         priceDate: formatPriceDate(fac.data_zrodla_cena),
                         street: fac.ulica,
@@ -1246,7 +1260,7 @@ export default function SearchResults({
             <div className="absolute top-20 left-4 z-30 w-80 space-y-3">
               <SearchBar
                 initialQuery={cityInput}
-                initialType={selectedType === 'DPS' ? 'DPS' : selectedType === 'ŚDS' ? 'ŚDS' : 'Wszystkie'}
+                initialType={(['DPS', 'ŚDS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
                 compact={true}
                 onQueryChange={setCurrentQuery}
                 disableAutocomplete={true}
@@ -1348,18 +1362,24 @@ export default function SearchResults({
                   {/* Type Filter */}
                   <div>
                     <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Typ placówki</label>
-                    <div className="flex gap-2">
-                      {['all', 'DPS', 'ŚDS'].map((type) => (
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { value: 'all', label: 'Wszystkie' },
+                        { value: 'DPS', label: 'DPS' },
+                        { value: 'ŚDS', label: 'ŚDS' },
+                        { value: 'Klub Senior+', label: 'Klub Senior+' },
+                        { value: 'Dzienny Dom Senior+', label: 'DD Senior+' },
+                      ].map(({ value, label }) => (
                         <button
-                          key={type}
-                          onClick={() => setSelectedType(type)}
-                          className={`flex-1 px-3 py-2 rounded-lg font-black text-[11px] uppercase tracking-wider transition-all ${
-                            selectedType === type
+                          key={value}
+                          onClick={() => setSelectedType(value)}
+                          className={`px-3 py-2 rounded-lg font-black text-[11px] uppercase tracking-wider transition-all ${
+                            selectedType === value
                               ? 'bg-slate-900 text-white'
                               : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
                           }`}
                         >
-                          {type === 'all' ? 'Wszystkie' : type}
+                          {label}
                         </button>
                       ))}
                     </div>

@@ -1,0 +1,55 @@
+name: Monitor ośrodków Senior+ — Małopolska
+
+on:
+  schedule:
+    # 1. każdego miesiąca o 9:30 UTC (MUW aktualizuje wykaz zwykle na początku miesiąca)
+    - cron: '30 9 1 * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Sprawdź i utwórz Issue nawet jeśli plik się nie zmienił'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check-xlsx:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Zainstaluj zależności
+        run: pip install requests openpyxl psycopg2-binary urllib3
+
+      - name: Uruchom monitoring Senior+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FORCE_CHECK: ${{ github.event.inputs.force || 'false' }}
+        run: python scripts/monitor-senior-plus.py
+
+      - name: Zapisz nowy XLSX do repozytorium (jeśli jest)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "raw_dane/malopolskie/" || true
+          if git diff --cached --quiet; then
+            echo "Brak zmian do zakomitowania"
+          else
+            git commit -m "chore: Nowy wykaz ośrodków Senior+ $(date +%Y-%m-%d)"
+            git push
+          fi

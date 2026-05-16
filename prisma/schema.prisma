@@ -43,6 +43,10 @@ model Placowka {
   oficjalne_id      Int?               // l.p. z wykazu województwa (np. 1-91 dla DPS Małopolska)
   nazwa_oficjalna   String?            // Dokładna nazwa z oficjalnego dokumentu
 
+  // ✨ SENIOR+ (Klub Senior+ / Dzienny Dom Senior+):
+  rok_powstania     Int?               // Rok powstania ośrodka Senior+
+  jst_nazwa         String?            // Jednostka samorządu terytorialnego prowadząca
+
   analytics         PlacowkaAnalytics?
   events            PlacowkaEvent[]
   snapshots         PlacowkaSnapshot[]

@@ -19,9 +19,19 @@ interface SuggestResponse {
   showAll: boolean;
 }
 
+type PlacowkaType = 'DPS' | 'ŚDS' | 'Klub Senior+' | 'Dzienny Dom Senior+' | 'Wszystkie';
+
+const TYPE_TO_URL: Record<PlacowkaType, string> = {
+  'DPS': 'dps',
+  'ŚDS': 'sds',
+  'Klub Senior+': 'klub-senior',
+  'Dzienny Dom Senior+': 'dzienny-dom-senior',
+  'Wszystkie': '',
+};
+
 interface SearchBarProps {
   initialQuery?: string;
-  initialType?: 'DPS' | 'ŚDS' | 'Wszystkie';
+  initialType?: PlacowkaType;
   compact?: boolean; // dla wersji na stronie wyników
   onQueryChange?: (query: string) => void; // callback when query changes
   disableAutocomplete?: boolean; // wyłącz dropdown na stronie wyników
@@ -124,7 +134,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
 }) => {
   const [cityInput, setCityInput] = useState(initialQuery);
-  const [selectedType, setSelectedType] = useState<'DPS' | 'ŚDS' | 'Wszystkie'>(initialType);
+  const [selectedType, setSelectedType] = useState<PlacowkaType>(initialType);
   const [isGeoLoading, setIsGeoLoading] = useState(false);
   const [showGeoSuggestion, setShowGeoSuggestion] = useState(false);
 
@@ -240,9 +250,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     const params = new URLSearchParams();
     params.append('q', suggestion.nazwa);
     params.append('powiat', suggestion.powiat);
-    if (selectedType !== 'Wszystkie') {
-      params.append('type', selectedType === 'DPS' ? 'dps' : 'sds');
-    }
+    const typeParam = TYPE_TO_URL[selectedType];
+    if (typeParam) params.append('type', typeParam);
 
     // Use callback if provided (map view), otherwise navigate
     if (onSearch) {
@@ -258,9 +267,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     const params = new URLSearchParams();
     params.append('q', cityInput);
     params.append('partial', 'true');
-    if (selectedType !== 'Wszystkie') {
-      params.append('type', selectedType === 'DPS' ? 'dps' : 'sds');
-    }
+    const typeParamPartial = TYPE_TO_URL[selectedType];
+    if (typeParamPartial) params.append('type', typeParamPartial);
     window.location.href = `/search?${params.toString()}`;
   };
 
@@ -302,9 +310,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     // Fallback - obecna logika (partial search)
     const params = new URLSearchParams();
     if (cityInput) params.append('q', cityInput);
-    if (selectedType !== 'Wszystkie') {
-      params.append('type', selectedType === 'DPS' ? 'dps' : 'sds');
-    }
+    const typeParamFallback = TYPE_TO_URL[selectedType];
+    if (typeParamFallback) params.append('type', typeParamFallback);
 
     // Use callback if provided (map view), otherwise navigate
     if (onSearch) {
@@ -380,6 +387,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
           <TypeChip active={selectedType === 'DPS'} label="DPS" sub="Całodobowe" onClick={() => setSelectedType('DPS')} />
           <TypeChip active={selectedType === 'ŚDS'} label="ŚDS" sub="Dzienne" onClick={() => setSelectedType('ŚDS')} />
+          <TypeChip active={selectedType === 'Klub Senior+'} label="Klub Senior+" sub="Aktywność" onClick={() => setSelectedType('Klub Senior+')} />
+          <TypeChip active={selectedType === 'Dzienny Dom Senior+'} label="DD Senior+" sub="Dzienny" onClick={() => setSelectedType('Dzienny Dom Senior+')} />
         </div>
       )}
 

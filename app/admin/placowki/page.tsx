@@ -308,6 +308,8 @@ export default function ListaPlacowekPage() {
               <option value="">Wszystkie</option>
               <option value="DPS">DPS</option>
               <option value="ŚDS">ŚDS</option>
+              <option value="Klub Senior+">Klub Senior+</option>
+              <option value="Dzienny Dom Senior+">Dzienny Dom Senior+</option>
             </select>
           </div>
 
@@ -451,9 +453,11 @@ export default function ListaPlacowekPage() {
                     <td className="px-6 py-4 text-sm text-gray-900">{p.nazwa}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs rounded-full ${
-                        p.typ_placowki === 'DPS' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : 'bg-purple-100 text-purple-800'
+                        p.typ_placowki === 'DPS'
+                          ? 'bg-blue-100 text-blue-800'
+                          : p.typ_placowki === 'ŚDS'
+                          ? 'bg-purple-100 text-purple-800'
+                          : 'bg-emerald-100 text-emerald-800'
                       }`}>
                         {p.typ_placowki}
                       </span>

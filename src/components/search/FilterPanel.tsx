@@ -98,7 +98,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           options={[
             { value: "all", label: "Wszystkie" },
             { value: "DPS", label: "DPS (Całodobowe)" },
-            { value: "ŚDS", label: "ŚDS (Dzienne)" }
+            { value: "ŚDS", label: "ŚDS (Dzienne)" },
+            { value: "Klub Senior+", label: "Klub Senior+" },
+            { value: "Dzienny Dom Senior+", label: "Dzienny Dom Senior+" },
           ]}
         />
         <FilterSelect

@@ -34,6 +34,7 @@ function createPinIcon(color: string, pinClass: string) {
 
 const dpsIcon = createPinIcon('#10b981', 'map-pin-dps');   // emerald green
 const sdsIcon = createPinIcon('#1e3a8a', 'map-pin-sds');   // dark blue
+const seniorPlusIcon = createPinIcon('#f59e0b', 'map-pin-senior-plus'); // amber/gold
 
 // Custom cluster icon - dual color (DPS green + ŚDS dark blue)
 const createClusterCustomIcon = function (cluster: any) {
@@ -444,7 +445,7 @@ export default function FacilityMap({
                 <Marker
                   key={facility.id}
                   position={[facility.latitude!, facility.longitude!]}
-                  icon={facility.typ_placowki === 'DPS' ? dpsIcon : sdsIcon}
+                  icon={facility.typ_placowki === 'DPS' ? dpsIcon : facility.typ_placowki === 'ŚDS' ? sdsIcon : seniorPlusIcon}
                 >
                   <Popup maxWidth={350} minWidth={280} className="facility-card-popup">
                     <div style={{
@@ -465,8 +466,8 @@ export default function FacilityMap({
                             fontWeight: 800,
                             letterSpacing: '0.05em',
                             textTransform: 'uppercase',
-                            background: facility.typ_placowki === 'DPS' ? '#d1fae5' : '#dbeafe',
-                            color: facility.typ_placowki === 'DPS' ? '#065f46' : '#1e40af',
+                            background: facility.typ_placowki === 'DPS' ? '#d1fae5' : facility.typ_placowki === 'ŚDS' ? '#dbeafe' : '#fef3c7',
+                            color: facility.typ_placowki === 'DPS' ? '#065f46' : facility.typ_placowki === 'ŚDS' ? '#1e40af' : '#92400e',
                           }}>
                             {facility.typ_placowki}
                           </span>

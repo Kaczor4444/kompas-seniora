@@ -25,6 +25,8 @@ export const PUBLIC_PLACOWKA_SELECT = {
   longitude: true,
   data_aktualizacji: true,
   zrodlo_dane: true,
+  rok_powstania: true,
+  jst_nazwa: true,
 } as const;
 
 // Kolumny do SELECT w raw SQL (ten sam zestaw co powyżej)
@@ -33,6 +35,7 @@ export const PUBLIC_PLACOWKA_COLUMNS = [
   'kod_pocztowy', 'gmina', 'powiat', 'wojewodztwo', 'telefon', 'email',
   'www', 'facebook', 'liczba_miejsc', 'miejsca_za_zyciem', 'profil_opieki',
   'koszt_pobytu', 'data_zrodla_cena', 'latitude', 'longitude', 'data_aktualizacji', 'zrodlo_dane',
+  'rok_powstania', 'jst_nazwa',
 ].map(col => `"${col}"`).join(', ');
 
 type PublicPlacowka = {
