@@ -8,7 +8,7 @@ interface FacilityCardProps {
   facility: {
     id: number;
     name: string;
-    type: 'DPS' | 'ŚDS';
+    type: string;
     city: string;
     powiat: string;
     category: string;
@@ -75,10 +75,12 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
               flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider
               ${facility.type === 'DPS'
                 ? 'bg-emerald-100 text-emerald-700'
-                : 'bg-blue-100 text-blue-700'
+                : facility.type === 'ŚDS'
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-amber-100 text-amber-700'
               }
             `}>
-              {facility.type}
+              {facility.type === 'Dzienny Dom Senior+' ? 'DD Senior+' : facility.type}
             </span>
 
             {/* Name */}
@@ -96,7 +98,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
                   <>
                     {facility.price.toLocaleString('pl-PL')} <span className="text-sm font-medium text-slate-500">zł</span>
                   </>
-                ) : facility.type === 'ŚDS' ? (
+                ) : facility.type === 'ŚDS' || facility.type.includes('Senior+') ? (
                   <span className="text-emerald-600 text-lg">Bezpłatne</span>
                 ) : (
                   <span className="text-slate-400 text-base font-semibold">Zapytaj</span>

@@ -117,6 +117,8 @@ interface Placowka {
   zrodlo_dane: string | null;
   latitude: number | null;
   longitude: number | null;
+  rok_powstania?: number | null;
+  jst_nazwa?: string | null;
 }
 
 const SESSION_VIEWS_KEY = 'kompas-session-views';
@@ -335,11 +337,13 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
     }
   };
 
-  // Determine funding availability based on facility type
+  const isSeniorPlus = placowka.typ_placowki.includes('Senior+');
   const hasFunding = placowka.typ_placowki.includes('DPS');
-  
-  // Mock wait time based on facility type
-  const waitTime = placowka.typ_placowki.includes('DPS') ? '3-6 miesięcy' : '1-3 miesiące';
+  const waitTime = placowka.typ_placowki.includes('DPS')
+    ? '3-6 miesięcy'
+    : isSeniorPlus
+    ? 'Na bieżąco'
+    : '1-3 miesiące';
 
   // Helper to get icon for features
   const getIconForFeature = (profile: string) => {
@@ -463,7 +467,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
               <div className="font-bold text-slate-900 text-sm">
                 {placowka.koszt_pobytu && placowka.koszt_pobytu > 0
                   ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł`
-                  : placowka.typ_placowki.includes('ŚDS') ? 'Bezpłatne' : 'Zapytaj'}
+                  : (placowka.typ_placowki.includes('ŚDS') || isSeniorPlus) ? 'Bezpłatne' : 'Zapytaj'}
               </div>
             </div>
           </div>
@@ -503,6 +507,24 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
               <p className="text-slate-600 leading-relaxed text-lg mb-8">
                 {generateFacilityDescription(placowka)}
               </p>
+
+              {/* DANE SENIOR+ */}
+              {isSeniorPlus && (placowka.rok_powstania || placowka.jst_nazwa) && (
+                <div className="flex flex-wrap gap-3 mb-8 pt-2">
+                  {placowka.rok_powstania && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl text-sm">
+                      <CalendarCheck size={16} className="text-amber-600 shrink-0" />
+                      <span className="text-amber-900 font-semibold">Działa od {placowka.rok_powstania} r.</span>
+                    </div>
+                  )}
+                  {placowka.jst_nazwa && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl text-sm">
+                      <Building2 size={16} className="text-amber-600 shrink-0" />
+                      <span className="text-amber-900 font-semibold">{placowka.jst_nazwa}</span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* RODZAJ PLACÓWKI - WEWNĄTRZ TEGO SAMEGO KAFELKA */}
               {profiles.length > 0 && (
@@ -632,90 +654,160 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
               );
             })()}
 
-            {/* JAK ZŁOŻYĆ WNIOSEK - PROCEDURAL GUIDE */}
+            {/* JAK DOŁĄCZYĆ / ZŁOŻYĆ WNIOSEK */}
             <section className="bg-white p-6 md:p-8 rounded-2xl border border-stone-100 shadow-sm">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
-                  <ClipboardList size={24} className="text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-2">
-                    Jak złożyć wniosek?
-                  </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    Proces ubiegania się o miejsce w {placowka.typ_placowki}
-                  </p>
-                </div>
-              </div>
+              {isSeniorPlus ? (
+                <>
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shrink-0">
+                      <ClipboardList size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 mb-2">
+                        Jak dołączyć do ośrodka?
+                      </h3>
+                      <p className="text-slate-600 text-sm leading-relaxed">
+                        Dołączenie do {placowka.typ_placowki} jest proste — bez skomplikowanych procedur
+                      </p>
+                    </div>
+                  </div>
 
-              <ol className="space-y-5 mb-6">
-                <li className="flex gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
-                    1
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-1">Złóż wniosek w MOPS/GOPS</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      Skompletuj dokumenty (zaświadczenie lekarskie, dowód, dokumenty o dochodach) i złóż wniosek w odpowiednim ośrodku pomocy społecznej.
-                    </p>
-                  </div>
-                </li>
+                  <ol className="space-y-5 mb-6">
+                    <li className="flex gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-black text-sm">
+                        1
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-1">Zadzwoń lub napisz do ośrodka</h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Skontaktuj się bezpośrednio z {placowka.typ_placowki === 'Klub Senior+' ? 'klubem' : 'ośrodkiem'} — zapytaj o dostępność miejsc i harmonogram zajęć.
+                        </p>
+                      </div>
+                    </li>
 
-                <li className="flex gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
-                    2
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-1">Przejdź wywiad środowiskowy</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      Pracownik socjalny przeprowadzi rozmowę w domu, aby ocenić sytuację i potrzeby osoby wymagającej opieki.
-                    </p>
-                  </div>
-                </li>
+                    <li className="flex gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-black text-sm">
+                        2
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-1">Wypełnij formularz zgłoszeniowy</h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Ośrodek może poprosić o krótki formularz lub deklarację uczestnictwa. Wystarczy dowód osobisty — nie ma potrzeby zaświadczeń lekarskich.
+                        </p>
+                      </div>
+                    </li>
 
-                <li className="flex gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
-                    3
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 mb-1">Otrzymaj decyzję i czekaj na miejsce</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      MOPS/GOPS wyda decyzję o skierowaniu. Następnie czekasz na wolne miejsce w placówce odpowiedniego profilu.
-                    </p>
-                  </div>
-                </li>
-              </ol>
+                    <li className="flex gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-black text-sm">
+                        3
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-1">Zacznij korzystać z zajęć</h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Po zapisaniu możesz od razu uczestniczyć w zajęciach: warsztatach, spotkaniach, wycieczkach i innych aktywnościach organizowanych przez ośrodek.
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
 
-              <div className="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-xl mb-6">
-                <div className="flex items-start gap-3">
-                  <AlertCircle size={20} className="shrink-0 mt-0.5 text-amber-600" />
-                  <div className="text-sm text-slate-700 leading-relaxed">
-                    <p className="font-bold text-amber-900 mb-2">Ważne: Wniosek składasz według miejsca zamieszkania</p>
-                    <p>
-                      Nawet jeśli szukasz miejsca w {placowka.miejscowosc}, musisz złożyć wniosek w MOPS/GOPS właściwym dla
-                      <strong> miejsca zameldowania seniora</strong>, a nie lokalizacji placówki.
-                    </p>
+                  <div className="bg-emerald-50 border-l-4 border-emerald-500 p-5 rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 size={20} className="shrink-0 mt-0.5 text-emerald-600" />
+                      <div className="text-sm text-slate-700 leading-relaxed">
+                        <p className="font-bold text-emerald-900 mb-1">Bezpłatne i bez skierowania</p>
+                        <p>
+                          Ośrodki Senior+ są <strong>bezpłatne</strong> i otwarte dla każdego seniora z gminy prowadzącej ośrodek — nie potrzeba skierowania z MOPS ani zaświadczenia lekarskiego.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                      <ClipboardList size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 mb-2">
+                        Jak złożyć wniosek?
+                      </h3>
+                      <p className="text-slate-600 text-sm leading-relaxed">
+                        Proces ubiegania się o miejsce w {placowka.typ_placowki}
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Link
-                  href="/mops"
-                  className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-sm"
-                >
-                  <ClipboardList size={18} />
-                  Znajdź MOPS/GOPS
-                </Link>
+                  <ol className="space-y-5 mb-6">
+                    <li className="flex gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
+                        1
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-1">Złóż wniosek w MOPS/GOPS</h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Skompletuj dokumenty (zaświadczenie lekarskie, dowód, dokumenty o dochodach) i złóż wniosek w odpowiednim ośrodku pomocy społecznej.
+                        </p>
+                      </div>
+                    </li>
 
-                <Link
-                  href={placowka.typ_placowki === 'DPS' ? '/poradniki/finanse-prawne/proces-przyjecia-dps' : '/poradniki/wybor-opieki/wybor-placowki'}
-                  className="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 text-white py-3 px-4 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-sm"
-                >
-                  <Book size={18} />
-                  Szczegółowy przewodnik
-                </Link>
-              </div>
+                    <li className="flex gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
+                        2
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-1">Przejdź wywiad środowiskowy</h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Pracownik socjalny przeprowadzi rozmowę w domu, aby ocenić sytuację i potrzeby osoby wymagającej opieki.
+                        </p>
+                      </div>
+                    </li>
+
+                    <li className="flex gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">
+                        3
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 mb-1">Otrzymaj decyzję i czekaj na miejsce</h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          MOPS/GOPS wyda decyzję o skierowaniu. Następnie czekasz na wolne miejsce w placówce odpowiedniego profilu.
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
+
+                  <div className="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-xl mb-6">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle size={20} className="shrink-0 mt-0.5 text-amber-600" />
+                      <div className="text-sm text-slate-700 leading-relaxed">
+                        <p className="font-bold text-amber-900 mb-2">Ważne: Wniosek składasz według miejsca zamieszkania</p>
+                        <p>
+                          Nawet jeśli szukasz miejsca w {placowka.miejscowosc}, musisz złożyć wniosek w MOPS/GOPS właściwym dla
+                          <strong> miejsca zameldowania seniora</strong>, a nie lokalizacji placówki.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Link
+                      href="/mops"
+                      className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-sm"
+                    >
+                      <ClipboardList size={18} />
+                      Znajdź MOPS/GOPS
+                    </Link>
+
+                    <Link
+                      href={placowka.typ_placowki === 'DPS' ? '/poradniki/finanse-prawne/proces-przyjecia-dps' : '/poradniki/wybor-opieki/wybor-placowki'}
+                      className="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 text-white py-3 px-4 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-sm"
+                    >
+                      <Book size={18} />
+                      Szczegółowy przewodnik
+                    </Link>
+                  </div>
+                </>
+              )}
             </section>
 
           </div>
@@ -736,7 +828,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                   <div className="text-5xl md:text-6xl font-black mb-3">
                     {placowka.koszt_pobytu && placowka.koszt_pobytu > 0
                       ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł`
-                      : placowka.typ_placowki.includes('ŚDS') ? 'Bezpłatne' : 'Zapytaj'}
+                      : (placowka.typ_placowki.includes('ŚDS') || isSeniorPlus) ? 'Bezpłatne' : 'Zapytaj'}
                   </div>
                   {placowka.koszt_pobytu && placowka.koszt_pobytu > 0 && placowka.data_zrodla_cena && (() => {
                     const d = new Date(placowka.data_zrodla_cena!);

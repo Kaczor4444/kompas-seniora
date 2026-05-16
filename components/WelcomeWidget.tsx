@@ -69,7 +69,7 @@ function buildFacilityQuery(f: FacilityDetail, lang: Language): string {
     const typeLabel = f.type === 'DPS' ? 'Residential Care Home (DPS)' : f.type === 'ŚDS' ? 'Day Care Center (ŚDS)' : f.type ?? ''
     const parts = [`Describe this facility in English: ${typeLabel} "${f.name}", located in ${f.city}${f.powiat ? `, ${f.powiat} county` : ''}.`]
     if (f.price) parts.push(`Monthly cost: ${f.price} PLN.`)
-    else if (f.price === 0 || f.price === null) parts.push('Funded by NFZ (no monthly cost).')
+    else if (f.price === 0 || f.price === null) parts.push('Free of charge (no monthly cost).')
     if (f.profiles) parts.push(`Care profiles: ${f.profiles}.`)
     parts.push('What type of care does it offer and who is it for?')
     return parts.join(' ')

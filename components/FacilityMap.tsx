@@ -36,29 +36,29 @@ const dpsIcon = createPinIcon('#10b981', 'map-pin-dps');   // emerald green
 const sdsIcon = createPinIcon('#1e3a8a', 'map-pin-sds');   // dark blue
 const seniorPlusIcon = createPinIcon('#f59e0b', 'map-pin-senior-plus'); // amber/gold
 
-// Custom cluster icon - dual color (DPS green + ŚDS dark blue)
+// Custom cluster icon - tri-color (DPS green + ŚDS dark blue + Senior+ amber)
 const createClusterCustomIcon = function (cluster: any) {
   const markers = cluster.getAllChildMarkers();
   const count = markers.length;
 
-  // Policz DPS vs ŚDS
   const dpsCount = markers.filter((m: any) =>
     m.options.icon.options.className?.includes('map-pin-dps')
   ).length;
+  const seniorPlusCount = markers.filter((m: any) =>
+    m.options.icon.options.className?.includes('map-pin-senior-plus')
+  ).length;
+  const sdsCount = count - dpsCount - seniorPlusCount;
 
-  // Proporcje dla gradient
-  const dpsPercent = Math.round((dpsCount / count) * 100);
+  const dpsEnd = Math.round((dpsCount / count) * 100);
+  const sdsEnd = Math.round(((dpsCount + sdsCount) / count) * 100);
+
+  // Gradient: DPS zielony → ŚDS granatowy → Senior+ amber
+  const gradient = `linear-gradient(90deg, #10b981 ${dpsEnd}%, #1e3a8a ${dpsEnd}% ${sdsEnd}%, #f59e0b ${sdsEnd}% 100%)`;
 
   let size = 45;
   let fontSize = 16;
-
-  if (count >= 10) {
-    size = 60;
-    fontSize = 20;
-  } else if (count >= 5) {
-    size = 50;
-    fontSize = 18;
-  }
+  if (count >= 10) { size = 60; fontSize = 20; }
+  else if (count >= 5) { size = 50; fontSize = 18; }
 
   return L.divIcon({
     html: `
@@ -69,7 +69,7 @@ const createClusterCustomIcon = function (cluster: any) {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(90deg, #10b981 ${dpsPercent}%, #1e3a8a ${dpsPercent}%);
+        background: ${gradient};
         border: 3px solid white;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       ">
@@ -499,7 +499,7 @@ export default function FacilityMap({
                                 <span style={{ fontSize: '12px', fontWeight: 500, color: '#64748b', marginLeft: '2px' }}>zł</span>
                               </>
                             ) : (
-                              <span style={{ color: '#10b981', fontSize: '16px' }}>NFZ</span>
+                              <span style={{ color: '#10b981', fontSize: '16px' }}>Bezpłatne</span>
                             )}
                           </div>
                           {facility.koszt_pobytu && facility.koszt_pobytu > 0 && (

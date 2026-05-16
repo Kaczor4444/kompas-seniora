@@ -1130,7 +1130,7 @@ export default function SearchResults({
                       facility={{
                         id: fac.id,
                         name: fac.nazwa,
-                        type: fac.typ_placowki as 'DPS' | 'ŚDS',
+                        type: fac.typ_placowki,
                         city: fac.miejscowosc || '',
                         powiat: fac.powiat || '',
                         category: fac.typ_placowki === 'DPS'
