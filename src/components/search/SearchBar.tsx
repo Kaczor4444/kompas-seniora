@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, AlertCircle, Check, Navigation } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // Types
 interface Suggestion {
@@ -397,27 +398,25 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       {!compact && (
         <div className="space-y-2.5">
           {/* Toggle */}
-          <div className="flex bg-slate-100 p-1 rounded-xl w-fit gap-1">
-            <button
-              onClick={() => { setCategory('opieka'); setSelectedType('Wszystkie'); }}
-              className={`px-5 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
-                category === 'opieka'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              Opieka
-            </button>
-            <button
-              onClick={() => { setCategory('aktywnosc'); setSelectedType('Wszystkie'); }}
-              className={`px-5 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
-                category === 'aktywnosc'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              Aktywność
-            </button>
+          <div className="flex bg-slate-100 p-1 rounded-xl w-fit">
+            {(['opieka', 'aktywnosc'] as Category[]).map((cat) => (
+              <button
+                key={cat}
+                onClick={() => { setCategory(cat); setSelectedType('Wszystkie'); }}
+                className="relative px-6 py-2 text-[11px] font-black uppercase tracking-widest transition-colors z-10"
+              >
+                {category === cat && (
+                  <motion.div
+                    layoutId="toggle-pill"
+                    className="absolute inset-0 bg-white rounded-lg shadow-sm"
+                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <span className={`relative z-10 transition-colors ${category === cat ? 'text-slate-900' : 'text-slate-400'}`}>
+                  {cat === 'opieka' ? 'Opieka' : 'Aktywność'}
+                </span>
+              </button>
+            ))}
           </div>
 
           {/* Chipy zależne od kategorii */}
