@@ -19,13 +19,15 @@ interface SuggestResponse {
   showAll: boolean;
 }
 
-type PlacowkaType = 'DPS' | 'ŚDS' | 'Klub Senior+' | 'Dzienny Dom Senior+' | 'Wszystkie';
+type PlacowkaType = 'DPS' | 'ŚDS' | 'Klub Senior+' | 'Dzienny Dom Senior+' | 'UTW' | 'Wszystkie';
+type Category = 'opieka' | 'aktywnosc';
 
 const TYPE_TO_URL: Record<PlacowkaType, string> = {
   'DPS': 'dps',
   'ŚDS': 'sds',
   'Klub Senior+': 'klub-senior',
   'Dzienny Dom Senior+': 'dzienny-dom-senior',
+  'UTW': 'utw',
   'Wszystkie': '',
 };
 
@@ -135,6 +137,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const [cityInput, setCityInput] = useState(initialQuery);
   const [selectedType, setSelectedType] = useState<PlacowkaType>(initialType);
+  const [category, setCategory] = useState<Category>('opieka');
   const [isGeoLoading, setIsGeoLoading] = useState(false);
   const [showGeoSuggestion, setShowGeoSuggestion] = useState(false);
 
@@ -250,10 +253,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     const params = new URLSearchParams();
     params.append('q', suggestion.nazwa);
     params.append('powiat', suggestion.powiat);
+
+    if (selectedType === 'UTW') {
+      window.location.href = `/utw?powiat=${encodeURIComponent(suggestion.powiat)}`;
+      return;
+    }
+
     const typeParam = TYPE_TO_URL[selectedType];
     if (typeParam) params.append('type', typeParam);
 
-    // Use callback if provided (map view), otherwise navigate
     if (onSearch) {
       onSearch(params);
     } else {
@@ -308,12 +316,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     }
 
     // Fallback - obecna logika (partial search)
+    if (selectedType === 'UTW') {
+      window.location.href = `/utw`;
+      return;
+    }
+
     const params = new URLSearchParams();
     if (cityInput) params.append('q', cityInput);
     const typeParamFallback = TYPE_TO_URL[selectedType];
     if (typeParamFallback) params.append('type', typeParamFallback);
 
-    // Use callback if provided (map view), otherwise navigate
     if (onSearch) {
       onSearch(params);
     } else {
@@ -381,13 +393,48 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <div className={`${compact ? 'max-w-2xl' : 'max-w-2xl'} space-y-3`}>
-      {/* Type chips */}
+      {/* Toggle Opieka / Aktywność + chipy */}
       {!compact && (
-        <div className="flex gap-2 flex-wrap">
-          <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
-          <TypeChip active={selectedType === 'DPS'} label="DPS" sub="Całodobowe" onClick={() => setSelectedType('DPS')} />
-          <TypeChip active={selectedType === 'Klub Senior+'} label="Klub Senior+" sub="Aktywność" onClick={() => setSelectedType('Klub Senior+')} />
-          <TypeChip active={selectedType === 'Dzienny Dom Senior+'} label="DD Senior+" sub="Dzienny" onClick={() => setSelectedType('Dzienny Dom Senior+')} />
+        <div className="space-y-2.5">
+          {/* Toggle */}
+          <div className="flex bg-slate-100 p-1 rounded-xl w-fit gap-1">
+            <button
+              onClick={() => { setCategory('opieka'); setSelectedType('Wszystkie'); }}
+              className={`px-5 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
+                category === 'opieka'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              Opieka
+            </button>
+            <button
+              onClick={() => { setCategory('aktywnosc'); setSelectedType('Klub Senior+'); }}
+              className={`px-5 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
+                category === 'aktywnosc'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              Aktywność
+            </button>
+          </div>
+
+          {/* Chipy zależne od kategorii */}
+          <div className="flex gap-2 flex-wrap">
+            {category === 'opieka' ? (
+              <>
+                <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
+                <TypeChip active={selectedType === 'DPS'} label="DPS" sub="Całodobowe" onClick={() => setSelectedType('DPS')} />
+                <TypeChip active={selectedType === 'Dzienny Dom Senior+'} label="DD Senior+" sub="Dzienny" onClick={() => setSelectedType('Dzienny Dom Senior+')} />
+              </>
+            ) : (
+              <>
+                <TypeChip active={selectedType === 'Klub Senior+'} label="Klub Seniora" sub="Bezpłatne" onClick={() => setSelectedType('Klub Senior+')} />
+                <TypeChip active={selectedType === 'UTW'} label="UTW" sub="Edukacja" onClick={() => setSelectedType('UTW')} />
+              </>
+            )}
+          </div>
         </div>
       )}
 
@@ -408,7 +455,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onFocus={() => { if (!cityInput.trim()) setShowGeoSuggestion(true); }}
               onBlur={() => setTimeout(() => setShowGeoSuggestion(false), 150)}
               onKeyDown={handleKeyDown}
-              placeholder="Gdzie szukasz opieki?"
+              placeholder={selectedType === 'UTW' ? 'Wpisz miasto lub powiat…' : 'Gdzie szukasz opieki?'}
               enterKeyHint="search"
               autoComplete="off"
               spellCheck="false"

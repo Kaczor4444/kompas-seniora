@@ -24,11 +24,12 @@ interface UtwEntry {
 interface Props {
   utw: UtwEntry[];
   powiaty: string[];
+  initialPowiat?: string;
 }
 
-export default function UtwResults({ utw, powiaty }: Props) {
+export default function UtwResults({ utw, powiaty, initialPowiat }: Props) {
   const [search, setSearch]         = useState('');
-  const [powiat, setPowiat]         = useState('');
+  const [powiat, setPowiat]         = useState(initialPowiat ?? '');
   const [view, setView]             = useState<'list' | 'map'>('list');
 
   const filtered = useMemo(() => {

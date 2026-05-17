@@ -8,7 +8,13 @@ export const metadata: Metadata = {
   description: 'Znajdź Uniwersytet Trzeciego Wieku w Małopolsce. 52 placówki edukacji i aktywności dla seniorów — wykłady, warsztaty, kursy językowe, wycieczki.',
 };
 
-export default async function UtwPage() {
+export default async function UtwPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ powiat?: string }>;
+}) {
+  const { powiat: initialPowiat } = await searchParams;
+
   const utw = await prisma.placowka.findMany({
     where: getVoivodeshipFilter({ typ_placowki: 'UTW' }),
     select: {
@@ -27,8 +33,7 @@ export default async function UtwPage() {
     orderBy: [{ powiat: 'asc' }, { miejscowosc: 'asc' }],
   });
 
-  // Unikalne powiaty do filtra
   const powiaty = [...new Set(utw.map(u => u.powiat).filter(Boolean))].sort() as string[];
 
-  return <UtwResults utw={utw} powiaty={powiaty} />;
+  return <UtwResults utw={utw} powiaty={powiaty} initialPowiat={initialPowiat} />;
 }
