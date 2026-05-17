@@ -430,9 +430,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               </>
             ) : (
               <>
+                <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
                 <TypeChip active={selectedType === 'Klub Senior+'} label="Klub Seniora" sub="Bezpłatne" onClick={() => setSelectedType('Klub Senior+')} />
                 <TypeChip active={selectedType === 'UTW'} label="UTW" sub="Edukacja" onClick={() => setSelectedType('UTW')} />
-                <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
               </>
             )}
           </div>
