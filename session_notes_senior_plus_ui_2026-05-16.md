@@ -187,9 +187,21 @@ URL `/search?type=sds` nadal działa (stare linki) — SearchResults mapuje go n
 
 ---
 
+### 9. Monitoring BIP Kraków — GitHub Action
+**Pliki nowe:**
+- `scripts/monitor-mddps-krakow.py`
+- `.github/workflows/mddps-krakow-monitor.yml`
+- `raw_dane/krakow/.mddps_last_change` (sentinel: `2023-03-20 14:58:55`)
+
+**Cron:** 5. każdego miesiąca, 8:00 UTC  
+**Zależności:** tylko `requests` (nie potrzebuje `DATABASE_URL`)  
+**Logika:** regex na datę `YYYY-MM-DD HH:MM:SS` z `bip.krakow.pl/?dok_id=78643&vReg=1` → GitHub Issue gdy nowsza  
+**commit:** `aecc7c9`
+
+---
+
 ## Następne kroki
 
 - [ ] Dodać `DATABASE_URL` secret w GitHub (blokuje monitoring Senior+)
 - [ ] SEO: odblokować robots.txt + layout.tsx `index: false`
-- [ ] Monitoring BIP Kraków (GitHub Action)
 - [ ] Sprawdzić Tarnów / Nowy Sącz pod kątem miejskich domów seniorów

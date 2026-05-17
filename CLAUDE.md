@@ -370,7 +370,11 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
-- **(sesja #18 — do commita)** (2026-05-17): feat: Senior+ UI rework, MDDPS Kraków import
+- **aecc7c9** (2026-05-17): feat: monitoring BIP Kraków — MDDPS (GitHub Action)
+  - Cron 5. każdego miesiąca: porównuje datę edycji w BIP dzienniku zmian
+  - `raw_dane/krakow/.mddps_last_change` — inicjalna data 2023-03-20
+  - GitHub Issue gdy wykryje zmianę (instrukcja ręcznej weryfikacji)
+- **9867c4e** (2026-05-17): feat: sesja #18 — Senior+ UI rework, MDDPS Kraków import
   - ŚDS ukryte z całego UI użytkownika (hero, filtry, kafelki, asystent, kalkulator) — zostaje w DB i artykułach
   - FacilityTypeCards: nowa sekcja na landingu (DPS/Klub Seniora/DD Senior+), zdjęcia jako tło
   - RegionalMap: 3 warstwy (DPS/KlubSenior/DDSenior) z przełącznikiem pills + kolory per typ
@@ -522,10 +526,10 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 - Nowa sekcja landingu: DPS / Klub Seniora / DD Senior+ (3 kafelki, zdjęcia jako tło)
 - "Klub Seniora" = etykieta w UI (w DB: typ_placowki='Klub Senior+')
 
-### ⚠️ Monitoring MDDPS Kraków — do zrobienia
-- GitHub Action scraper: sprawdza datę w `bip.krakow.pl/?dok_id=78643&vReg=1`
-- Gdy zmiana → GitHub Issue do ręcznej weryfikacji
-- Niski priorytet (ostatnia zmiana 2023-03-20)
+### ✅ Monitoring MDDPS Kraków — ZROBIONE (commit aecc7c9)
+- `.github/workflows/mddps-krakow-monitor.yml` — cron 5. każdego miesiąca
+- Skrypt: `scripts/monitor-mddps-krakow.py` (tylko `requests`, bez DATABASE_URL)
+- Sentinel: `raw_dane/krakow/.mddps_last_change` = `2023-03-20 14:58:55`
 
 ### ⚠️ Tarnów / Nowy Sącz — niezbadane
 - Czy mają własne miejskie odpowiedniki DD Senior+ poza programem MRPiPS? (jak Kraków MDDPS)
