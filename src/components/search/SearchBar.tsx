@@ -409,7 +409,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               Opieka
             </button>
             <button
-              onClick={() => { setCategory('aktywnosc'); setSelectedType('Klub Senior+'); }}
+              onClick={() => { setCategory('aktywnosc'); setSelectedType('Wszystkie'); }}
               className={`px-5 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
                 category === 'aktywnosc'
                   ? 'bg-white text-slate-900 shadow-sm'
