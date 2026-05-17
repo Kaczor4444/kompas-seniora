@@ -432,6 +432,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               <>
                 <TypeChip active={selectedType === 'Klub Senior+'} label="Klub Seniora" sub="Bezpłatne" onClick={() => setSelectedType('Klub Senior+')} />
                 <TypeChip active={selectedType === 'UTW'} label="UTW" sub="Edukacja" onClick={() => setSelectedType('UTW')} />
+                <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
               </>
             )}
           </div>
@@ -455,7 +456,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onFocus={() => { if (!cityInput.trim()) setShowGeoSuggestion(true); }}
               onBlur={() => setTimeout(() => setShowGeoSuggestion(false), 150)}
               onKeyDown={handleKeyDown}
-              placeholder={selectedType === 'UTW' ? 'Wpisz miasto lub powiat…' : 'Gdzie szukasz opieki?'}
+              placeholder={category === 'aktywnosc' ? 'Wpisz miejscowość…' : 'Gdzie szukasz opieki?'}
               enterKeyHint="search"
               autoComplete="off"
               spellCheck="false"
