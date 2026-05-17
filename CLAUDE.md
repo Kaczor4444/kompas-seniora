@@ -7,18 +7,18 @@
 
 - **Provider**: PostgreSQL (Neon)
 - **Połączenie**: `.env` → `DATABASE_URL`
-- **Total rekordów**: **315 placówek** (produkcja, stan: maj 2026)
+- **Total rekordów**: **367 placówek** (produkcja, stan: maj 2026)
   - DPS: 95
   - ŚDS: 97
   - Klub Senior+: 89 (79 z MUW + 10 MDDPS Kraków)
   - Dzienny Dom Senior+: 34 (28 z MUW + 6 MDDPS Kraków)
-  - Małopolskie: ~311
-  - Śląskie: 4
+  - **UTW: 52** (Uniwersytety Trzeciego Wieku, id 324–375)
+  - Małopolskie: 363 | Śląskie: 4
   - Z ceną: ~90 (tylko DPS, ~30%)
-  - Z geolokalizacją: 315 (100%)
+  - Z geolokalizacją: 367 (100%)
   - MDDPS Kraków: 16 (jst_nazwa='Miasto Kraków (MDDPS)')
 - **SQLite (`prisma/dev.db`)**: NIEUŻYWANY - tylko stare testowe dane (36 rekordów)
-- **UTW (Uniwersytety Trzeciego Wieku)**: planowane — 52 placówki z senioralna.malopolska.pl, osobna sekcja `/utw`
+- **UTW**: osobna sekcja `/utw` — nie wliczane do liczników opieki (getMainSearchFilter)
 
 **Aby zmodyfikować dane produkcyjne:**
 1. Użyj `npx prisma studio` (GUI)
@@ -371,6 +371,14 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **9af09f4** (2026-05-17): feat: sesja #19 — UTW (Uniwersytety Trzeciego Wieku)
+  - 52 UTW zescrapowane z senioralna.malopolska.pl → zaimportowane do bazy (id 324–375)
+  - Strona `/utw`: hero fioletowy, filtry, lista kart, mapa Leaflet
+  - Landing: 4. kafelek "Uniwersytet Trzeciego Wieku" (violet) w FacilityTypeCards
+  - `getMainSearchFilter()` w voivodeship-filter.ts — wyklucza ŚDS i UTW z głównych liczników
+  - `SCRAPER.md` — dokumentacja scraperów, User-Agent rules, Nominatim ascii_query fix
+  - Nominatim UA zmieniony na `geocoder-research/1.0` we wszystkich skryptach
+
 - **aecc7c9** (2026-05-17): feat: monitoring BIP Kraków — MDDPS (GitHub Action)
   - Cron 5. każdego miesiąca: porównuje datę edycji w BIP dzienniku zmian
   - `raw_dane/krakow/.mddps_last_change` — inicjalna data 2023-03-20
@@ -535,20 +543,17 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 ### ⚠️ Tarnów / Nowy Sącz — niezbadane
 - Czy mają własne miejskie odpowiedniki DD Senior+ poza programem MRPiPS? (jak Kraków MDDPS)
 
-### 🆕 UTW (Uniwersytety Trzeciego Wieku) — sesja #19
+### ✅ UTW (Uniwersytety Trzeciego Wieku) — ZROBIONE (sesja #19, commit 9af09f4)
 - **Źródło:** `https://www.senioralna.malopolska.pl/wyszukiwarka-wsparcia-seniorow/`
-- **robots.txt:** ✅ dozwolone (sprawdzone 2026-05-17)
-- **Liczba:** 52 placówki w Małopolsce
-- **Scraper:** `scripts/scrape-utw-malopolska.py` → `raw_dane/utw_malopolska.csv`
-- **Plan integracji:** osobna sekcja `/utw`, nowy `typ_placowki='UTW'` w Placowka, nowe pole `strona_www`
-- **Status:** scraper napisany, jeszcze nie uruchomiony
+- **robots.txt:** ✅ dozwolone
+- **Baza:** 52 rekordy (id 324–375), typ_placowki='UTW', pole `www` na stronę
+- **Strona:** `/utw` — hero fioletowy, szukaj, filtr powiatów, lista/mapa
+- **Landing:** 4. kafelek w FacilityTypeCards (violet, GraduationCap icon)
+- **Izolacja:** `getMainSearchFilter()` wyklucza UTW z głównej wyszukiwarki i liczników
 - **TODO:**
-  - [ ] Uruchomić scraper i przejrzeć CSV
-  - [ ] Migracja Prisma: pole `strona_www` w tabeli Placowka
-  - [ ] Import do bazy
-  - [ ] Strona `/utw` z wyszukiwaniem i mapą
-  - [ ] Kafelek na landingu
-  - [ ] Monitor (GitHub Action — hash HTML tabeli UTW)
+  - [ ] Ręczna weryfikacja danych kontaktowych z witryn UTW
+  - [ ] Po weryfikacji: zmienić disclaimer na "dane zweryfikowane bezpośrednio (2026)"
+  - [ ] Monitor (GitHub Action — hash HTML tabeli UTW na senioralna.malopolska.pl)
 
 **Pełna dokumentacja scraperów:** `SCRAPER.md`
 
