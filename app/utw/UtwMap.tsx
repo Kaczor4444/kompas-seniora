@@ -40,10 +40,16 @@ interface UtwEntry {
 export default function UtwMap({ utw }: { utw: UtwEntry[] }) {
   const withGeo = utw.filter(u => u.latitude && u.longitude);
 
+  // Granice Małopolski — nie można oddalić ani wyjść poza region
+  const bounds: [[number, number], [number, number]] = [[49.0, 18.7], [50.8, 21.8]];
+
   return (
     <MapContainer
       center={[49.9, 20.2]}
       zoom={8}
+      minZoom={8}
+      maxBounds={bounds}
+      maxBoundsViscosity={1.0}
       style={{ height: '100%', width: '100%' }}
       scrollWheelZoom
     >

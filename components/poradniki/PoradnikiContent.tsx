@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -229,14 +230,18 @@ export default function PoradnikiContent({
                 : 'flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 -mx-4 px-4 md:grid md:grid-cols-3 md:gap-8 md:pb-0 md:mx-0 md:px-0 scrollbar-hide'
               }
             `}>
-              {displayArticles.map((article) => {
+              {displayArticles.map((article, index) => {
                 const articleId = `${article.sectionId}-${article.slug}`
                 const isSaved = savedArticleIds.includes(articleId)
                 const isPlaceholder = article.excerpt === 'Artykuł w przygotowaniu...'
 
                 return (
-                  <article
+                  <motion.article
                     key={articleId}
+                    initial={isFullPage ? { opacity: 0 } : false}
+                    whileInView={isFullPage ? { opacity: 1 } : undefined}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{ duration: 0.5, delay: Math.floor(index / 2) * 0.2, ease: 'linear' }}
                     className={`
                       bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col border border-stone-100 relative
                       ${!isFullPage ? 'min-w-[85vw] sm:min-w-[350px] md:min-w-0 snap-center h-auto md:h-full' : 'h-full'}
@@ -319,7 +324,7 @@ export default function PoradnikiContent({
                         </span>
                       </div>
                     </Link>
-                  </article>
+                  </motion.article>
                 )
               })}
             </div>
