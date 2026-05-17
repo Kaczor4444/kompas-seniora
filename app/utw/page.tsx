@@ -27,6 +27,7 @@ export default async function UtwPage({
       telefon:      true,
       email:        true,
       www:          true,
+      facebook:     true,
       latitude:     true,
       longitude:    true,
     },
