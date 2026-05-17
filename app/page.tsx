@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { getVoivodeshipFilter, getMainSearchFilter } from '@/lib/voivodeship-filter';
 import { getFeaturedArticlesForHome } from '@/lib/articleHelpers';
 import HomeClient from '@/src/components/HomeClient';
 
@@ -9,9 +9,7 @@ export const revalidate = 3600;
 export default async function Home() {
   // 📊 Fetch real-time facility count, per-powiat breakdown, and featured articles
   const [totalFacilities, allFacilities, featuredArticles] = await Promise.all([
-    prisma.placowka.count({
-      where: { ...getVoivodeshipFilter(), typ_placowki: { not: 'ŚDS' } }
-    }),
+    prisma.placowka.count({ where: getMainSearchFilter() }),
     prisma.placowka.findMany({
       where: getVoivodeshipFilter(),
       select: { powiat: true, miejscowosc: true, typ_placowki: true }
@@ -58,10 +56,11 @@ export default async function Home() {
   }
 
   const typeCounts = {
-    DPS: allFacilities.filter(f => f.typ_placowki === 'DPS').length,
-    SDS: allFacilities.filter(f => f.typ_placowki === 'ŚDS').length,
+    DPS:        allFacilities.filter(f => f.typ_placowki === 'DPS').length,
+    SDS:        allFacilities.filter(f => f.typ_placowki === 'ŚDS').length,
     KlubSenior: allFacilities.filter(f => f.typ_placowki === 'Klub Senior+').length,
-    DDSenior: allFacilities.filter(f => f.typ_placowki === 'Dzienny Dom Senior+').length,
+    DDSenior:   allFacilities.filter(f => f.typ_placowki === 'Dzienny Dom Senior+').length,
+    UTW:        allFacilities.filter(f => f.typ_placowki === 'UTW').length,
   };
 
   const powiatCountsByType: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>> = {

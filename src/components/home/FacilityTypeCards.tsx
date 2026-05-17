@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Home, Users, Star, Sun } from 'lucide-react';
+import { ArrowRight, Home, Users, Star, Sun, GraduationCap } from 'lucide-react';
 
 interface TypeCounts {
   DPS: number;
   SDS: number;
   KlubSenior: number;
   DDSenior: number;
+  UTW: number;
 }
 
 const CARDS = [
@@ -67,6 +68,25 @@ const CARDS = [
       badge: 'bg-orange-50 text-orange-700',
       cta: 'bg-orange-500 hover:bg-orange-600',
       label: 'text-orange-600',
+    },
+  },
+  {
+    key: 'UTW' as const,
+    label: 'UTW',
+    fullName: 'Uniwersytet Trzeciego Wieku',
+    subtitle: 'Edukacja i aktywność',
+    description:
+      'Edukacja, kultura i nowe znajomości dla aktywnych seniorów. Wykłady, kursy językowe, warsztaty, wycieczki krajoznawcze. Bezpłatne lub za symboliczną składkę. Brak skierowania, brak kryterium zdrowotnego.',
+    href: '/utw',
+    image: '/images/aktywnosc_seniora.webp',
+    icon: GraduationCap,
+    color: {
+      border: 'border-violet-200',
+      iconBg: 'bg-violet-50',
+      iconText: 'text-violet-600',
+      badge: 'bg-violet-50 text-violet-700',
+      cta: 'bg-violet-600 hover:bg-violet-700',
+      label: 'text-violet-600',
     },
   },
 ];

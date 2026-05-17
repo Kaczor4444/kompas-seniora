@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { getVoivodeshipFilter, getMainSearchFilter } from '@/lib/voivodeship-filter';
 
 const prisma = new PrismaClient();
 
@@ -8,13 +8,13 @@ export async function GET() {
   try {
     const facilitiesByVoivodeship = await prisma.placowka.groupBy({
       by: ['wojewodztwo'],
-      where: getVoivodeshipFilter(),
+      where: getMainSearchFilter(),
       _count: { id: true },
     });
 
     const facilitiesByCity = await prisma.placowka.groupBy({
       by: ['miejscowosc'],
-      where: getVoivodeshipFilter({ typ_placowki: { not: 'ŚDS' } }),
+      where: getMainSearchFilter(),
       _count: { id: true },
       orderBy: { _count: { id: 'desc' } },
     });
@@ -37,7 +37,7 @@ export async function GET() {
       .sort((a, b) => b.count - a.count);
 
     const totalFacilities = await prisma.placowka.count({
-      where: getVoivodeshipFilter({ typ_placowki: { not: 'ŚDS' } })
+      where: getMainSearchFilter()
     });
 
     return NextResponse.json({

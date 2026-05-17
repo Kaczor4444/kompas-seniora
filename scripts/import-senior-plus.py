@@ -74,7 +74,7 @@ def geocode(ulica: str | None, miejscowosc: str, kod: str | None) -> tuple[float
     parts.append("Polska")
     q = ", ".join(parts)
 
-    headers = {"User-Agent": "KompasSeniora/1.0 (import-senior-plus)"}
+    headers = {"User-Agent": "geocoder-research/1.0"}
     params = {"q": q, "format": "json", "limit": 1, "countrycodes": "pl"}
     try:
         r = requests.get("https://nominatim.openstreetmap.org/search",

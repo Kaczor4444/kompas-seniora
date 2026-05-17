@@ -18,7 +18,7 @@ interface HomeClientProps {
   totalFacilities: number;
   powiatCounts: Record<string, number>;
   featuredArticles: ArticleWithMetadata[];
-  typeCounts: { DPS: number; SDS: number; KlubSenior: number; DDSenior: number };
+  typeCounts: { DPS: number; SDS: number; KlubSenior: number; DDSenior: number; UTW: number };
   powiatCountsByType: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>>;
 }
 

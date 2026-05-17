@@ -8,6 +8,11 @@
 // Lista województw widocznych dla userów
 export const ENABLED_VOIVODESHIPS = ['małopolskie'] as const;
 
+// Typy wykluczone z głównej wyszukiwarki i liczników opieki.
+// ŚDS — ukryte z UI, zostają w DB.
+// UTW  — mają własną sekcję /utw, nie mieszamy z opieką.
+export const EXCLUDED_FROM_MAIN = ['ŚDS', 'UTW'] as const;
+
 export type EnabledVoivodeship = typeof ENABLED_VOIVODESHIPS[number];
 
 /**
@@ -47,6 +52,21 @@ export function getVoivodeshipFilter(additionalWhere?: Record<string, any>) {
       additionalWhere
     ]
   };
+}
+
+/**
+ * Filter dla głównej wyszukiwarki i liczników — wyklucza ŚDS i UTW.
+ * Używaj zamiast getVoivodeshipFilter() wszędzie gdzie nie chcesz UTW/ŚDS.
+ */
+export function getMainSearchFilter(additionalWhere?: Record<string, any>) {
+  const excludeTypes = {
+    typ_placowki: { notIn: EXCLUDED_FROM_MAIN as unknown as string[] }
+  };
+  return getVoivodeshipFilter(
+    additionalWhere
+      ? { AND: [excludeTypes, additionalWhere] }
+      : excludeTypes
+  );
 }
 
 /**

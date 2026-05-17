@@ -129,7 +129,7 @@ def geocode(ulica: str) -> tuple[float, float] | None:
         'format': 'json',
         'limit': 1,
     }
-    headers = {'User-Agent': 'KompasSeniora/1.0 (kompas-seniora.pl)'}
+    headers = {'User-Agent': 'geocoder-research/1.0'}
     try:
         r = requests.get(url, params=params, headers=headers, timeout=10)
         r.raise_for_status()

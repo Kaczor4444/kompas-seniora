@@ -1,7 +1,7 @@
 // app/api/teryt/suggest/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { getVoivodeshipFilter, getMainSearchFilter } from '@/lib/voivodeship-filter';
 import { normalizePolish } from '@/lib/normalize-polish';
 import { mapCityCountyToPowiat } from '@/lib/city-county-mapping';
 import { checkRedisRateLimit } from '@/lib/redis';
@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
 
       // 🔧 FIX N+1: Pobierz wszystkie placówki RAZ (przed pętlą)
       const allFacilities = await prisma.placowka.findMany({
-        where: getVoivodeshipFilter(),
+        where: getMainSearchFilter(),
         select: { miejscowosc: true, powiat: true, typ_placowki: true }
       });
 

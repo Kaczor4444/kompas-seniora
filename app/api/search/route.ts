@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculateMatchScore } from '@/lib/teryt';
-import { getVoivodeshipFilter } from '@/lib/voivodeship-filter';
+import { getVoivodeshipFilter, getMainSearchFilter } from '@/lib/voivodeship-filter';
 
 
 export async function GET(request: NextRequest) {
@@ -17,8 +17,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all matching placówki (filtered by enabled voivodeships + type)
+    // getMainSearchFilter wyklucza ŚDS i UTW gdy brak konkretnego filtra typu
+    const whereFilter = typ !== 'all' && typ !== 'WSZYSTKIE'
+      ? getVoivodeshipFilter(typeFilter)
+      : getMainSearchFilter();
+
     const allPlacowki = await prisma.placowka.findMany({
-      where: getVoivodeshipFilter(typeFilter),
+      where: whereFilter,
       select: {
         id: true,
         nazwa: true,

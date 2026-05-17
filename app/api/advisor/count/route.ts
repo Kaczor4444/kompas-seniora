@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { EXCLUDED_FROM_MAIN } from '@/lib/voivodeship-filter';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,6 +16,9 @@ export async function GET(request: NextRequest) {
       where.typ_placowki = { contains: 'DPS', mode: 'insensitive' };
     } else if (type === 'ŚDS') {
       where.typ_placowki = { contains: 'ŚDS', mode: 'insensitive' };
+    } else if (!type) {
+      // brak filtra — wyklucz ŚDS i UTW z licznika opieki
+      where.typ_placowki = { notIn: EXCLUDED_FROM_MAIN as unknown as string[] };
     }
 
     if (powiat) {

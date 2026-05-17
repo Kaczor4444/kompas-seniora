@@ -18,6 +18,7 @@
   - Z geolokalizacją: 315 (100%)
   - MDDPS Kraków: 16 (jst_nazwa='Miasto Kraków (MDDPS)')
 - **SQLite (`prisma/dev.db`)**: NIEUŻYWANY - tylko stare testowe dane (36 rekordów)
+- **UTW (Uniwersytety Trzeciego Wieku)**: planowane — 52 placówki z senioralna.malopolska.pl, osobna sekcja `/utw`
 
 **Aby zmodyfikować dane produkcyjne:**
 1. Użyj `npx prisma studio` (GUI)
@@ -533,6 +534,23 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ### ⚠️ Tarnów / Nowy Sącz — niezbadane
 - Czy mają własne miejskie odpowiedniki DD Senior+ poza programem MRPiPS? (jak Kraków MDDPS)
+
+### 🆕 UTW (Uniwersytety Trzeciego Wieku) — sesja #19
+- **Źródło:** `https://www.senioralna.malopolska.pl/wyszukiwarka-wsparcia-seniorow/`
+- **robots.txt:** ✅ dozwolone (sprawdzone 2026-05-17)
+- **Liczba:** 52 placówki w Małopolsce
+- **Scraper:** `scripts/scrape-utw-malopolska.py` → `raw_dane/utw_malopolska.csv`
+- **Plan integracji:** osobna sekcja `/utw`, nowy `typ_placowki='UTW'` w Placowka, nowe pole `strona_www`
+- **Status:** scraper napisany, jeszcze nie uruchomiony
+- **TODO:**
+  - [ ] Uruchomić scraper i przejrzeć CSV
+  - [ ] Migracja Prisma: pole `strona_www` w tabeli Placowka
+  - [ ] Import do bazy
+  - [ ] Strona `/utw` z wyszukiwaniem i mapą
+  - [ ] Kafelek na landingu
+  - [ ] Monitor (GitHub Action — hash HTML tabeli UTW)
+
+**Pełna dokumentacja scraperów:** `SCRAPER.md`
 
 ---
 
