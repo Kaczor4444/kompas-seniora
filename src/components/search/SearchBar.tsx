@@ -408,11 +408,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 {category === cat && (
                   <motion.div
                     layoutId="toggle-pill"
-                    className="absolute inset-0 bg-white rounded-lg shadow-sm"
+                    className="absolute inset-0 bg-emerald-600 rounded-lg shadow-sm"
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
-                <span className={`relative z-10 transition-colors ${category === cat ? 'text-slate-900' : 'text-slate-400'}`}>
+                <span className={`relative z-10 transition-colors ${category === cat ? 'text-white' : 'text-slate-400'}`}>
                   {cat === 'opieka' ? 'Opieka' : 'Aktywność'}
                 </span>
               </button>
