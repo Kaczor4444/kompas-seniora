@@ -144,7 +144,51 @@ Secret `DATABASE_URL` nie jest dodany w repo GitHub. Cron uruchomi monitor ale n
 
 ## Następne kroki powiązane z Senior+
 
-- [ ] Naprawić pole `powiat` dla 107 Senior+ rekordów (mapowanie JST → powiat)
+- [x] Naprawić pole `powiat` dla 107 Senior+ rekordów — DONE (commit e4e77a2, skrypt `fix-senior-plus-powiat.js`)
+- [x] Karta placówki — wyświetlać `rok_powstania` i `jst_nazwa` — DONE (sesja #18, PlacowkaDetails)
 - [ ] Dodać `DATABASE_URL` secret w GitHub
-- [ ] Karta placówki `/app/placowka/[id]/page.tsx` — wyświetlać `rok_powstania` i `jst_nazwa`
+
+---
+
+## 🏙️ INSIGHT: MDDPS Kraków — do dyskusji w przyszłej sesji
+
+**Problem odkryty:** Kraków nie ma żadnego rekordu `Dzienny Dom Senior+` w bazie — ale to nie luka danych, tylko świadoma decyzja miasta.
+
+**Stan faktyczny:**
+- Gmina miejska Kraków **nie aplikowała do programu MRPiPS Senior+** (dotacje dla gmin)
+- Zamiast tego zbudowała własną sieć **6 Miejskich Dziennych Domów Pomocy Społecznej (MDDPS)**, finansowanych z budżetu miasta
+- MDDPS funkcjonalnie = DD Senior+, ale inny organ finansujący i inna nazwa
+
+**6 MDDPS w Krakowie:**
+| Dom | Adres | Tel |
+|-----|-------|-----|
+| Nr 1 "Socius" | ul. Jana Sas-Zubrzyckiego 10 | 12 655 21 76 |
+| Nr 2 | ul. ks. W. Gurgacza 5 | 12 411 00 50 |
+| Nr 3 | ul. Korczaka 4 | 12 416 15 60 |
+| Nr 4 | ul. Sudolska 7a | 12 412 62 34 |
+| Nr 5 | ul. Nad Sudołem 32 | 12 415 54 14 |
+| Nr 6 (CKiRS) | os. Szkolne 20 | 12 644 20 52 |
+
+Kontakt ogólny: sekretariat@mddps.krakow.pl  
+Źródło: https://mops.krakow.pl/262772,artykul,nasze-domy---mddps-w-krakowie.html
+
+**Pytania do decyzji:**
+1. Czy dodać MDDPS do bazy jako nowy typ (`typ_placowki = 'MDDPS'` lub `'Dzienny Dom'`)?
+2. Czy Tarnów, Nowy Sącz też mają własne miejskie odpowiedniki poza programem MRPiPS?
+3. Jak monitorować zmiany? BIP Kraków (`bip.krakow.pl/?dok_id=78643`) — **DA SIĘ monitorować**:
+   - Strona server-side (SSR) — działa `requests` + `BeautifulSoup`, bez JS
+   - **Najlepszy sygnał:** `bip.krakow.pl/?dok_id=78643&vReg=1` — dziennik zmian z dokładną datą edycji
+   - Ostatnia zmiana: **2023-03-20** (ponad 2 lata temu — nie pali się)
+   - Na stronie: 17 publicznych MDDPS (6 domów + 11 klubów) + 5 niepublicznych
+4. Ewentualny GitHub Action scraper (podobny do `senior-plus-monitor.yml`):
+   - Sprawdza datę w `?vReg=1`, porównuje z zapisaną
+   - Gdy zmiana → tworzy GitHub Issue z komunikatem do ręcznej weryfikacji
+
+**Sesja #18:** Dodano notatkę w opisie kafelka DD Senior+ na stronie głównej że duże miasta mogą mieć własne odpowiedniki poza programem MRPiPS. Zaimportowano 16 placówek MDDPS Kraków do bazy (sesja #18, skrypt `scripts/import-mddps-krakow.py`).
+
+**Weryfikacja Klub Senior+ Kraków (sesja #18):**
+- W bazie: **1 Klub Senior+** przy ul. Krowoderskich Zuchów 6 (z wykazu MUW, program MRPiPS)
+- Na BIP Kraków: **11 Klubów Samopomocy MDDPS** (zupełnie inne placówki, budżet miasta)
+- **Brak nakładania** — to dwa odrębne systemy, żaden z 11 MDDPS-owych nie pokrywa się z naszym rekordem
+- Kraków konsekwentnie buduje własną infrastrukturę zamiast korzystać z dotacji MRPiPS
 - [ ] Autocomplete TERYT (`/api/teryt/suggest`) — sprawdzić czy Senior+ pojawiają się przy wyszukiwaniu miejscowości

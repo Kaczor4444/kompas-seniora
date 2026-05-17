@@ -731,7 +731,7 @@ export default function SearchResults({
           <div className="max-w-2xl">
             <SearchBar
               initialQuery={cityInput}
-              initialType={(['DPS', 'ŚDS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
+              initialType={(['DPS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
               compact={true}
               onQueryChange={setCurrentQuery}
               disableAutocomplete={true}
@@ -817,7 +817,6 @@ export default function SearchResults({
                   {[
                     { value: 'all', label: 'Wszystkie' },
                     { value: 'DPS', label: 'DPS' },
-                    { value: 'ŚDS', label: 'ŚDS' },
                     { value: 'Klub Senior+', label: 'Klub Senior+' },
                     { value: 'Dzienny Dom Senior+', label: 'DD Senior+' },
                   ].map(({ value, label }) => (
@@ -909,7 +908,7 @@ export default function SearchResults({
               )}
 
               {/* Price Filter - tylko dla DPS (ŚDS i Senior+ są bezpłatne) */}
-              {selectedType !== 'ŚDS' && selectedType !== 'Klub Senior+' && selectedType !== 'Dzienny Dom Senior+' && (
+              {selectedType !== 'Klub Senior+' && selectedType !== 'Dzienny Dom Senior+' && (
                 <div>
                   <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
                     Cena do: <span className="text-slate-900">{priceLimit} zł</span>
@@ -1260,7 +1259,7 @@ export default function SearchResults({
             <div className="absolute top-20 left-4 z-30 w-80 space-y-3">
               <SearchBar
                 initialQuery={cityInput}
-                initialType={(['DPS', 'ŚDS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
+                initialType={(['DPS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
                 compact={true}
                 onQueryChange={setCurrentQuery}
                 disableAutocomplete={true}
@@ -1366,7 +1365,6 @@ export default function SearchResults({
                       {[
                         { value: 'all', label: 'Wszystkie' },
                         { value: 'DPS', label: 'DPS' },
-                        { value: 'ŚDS', label: 'ŚDS' },
                         { value: 'Klub Senior+', label: 'Klub Senior+' },
                         { value: 'Dzienny Dom Senior+', label: 'DD Senior+' },
                       ].map(({ value, label }) => (
@@ -1480,7 +1478,7 @@ export default function SearchResults({
                   )}
 
                 {/* Price Filter - Collapsible */}
-                {selectedType !== 'ŚDS' && (
+                {selectedType === 'DPS' && (
                   <div>
                     <button
                       onClick={() => setShowPriceExpanded(!showPriceExpanded)}

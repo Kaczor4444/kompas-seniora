@@ -26,6 +26,12 @@ export default function MopsFinderPage() {
   const [results, setResults] = useState<MopsRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [searchMode, setSearchMode] = useState<'direct' | 'powiat_fallback' | 'ambiguous'>('direct');
+  const [fallbackPowiat, setFallbackPowiat] = useState<string>('');
+  const [fallbackLocality, setFallbackLocality] = useState<string>('');
+  const [ambiguousPowiaty, setAmbiguousPowiaty] = useState<string[]>([]);
+  const [mopsByPowiat, setMopsByPowiat] = useState<Record<string, MopsRecord[]>>({});
+  const [activePowiat, setActivePowiat] = useState<string>('');
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,18 +39,38 @@ export default function MopsFinderPage() {
 
     setLoading(true);
     setSearched(true);
+    setAmbiguousPowiaty([]);
+    setMopsByPowiat({});
+    setActivePowiat('');
 
     try {
       const res = await fetch(`/api/mops/search?q=${encodeURIComponent(search)}`);
       if (res.ok) {
         const data = await res.json();
-        setResults(data.results || []);
+        setSearchMode(data.mode || 'direct');
+        setFallbackPowiat(data.powiat || '');
+        setFallbackLocality(data.localityName || search);
+
+        if (data.mode === 'ambiguous') {
+          setAmbiguousPowiaty(data.powiaty || []);
+          setMopsByPowiat(data.mopsByPowiat || {});
+          const first = data.powiaty?.[0] || '';
+          setActivePowiat(first);
+          setResults(data.mopsByPowiat?.[first] || []);
+        } else {
+          setResults(data.results || []);
+        }
       }
     } catch (error) {
       console.error('Search error:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePowiatChip = (powiat: string) => {
+    setActivePowiat(powiat);
+    setResults(mopsByPowiat[powiat] || []);
   };
 
   return (
@@ -61,7 +87,7 @@ export default function MopsFinderPage() {
             Znajdź właściwy MOPS/GOPS
           </h1>
           <p className="text-lg text-slate-600 max-w-3xl">
-            Wpisz miasto lub gminę, gdzie <strong>mieszka</strong> osoba potrzebująca opieki w DPS/ŚDS
+            Wpisz miasto lub gminę, gdzie <strong>mieszka</strong> osoba potrzebująca opieki w DPS
           </p>
         </div>
       </div>
@@ -75,7 +101,7 @@ export default function MopsFinderPage() {
             <div>
               <h3 className="font-bold text-blue-900 mb-2">⚠️ Ważne!</h3>
               <p className="text-blue-800 leading-relaxed">
-                Wniosek o skierowanie do DPS/ŚDS składa się w ośrodku pomocy społecznej
+                Wniosek o skierowanie do DPS składa się w ośrodku pomocy społecznej
                 <strong> według miejsca zamieszkania osoby potrzebującej</strong>,
                 nie lokalizacji placówki.
               </p>
@@ -129,9 +155,52 @@ export default function MopsFinderPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="text-sm text-slate-600 font-bold">
-                  Znaleziono {results.length} {results.length === 1 ? 'ośrodek' : 'ośrodki'}:
-                </p>
+                {searchMode === 'ambiguous' && (
+                  <div className="space-y-3">
+                    <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-xl">
+                      <p className="text-sm font-bold text-amber-900">
+                        Miejscowość <strong>{fallbackLocality}</strong> istnieje w kilku powiatach — wybierz właściwy:
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {ambiguousPowiaty.map(powiat => (
+                        <button
+                          key={powiat}
+                          onClick={() => handlePowiatChip(powiat)}
+                          className={`px-4 py-2 rounded-xl text-sm font-black border transition-all ${
+                            activePowiat === powiat
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-white text-slate-700 border-stone-200 hover:border-blue-400'
+                          }`}
+                        >
+                          pow. {powiat}
+                          {mopsByPowiat[powiat] && (
+                            <span className={`ml-1.5 text-[10px] font-black ${activePowiat === powiat ? 'opacity-70' : 'text-slate-400'}`}>
+                              ({mopsByPowiat[powiat].length})
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {searchMode === 'powiat_fallback' && (
+                  <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-xl">
+                    <p className="text-sm font-bold text-amber-900">
+                      Nie znaleziono ośrodka bezpośrednio dla miejscowości <strong>{fallbackLocality}</strong>.
+                    </p>
+                    <p className="text-sm text-amber-800 mt-1">
+                      Poniżej wszystkie ośrodki w powiecie <strong>{fallbackPowiat}</strong> — wybierz ten właściwy dla Twojej gminy.
+                    </p>
+                  </div>
+                )}
+
+                {searchMode === 'direct' && (
+                  <p className="text-sm text-slate-600 font-bold">
+                    Znaleziono {results.length} {results.length === 1 ? 'ośrodek' : results.length < 5 ? 'ośrodki' : 'ośrodków'}:
+                  </p>
+                )}
 
                 {results.map((mops) => (
                   <div key={mops.id} className="bg-white p-6 rounded-2xl border-2 border-stone-200 hover:border-blue-300 transition-all shadow-sm">
@@ -187,11 +256,6 @@ export default function MopsFinderPage() {
                       )}
                     </div>
 
-                    {mops.notes && (
-                      <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                        <p className="text-xs text-amber-800">{mops.notes}</p>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>

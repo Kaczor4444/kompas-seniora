@@ -5,6 +5,7 @@ import { ArrowLeft, AlertCircle, Phone, MapPin, CheckCircle2, Search, Heart, Arr
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
+import PriceMap from '@/src/components/kalkulator/PriceMap';
 import { getGminaForCity } from '@/lib/city-to-gmina';
 import { addFavorite, removeFavorite, isFavorite, getFavorites } from '@/src/utils/favorites';
 
@@ -605,6 +606,8 @@ function KalkulatorContent() {
 
         {/* ── DPS Lookup section ── */}
         <div className="border-t-2 border-slate-200 pt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          <div>
           <div className="flex items-center gap-4 mb-4">
             <span className="h-px w-10 bg-emerald-600" />
             <span className="text-[11px] font-black uppercase tracking-[0.3em] text-emerald-700">Wyszukiwarka DPS</span>
@@ -889,6 +892,18 @@ function KalkulatorContent() {
               </div>
             );
           })()}
+          </div>{/* end left column */}
+
+          {/* Right column — Price Map */}
+          <div className="hidden lg:block">
+            <div className="sticky top-24">
+              <PriceMap
+                highlightedPowiat={lookupResult?.facilities[0]?.powiat}
+              />
+            </div>
+          </div>
+
+          </div>{/* end grid */}
         </div>
 
         {/* Expert note */}
@@ -904,9 +919,9 @@ function KalkulatorContent() {
               Nie traktuj tego wyniku jako decyzji administracyjnej.
             </p>
           </div>
-          <a href="/asystent?start=true"
-            className="bg-emerald-500 hover:bg-emerald-400 text-white font-black text-[12px] uppercase tracking-widest px-8 py-4 rounded-xl transition-all shrink-0 active:scale-95">
-            Zapytaj AI
+          <a href="/mops"
+            className="bg-emerald-500 hover:bg-emerald-400 text-white font-black text-[12px] uppercase tracking-widest px-8 py-4 rounded-xl transition-all shrink-0 active:scale-95 whitespace-nowrap">
+            Znajdź MOPS/GOPS
           </a>
         </div>
 

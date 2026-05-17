@@ -131,11 +131,11 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
                 <div className="w-10 h-10 rounded-lg bg-white/10 text-emerald-400 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
                   <QuestionnaireIcon size={20} />
                 </div>
-                <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Sztuczna Inteligencja</span>
+                <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Ankieta</span>
               </div>
               <h3 className="text-xl font-black text-white mb-2">Asystent Wyboru</h3>
               <p className="text-sm text-slate-300 font-medium leading-relaxed mb-4">
-                Odpowiedz na 4 pytania o potrzeby seniora - podpowiemy która forma opieki DPS czy ŚDS będzie właściwa i co zrobić dalej.
+                Odpowiedz na 4 pytania o potrzeby seniora — podpowiemy właściwą formę opieki i pokażemy placówki w Twojej okolicy.
               </p>
               <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2 group-hover:gap-3 transition-all">
                 Uruchom asystenta <ArrowRight size={14} />

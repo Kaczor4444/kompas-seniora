@@ -7,15 +7,16 @@
 
 - **Provider**: PostgreSQL (Neon)
 - **Połączenie**: `.env` → `DATABASE_URL`
-- **Total rekordów**: **299 placówek** (produkcja, stan: maj 2026)
+- **Total rekordów**: **315 placówek** (produkcja, stan: maj 2026)
   - DPS: 95
   - ŚDS: 97
-  - Klub Senior+: 79
-  - Dzienny Dom Senior+: 28
-  - Małopolskie: ~295
+  - Klub Senior+: 89 (79 z MUW + 10 MDDPS Kraków)
+  - Dzienny Dom Senior+: 34 (28 z MUW + 6 MDDPS Kraków)
+  - Małopolskie: ~311
   - Śląskie: 4
   - Z ceną: ~90 (tylko DPS, ~30%)
-  - Z geolokalizacją: 299 (100%)
+  - Z geolokalizacją: 315 (100%)
+  - MDDPS Kraków: 16 (jst_nazwa='Miasto Kraków (MDDPS)')
 - **SQLite (`prisma/dev.db`)**: NIEUŻYWANY - tylko stare testowe dane (36 rekordów)
 
 **Aby zmodyfikować dane produkcyjne:**
@@ -356,7 +357,7 @@ cat .env | grep DATABASE_URL
 ### Ile rekordów w produkcji?
 ```bash
 npx prisma studio
-# Otwórz model "Placowka" → powinno być 299 (95 DPS + 97 ŚDS + 79 Klub Senior+ + 28 DDS)
+# Otwórz model "Placowka" → powinno być 315 (95 DPS + 97 ŚDS + 89 Klub Senior+ + 34 DDS)
 ```
 
 ### Test wyszukiwania
@@ -369,6 +370,22 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **(sesja #18 — do commita)** (2026-05-17): feat: Senior+ UI rework, MDDPS Kraków import
+  - ŚDS ukryte z całego UI użytkownika (hero, filtry, kafelki, asystent, kalkulator) — zostaje w DB i artykułach
+  - FacilityTypeCards: nowa sekcja na landingu (DPS/Klub Seniora/DD Senior+), zdjęcia jako tło
+  - RegionalMap: 3 warstwy (DPS/KlubSenior/DDSenior) z przełącznikiem pills + kolory per typ
+  - SupportAssistant: przebudowany na DPS/KlubSenior/DDSenior/MOPS (bez ŚDS)
+  - MOPS search: 2-step z TERYT fallback + disambiguacja (wieloznaczne miejscowości → chips powiatów)
+  - PriceMap: mapa Małopolski ze średnimi cenami DPS per powiat na stronie kalkulatora
+  - MDDPS Kraków: 16 placówek dodanych do bazy (6 domów → DD Senior+, 10 klubów → Klub Senior+)
+  - FacilityTypeCards label: "Klub Senior+" → "Klub Seniora" (bez plusa, obejmuje też MDDPS)
+- **e4e77a2** (2026-05-16): feat: Senior+ — poprawki wyświetlania i danych
+  - FacilityCard: badge amber + "DD Senior+" skrót + "Bezpłatne" zamiast "Zapytaj"
+  - SearchResults: usunięto błędny type cast `as 'DPS'|'ŚDS'` dla Senior+
+  - FacilityMap: "Bezpłatne" zamiast "NFZ" w tooltipie; klaster tri-color (zielony/granatowy/amber)
+  - WelcomeWidget: "Free of charge" zamiast "Funded by NFZ"
+  - PlacowkaDetails: dodano `rok_powstania`/`jst_nazwa`; sekcja "Jak dołączyć?" dla Senior+; "Bezpłatne" i "Na bieżąco" dla Senior+
+  - `scripts/fix-senior-plus-powiat.js`: zaktualizowano `powiat` dla **107 rekordów** Senior+ (JST → powiat administracyjny, np. "Szczurowa" → "brzeski")
 - **2991097** (2026-05-16): feat: Ośrodki Senior+ — pełna integracja (baza, UI, monitoring)
   - Prisma: dodano `rok_powstania` i `jst_nazwa` do modelu Placowka
   - Import: 107 ośrodków (79 Klub Senior+ + 28 Dzienny Dom Senior+) z geolokalizacją
@@ -485,17 +502,34 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 ### ❌ SEO — strona nadal niewidoczna dla Google i AI!
 1. **`public/robots.txt`** → `Disallow: /` (blokuje wszystko) → zmienić na `Allow: /`, `Disallow: /admin/`
 2. **`app/layout.tsx:65-72`** → `robots: { index: false }` → zmienić na `index: true, follow: true`
-3. **`app/sitemap.ts`** → dodać dynamiczny sitemap (299 placówek + artykuły)
+3. **`app/sitemap.ts`** → dodać dynamiczny sitemap (315 placówek + artykuły)
 
 ### ⚠️ Senior+ GitHub Action — wymaga secretu!
 - Dodać `DATABASE_URL` jako secret w GitHub → Settings → Secrets → Actions
-- Bez tego cron `senior-plus-monitor.yml` nie zaimportuje nowych danych do bazy
+- Bez tego cron `senior-plus-monitor.yml` nie zaimportuje nowych danych do bazy Neon
 
-### 🔧 Senior+ — poprawki jakości danych
-- Pole `powiat` dla Senior+ jest teraz = JST (np. "Andrychów"), nie nazwa powiatu
-- Należy uzupełnić mapowanie JST → powiat (np. "Andrychów" → "wadowicki")
-- Skrypt: `scripts/import-senior-plus.py` → funkcja `get_powiat_from_jst()`
+### ✅ MDDPS Kraków — ZAIMPORTOWANE (sesja #18)
+- 16 placówek: 6 Domy (→ Dzienny Dom Senior+) + 10 Kluby (→ Klub Senior+)
+- jst_nazwa = 'Miasto Kraków (MDDPS)' dla wszystkich 16
+- Monitoring BIP: `bip.krakow.pl/?dok_id=78643&vReg=1` — ostatnia zmiana 2023-03-20 (nie pali się)
+- Skrypt: `scripts/import-mddps-krakow.py`
+
+### ✅ ŚDS usunięte z UI — ZROBIONE (sesja #18)
+- Hero, wyszukiwarka, filtry, asystent, kafelki, kalkulator — ŚDS niewidoczne dla użytkownika
+- Dane w DB i artykuły edukacyjne — zachowane
+
+### ✅ FacilityTypeCards — ZROBIONE (sesja #18)
+- Nowa sekcja landingu: DPS / Klub Seniora / DD Senior+ (3 kafelki, zdjęcia jako tło)
+- "Klub Seniora" = etykieta w UI (w DB: typ_placowki='Klub Senior+')
+
+### ⚠️ Monitoring MDDPS Kraków — do zrobienia
+- GitHub Action scraper: sprawdza datę w `bip.krakow.pl/?dok_id=78643&vReg=1`
+- Gdy zmiana → GitHub Issue do ręcznej weryfikacji
+- Niski priorytet (ostatnia zmiana 2023-03-20)
+
+### ⚠️ Tarnów / Nowy Sącz — niezbadane
+- Czy mają własne miejskie odpowiedniki DD Senior+ poza programem MRPiPS? (jak Kraków MDDPS)
 
 ---
 
-Ostatnia aktualizacja: 2026-05-16
+Ostatnia aktualizacja: 2026-05-17

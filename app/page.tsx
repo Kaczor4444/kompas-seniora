@@ -10,11 +10,11 @@ export default async function Home() {
   // 📊 Fetch real-time facility count, per-powiat breakdown, and featured articles
   const [totalFacilities, allFacilities, featuredArticles] = await Promise.all([
     prisma.placowka.count({
-      where: getVoivodeshipFilter()
+      where: { ...getVoivodeshipFilter(), typ_placowki: { not: 'ŚDS' } }
     }),
     prisma.placowka.findMany({
       where: getVoivodeshipFilter(),
-      select: { powiat: true, miejscowosc: true }
+      select: { powiat: true, miejscowosc: true, typ_placowki: true }
     }),
     getFeaturedArticlesForHome(),
   ]);
@@ -57,5 +57,22 @@ export default async function Home() {
     powiatCounts['Tarnów'] = tarnowCity;
   }
 
-  return <HomeClient totalFacilities={totalFacilities} powiatCounts={powiatCounts} featuredArticles={featuredArticles} />;
+  const typeCounts = {
+    DPS: allFacilities.filter(f => f.typ_placowki === 'DPS').length,
+    SDS: allFacilities.filter(f => f.typ_placowki === 'ŚDS').length,
+    KlubSenior: allFacilities.filter(f => f.typ_placowki === 'Klub Senior+').length,
+    DDSenior: allFacilities.filter(f => f.typ_placowki === 'Dzienny Dom Senior+').length,
+  };
+
+  const powiatCountsByType: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>> = {
+    DPS: {}, KlubSenior: {}, DDSenior: {}
+  };
+  for (const f of allFacilities) {
+    if (!f.powiat) continue;
+    if (f.typ_placowki === 'DPS') powiatCountsByType.DPS[f.powiat] = (powiatCountsByType.DPS[f.powiat] || 0) + 1;
+    else if (f.typ_placowki === 'Klub Senior+') powiatCountsByType.KlubSenior[f.powiat] = (powiatCountsByType.KlubSenior[f.powiat] || 0) + 1;
+    else if (f.typ_placowki === 'Dzienny Dom Senior+') powiatCountsByType.DDSenior[f.powiat] = (powiatCountsByType.DDSenior[f.powiat] || 0) + 1;
+  }
+
+  return <HomeClient totalFacilities={totalFacilities} powiatCounts={powiatCounts} featuredArticles={featuredArticles} typeCounts={typeCounts} powiatCountsByType={powiatCountsByType} />;
 }

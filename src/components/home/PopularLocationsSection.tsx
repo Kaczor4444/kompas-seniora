@@ -11,7 +11,6 @@ interface CityData {
   slug: string;
   count: number;
   voivodeship: string;
-  avgCost?: number;
 }
 
 export default function PopularLocationsSection() {
@@ -25,7 +24,6 @@ export default function PopularLocationsSection() {
         const data = await response.json();
 
         if (data.success && data.data.byCities) {
-          const avgCostMap: Record<string, number> = data.data.cityAvgCost || {};
           const citiesWithCounts = POPULAR_CITIES_CONFIG.map(config => {
             const cityStats = data.data.byCities.find(
               (city: { name: string; count: number }) =>
@@ -37,7 +35,6 @@ export default function PopularLocationsSection() {
               slug: config.slug,
               count: cityStats?.count || 0,
               voivodeship: config.voivodeship,
-              avgCost: avgCostMap[config.name] || undefined,
             };
           });
 
@@ -73,10 +70,10 @@ export default function PopularLocationsSection() {
   }, []);
 
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="py-10 md:py-16 bg-stone-50 border-t border-stone-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-14 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 border border-stone-100">
               <MapPin size={12} className="text-primary-600" aria-hidden="true" />
@@ -86,7 +83,7 @@ export default function PopularLocationsSection() {
               <span className="text-emerald-600">Największe</span> ośrodki opieki
             </h2>
             <p className="mt-4 text-slate-500 text-base md:text-lg font-medium">
-              Miasta z najszerszą ofertą placówek DPS i ŚDS w Małopolsce.
+              Miasta z największą liczbą placówek opieki w Małopolsce.
             </p>
           </div>
           <Link
@@ -97,7 +94,7 @@ export default function PopularLocationsSection() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
           {isLoading ? (
             // Loading skeleton
             POPULAR_CITIES_CONFIG.map((config) => (
@@ -121,7 +118,6 @@ export default function PopularLocationsSection() {
                 name={city.name}
                 slug={city.slug}
                 count={city.count}
-                avgCost={city.avgCost}
               />
             ))
           )}

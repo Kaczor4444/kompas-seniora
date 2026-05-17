@@ -386,7 +386,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <div className="flex gap-2 flex-wrap">
           <TypeChip active={selectedType === 'Wszystkie'} label="Wszystkie" onClick={() => setSelectedType('Wszystkie')} />
           <TypeChip active={selectedType === 'DPS'} label="DPS" sub="Całodobowe" onClick={() => setSelectedType('DPS')} />
-          <TypeChip active={selectedType === 'ŚDS'} label="ŚDS" sub="Dzienne" onClick={() => setSelectedType('ŚDS')} />
           <TypeChip active={selectedType === 'Klub Senior+'} label="Klub Senior+" sub="Aktywność" onClick={() => setSelectedType('Klub Senior+')} />
           <TypeChip active={selectedType === 'Dzienny Dom Senior+'} label="DD Senior+" sub="Dzienny" onClick={() => setSelectedType('Dzienny Dom Senior+')} />
         </div>

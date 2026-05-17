@@ -14,15 +14,9 @@ export async function GET() {
 
     const facilitiesByCity = await prisma.placowka.groupBy({
       by: ['miejscowosc'],
-      where: getVoivodeshipFilter(),
+      where: getVoivodeshipFilter({ typ_placowki: { not: 'ŚDS' } }),
       _count: { id: true },
       orderBy: { _count: { id: 'desc' } },
-    });
-
-    const avgCostByCity = await prisma.placowka.groupBy({
-      by: ['miejscowosc'],
-      where: getVoivodeshipFilter({ koszt_pobytu: { not: null } }),
-      _avg: { koszt_pobytu: true },
     });
 
     const voivodeshipStats = facilitiesByVoivodeship.reduce((acc, item) => {
@@ -43,16 +37,8 @@ export async function GET() {
       .sort((a, b) => b.count - a.count);
 
     const totalFacilities = await prisma.placowka.count({
-      where: getVoivodeshipFilter()
+      where: getVoivodeshipFilter({ typ_placowki: { not: 'ŚDS' } })
     });
-
-    const cityAvgCostMap: Record<string, number> = {};
-    for (const item of avgCostByCity) {
-      if (item._avg.koszt_pobytu) {
-        const key = item.miejscowosc.trim();
-        cityAvgCostMap[key] = Math.round(item._avg.koszt_pobytu);
-      }
-    }
 
     return NextResponse.json({
       success: true,
@@ -61,7 +47,6 @@ export async function GET() {
         byVoivodeship: voivodeshipStats,
         byCities: cityStats,
         topCities: cityStats.slice(0, 10),
-        cityAvgCost: cityAvgCostMap,
       },
     });
 

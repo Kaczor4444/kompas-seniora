@@ -49,8 +49,6 @@ const ALL_CARE_PROFILES = [
   { value: "I", label: "Niepełnosprawni fizycznie" },
   { value: "G", label: "Dzieci niepełnosprawne" },
   { value: "H", label: "Młodzież niepełnosprawna" },
-  { value: "B", label: "Zaburzenia psychiczne (ŚDS)" },
-  { value: "D", label: "Podeszły wiek (ŚDS)" },
 ];
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({
@@ -98,7 +96,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           options={[
             { value: "all", label: "Wszystkie" },
             { value: "DPS", label: "DPS (Całodobowe)" },
-            { value: "ŚDS", label: "ŚDS (Dzienne)" },
             { value: "Klub Senior+", label: "Klub Senior+" },
             { value: "Dzienny Dom Senior+", label: "Dzienny Dom Senior+" },
           ]}

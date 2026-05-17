@@ -25,7 +25,7 @@ import {
 
 interface SupportAssistantProps {
   onFacilityClick?: (id: number) => void;
-  onSearchRedirect?: (type: 'DPS' | 'ŚDS' | 'Wszystkie', location: string) => void;
+  onSearchRedirect?: (type: 'DPS' | 'Wszystkie', location: string) => void;
   prefilledLocation?: string;
 }
 
@@ -41,9 +41,7 @@ const LOADING_MESSAGES = [
 
 const DIAGNOSIS_OPTIONS = [
   { id: 'demencja', label: 'Demencja / Alzheimer', icon: <Brain size={18} /> },
-  { id: 'psychiatryczne', label: 'Schorzenia psychiatryczne', icon: <Activity size={18} /> },
-  { id: 'upośledzenie', label: 'Upośledzenie intelektualne', icon: <User size={18} /> },
-  { id: 'ruchowa', label: 'Choroba przewlekła (udar, Parkinson, SM)', icon: <Accessibility size={18} /> },
+  { id: 'ruchowa', label: 'Choroba ruchowa (udar, Parkinson, SM)', icon: <Accessibility size={18} /> },
   { id: 'inne', label: 'Inne schorzenia przewlekłe', icon: <Info size={18} /> }
 ];
 
@@ -137,13 +135,9 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
 
   // Derive early type recommendation from partial answers
   const earlyType = useMemo(() => {
-    if (answers.diagnosis === 'ruchowa') return 'DPS';
-    if (answers.independence === 'red' || answers.mode === 'full') return 'DPS';
-    if (answers.mode === 'day' && (
-      answers.diagnosis === 'psychiatryczne' ||
-      answers.diagnosis === 'upośledzenie' ||
-      answers.diagnosis === 'demencja'
-    )) return 'ŚDS';
+    if (answers.diagnosis === 'ruchowa' || answers.independence === 'red' || answers.mode === 'full') return 'DPS';
+    if (answers.mode === 'day' || answers.independence === 'green') return 'Klub Senior+';
+    if (answers.independence === 'yellow') return 'Dzienny Dom Senior+';
     return null;
   }, [answers.diagnosis, answers.mode, answers.independence]);
 
@@ -263,64 +257,46 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
     return forms[who] || 'Bliska osoba';
   };
 
-  const recommendation = useMemo((): 'DPS' | 'ŚDS' | 'mops' => {
-    // Physical disability → DPS
+  const recommendation = useMemo((): 'DPS' | 'klubSenior' | 'ddSenior' | 'mops' => {
+    // Choroba ruchowa lub stała opieka lub tryb całodobowy → DPS
     if (answers.diagnosis === 'ruchowa') return 'DPS';
-    // 24/7 care needed → DPS
     if (answers.independence === 'red') return 'DPS';
-    // Full-time mode → DPS (for any diagnosis)
     if (answers.mode === 'full') return 'DPS';
-    // ŚDS: qualifying diagnoses + day mode
-    // psychiatryczne/upośledzenie → statutory ŚDS Typ A/B
-    // demencja + day → ŚDS Typ C (early/mild dementia, returns home at night)
-    if (answers.mode === 'day' && (
-      answers.diagnosis === 'psychiatryczne' ||
-      answers.diagnosis === 'upośledzenie' ||
-      answers.diagnosis === 'demencja'
-    )) return 'ŚDS';
-    // Everything else → MOPS consultation
+    // Demencja zaawansowana (stała opieka) → DPS; wczesna (dzienna) → DD Senior+
+    if (answers.diagnosis === 'demencja' && (answers.mode as string) === 'full') return 'DPS';
+    if (answers.diagnosis === 'demencja' && (answers.mode as string) === 'day') return 'ddSenior';
+    // Samodzielny senior, tryb dzienny → Klub Senior+
+    if (answers.independence === 'green' && (answers.mode as string) !== 'full') return 'klubSenior';
+    // Wymaga pomocy, tryb dzienny → Dzienny Dom Senior+
+    if (answers.independence === 'yellow' && answers.mode === 'day') return 'ddSenior';
+    // Inne schorzenia, unknown mode → MOPS
     return 'mops';
   }, [answers]);
 
-  // DPS type label based on diagnosis (from article: typy-dps.mdx)
   const dpsTypeLabel = useMemo(() => {
-    if (answers.diagnosis === 'psychiatryczne') return 'DPS psychiatryczny';
-    if (answers.diagnosis === 'upośledzenie') return 'DPS dla niepełnosprawnych';
     if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny';
     if (answers.diagnosis === 'demencja') return 'DPS dla seniorów';
-    return 'Pobyt całodobowy (DPS)';
+    return 'Dom Pomocy Społecznej (DPS)';
   }, [answers.diagnosis]);
 
-  // ŚDS type label - show Typ for demencja case
-  const sdsTypeLabel = useMemo(() => {
-    if (answers.diagnosis === 'demencja') return 'Dom Dzienny (ŚDS Typ C)';
-    if (answers.diagnosis === 'upośledzenie') return 'Dom Dzienny (ŚDS Typ B)';
-    if (answers.diagnosis === 'psychiatryczne') return 'Dom Dzienny (ŚDS Typ A)';
-    return 'Dom Dzienny (ŚDS)';
-  }, [answers.diagnosis]);
-
-  // DPS description based on diagnosis
   const dpsTypeDesc = useMemo(() => {
-    if (answers.diagnosis === 'demencja') return 'Zaawansowana demencja (agresja, urojenia, brak orientacji) wymaga całodobowej opieki. Łagodna demencja z problemami z pamięcią → DPS dla seniorów; z zachowaniami psychotycznymi → DPS psychiatryczny. MOPS określi właściwy profil po wywiadzie.';
-    if (answers.diagnosis === 'psychiatryczne') return 'Placówka zapewnia stałą opiekę psychiatryczną, farmakoterapię, terapię indywidualną i grupową oraz bezpieczne, specjalistyczne otoczenie.';
-    if (answers.diagnosis === 'upośledzenie') return 'Placówka oferuje treningi samodzielności, terapię zajęciową i wsparcie psychologiczne. Celem jest rozwijanie niezależności i integracja społeczna.';
-    if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny specjalizuje się w intensywnej fizjoterapii, monitoringu medycznym i stałej pielęgnacji przy chorobach takich jak udar, Parkinson czy SM.';
-    return 'Zapewnia profesjonalną, całodobową opiekę medyczną oraz pełne bezpieczeństwo gdy niesamodzielność przekracza możliwości opieki domowej.';
+    if (answers.diagnosis === 'demencja') return 'Przy zaawansowanej demencji senior potrzebuje całodobowego nadzoru i specjalistycznej opieki pielęgniarskiej. DPS dla seniorów lub DPS psychiatryczny — MOPS po wywiadzie określi właściwy profil.';
+    if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny specjalizuje się w fizjoterapii, monitoringu medycznym i stałej pielęgnacji. Odpowiedni przy udarze, chorobie Parkinsona lub SM gdy opieka domowa przestała wystarczać.';
+    return 'Całodobowa placówka zapewniająca zakwaterowanie, wyżywienie i stałą opiekę pielęgniarską. Właściwa gdy niesamodzielność przekracza możliwości rodziny i opieki domowej.';
   }, [answers.diagnosis]);
 
-  // ŚDS description - contextual
-  const sdsTypeDesc = useMemo(() => {
-    if (answers.diagnosis === 'demencja') return 'ŚDS Typ C to opieka dzienna dla seniorów z łagodną demencją lub otępieniem. Senior uczestniczy w zajęciach aktywizujących i terapii przez kilka godzin — wieczorem wraca do domu. To rozwiązanie zanim zajdzie potrzeba przeprowadzki do DPS.';
-    if (answers.diagnosis === 'upośledzenie') return 'ŚDS Typ B to placówka wsparcia dziennego dla osób z niepełnosprawnością intelektualną. Uczestnicy rozwijają samodzielność przez terapię zajęciową i treningi społeczne, a wieczorem wracają do domu.';
-    return 'ŚDS to placówka wsparcia dziennego dla osób z zaburzeniami psychicznymi lub niepełnosprawnością intelektualną. Uczestnicy korzystają z terapii w ciągu dnia, a na noc wracają do domu.';
+  const klubSeniorDesc = useMemo(() => {
+    return 'Klub Senior+ to bezpłatne miejsce codziennych zajęć dla aktywnych seniorów — warsztaty, wycieczki, sport, integracja. Nie wymaga skierowania z MOPS ani diagnozy lekarskiej. Wystarczy zadzwonić i zapisać się bezpośrednio w ośrodku.';
+  }, []);
+
+  const ddSeniorDesc = useMemo(() => {
+    if (answers.diagnosis === 'demencja') return 'Dzienny Dom Senior+ jest przeznaczony dla seniorów sprawnych w samoobsłudze — przy demencji decyzję podejmuje lokalny OPS po wywiadzie środowiskowym. Wczesna demencja bywa akceptowana, umiarkowana lub zaawansowana raczej nie. Skonsultuj z lekarzem i MOPS czy stan zdrowia kwalifikuje do tej formy. Alternatywą jest DPS.';
+    return 'Dzienny Dom Senior+ oferuje opiekę, posiłki i zajęcia aktywizujące przez kilka godzin dziennie. Senior wraca na noc do domu. Bezpłatny, prowadzony przez gminy — bez skierowania z MOPS.';
   }, [answers.diagnosis]);
 
-  // Article subtitle based on DPS type
   const dpsArticleSubtitle = useMemo(() => {
-    if (answers.diagnosis === 'psychiatryczne') return 'DPS psychiatryczny — dla osób przewlekle psychicznie chorych';
-    if (answers.diagnosis === 'upośledzenie') return 'DPS dla niepełnosprawnych intelektualnie — treningi samodzielności';
     if (answers.diagnosis === 'ruchowa') return 'DPS rehabilitacyjny — dla osób z chorobami somatycznymi';
-    if (answers.diagnosis === 'demencja') return 'Zaawansowana demencja — DPS dla seniorów lub psychiatryczny?';
+    if (answers.diagnosis === 'demencja') return 'Demencja — kiedy DPS staje się koniecznością?';
     return 'Poznaj 6 typów DPS i sprawdź który pasuje do potrzeb';
   }, [answers.diagnosis]);
 
@@ -334,7 +310,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
 
   const handleShare = async () => {
     const shareTitle = "Kompas Seniora - Plan Wsparcia";
-    const recLabel = recommendation === 'DPS' ? 'Pobyt całodobowy (DPS)' : recommendation === 'ŚDS' ? 'Wsparcie dzienne (ŚDS)' : 'Konsultacja z MOPS';
+    const recLabel = recommendation === 'DPS' ? 'Pobyt całodobowy (DPS)' : recommendation === 'klubSenior' ? 'Klub Senior+' : recommendation === 'ddSenior' ? 'Dzienny Dom Senior+' : 'Konsultacja z MOPS';
     const shareText = `Cześć, wygenerowałem plan wsparcia dla osoby bliskiej (${getProperFormSummary(answers.who)}) na kompaseniora.pl. Rekomendacja dla ${answers.location || 'naszego regionu'}: ${recLabel}.`;
     const shareUrl = window.location.href;
 
@@ -420,7 +396,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
               Dopasuj pomoc <br/> do potrzeb bliskiej osoby.
             </h2>
             <p className="text-slate-500 text-xl max-w-2xl mx-auto mb-14 leading-relaxed">
-              Odpowiedz na 4 pytania o potrzeby seniora - podpowiemy która forma opieki DPS czy ŚDS będzie właściwa.
+              Odpowiedz na 4 pytania o potrzeby seniora — podpowiemy właściwą formę opieki i pokażemy placówki w Twojej okolicy.
             </p>
             <button
               onClick={() => handleNext('who')}
@@ -640,10 +616,10 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                 </div>
 
                 {/* Sekcja Rekomendacji - Adaptive Hero */}
-                <div className={`p-6 md:p-16 lg:p-24 text-white relative text-center md:text-left overflow-hidden ${recommendation === 'mops' ? 'bg-amber-900' : 'bg-slate-900'}`}>
+                <div className={`p-6 md:p-16 lg:p-24 text-white relative text-center md:text-left overflow-hidden ${recommendation === 'mops' ? 'bg-amber-900' : recommendation === 'klubSenior' ? 'bg-emerald-800' : recommendation === 'ddSenior' ? 'bg-orange-900' : 'bg-slate-900'}`}>
                    <div className={`absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 rounded-full blur-[80px] md:blur-[120px] -mr-20 md:-mr-40 -mt-20 md:-mt-40 ${recommendation === 'mops' ? 'bg-amber-500/10' : 'bg-primary-500/10'}`} />
                    <div className="relative z-10 max-w-4xl">
-                      <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 md:mb-8 border ${recommendation === 'mops' ? 'bg-amber-500/20 text-amber-300 border-amber-500/20' : 'bg-primary-500/20 text-primary-400 border-primary-500/20'}`}>
+                      <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 md:mb-8 border ${recommendation === 'mops' ? 'bg-amber-500/20 text-amber-300 border-amber-500/20' : 'bg-white/10 text-white/70 border-white/20'}`}>
                          {recommendation === 'mops' ? <HelpCircle size={14} /> : <Star size={14} />}
                          {recommendation === 'mops' ? 'Zalecamy konsultację' : 'Polecamy'}
                       </div>
@@ -651,18 +627,22 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                          {recommendation === 'mops' ? (
                            <>Najpierw skontaktuj się<br className="hidden md:block" />
                            <span className="text-amber-400 italic">z MOPS w Twoim mieście</span></>
-                         ) : recommendation === 'ŚDS' ? (
-                           <>Najlepsza opcja to <br className="hidden md:block" />
-                           <span className="text-primary-400 italic">{sdsTypeLabel}</span></>
+                         ) : recommendation === 'klubSenior' ? (
+                           <>Najlepsza opcja to<br className="hidden md:block" />
+                           <span className="text-emerald-300 italic">Klub Senior+</span></>
+                         ) : recommendation === 'ddSenior' ? (
+                           <>Najlepsza opcja to<br className="hidden md:block" />
+                           <span className="text-orange-300 italic">Dzienny Dom Senior+</span></>
                          ) : (
-                           <>Najlepsza opcja to <br className="hidden md:block" />
+                           <>Najlepsza opcja to<br className="hidden md:block" />
                            <span className="text-primary-400 italic">{dpsTypeLabel}</span></>
                          )}
                       </h3>
-                      <p className="text-slate-400 text-base md:text-xl leading-relaxed opacity-90 max-w-2xl">
-                         {recommendation === 'ŚDS' && sdsTypeDesc}
+                      <p className="text-slate-300 text-base md:text-xl leading-relaxed opacity-90 max-w-2xl">
+                         {recommendation === 'klubSenior' && klubSeniorDesc}
+                         {recommendation === 'ddSenior' && ddSeniorDesc}
                          {recommendation === 'DPS' && dpsTypeDesc}
-                         {recommendation === 'mops' && "Pracownik socjalny MOPS oceni potrzeby, przeprowadzi wywiad środowiskowy i wskaże właściwą formę pomocy — DPS, ŚDS lub opiekę domową."}
+                         {recommendation === 'mops' && "Pracownik socjalny MOPS oceni potrzeby, przeprowadzi wywiad środowiskowy i wskaże właściwą formę pomocy — DPS, opieka domowa lub inna forma wsparcia."}
                       </p>
                    </div>
                 </div>
@@ -741,7 +721,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                   if (answers.location) p.set('q', answers.location);
                                   if (resolvedPowiat) p.set('powiat', resolvedPowiat);
                                   if (recommendation === 'DPS') p.set('type', 'dps');
-                                  if (recommendation === 'ŚDS') p.set('type', 'śds');
+                                  if (recommendation === 'klubSenior') p.set('type', 'klub-senior');
+                                  if (recommendation === 'ddSenior') p.set('type', 'dzienny-dom-senior');
                                   window.location.href = `/search?${p.toString()}`;
                                 }}
                                 className="p-6 md:p-8 rounded-2xl border border-stone-200 bg-white flex items-center justify-between group cursor-pointer hover:border-primary-500 transition-all shadow-sm"
@@ -763,12 +744,13 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                   if (answers.location) p.set('q', answers.location);
                                   if (resolvedPowiat) p.set('powiat', resolvedPowiat);
                                   if (recommendation === 'DPS') p.set('type', 'dps');
-                                  if (recommendation === 'ŚDS') p.set('type', 'śds');
+                                  if (recommendation === 'klubSenior') p.set('type', 'klub-senior');
+                                  if (recommendation === 'ddSenior') p.set('type', 'dzienny-dom-senior');
                                   window.location.href = `/search?${p.toString()}`;
                                 }}
                                 className="w-full py-4 md:py-5 bg-primary-600 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-primary-700 transition-all shadow-xl flex items-center justify-center gap-3"
                               >
-                                Przeglądaj wszystkie ({recommendation}) <ArrowUpRight size={16} />
+                                Przeglądaj placówki <ArrowUpRight size={16} />
                               </button>
                             </div>
                           </div>
@@ -780,19 +762,24 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                               </h4>
                             </div>
                             <div className="space-y-3 md:space-y-4">
-                              <ChecklistItem checked={checklist.includes('1')} onClick={() => toggleChecklist('1')} text="Pobierz wniosek o skierowanie w swoim OPS / MOPS" />
-                              {recommendation === 'ŚDS' && (answers.diagnosis === 'psychiatryczne' || answers.diagnosis === 'demencja' || answers.diagnosis === 'upośledzenie') ? (
+                              {(recommendation === 'klubSenior' || recommendation === 'ddSenior') ? (
                                 <>
-                                  <ChecklistItem checked={checklist.includes('sds-neurolog')} onClick={() => toggleChecklist('sds-neurolog')} text={answers.diagnosis === 'demencja' ? 'Zaświadczenie od psychiatry lub neurologa (wymagane do ŚDS)' : 'Zaświadczenie od psychiatry (wymagane do ŚDS)'} />
-                                  <ChecklistItem checked={checklist.includes('sds-poz')} onClick={() => toggleChecklist('sds-poz')} text="Zaświadczenie lekarza POZ o braku przeciwwskazań zdrowotnych" />
-                                  <ChecklistItem checked={checklist.includes('sds-orzeczenie')} onClick={() => toggleChecklist('sds-orzeczenie')} text="Orzeczenie o niepełnosprawności (jeśli nie ma — złóż wniosek do PCPR)" />
+                                  <ChecklistItem checked={checklist.includes('sp-1')} onClick={() => toggleChecklist('sp-1')} text="Znajdź placówkę w swojej gminie i zadzwoń bezpośrednio" />
+                                  <ChecklistItem checked={checklist.includes('sp-2')} onClick={() => toggleChecklist('sp-2')} text="Zapytaj o dostępność miejsc i harmonogram zajęć" />
+                                  <ChecklistItem checked={checklist.includes('sp-3')} onClick={() => toggleChecklist('sp-3')} text="Wypełnij formularz zgłoszeniowy — wystarczy dowód osobisty" />
+                                  {recommendation === 'ddSenior' && answers.diagnosis === 'demencja' && (
+                                    <ChecklistItem checked={checklist.includes('sp-4')} onClick={() => toggleChecklist('sp-4')} text="Skonsultuj z lekarzem czy stopień demencji kwalifikuje do DD Senior+" />
+                                  )}
                                 </>
                               ) : (
-                                <ChecklistItem checked={checklist.includes('2')} onClick={() => toggleChecklist('2')} text="Umów wizytę u lekarza POZ po zaświadczenie" />
+                                <>
+                                  <ChecklistItem checked={checklist.includes('1')} onClick={() => toggleChecklist('1')} text="Pobierz wniosek o skierowanie w swoim OPS / MOPS" />
+                                  <ChecklistItem checked={checklist.includes('2')} onClick={() => toggleChecklist('2')} text="Umów wizytę u lekarza POZ po zaświadczenie lekarskie" />
+                                  {answers.diagnosis && <ChecklistItem checked={checklist.includes('diag-doc')} onClick={() => toggleChecklist('diag-doc')} text={`Dokumentacja medyczna: ${DIAGNOSIS_OPTIONS.find(o => o.id === answers.diagnosis)?.label}`} />}
+                                  <ChecklistItem checked={checklist.includes('3')} onClick={() => toggleChecklist('3')} text="Przygotuj ostatnią decyzję o wysokości emerytury" />
+                                  <ChecklistItem checked={checklist.includes('4')} onClick={() => toggleChecklist('4')} text="Złóż komplet dokumentów w OPS/MOPS i czekaj na wywiad środowiskowy" />
+                                </>
                               )}
-                              {answers.diagnosis && <ChecklistItem checked={checklist.includes('diag-doc')} onClick={() => toggleChecklist('diag-doc')} text={`Dokumentacja medyczna: ${DIAGNOSIS_OPTIONS.find(o => o.id === answers.diagnosis)?.label}`} />}
-                              <ChecklistItem checked={checklist.includes('3')} onClick={() => toggleChecklist('3')} text="Przygotuj ostatnią decyzję o wysokości emerytury" />
-                              {recommendation === 'ŚDS' && <ChecklistItem checked={checklist.includes('sds-mops')} onClick={() => toggleChecklist('sds-mops')} text="Złóż komplet dokumentów w OPS/MOPS — pracownik socjalny wyda skierowanie" />}
                             </div>
                           </div>
                         </>
@@ -808,7 +795,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                          >
                             <h4 className={`text-xl md:text-2xl font-black flex items-center gap-3 ${recommendation === 'mops' ? 'text-amber-900' : 'text-primary-900'}`}>
                                <MessageSquare size={26} className={recommendation === 'mops' ? 'text-amber-600' : 'text-primary-600'} />
-                               {recommendation === 'mops' ? 'Pytania do pracownika MOPS' : 'Pytania do urzędnika'}
+                               {recommendation === 'mops' ? 'Pytania do pracownika MOPS' : (recommendation === 'klubSenior' || recommendation === 'ddSenior') ? 'Pytania do ośrodka' : 'Pytania do urzędnika'}
                             </h4>
                             <ChevronDown className={`transition-transform md:hidden ${recommendation === 'mops' ? 'text-amber-400' : 'text-primary-400'} ${isQuestionsExpanded ? 'rotate-180' : ''}`} />
                          </button>
@@ -821,15 +808,25 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                 <QuestionItem text="Ile czasu trwa przyznanie skierowania do DPS lub ŚDS?" />
                                 <QuestionItem text="Jakie dokumenty i zaświadczenia będą potrzebne?" />
                               </ul>
+                            ) : recommendation === 'klubSenior' ? (
+                              <ul className="space-y-6 md:space-y-8">
+                                <QuestionItem text="Ile miejsc jest dostępnych i jak długa jest lista oczekujących?" />
+                                <QuestionItem text="Ile dni w tygodniu działa klub i jakie są godziny otwarcia?" />
+                                <QuestionItem text="Jakie zajęcia są organizowane — sportowe, kulturalne, wyjazdowe?" />
+                                <QuestionItem text="Czy jest możliwość dojazdu lub czy placówka organizuje transport?" />
+                              </ul>
+                            ) : recommendation === 'ddSenior' ? (
+                              <ul className="space-y-6 md:space-y-8">
+                                <QuestionItem text="Ile godzin dziennie i ile dni w tygodniu działa ośrodek?" />
+                                <QuestionItem text="Czy zapewniony jest posiłek i opieka pielęgniarska w ciągu dnia?" />
+                                <QuestionItem text="Czy jest możliwość organizacji transportu do i z ośrodka?" />
+                                <QuestionItem text="Jakie dokumenty są potrzebne do zapisania się?" />
+                              </ul>
                             ) : (
                               <ul className="space-y-6 md:space-y-8">
                                 <QuestionItem text="Ile wynosi średni czas oczekiwania na wolne miejsce?" />
-                                {answers.diagnosis === 'demencja' && recommendation === 'DPS' && <QuestionItem text="Czy to DPS dla seniorów czy psychiatryczny — jak to oceniacie?" />}
-                                {answers.diagnosis === 'demencja' && recommendation === 'ŚDS' && <QuestionItem text="Czy to ŚDS Typ C? Ile dni w tygodniu i jakie godziny otwarcia?" />}
-                                {answers.diagnosis === 'psychiatryczne' && <QuestionItem text="Czy placówka ma kontrakt z psychiatrą i jak często przyjeżdża?" />}
+                                {answers.diagnosis === 'demencja' && <QuestionItem text="Czy to DPS dla seniorów czy psychiatryczny — jak to oceniacie?" />}
                                 {answers.diagnosis === 'ruchowa' && <QuestionItem text="Jak wygląda codzienny plan rehabilitacji i kto go prowadzi?" />}
-                                {answers.diagnosis === 'upośledzenie' && <QuestionItem text="Jakie treningi samodzielności i terapia zajęciowa są dostępne?" />}
-                                {recommendation === 'ŚDS' && <QuestionItem text="Ile dni w tygodniu działa ŚDS i jakie są godziny otwarcia?" />}
                                 <QuestionItem text="Czy senior kwalifikuje się do dodatku pielęgnacyjnego?" />
                                 <QuestionItem text="Jakie konkretnie dokumenty są wymagane w naszym powiecie?" />
                               </ul>
@@ -902,7 +899,7 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                 </Link>
                               </>
                             ) : (
-                              /* ŚDS */
+                              /* Klub Senior+ / DD Senior+ */
                               <>
                                 <Link
                                   href="/poradniki/wybor-opieki/wybor-placowki"
@@ -910,8 +907,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1">
-                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">DPS vs ŚDS — tabela różnic i wymagań</h5>
-                                      <p className="text-xs text-slate-500">Pobyt, cel, wymagania i koszty — porównanie</p>
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">Jak wybrać odpowiednią placówkę dla seniora?</h5>
+                                      <p className="text-xs text-slate-500">Kryteria wyboru, wizyta i czerwone flagi</p>
                                     </div>
                                     <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
                                   </div>
@@ -922,12 +919,8 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1">
-                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">6 Typów DPS — na wypadek gdy potrzeby wzrosną</h5>
-                                      <p className="text-xs text-slate-500">
-                                        {answers.diagnosis === 'demencja'
-                                          ? 'Gdy demencja się pogłębi — który DPS i co wówczas zrobić'
-                                          : 'Wiedz co dalej gdy tryb dzienny przestanie wystarczać'}
-                                      </p>
+                                      <h5 className="font-bold text-slate-900 text-sm mb-1 group-hover:text-primary-700">Kiedy Senior+ przestaje wystarczać?</h5>
+                                      <p className="text-xs text-slate-500">6 sygnałów że czas rozważyć DPS lub opiekę całodobową</p>
                                     </div>
                                     <ArrowUpRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0 mt-1" />
                                   </div>

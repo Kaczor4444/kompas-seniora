@@ -216,7 +216,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   // 🔧 OPTYMALIZACJA: Pobierz wszystkie placówki RAZ (zamiast 5x w różnych trybach)
   const allFacilities = await prisma.placowka.findMany({
-    where: getVoivodeshipFilter(),
+    where: getVoivodeshipFilter({ typ_placowki: { not: 'ŚDS' } }),
     orderBy: { nazwa: 'asc' },
     select: PUBLIC_PLACOWKA_SELECT,
   });
