@@ -498,8 +498,10 @@ export default function FacilityMap({
                                 {Math.round(facility.koszt_pobytu).toLocaleString('pl-PL')}
                                 <span style={{ fontSize: '12px', fontWeight: 500, color: '#64748b', marginLeft: '2px' }}>zł</span>
                               </>
-                            ) : (
+                            ) : facility.typ_placowki === 'ŚDS' || facility.typ_placowki?.includes('Senior+') ? (
                               <span style={{ color: '#10b981', fontSize: '16px' }}>Bezpłatne</span>
+                            ) : (
+                              <span style={{ color: '#94a3b8', fontSize: '14px', fontWeight: 600 }}>Zapytaj</span>
                             )}
                           </div>
                           {facility.koszt_pobytu && facility.koszt_pobytu > 0 && (

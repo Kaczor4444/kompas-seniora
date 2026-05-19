@@ -1,0 +1,46 @@
+name: Monitor — Rejestr DPS Śląskiego
+
+on:
+  schedule:
+    # 8. każdego miesiąca o 9:00 UTC (różny dzień od Małopolski: 1. i 5.)
+    - cron: '0 9 8 * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Wymuś sprawdzenie (symulacja zmiany)'
+        required: false
+        default: 'false'
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests urllib3
+
+      - name: Run monitor
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          FORCE_CHECK: ${{ github.event.inputs.force || 'false' }}
+        run: python scripts/monitor-dps-slaskie.py
+
+      - name: Commit updated sentinel (jeśli zmieniony)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add raw_dane/slaskie/.dps_slaskie_last_hash
+          git diff --staged --quiet || git commit -m "chore: aktualizacja sentinel DPS Śląskie [skip ci]"
+          git push || true

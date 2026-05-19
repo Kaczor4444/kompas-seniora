@@ -35,6 +35,27 @@ export function mapCityCountyToPowiat(powiat: string): string {
     return 'tarnowski';
   }
 
+  // ===== ŚLĄSKIE — 19 miast na prawach powiatu =====
+  if (normalized === 'm. bielsko-biala' || normalized === 'm. bielsko biala' || normalized === 'bielsko-biala') return 'm. Bielsko-Biała';
+  if (normalized === 'm. bytom' || normalized === 'bytom') return 'm. Bytom';
+  if (normalized === 'm. chorzow' || normalized === 'chorzow') return 'm. Chorzów';
+  if (normalized === 'm. czestochowa' || normalized === 'czestochowa') return 'm. Częstochowa';
+  if (normalized === 'm. dabrowa gornicza' || normalized === 'dabrowa gornicza') return 'm. Dąbrowa Górnicza';
+  if (normalized === 'm. gliwice' || normalized === 'gliwice') return 'm. Gliwice';
+  if (normalized === 'm. jastrzebie-zdro j' || normalized === 'm. jastrzebie zdro j' || normalized === 'jastrzebie-zdro j' || normalized === 'm. jastrzebie-zdroj' || normalized === 'jastrzebie zdro j') return 'm. Jastrzębie-Zdrój';
+  if (normalized === 'm. jaworzno' || normalized === 'jaworzno') return 'm. Jaworzno';
+  if (normalized === 'm. katowice' || normalized === 'katowice') return 'm. Katowice';
+  if (normalized === 'm. myslowice' || normalized === 'myslowice') return 'm. Mysłowice';
+  if (normalized === 'm. piekary slaskie' || normalized === 'piekary slaskie') return 'm. Piekary Śląskie';
+  if (normalized === 'm. ruda slaska' || normalized === 'ruda slaska') return 'm. Ruda Śląska';
+  if (normalized === 'm. rybnik' || normalized === 'rybnik') return 'm. Rybnik';
+  if (normalized === 'm. siemianowice slaskie' || normalized === 'siemianowice slaskie') return 'm. Siemianowice Śląskie';
+  if (normalized === 'm. sosnowiec' || normalized === 'sosnowiec') return 'm. Sosnowiec';
+  if (normalized === 'm. swietochlowice' || normalized === 'swietochlowice') return 'm. Świętochłowice';
+  if (normalized === 'm. tychy' || normalized === 'tychy') return 'm. Tychy';
+  if (normalized === 'm. zabrze' || normalized === 'zabrze') return 'm. Zabrze';
+  if (normalized === 'm. zory' || normalized === 'zory') return 'm. Żory';
+
   // Inne powiaty - bez zmian
   return powiat;
 }

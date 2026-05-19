@@ -52,7 +52,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
 
             {/* Subtitle */}
             <p className="text-slate-600 text-lg md:text-xl font-medium max-w-xl leading-relaxed border-l-4 border-emerald-100 pl-6">
-              Niezależny przewodnik po opiece i aktywności dla seniorów w <strong className="text-slate-900 font-black">Małopolsce</strong>. Formalności, finanse, placówki — krok po kroku.
+              Niezależny przewodnik po opiece i aktywności dla seniorów w <strong className="text-slate-900 font-black">Małopolsce i na Śląsku</strong>. Formalności, finanse, placówki — krok po kroku.
             </p>
 
             {/* Search block */}
@@ -148,7 +148,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
         <div className="mt-10 pt-8 border-t border-slate-100">
           <div className="grid grid-cols-3 gap-3 md:gap-6">
             <TrustItem icon={<ShieldCheck size={22} />} label="Źródło danych" value="Oficjalne BIP" />
-            <TrustItem icon={<Building2 size={22} />} label="Placówek w bazie" value={`${totalFacilities ?? 184} w Małopolsce`} />
+            <TrustItem icon={<Building2 size={22} />} label="Placówek w bazie" value={`${totalFacilities ?? 415} w Polsce`} />
             <TrustItem icon={<RefreshCw size={22} />} label="Aktualizacja" value="Stale aktualizowane" />
           </div>
         </div>

@@ -6,7 +6,7 @@
  */
 
 // Lista województw widocznych dla userów
-export const ENABLED_VOIVODESHIPS = ['małopolskie'] as const;
+export const ENABLED_VOIVODESHIPS = ['małopolskie', 'śląskie'] as const;
 
 // Typy wykluczone z głównej wyszukiwarki i liczników opieki.
 // ŚDS — ukryte z UI, zostają w DB.

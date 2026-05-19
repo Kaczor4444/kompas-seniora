@@ -7,16 +7,15 @@ import SearchResults from '@/components/SearchResults';
 import { calculateDistance } from '@/src/utils/distance';
 
 // 🚫 BLACKLISTA STOLIC POLSKI (zawsze poza obsługiwanym regionem)
-// Małopolska ma tylko wioski o tych nazwach - user na pewno szuka stolicy!
+// Zawiera tylko miasta które NIE są w żadnym obsługiwanym województwie.
+// ⚠️ NIE dodawaj tu miast Śląskich ani Małopolskich!
 const CAPITAL_CITIES_BLACKLIST = [
   'warszawa', 'lodz', 'wroclaw', 'poznan', 'gdansk', 'szczecin',
-  'bydgoszcz', 'lublin', 'katowice', 'bialystok', 'gdynia',
-  'czestochowa', 'radom', 'sosnowiec', 'torun', 'kielce',
-  'gliwice', 'zabrze', 'bytom', 'olsztyn', 'bielsko-biala',
-  'rzeszow', 'ruda slaska', 'rybnik', 'tychy', 'dabrowa gornicza',
-  'plock', 'elblag', 'opole', 'gorzow wielkopolski', 'wloclawek',
-  'zielona gora', 'tarnobrzeg', 'chorzow', 'koszalin', 'kalisz',
-  'legnica', 'grudziadz', 'slupsk', 'jaworzno', 'jastrzebie zdroj'
+  'bydgoszcz', 'lublin', 'bialystok', 'gdynia',
+  'radom', 'torun', 'kielce', 'olsztyn',
+  'rzeszow', 'plock', 'elblag', 'opole', 'gorzow wielkopolski', 'wloclawek',
+  'zielona gora', 'tarnobrzeg', 'koszalin', 'kalisz',
+  'legnica', 'grudziadz', 'slupsk',
 ];
 
 // Geocoding result with out-of-region detection
@@ -27,15 +26,35 @@ interface GeocodingResult {
   outOfRegion?: boolean; // true jeśli miasto poza obsługiwanymi województwami
 }
 
-// 🎯 HARDCODED współrzędne dla głównych miast Małopolski (centrum miasta!)
-// Gdy rozszerzamy na inne województwa - Nominatim automatycznie zadziała
+// 🎯 HARDCODED współrzędne dla głównych miast obsługiwanych województw (centrum miasta!)
 const CITY_CENTER_COORDS: Record<string, { lat: number; lng: number; wojewodztwo: string }> = {
-  'krakow': { lat: 50.0647, lng: 19.9450, wojewodztwo: 'małopolskie' },      // Rynek Główny
-  'tarnow': { lat: 50.0121, lng: 20.9877, wojewodztwo: 'małopolskie' },      // Rynek
-  'nowy sacz': { lat: 49.6247, lng: 20.6931, wojewodztwo: 'małopolskie' },   // Centrum
-  'oswiecim': { lat: 50.0374, lng: 19.2114, wojewodztwo: 'małopolskie' },    // Centrum
-  'wieliczka': { lat: 49.9836, lng: 20.0643, wojewodztwo: 'małopolskie' },   // Centrum
-  'olkusz': { lat: 50.2812, lng: 19.5608, wojewodztwo: 'małopolskie' },      // Rynek
+  // Małopolska
+  'krakow':    { lat: 50.0647, lng: 19.9450, wojewodztwo: 'małopolskie' },
+  'tarnow':    { lat: 50.0121, lng: 20.9877, wojewodztwo: 'małopolskie' },
+  'nowy sacz': { lat: 49.6247, lng: 20.6931, wojewodztwo: 'małopolskie' },
+  'oswiecim':  { lat: 50.0374, lng: 19.2114, wojewodztwo: 'małopolskie' },
+  'wieliczka': { lat: 49.9836, lng: 20.0643, wojewodztwo: 'małopolskie' },
+  'olkusz':    { lat: 50.2812, lng: 19.5608, wojewodztwo: 'małopolskie' },
+  // Śląskie — 19 miast na prawach powiatu
+  'katowice':         { lat: 50.2599, lng: 19.0216, wojewodztwo: 'śląskie' },
+  'czestochowa':      { lat: 50.8118, lng: 19.1203, wojewodztwo: 'śląskie' },
+  'sosnowiec':        { lat: 50.2863, lng: 19.1040, wojewodztwo: 'śląskie' },
+  'gliwice':          { lat: 50.2945, lng: 18.6714, wojewodztwo: 'śląskie' },
+  'zabrze':           { lat: 50.3248, lng: 18.7857, wojewodztwo: 'śląskie' },
+  'bytom':            { lat: 50.3484, lng: 18.9162, wojewodztwo: 'śląskie' },
+  'bielsko-biala':    { lat: 49.8224, lng: 19.0584, wojewodztwo: 'śląskie' },
+  'ruda slaska':      { lat: 50.2590, lng: 18.8564, wojewodztwo: 'śląskie' },
+  'rybnik':           { lat: 50.0971, lng: 18.5412, wojewodztwo: 'śląskie' },
+  'tychy':            { lat: 50.1357, lng: 18.9968, wojewodztwo: 'śląskie' },
+  'dabrowa gornicza': { lat: 50.3249, lng: 19.1887, wojewodztwo: 'śląskie' },
+  'chorzow':          { lat: 50.2974, lng: 18.9538, wojewodztwo: 'śląskie' },
+  'jaworzno':         { lat: 50.2051, lng: 19.2736, wojewodztwo: 'śląskie' },
+  'jastrzebie zdroj': { lat: 49.9557, lng: 18.5977, wojewodztwo: 'śląskie' },
+  'siemianowice slaskie': { lat: 50.3185, lng: 19.0185, wojewodztwo: 'śląskie' },
+  'myslowice':        { lat: 50.2272, lng: 19.1655, wojewodztwo: 'śląskie' },
+  'piekary slaskie':  { lat: 50.3844, lng: 18.9378, wojewodztwo: 'śląskie' },
+  'swietochlowice':   { lat: 50.2983, lng: 18.9185, wojewodztwo: 'śląskie' },
+  'zory':             { lat: 50.0572, lng: 18.7036, wojewodztwo: 'śląskie' },
 };
 
 async function geocodeCity(cityName: string, powiat?: string, woj?: string): Promise<GeocodingResult | null> {
