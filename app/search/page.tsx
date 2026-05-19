@@ -189,6 +189,7 @@ interface SearchPageProps {
     lng?: string;
     near?: string;
     city?: string;  // true when searching for city-only (miasta na prawach powiatu)
+    cn?: string;    // city name (from CityCard near=true click, for dynamic distance message)
   }>;
 }
 
@@ -217,6 +218,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const userLat = params.lat ? parseFloat(params.lat) : null;
   const userLng = params.lng ? parseFloat(params.lng) : null;
   const isNearSearch = params.near === 'true';
+  const nearCityParam = params.cn || null; // city name from CityCard near=true click
 
   console.log('🔍 SEARCH PAGE - Search params:', {
     query: query || '(empty)',
@@ -297,8 +299,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     // Klient filtruje suwakiem (domyślnie 30km, max 100km).
     // Dzięki temu suwak działa i liczba placówek rośnie przy zwiększaniu dystansu.
     if (wojewodztwo !== 'all') {
-      const inDefault = facilitiesWithDistance.filter(f => f.distance <= DEFAULT_RADIUS_KM).length;
-      message = `W promieniu ${DEFAULT_RADIUS_KM} km: ${inDefault} ${getPlacowkaForm(inDefault)}. Rozszerz suwak, aby zobaczyć więcej.`;
+      // Klient wygeneruje dynamiczny tekst z getCityGenitive z nearCityGenitive prop
+      message = '';
       results = facilitiesWithDistance; // wszystkie — klient filtruje suwakiem
     } else {
       // ✅ TRYB GEOLOKALIZACJA (woj='all') — GPS użytkownika, filtruj na serwerze
@@ -781,6 +783,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   // 🚫 NIE pokazuj searchCenter jeśli miasto jest poza obsługiwanym regionem
   const validSearchCenter = searchCenter && !searchCenter.outOfRegion ? searchCenter : null;
 
+  // Genitivus nazwy miasta dla dynamicznego komunikatu odległości (near=true, klik z CityCard)
+  const GENITIVE_MAP: Record<string, string> = {
+    'Kraków': 'Krakowa', 'Olkusz': 'Olkusza', 'Tarnów': 'Tarnowa',
+    'Nowy Sącz': 'Nowego Sącza', 'Zakopane': 'Zakopanego',
+    'Oświęcim': 'Oświęcimia', 'Wieliczka': 'Wieliczki',
+    'Wadowice': 'Wadowic', 'Chrzanów': 'Chrzanowa',
+    'Katowice': 'Katowic', 'Zabrze': 'Zabrza', 'Gliwice': 'Gliwic',
+    'Bytom': 'Bytomia', 'Częstochowa': 'Częstochowy', 'Cieszyn': 'Cieszyna',
+    'Sosnowiec': 'Sosnowca', 'Rybnik': 'Rybnika', 'Tychy': 'Tychów',
+    'Bielsko-Biała': 'Bielska-Białej', 'Chorzów': 'Chorzowa',
+  };
+  const nearCityGenitive = nearCityParam ? (GENITIVE_MAP[nearCityParam] ?? nearCityParam) : null;
+
   // ⚠️ WYKRYJ: user szukał stolicę Polski ALE wybrał z autocomplete (powiat znany)
   // Pokazujemy ostrzeżenie "to część wsi, nie stolica!"
   const normalizedQuery = normalizePolish(query).toLowerCase();
@@ -810,6 +825,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         isPartOfVillage: isCapitalCity && !!powiatParam // Flaguj że to część wsi o nazwie stolicy
       } : undefined}
       capitalCityWarning={capitalCityWarning}
+      nearCityGenitive={nearCityGenitive ?? undefined}
       userLocation={userLat && userLng ? { lat: userLat, lng: userLng } : undefined}
       powiatBreakdown={Object.keys(powiatBreakdown).length > 0 ? powiatBreakdown : undefined}
       powiatSearchCenters={Object.keys(powiatSearchCenters).length > 0 ? powiatSearchCenters : undefined}

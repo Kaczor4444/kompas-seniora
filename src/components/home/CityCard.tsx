@@ -20,7 +20,7 @@ const CityCard = memo(({ name, count, voivodeship, lat, lng }: CityCardProps) =>
     if (lat && lng && voivodeship && voivodeship !== 'małopolskie') {
       const woj = voivodeship.replace(/ą/g,'a').replace(/ę/g,'e').replace(/ó/g,'o')
         .replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z').replace(/ń/g,'n').replace(/ł/g,'l');
-      return `/search?lat=${lat}&lng=${lng}&near=true&woj=${woj}`;
+      return `/search?lat=${lat}&lng=${lng}&near=true&woj=${woj}&cn=${encodeURIComponent(name)}`;
     }
     // Małopolskie → city=true (szukaj tylko w tym mieście, sprawdzone zachowanie)
     return `/search?q=${encodeURIComponent(name)}&city=true`;

@@ -114,6 +114,7 @@ interface SearchResultsProps {
     cityName: string;
     powiat: string;
   };
+  nearCityGenitive?: string; // genitivus nazwy miasta (np. "Katowic") dla dynamicznego komunikatu suwaka
 }
 
 
@@ -131,6 +132,7 @@ export default function SearchResults({
   powiatSearchCenters,
   initialView = 'list',
   capitalCityWarning,
+  nearCityGenitive,
 }: SearchResultsProps) {
 
   const router = useRouter();
@@ -1074,7 +1076,17 @@ export default function SearchResults({
             {/* Results Count */}
             {facilities.length > 0 && (
               <div className="mb-6">
-                {message ? (
+                {userLocation && nearCityGenitive ? (
+                  // Dynamiczny komunikat przy kliknięciu miasta (suwak zmienia liczby w czasie rzeczywistym)
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                    {(() => {
+                      const count = facilities.length;
+                      const dist = maxDistance;
+                      const form = count === 1 ? 'placówka' : (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) ? 'placówki' : 'placówek';
+                      return `W promieniu ${dist} km od ${nearCityGenitive} znajduje się ${count} ${form}. Zwiększ odległość, aby zobaczyć więcej placówek.`;
+                    })()}
+                  </h2>
+                ) : message ? (
                   <h2 className="text-2xl font-black text-slate-900 tracking-tight">
                     {message}
                   </h2>
