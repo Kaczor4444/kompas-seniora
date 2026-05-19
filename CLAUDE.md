@@ -371,6 +371,10 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **cffa01e** (2026-05-19): fix: CityCard — dodaje woj=slaskie do URL śląskich miast
+  - Filtr województwa teraz auto-wybiera "Śląskie" gdy klik na śląskie miasto
+  - CityCard otrzymuje prop `voivodeship` i dokłada `?woj=slaskie` do URL
+
 - **a162da3** (2026-05-19): feat: PopularLocations + FacilityTypeCards multi-voivodeship
   - `popular-cities.ts`: +6 śląskich miast (Katowice, Zabrze, Gliwice, Bytom, Częstochowa, Cieszyn)
   - `PopularLocationsSection`: tekst "w Małopolsce" → "w Małopolsce i na Śląsku"
