@@ -218,13 +218,28 @@ export default function SearchResults({
     "krakowski", "limanowski", "miechowski", "myślenicki", "nowosądecki",
     "nowotarski", "olkuski", "oświęcimski", "proszowicki", "suski",
     "tarnowski", "tatrzański", "wadowicki", "wielicki",
-    // Note: miasta na prawach powiatu (m. Kraków, m. Nowy Sącz, m. Tarnów) są mapowane
-    // na odpowiadające im powiaty ziemskie (krakowski, nowosądecki, tarnowski)
-    // w app/search/page.tsx, więc nie są potrzebne tutaj jako osobne opcje
   ];
+  const ALL_SLASKIE_POWIATS = [
+    // Powiaty ziemskie
+    "będziński", "bielski", "cieszyński", "częstochowski", "gliwicki",
+    "kłobucki", "lubliniecki", "mikołowski", "myszkowski", "pszczyński",
+    "raciborski", "rybnicki", "tarnogórski", "bieruńsko-lędziński",
+    "wodzisławski", "zawierciański", "żywiecki",
+    // Miasta na prawach powiatu
+    "m. Bielsko-Biała", "m. Bytom", "m. Chorzów", "m. Częstochowa",
+    "m. Dąbrowa Górnicza", "m. Gliwice", "m. Jastrzębie-Zdrój", "m. Jaworzno",
+    "m. Katowice", "m. Mysłowice", "m. Piekary Śląskie", "m. Ruda Śląska",
+    "m. Rybnik", "m. Siemianowice Śląskie", "m. Sosnowiec", "m. Świętochłowice",
+    "m. Tychy", "m. Zabrze", "m. Żory",
+  ];
+
+  const defaultPowiats = selectedVoivodeship === 'śląskie'
+    ? ALL_SLASKIE_POWIATS
+    : ALL_MALOPOLSKA_POWIATS;
+
   const availablePowiats = terytPowiats && terytPowiats.length > 0
     ? ["Wszystkie", ...Array.from(new Set(terytPowiats.map(mapCityCountyToPowiat)))]
-    : ["Wszystkie", ...ALL_MALOPOLSKA_POWIATS];
+    : ["Wszystkie", ...defaultPowiats];
 
   // Dynamiczne profile — tylko te kody które faktycznie występują w wynikach
   const availableProfiles = useMemo(() => {
@@ -839,11 +854,16 @@ export default function SearchResults({
               <div>
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Województwo</label>
                 <select
-                  value="Małopolskie"
-                  disabled
-                  className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-lg text-sm font-bold text-slate-600 cursor-not-allowed"
+                  value={selectedVoivodeship}
+                  onChange={(e) => {
+                    setSelectedVoivodeship(e.target.value);
+                    setSelectedPowiat("Wszystkie");
+                  }}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 transition-colors"
                 >
-                  <option value="Małopolskie">Małopolskie</option>
+                  <option value="Wszystkie">Wszystkie</option>
+                  <option value="małopolskie">Małopolskie</option>
+                  <option value="śląskie">Śląskie</option>
                 </select>
               </div>
 
