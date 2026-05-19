@@ -366,6 +366,88 @@ const defaultPowiats = selectedVoivodeship === 'śląskie'
 <option value="nowe-województwo">NoweWojewództwo</option>
 ```
 
+### 6f. PopularLocationsSection — dodaj miasta nowego województwa
+
+```typescript
+// lib/popular-cities.ts — POPULAR_CITIES_CONFIG
+// Dodaj po sekcji śląskiej:
+{ name: 'Wrocław',  slug: 'wroclaw',  voivodeship: 'dolnośląskie' },
+{ name: 'Legnica',  slug: 'legnica',  voivodeship: 'dolnośląskie' },
+// ... wybierz 4–6 największych miast nowego województwa
+```
+
+Liczby placówek są pobierane **dynamicznie** z `/api/stats` — nie musisz ich hardcodować.  
+Miasta są wyświetlane posortowane malejąco wg liczby placówek, więc "puste" miasta (0 placówek) odpadają na dół.
+
+Zaktualizuj tekst sekcji:
+```tsx
+// src/components/home/PopularLocationsSection.tsx
+<p className="mt-4 ...">
+  Miasta z największą liczbą placówek opieki w Małopolsce, na Śląsku i w NoweWoj.
+</p>
+```
+
+**CityCard automatycznie doda `woj=XXXX` do URL** — dzięki temu klik na miasto nowego województwa od razu pre-selekcjonuje właściwe województwo w filtrach wyszukiwarki. Upewnij się że `woj` dla nowego województwa jest w mapie w `app/search/page.tsx`:
+
+```typescript
+// app/search/page.tsx — wojewodztwoMap
+const wojewodztwoMap: Record<string, string> = {
+  'malopolskie': 'małopolskie',
+  'slaskie': 'śląskie',
+  'dolnoslaskie': 'dolnośląskie',  // ← dodaj
+  // ...
+};
+```
+
+I że CityCard obsługuje nowy slug województwa:
+```typescript
+// src/components/home/CityCard.tsx — getCitySearchUrl()
+// Obecna logika: dodaje woj=X dla wszystkich woj != małopolskie
+// Wystarczy że voivodeship prop jest przekazane — reszta działa automatycznie
+if (voivodeship && voivodeship !== 'małopolskie') {
+  params.set('woj', normalizeWojSlug(voivodeship)); // dolnośląskie → dolnoslaskie
+}
+```
+
+Dodaj normalizację slug jeśli brakuje:
+```typescript
+function normalizeWojSlug(woj: string): string {
+  return woj.toLowerCase()
+    .replace(/ą/g,'a').replace(/ę/g,'e').replace(/ó/g,'o').replace(/ś/g,'s')
+    .replace(/ź/g,'z').replace(/ż/g,'z').replace(/ń/g,'n').replace(/ł/g,'l')
+    .replace(/ć/g,'c');
+}
+```
+
+### 6g. FacilityTypeCards — zsumuj liczniki ze wszystkich województw
+
+`FacilityTypeCards` pokazuje łączną liczbę placówek każdego typu. Po dodaniu nowego województwa zaktualizuj sumowanie w `HomeClient.tsx`:
+
+```tsx
+// src/components/HomeClient.tsx
+<FacilityTypeCards typeCounts={{
+  DPS:        typeCounts.DPS        + typeCountsSlaskie.DPS        + typeCountsNoweWoj.DPS,
+  SDS:        typeCounts.SDS        + typeCountsSlaskie.SDS        + typeCountsNoweWoj.SDS,
+  KlubSenior: typeCounts.KlubSenior + typeCountsSlaskie.KlubSenior + typeCountsNoweWoj.KlubSenior,
+  DDSenior:   typeCounts.DDSenior   + typeCountsSlaskie.DDSenior   + typeCountsNoweWoj.DDSenior,
+  UTW:        typeCounts.UTW        + typeCountsSlaskie.UTW        + typeCountsNoweWoj.UTW,
+}} />
+```
+
+Dane `typeCountsNoweWoj` oblicz w `app/page.tsx` analogicznie do `typeCountsSlaskie`:
+```typescript
+const noweWoj = allFacilities.filter(f => f.wojewodztwo === 'nowe-województwo');
+const typeCountsNoweWoj = {
+  DPS:        noweWoj.filter(f => f.typ_placowki === 'DPS').length,
+  SDS:        0,
+  KlubSenior: noweWoj.filter(f => f.typ_placowki === 'Klub Senior+').length,
+  DDSenior:   noweWoj.filter(f => f.typ_placowki === 'Dzienny Dom Senior+').length,
+  UTW:        0,
+};
+```
+
+I przekaż przez `HomeClient` props (tak jak `typeCountsSlaskie`).
+
 ---
 
 ## Krok 7 — SVG mapa powiatów
@@ -668,8 +750,11 @@ Uzupełnij tabelę w sekcji "Gotowe przykłady" poniżej.
 | 8 | **SSL cert Python** | `urllib.request` nie otwiera HTTPS | Użyj `curl` do pobrania, Python czyta plik lokalnie |
 | 9 | **BOM w SIMC CSV** | Pierwszy kolumn = `﻿WOJ` zamiast `WOJ` | `encoding='utf-8-sig'` w Pythonie lub `.replace(/^﻿/, '')` w Node.js |
 | 10 | **Filie DPS** | Jedna lp. ma dwa adresy | Importuj jako osobne rekordy z tym samym `oficjalne_id` |
+| 11 | **CityCard bez woj=** | Klik na miasto śląskie → filtr województwa pokazuje "Wszystkie" | Przekaż `voivodeship` prop do CityCard — doda `?woj=slaskie` do URL automatycznie |
+| 12 | **FacilityTypeCards stary licznik** | DPS pokazuje tylko Małopolskę (95) zamiast łącznej (195) | Zsumuj `typeCounts + typeCountsSlaskie + ...` w HomeClient.tsx |
+| 13 | **PopularLocations brak śląskich miast** | Śląskie miasta nie pojawiają się w sekcji "Największe ośrodki" | Dodaj do `POPULAR_CITIES_CONFIG` + zaktualizuj tekst sekcji |
 
 ---
 
-*Ostatnia aktualizacja: 2026-05-19 (sesja #20 — kompletna integracja Śląskiego)*  
-*Commit: 54547fd (fix tooltip) ← ostatni commit tej sesji*
+*Ostatnia aktualizacja: 2026-05-19 (sesja #20 — finał)*  
+*Ostatni commit: 2a130d7 (CityCard woj= fix + CLAUDE.md)*
