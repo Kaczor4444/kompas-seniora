@@ -154,7 +154,11 @@ Baza TERYT - miejscowości dla obsługiwanych województw. Źródło: `data/SIMC
 - `AppEvent` - eventy app-level
 - `SharedList` - udostępnione listy
 - `PlacowkaCena` - historia cen
-- `MopsContact` - kontakty MOPS
+- `MopsContact` - kontakty MOPS/GOPS/CUS (**190 rekordów**: 23 Małopolska + 167 Śląskie)
+  - Małopolskie: 23 (MOPS/GOPS/CUS, zweryfikowane ręcznie) — `raw_dane/malopolskie/ops_malopolska_geo.csv`
+  - Śląskie: 167 (MOPS=42, GOPS=122, CUS=3) — `raw_dane/slaskie/ops_slaskie.csv` + PDF (gitignored)
+  - Monitor śląski: `scripts/monitor-mops-slaskie.py` | cron 20. każdego miesiąca
+  - API bez filtra woj. — `/api/mops/search` działa dla obu województw
 
 ---
 
@@ -370,6 +374,14 @@ npx prisma studio
 ---
 
 ## 📌 COMMIT HISTORY (ostatnie)
+
+- **01e4b5a** (2026-05-20): feat: MOPS Śląskie — 167 ośrodków + monitor GitHub Action
+  - PDF: Wykaz OPS woj. śląskiego (katowice.uw.gov.pl, maj 2026)
+  - Typy: MOPS=42, GOPS=122, CUS=3 | GPS: 166/167 | 0 błędów importu
+  - `parse-mops-slaskie.py` — PDF → CSV (pypdf, regex parser)
+  - `import-mops-slaskie.js` — CSV → DB z geocodingiem Nominatim (167 rekordów)
+  - `monitor-mops-slaskie.py` + `slaskie-mops-monitor.yml` — cron 20. każdego miesiąca
+  - `/mops` i `/api/mops/search` działają dla Śląska bez zmian w kodzie
 
 - **bf01c24** (2026-05-19): feat: dynamiczny komunikat odległości + ikona samochodu
   - Kliknięcie Katowic → "W promieniu 30 km od Katowic znajduje się 55 placówek. Zwiększ odległość..."
