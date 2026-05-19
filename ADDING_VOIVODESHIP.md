@@ -643,15 +643,36 @@ interface HomeClientProps {
 
 ## Krok 9 — GitHub Actions — monitoring PDF
 
-Skopiuj `scripts/monitor-dps-slaskie.py` → `scripts/monitor-dps-NAZWA.py`:
+Skopiuj `scripts/monitor-dps-slaskie.py` → `scripts/monitor-dps-NAZWA.py`.
 
+**Wybierz wzorzec monitora zależnie od tego czy URL pliku zmienia się:**
+
+**Wzorzec A — stały URL** (plik podmieniony w miejscu, jak MOPS Śląskie):
 ```python
-# Zmień:
-PDF_URL = "https://URL_DO_PDF_NOWEGO_WOJ"
+PDF_URL = "https://www.MIASTO.uw.gov.pl/download/XXX"
 SENTINEL_FILE = 'raw_dane/NAZWA/.dps_NAZWA_last_hash'
+# Monitor sprawdza nagłówki HTTP (Last-Modified, ETag, Content-Length)
 ```
 
-Monitor sprawdza nagłówki HTTP (`Last-Modified`, `ETag`, `Content-Length`) — nie pobiera całego PDF.
+**Wzorzec B — zmienny URL** (data w nazwie pliku, jak DPS Śląskie ⚠️):
+```python
+PAGE_URL    = "https://www.MIASTO.uw.gov.pl/wydzial/wydzial-rodziny-i-polityki-spolecznej"
+PDF_PATTERN = re.compile(r'href="([^"]*Rejestr[^"]*\.pdf)"', re.IGNORECASE)
+SENTINEL_FILE = 'raw_dane/NAZWA/.dps_NAZWA_pdf_url'  # przechowuje URL (nie hash!)
+
+def find_current_pdf_url():
+    r = requests.get(PAGE_URL, headers=HEADERS, timeout=20)
+    m = PDF_PATTERN.search(r.text)
+    return m.group(1) if m else None
+# Gdy URL się zmienia → Issue zawiera gotowy nowy URL do pobrania
+```
+
+Sprawdź wzorzec przed uruchomieniem:
+```bash
+curl -s "https://www.MIASTO.uw.gov.pl/wydzial/..." | grep -oi 'href="[^"]*\.pdf"' | head -5
+```
+
+Pełne implementacje obu wzorców: **SCRAPER.md → „Wzorzec A" i „Wzorzec B"**.
 
 Skopiuj `.github/workflows/slaskie-dps-monitor.yml` → `.github/workflows/NAZWA-dps-monitor.yml`:
 
@@ -927,7 +948,7 @@ python3 scripts/monitor-mops-NAZWA.py
 | 12 | **FacilityTypeCards stary licznik** | DPS pokazuje tylko Małopolskę (95) zamiast łącznej (195) | Zsumuj `typeCounts + typeCountsSlaskie + ...` w HomeClient.tsx |
 | 13 | **PopularLocations brak śląskich miast** | Śląskie miasta nie pojawiają się w sekcji "Największe ośrodki" | Dodaj do `POPULAR_CITIES_CONFIG` + zaktualizuj tekst sekcji |
 | 16 | **MOPS: URL bez `www.`** | `katowice.uw.gov.pl/download/441` → 404; monitor hashuje stronę błędu | Zawsze sprawdź z `www.` — `curl -I https://www.MIASTO.uw.gov.pl/download/XXX` |
-| 17 | **MOPS: URL DPS Śląskiego zmienia się** | Po aktualizacji PDF nazwa pliku zawiera datę — stary URL zwraca 404 | Monitor wykryje zmianę Content-Length; sprawdź stronę UW ręcznie po Issue |
+| 17 | **URL DPS zmienia się przy aktualizacji** | `Rejestr_..._12_03_2026.pdf` → 404 po aktualizacji; monitor nie wykryje zmiany | Użyj **Wzorca B** (SCRAPER.md): scrapuj stronę nadrzędną UW, wyciągnij link PDF wzorcem regex, porównaj URL z sentinel (nie hash). Issue zawiera gotowy nowy URL |
 | 18 | **MOPS: plain OPS bez kwalifikatora** | "Ośrodek Pomocy Społecznej w Chorzowie" — MOPS czy GOPS? | Grodzki powiat (miasto na pr. powiatu) → MOPS; ziemski → GOPS. W `map_typ()` domyślnie GOPS |
 | 19 | **MOPS: wieloliniowe telefony w PDF** | Jeden rekord rozbity na 3 linie (multi-phone) | Sklejaj linie buforem aż trafisz na email na końcu (sentinel = email) |
 | 20 | **MOPS: adresy bez ulicy (numer-only)** | "Jasienica 845" — brak `ul.`, tylko numer | Geocoding: `{miejscowosc} {numer}, Polska`; ~2-4 rekordy na województwo bez GPS |

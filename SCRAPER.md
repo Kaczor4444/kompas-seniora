@@ -209,7 +209,10 @@ with open(OUTPUT_CSV, 'w', newline='', encoding='utf-8') as f:
         f.flush()  # ← zapisuje natychmiast po każdym wpisie
 ```
 
-### Wzorzec monitora (HTTP headers hash)
+### Wzorzec A — monitor ze stałym URL (MOPS Śląskie, Małopolska)
+
+Gdy URL pliku **nie zmienia się** przy aktualizacji (plik podmieniony w miejscu):
+
 ```python
 def get_file_hash(url):
     r = requests.head(url, headers=HEADERS, timeout=20, verify=False, allow_redirects=True)
@@ -219,10 +222,84 @@ def get_file_hash(url):
         if v: parts.append(f"{h}:{v}")
     if parts:
         return hashlib.sha256('\n'.join(parts).encode()).hexdigest()[:16]
-    # Fallback: pobierz pierwsze 64KB
+    # Fallback: pobierz pierwsze 64KB i hashuj
     r2 = requests.get(url, headers={**HEADERS, 'Range': 'bytes=0-65535'}, ...)
     return hashlib.sha256(chunk).hexdigest()[:16]
 ```
+
+Sentinel przechowuje: **hash nagłówków** (16 znaków hex).
+
+---
+
+### Wzorzec B — monitor ze zmiennym URL (DPS Śląskie)
+
+Gdy URL pliku **zmienia się** przy każdej aktualizacji (data w nazwie pliku):
+```
+# Stary URL (nieaktualne):
+https://www.katowice.uw.gov.pl/files/146/Rejestr_..._12_03_2026.pdf
+# Nowy URL po aktualizacji:
+https://www.katowice.uw.gov.pl/files/146/Rejestr_..._15_09_2026.pdf
+```
+
+**Problem:** HEAD-request starego URL → 404 → monitor zgłasza błąd zamiast wykryć zmianę.
+
+**Rozwiązanie — scraping strony nadrzędnej:**
+1. Pobierz stronę UW (np. `https://www.katowice.uw.gov.pl/wydzial/wydzial-rodziny-i-polityki-spolecznej`)
+2. Wyciągnij wszystkie linki pasujące do wzorca (np. `href` zawierające `Rejestr` i `.pdf`)
+3. Porównaj znaleziony URL z sentinel (który przechowuje poprzedni URL, nie hash)
+4. Zmiana URL → GitHub Issue zawiera **gotowy nowy URL** do pobrania
+5. Monitor zapisuje nowy URL do sentinel
+
+```python
+import re, requests, hashlib, os
+
+PAGE_URL   = "https://www.katowice.uw.gov.pl/wydzial/wydzial-rodziny-i-polityki-spolecznej"
+# Wzorzec dopasowania linku do PDF w HTML strony
+PDF_PATTERN = re.compile(r'href="(https?://[^"]*Rejestr[^"]*\.pdf)"', re.IGNORECASE)
+SENTINEL_FILE = 'raw_dane/slaskie/.dps_slaskie_pdf_url'  # przechowuje URL (nie hash)
+
+def find_current_pdf_url():
+    r = requests.get(PAGE_URL, headers=HEADERS, timeout=20)
+    m = PDF_PATTERN.search(r.text)
+    return m.group(1) if m else None
+
+def main():
+    current_url = find_current_pdf_url()
+    if not current_url:
+        print("❌ Nie znaleziono linku PDF na stronie — sprawdź wzorzec PDF_PATTERN")
+        return
+
+    prev_url = open(SENTINEL_FILE).read().strip() if os.path.exists(SENTINEL_FILE) else None
+
+    if prev_url == current_url:
+        print(f"✅ Brak zmian — URL bez zmian:\n   {current_url}")
+        return
+
+    print(f"🚨 NOWY URL PDF!")
+    print(f"   Stary: {prev_url}")
+    print(f"   Nowy:  {current_url}")
+
+    # Issue zawiera gotowy URL — nie trzeba szukać ręcznie
+    create_github_issue(prev_url, current_url)
+
+    with open(SENTINEL_FILE, 'w') as f:
+        f.write(current_url)
+```
+
+**Sentinel przechowuje: pełny URL** (nie hash) — diff jest czytelny (`git diff`).
+
+**Zalety Wzorca B vs A:**
+- Issue zawiera **gotowy nowy URL** — zero ręcznego szukania
+- `git diff sentinel` pokazuje stary i nowy URL wprost
+- Działa nawet gdy serwer nie zwraca `Last-Modified`/`ETag`
+
+**⚠️ Uwaga:** `PDF_PATTERN` trzeba dopasować do konkretnej strony UW.
+Sprawdź selektor przed uruchomieniem:
+```bash
+curl -s "https://www.MIASTO.uw.gov.pl/wydzial/..." | grep -oi 'href="[^"]*\.pdf"' | head -5
+```
+
+**TODO dla `monitor-dps-slaskie.py`:** zaimplementować Wzorzec B (obecnie używa HEAD na hardcoded URL → po aktualizacji PDF zwróci 404).
 
 ---
 
