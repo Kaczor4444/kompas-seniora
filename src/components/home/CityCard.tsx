@@ -15,14 +15,13 @@ interface CityCardProps {
 
 const CityCard = memo(({ name, count, voivodeship, lat, lng }: CityCardProps) => {
   const getCitySearchUrl = () => {
-    // Jeśli mamy koordynaty (śląskie i kolejne woj.) → near=true z lat/lng
-    // Zwraca WSZYSTKIE placówki woj. posortowane odległościowo — suwak działa
-    if (lat && lng && voivodeship && voivodeship !== 'małopolskie') {
+    // Wszystkie miasta → city=true (szukaj tylko placówek w tym mieście)
+    // Dla nie-małopolskich dodaj woj= żeby filtr województwa był pre-wybrany
+    if (voivodeship && voivodeship !== 'małopolskie') {
       const woj = voivodeship.replace(/ą/g,'a').replace(/ę/g,'e').replace(/ó/g,'o')
         .replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z').replace(/ń/g,'n').replace(/ł/g,'l');
-      return `/search?lat=${lat}&lng=${lng}&near=true&woj=${woj}&cn=${encodeURIComponent(name)}`;
+      return `/search?q=${encodeURIComponent(name)}&city=true&woj=${woj}`;
     }
-    // Małopolskie → city=true (szukaj tylko w tym mieście, sprawdzone zachowanie)
     return `/search?q=${encodeURIComponent(name)}&city=true`;
   };
 
