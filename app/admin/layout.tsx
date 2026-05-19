@@ -49,6 +49,12 @@ export default async function AdminLayout({
                       MOPS/GOPS
                     </Link>
                     <Link
+                      href="/admin/scrapers"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Monitory
+                    </Link>
+                    <Link
                       href="/admin/security-log"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
