@@ -7,16 +7,16 @@
 
 - **Provider**: PostgreSQL (Neon)
 - **Połączenie**: `.env` → `DATABASE_URL`
-- **Total rekordów**: **367 placówek** (produkcja, stan: maj 2026)
-  - DPS: 95
-  - ŚDS: 97
-  - Klub Senior+: 89 (79 z MUW + 10 MDDPS Kraków)
-  - Dzienny Dom Senior+: 34 (28 z MUW + 6 MDDPS Kraków)
-  - **UTW: 52** (Uniwersytety Trzeciego Wieku, id 324–375)
-  - Małopolskie: 363 | Śląskie: 4
-  - Z ceną: ~90 (tylko DPS, ~30%)
-  - Z geolokalizacją: 367 (100%)
-  - MDDPS Kraków: 16 (jst_nazwa='Miasto Kraków (MDDPS)')
+- **Total rekordów**: **467 placówek** (produkcja, stan: maj 2026)
+  - **Małopolskie: 363**
+    - DPS: 95 | ŚDS: 97 | Klub Senior+: 89 | Dzienny Dom Senior+: 34 | UTW: 52
+    - MDDPS Kraków: 16 (jst_nazwa='Miasto Kraków (MDDPS)')
+  - **Śląskie: 104** (100 nowych DPS z rejestru WUW, sesja #20)
+    - DPS: 104 (z rejestru DPS Śląskiego, aktualizacja 12.03.2026)
+  - Z ceną: ~90 (tylko DPS Małopolskie, ~26% wszystkich)
+  - Z geolokalizacją: 467 (100%)
+- **TerytLocation**: 17,818 lokalizacji
+  - Małopolskie: 13,831 | Śląskie: 3,987 (WOJ=24, dodano sesja #20)
 - **SQLite (`prisma/dev.db`)**: NIEUŻYWANY - tylko stare testowe dane (36 rekordów)
 - **UTW**: osobna sekcja `/utw` — nie wliczane do liczników opieki (getMainSearchFilter)
 
@@ -128,20 +128,20 @@ Główna tabela z placówkami opieki.
 - ⚠️ Możliwe Unicode encoding issues (NFD vs NFC)
 - ⚠️ Niespójność nazw powiatów: "Kraków" vs "krakowski" vs "m. Kraków"
 
-#### `TerytLocation` (13,831 lokalizacji - WSZYSTKIE miejscowości Małopolski)
-Baza TERYT - miejscowości dla Małopolski i Śląskiego.
+#### `TerytLocation` (17,818 lokalizacji — Małopolska + Śląskie)
+Baza TERYT - miejscowości dla obsługiwanych województw. Źródło: `data/SIMC_Adresowy_20250922.csv`.
 
 **⚠️ UWAGA:** Baza zawiera WSZYSTKIE rodzaje miejscowości (również części/dzielnice RM=00).
-Dokumentacja wspominała filtrowanie do ~1,901 głównych miejscowości, ale **to NIE zostało wykonane**.
 
-**Statystyki:**
-- Wszystkie lokalizacje: 13,831
-- RM=00 (część/dzielnica): 10,606 (77%)
-- RM=01 (wieś): 1,832
-- RM=03 (osada): 1,179
-- RM=96 (miasto na prawach powiatu): 63
-- RM=98 (miasto): 4
-- Inne (02,04,05,07): 147
+**Statystyki (total: 17,818):**
+- Małopolskie (WOJ=12): 13,831
+- Śląskie (WOJ=24): 3,987 (17 powiatów ziemskich + 19 miast na prawach powiatu)
+- RM=00 (część/dzielnica): ~77% wszystkich rekordów
+
+**Skrypty importu:**
+- Małopolskie: `scripts/import-teryt-filtered.js` (lub `import-teryt-full.js`)
+- Śląskie: `scripts/import-teryt-slaskie.js` (WOJ=24)
+- Wzorzec dla nowych województw: `ADDING_VOIVODESHIP.md`
 
 **Pola:**
 - `nazwa_normalized` - bez polskich znaków
@@ -371,6 +371,20 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **7d532f6** (2026-05-19): feat: sesja #20 — integracja województwa Śląskiego
+  - TerytLocation: +3,987 lokalizacji śląskich (WOJ=24, 17 powiatów + 19 miast)
+  - Placowka: +100 DPS śląskich z rejestru WUW (aktualizacja 12.03.2026), 100% geocodowanych
+  - `scripts/import-teryt-slaskie.js` — wzorzec dla kolejnych województw (zmień WOJ + POWIATY_MAP)
+  - `scripts/import-dps-slaskie.js` — 100 DPS z danymi hardcoded z PDF
+  - `scripts/monitor-dps-slaskie.py` — hash nagłówków HTTP PDF → GitHub Issue przy zmianie
+  - `.github/workflows/slaskie-dps-monitor.yml` — cron 8. każdego miesiąca
+  - `ENABLED_VOIVODESHIPS` += 'śląskie' | `city-county-mapping.ts` +19 miast śląskich
+  - `CITY_CENTER_COORDS` +19 miast śląskich | usunięto Śląskie z `CAPITAL_CITIES_BLACKLIST`
+  - `HeroSection.tsx`: "Małopolsce i na Śląsku" | FacilityMap: "Zapytaj" dla DPS bez ceny
+  - `ADDING_VOIVODESHIP.md` — nowy poradnik dla kolejnych województw
+  - Tableau Public: export CSV (315 Małopolska + 100 Śląskie), dashboard mapa+bar chart
+  - **TODO:** odblokować filtr województwa w SearchResults UI (filtr chipsy)
+
 - **9af09f4** (2026-05-17): feat: sesja #19 — UTW (Uniwersytety Trzeciego Wieku)
   - 52 UTW zescrapowane z senioralna.malopolska.pl → zaimportowane do bazy (id 324–375)
   - Strona `/utw`: hero fioletowy, filtry, lista kart, mapa Leaflet
@@ -512,6 +526,12 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ## 🚨 KRYTYCZNE TODO - NASTĘPNA SESJA
 
+### ⚠️ Śląskie — filtr województwa w SearchResults UI (sesja #20, prawie gotowe)
+- **Problem:** użytkownik nie może wybrać "Śląskie" w filtrze województwa na liście wyników
+- **Plik:** `src/components/search/SearchResults.tsx` — chip/dropdown wyboru województwa
+- **Co zrobić:** dodać chip "Śląskie" obok "Małopolskie" w filtrze, dodać `ALL_SLASKIE_POWIATS` listę
+- Dane i UI są gotowe — to ostatni krok integracji
+
 ### ❌ SEO — strona nadal niewidoczna dla Google i AI!
 1. **`public/robots.txt`** → `Disallow: /` (blokuje wszystko) → zmienić na `Allow: /`, `Disallow: /admin/`
 2. **`app/layout.tsx:65-72`** → `robots: { index: false }` → zmienić na `index: true, follow: true`
@@ -559,4 +579,4 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ---
 
-Ostatnia aktualizacja: 2026-05-17
+Ostatnia aktualizacja: 2026-05-19 (sesja #20 — integracja Śląskiego, ADDING_VOIVODESHIP.md)
