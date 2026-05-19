@@ -371,6 +371,11 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **a162da3** (2026-05-19): feat: PopularLocations + FacilityTypeCards multi-voivodeship
+  - `popular-cities.ts`: +6 śląskich miast (Katowice, Zabrze, Gliwice, Bytom, Częstochowa, Cieszyn)
+  - `PopularLocationsSection`: tekst "w Małopolsce" → "w Małopolsce i na Śląsku"
+  - `FacilityTypeCards`: typeCounts = suma wszystkich województw (DPS 95+100=195)
+
 - **54547fd** (2026-05-19): sesja #20 — kompletna integracja województwa Śląskiego ✅
   - **Dane:** TerytLocation +3,987 śląskich (WOJ=24) | Placowka +100 DPS (100% geocodowanych)
   - **Skrypty:** `import-teryt-slaskie.js`, `import-dps-slaskie.js`, `monitor-dps-slaskie.py`
@@ -576,4 +581,4 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ---
 
-Ostatnia aktualizacja: 2026-05-19 (sesja #20 — pełna integracja Śląskiego + blueprint ADDING_VOIVODESHIP.md)
+Ostatnia aktualizacja: 2026-05-19 (sesja #20 — finał: PopularLocations + FacilityTypeCards multi-woj)
