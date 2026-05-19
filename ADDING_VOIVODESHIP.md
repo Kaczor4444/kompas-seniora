@@ -756,10 +756,11 @@ Uzupełnij tabelę w sekcji "Gotowe przykłady" poniżej.
 | 10 | **Filie DPS** | Jedna lp. ma dwa adresy | Importuj jako osobne rekordy z tym samym `oficjalne_id` |
 | 11 | **CityCard bez woj=** | Klik na miasto śląskie → filtr województwa pokazuje "Wszystkie" | Przekaż `voivodeship` prop do CityCard — doda `?woj=slaskie` do URL automatycznie |
 | 14 | **CityCard city=true dla śląskich** | Klik na Katowice → tylko 3 DPS, suwak odległości nie działa | Dodaj `lat`/`lng` do `POPULAR_CITIES_CONFIG` dla śląskich miast; CityCard użyje `?near=true&lat=X&lng=Y&woj=slaskie` zamiast `city=true` |
+| 15 | **near=true suwak bez efektu** | Zwiększenie suwaka do 100km nie dodaje placówek | Serwer (page.tsx) filtrował wyniki do 30km przed odesłaniem do klienta. Fix: gdy `woj≠'all'` (klik z CityCard) zwróć WSZYSTKIE placówki woj. posortowane odległościowo; klient filtruje suwakiem. Gdy `woj='all'` (GPS) — zachowaj stary filtr 30km na serwerze |
 | 12 | **FacilityTypeCards stary licznik** | DPS pokazuje tylko Małopolskę (95) zamiast łącznej (195) | Zsumuj `typeCounts + typeCountsSlaskie + ...` w HomeClient.tsx |
 | 13 | **PopularLocations brak śląskich miast** | Śląskie miasta nie pojawiają się w sekcji "Największe ośrodki" | Dodaj do `POPULAR_CITIES_CONFIG` + zaktualizuj tekst sekcji |
 
 ---
 
 *Ostatnia aktualizacja: 2026-05-19 (sesja #20 — finał)*  
-*Ostatni commit: 2a130d7 (CityCard woj= fix + CLAUDE.md)*
+*Ostatni commit: 01614d6 (near=true suwak fix — pułapka 15)*

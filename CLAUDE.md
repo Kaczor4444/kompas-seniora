@@ -371,6 +371,12 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **01614d6** (2026-05-19): fix: near=true — suwak dystansu działa przy kliknięciu miasta (Śląskie)
+  - Serwer wcześniej filtrował do 30km przed odesłaniem → suwak nie miał co rozszerzać
+  - Fix: `woj≠'all'` (klik CityCard) → wszystkie placówki woj. posortowane odległościowo (klient filtruje)
+  - `woj='all'` (GPS) → zachowane stare zachowanie (filtr 30km na serwerze)
+  - Dodano odmiany śląskich miast w dopełniaczu do `getCityGenitive`
+
 - **aca7d05** (2026-05-19): fix: CityCard śląskie — near=true z lat/lng zamiast city=true
   - `city=true` zwracał tylko 3 DPS z Katowic → suwak odległości bezużyteczny
   - Śląskie: `?near=true&lat=50.26&lng=19.02&woj=slaskie` → 104 DPS sortowane odległościowo
