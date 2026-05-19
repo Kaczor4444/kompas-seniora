@@ -371,19 +371,17 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
-- **7d532f6** (2026-05-19): feat: sesja #20 — integracja województwa Śląskiego
-  - TerytLocation: +3,987 lokalizacji śląskich (WOJ=24, 17 powiatów + 19 miast)
-  - Placowka: +100 DPS śląskich z rejestru WUW (aktualizacja 12.03.2026), 100% geocodowanych
-  - `scripts/import-teryt-slaskie.js` — wzorzec dla kolejnych województw (zmień WOJ + POWIATY_MAP)
-  - `scripts/import-dps-slaskie.js` — 100 DPS z danymi hardcoded z PDF
-  - `scripts/monitor-dps-slaskie.py` — hash nagłówków HTTP PDF → GitHub Issue przy zmianie
-  - `.github/workflows/slaskie-dps-monitor.yml` — cron 8. każdego miesiąca
-  - `ENABLED_VOIVODESHIPS` += 'śląskie' | `city-county-mapping.ts` +19 miast śląskich
-  - `CITY_CENTER_COORDS` +19 miast śląskich | usunięto Śląskie z `CAPITAL_CITIES_BLACKLIST`
-  - `HeroSection.tsx`: "Małopolsce i na Śląsku" | FacilityMap: "Zapytaj" dla DPS bez ceny
-  - `ADDING_VOIVODESHIP.md` — nowy poradnik dla kolejnych województw
-  - Tableau Public: export CSV (315 Małopolska + 100 Śląskie), dashboard mapa+bar chart
-  - **TODO:** odblokować filtr województwa w SearchResults UI (filtr chipsy)
+- **54547fd** (2026-05-19): sesja #20 — kompletna integracja województwa Śląskiego ✅
+  - **Dane:** TerytLocation +3,987 śląskich (WOJ=24) | Placowka +100 DPS (100% geocodowanych)
+  - **Skrypty:** `import-teryt-slaskie.js`, `import-dps-slaskie.js`, `monitor-dps-slaskie.py`
+  - **GitHub Actions:** `slaskie-dps-monitor.yml` — cron 8. każdego miesiąca
+  - **UI wyszukiwarka:** `ENABLED_VOIVODESHIPS` += śląskie | +19 city-county mappings | blacklist fix
+  - **UI filtry:** select województwa aktywny (Wszystkie/Małopolskie/Śląskie) | ALL_SLASKIE_POWIATS
+  - **Mapa:** `slaskie-counties.ts` (36 SVG paths z GeoJSON) | RegionalMap z pill-toggle 🟢/🔵
+  - **Bug fix:** tooltip miast (strip `m. ` prefix w countById lookup)
+  - **Docs:** `ADDING_VOIVODESHIP.md` — pełny blueprint z 11 krokami + tabela pułapek
+  - **Inne:** FacilityMap "Zapytaj" dla DPS bez ceny | HeroSection "Małopolsce i na Śląsku"
+  - Commits: 7d532f6, 4cb19a0, 4e9033c, 54bc80d, 4fca201, 54547fd
 
 - **9af09f4** (2026-05-17): feat: sesja #19 — UTW (Uniwersytety Trzeciego Wieku)
   - 52 UTW zescrapowane z senioralna.malopolska.pl → zaimportowane do bazy (id 324–375)
@@ -526,11 +524,10 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ## 🚨 KRYTYCZNE TODO - NASTĘPNA SESJA
 
-### ⚠️ Śląskie — filtr województwa w SearchResults UI (sesja #20, prawie gotowe)
-- **Problem:** użytkownik nie może wybrać "Śląskie" w filtrze województwa na liście wyników
-- **Plik:** `src/components/search/SearchResults.tsx` — chip/dropdown wyboru województwa
-- **Co zrobić:** dodać chip "Śląskie" obok "Małopolskie" w filtrze, dodać `ALL_SLASKIE_POWIATS` listę
-- Dane i UI są gotowe — to ostatni krok integracji
+### ✅ Śląskie — pełna integracja (sesja #20, commit 54547fd)
+- TERYT, DPS, wyszukiwarka, filtry, mapa SVG z przełącznikiem, monitoring — ZROBIONE
+- Blueprint dla kolejnych województw: `ADDING_VOIVODESHIP.md`
+- **Kolejne województwo:** Dolnośląskie (WOJ=02) lub Mazowieckie (WOJ=14)
 
 ### ❌ SEO — strona nadal niewidoczna dla Google i AI!
 1. **`public/robots.txt`** → `Disallow: /` (blokuje wszystko) → zmienić na `Allow: /`, `Disallow: /admin/`
@@ -579,4 +576,4 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ---
 
-Ostatnia aktualizacja: 2026-05-19 (sesja #20 — integracja Śląskiego, ADDING_VOIVODESHIP.md)
+Ostatnia aktualizacja: 2026-05-19 (sesja #20 — pełna integracja Śląskiego + blueprint ADDING_VOIVODESHIP.md)
