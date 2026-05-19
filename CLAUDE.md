@@ -371,6 +371,13 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **bf01c24** (2026-05-19): feat: dynamiczny komunikat odległości + ikona samochodu
+  - Kliknięcie Katowic → "W promieniu 30 km od Katowic znajduje się 55 placówek. Zwiększ odległość..."
+  - Liczba i dystans aktualizują się w czasie rzeczywistym przy przesuwaniu suwaka
+  - `CityCard`: dodaje `&cn=Katowice` do URL; serwer oblicza genitivus (GENITIVE_MAP)
+  - `SearchResults`: prop `nearCityGenitive`, dynamiczny tekst z `maxDistance` + `facilities.length`
+  - `FacilityCard`: ikona `Car` (size 18) za czasem jazdy — `2 min 🚗`
+
 - **01614d6** (2026-05-19): fix: near=true — suwak dystansu działa przy kliknięciu miasta (Śląskie)
   - Serwer wcześniej filtrował do 30km przed odesłaniem → suwak nie miał co rozszerzać
   - Fix: `woj≠'all'` (klik CityCard) → wszystkie placówki woj. posortowane odległościowo (klient filtruje)
