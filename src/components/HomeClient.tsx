@@ -41,8 +41,14 @@ export default function HomeClient({ totalFacilities, powiatCounts, featuredArti
         totalFacilities={totalFacilities}
       />
 
-      {/* Facility Type Cards */}
-      <FacilityTypeCards typeCounts={typeCounts} />
+      {/* Facility Type Cards — łączna liczba ze wszystkich województw */}
+      <FacilityTypeCards typeCounts={{
+        DPS:        typeCounts.DPS        + typeCountsSlaskie.DPS,
+        SDS:        typeCounts.SDS        + typeCountsSlaskie.SDS,
+        KlubSenior: typeCounts.KlubSenior + typeCountsSlaskie.KlubSenior,
+        DDSenior:   typeCounts.DDSenior   + typeCountsSlaskie.DDSenior,
+        UTW:        typeCounts.UTW        + typeCountsSlaskie.UTW,
+      }} />
 
       {/* How It Works - 3 Steps */}
       <section className="bg-slate-900 py-20 md:py-28">

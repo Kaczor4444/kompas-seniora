@@ -83,7 +83,7 @@ export default function PopularLocationsSection() {
               <span className="text-emerald-600">Największe</span> ośrodki opieki
             </h2>
             <p className="mt-4 text-slate-500 text-base md:text-lg font-medium">
-              Miasta z największą liczbą placówek opieki w Małopolsce.
+              Miasta z największą liczbą placówek opieki w Małopolsce i na Śląsku.
             </p>
           </div>
           <Link
