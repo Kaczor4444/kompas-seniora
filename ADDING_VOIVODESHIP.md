@@ -18,6 +18,7 @@ Wszystkie kroki w kolejności, z gotowymi fragmentami kodu do skopiowania.
 9. [GitHub Actions — monitoring PDF](#krok-9--github-actions--monitoring-pdf)
 10. [Weryfikacja końcowa](#krok-10--weryfikacja-końcowa)
 11. [Aktualizacja dokumentacji](#krok-11--aktualizacja-dokumentacji)
+12. [MOPS/GOPS/CUS — import i monitoring](#krok-12--mopsgopscus--import-i-monitoring)
 
 ---
 
@@ -732,11 +733,177 @@ Uzupełnij tabelę w sekcji "Gotowe przykłady" poniżej.
 
 ## Gotowe przykłady
 
-| Województwo   | WOJ | TERYT script                  | DPS script               | Counties file               | Monitor                       |
+### DPS + TERYT + Mapa
+
+| Województwo   | WOJ | TERYT script                  | DPS script               | Counties file               | Monitor DPS                   |
 |---------------|-----|-------------------------------|--------------------------|-----------------------------|-------------------------------|
 | Małopolskie   | 12  | `import-teryt-filtered.js`    | *(dane w CSV)*           | `malopolskie-counties.ts`   | `senior-plus-monitor.yml`     |
 | **Śląskie**   | 24  | `import-teryt-slaskie.js`     | `import-dps-slaskie.js`  | `slaskie-counties.ts`       | `slaskie-dps-monitor.yml`     |
 | Dolnośląskie  | 02  | *(do zrobienia)*              | *(do zrobienia)*         | *(do zrobienia)*            | *(do zrobienia)*              |
+
+### MOPS/GOPS/CUS
+
+| Województwo   | Źródło PDF                                          | Parser               | Import                   | Monitor                      | Cron    |
+|---------------|-----------------------------------------------------|----------------------|--------------------------|------------------------------|---------|
+| Małopolskie   | MUW Małopolska (CSV RJPS)                           | `import-mops-full.ts`| `import-mops-full.ts`    | *(brak dedykowanego)*        | —       |
+| **Śląskie**   | `www.katowice.uw.gov.pl/download/441`               | `parse-mops-slaskie.py` | `import-mops-slaskie.js` | `slaskie-mops-monitor.yml` | 20.     |
+| Dolnośląskie  | `https://www.duw.pl/` → Wydział Polityki Społecznej | *(do zrobienia)*     | *(do zrobienia)*         | *(do zrobienia)*             | 25.?    |
+
+---
+
+## Krok 12 — MOPS/GOPS/CUS — import i monitoring
+
+MOPS (i odpowiedniki: GOPS, CUS, MOPR, MGOPS) są odrębną bazą od DPS — trafiają do tabeli
+`MopsContact`, nie `Placowka`. Wyszukiwarka `/mops` i `/api/mops/search` nie filtrują po
+województwie, więc nowe dane pojawiają się automatycznie po imporcie.
+
+### 12a. Znajdź źródło danych
+
+Każdy UW publikuje wykaz ośrodków pomocy społecznej:
+```
+https://www.MIASTO.uw.gov.pl/ → Wydział Rodziny i Polityki Społecznej → Wykaz OPS
+```
+
+Śląskie: `https://www.katowice.uw.gov.pl/download/441` (stały URL, aktualizowany w miejscu)
+
+**⚠️ Sprawdź z `www.`** — wiele UW ma przekierowanie tylko na subdomenę `www.`:
+```bash
+curl -I "https://www.MIASTO.uw.gov.pl/download/XXX" -H "User-Agent: geocoder-research/1.0"
+# Powinno zwrócić: HTTP 200 | Type: application/pdf
+```
+
+### 12b. Pobierz i obejrzyj PDF
+
+```bash
+curl -L "https://www.MIASTO.uw.gov.pl/download/XXX" -o raw_dane/NAZWA/ops_NAZWA.pdf \
+  -H "User-Agent: geocoder-research/1.0"
+python3 -c "
+import pypdf
+r = pypdf.PdfReader('raw_dane/NAZWA/ops_NAZWA.pdf')
+print(f'Stron: {len(r.pages)}')
+print(r.pages[0].extract_text()[:800])
+"
+```
+
+Typowa struktura kolumn PDF:
+`Powiat | Gmina | Nazwa | Kod pocztowy | Miejscowość | Ulica | Nr | Telefon | E-mail`
+
+### 12c. Skopiuj i dostosuj parser
+
+```bash
+cp scripts/parse-mops-slaskie.py scripts/parse-mops-NAZWA.py
+```
+
+**Zmiany do wprowadzenia:**
+
+```python
+# 1. Ścieżki plików
+PDF_PATH = 'raw_dane/NAZWA/ops_NAZWA.pdf'
+CSV_PATH = 'raw_dane/NAZWA/ops_NAZWA.csv'
+
+# 2. Lista powiatów ziemskich nowego województwa
+POWIATY_ZIEMSKIE = ['powiat1', 'powiat2', ...]
+
+# 3. Lista powiatów grodzkich (miast na pr. powiatu)
+POWIATY_GRODZKIE = ['Miasto1', 'Miasto2', ...]
+```
+
+Uruchom i sprawdź wynik:
+```bash
+python3 scripts/parse-mops-NAZWA.py
+# Powinno: "Sparsowano X rekordów z Y stron"
+# Sprawdź: czy typy MOPS/GOPS/CUS są dobrze wykryte
+# Sprawdź: czy adresy mają "ul." w polu adres
+```
+
+**Mapowanie typów** (z nazwy instytucji):
+| Nazwa zawiera | Typ w DB |
+|---------------|----------|
+| `Centrum Usług Społecznych` | `CUS` |
+| `Miejski Ośrodek Pomocy Społecznej` | `MOPS` |
+| `Miejski Ośrodek Pomocy Rodzinie` | `MOPS` |
+| `Miejsko-Gminny OPS` | `GOPS` |
+| `Gminno-Miejski OPS` | `GOPS` |
+| `Gminny Ośrodek Pomocy Społecznej` | `GOPS` |
+| `Ośrodek Pomocy Społecznej` (bez kwalifikatora) | `GOPS` |
+
+### 12d. Skopiuj i dostosuj import
+
+```bash
+cp scripts/import-mops-slaskie.js scripts/import-mops-NAZWA.js
+```
+
+**Zmień tylko:**
+```javascript
+// Ścieżki
+const csvContent = fs.readFileSync('raw_dane/NAZWA/ops_NAZWA.csv', 'utf-8');
+// ...
+notes: `Źródło: Wykaz OPS woj. NAZWA (URL, data)`,
+// W danych:
+wojewodztwo: 'nowe-województwo',
+```
+
+**Uruchomienie** (~1.2s × liczba rekordów):
+```bash
+node scripts/import-mops-NAZWA.js
+# Oczekiwane: ✅✅✅... 166/167 geocoded, 0 errors
+```
+
+**Weryfikacja w bazie:**
+```bash
+node -e "
+require('dotenv').config();
+const {PrismaClient}=require('@prisma/client'); const p=new PrismaClient();
+async function main(){
+  const total = await p.mopsContact.count({where:{wojewodztwo:'nowe-województwo'}});
+  const noGeo = await p.mopsContact.count({where:{wojewodztwo:'nowe-województwo',latitude:null}});
+  const byTyp = await p.mopsContact.groupBy({by:['typ'],where:{wojewodztwo:'nowe-województwo'},_count:{id:true}});
+  console.log('Total:',total,'| bez GPS:',noGeo);
+  byTyp.forEach(r=>console.log(' ',r.typ,'→',r._count.id));
+  await p.\$disconnect();
+}
+main();"
+```
+
+### 12e. Monitor + GitHub Action
+
+```bash
+cp scripts/monitor-mops-slaskie.py scripts/monitor-mops-NAZWA.py
+cp .github/workflows/slaskie-mops-monitor.yml .github/workflows/NAZWA-mops-monitor.yml
+```
+
+**W skrypcie monitora zmień:**
+```python
+PDF_URL = "https://www.MIASTO.uw.gov.pl/download/XXX"
+PAGE_URL = "https://www.MIASTO.uw.gov.pl/wydzial/wydzial-rodziny-i-polityki-spolecznej"
+SENTINEL_FILE = '...raw_dane/NAZWA/.mops_NAZWA_last_hash'
+```
+
+**W workflow zmień:**
+```yaml
+# Inny dzień niż inne monitory (sprawdź SCRAPER.md → kalendarz)
+- cron: '0 9 25 * *'   # np. 25. każdego miesiąca
+run: python scripts/monitor-mops-NAZWA.py
+git add raw_dane/NAZWA/.mops_NAZWA_last_hash
+```
+
+**Inicjalizacja sentinela:**
+```bash
+python3 scripts/monitor-mops-NAZWA.py
+# "✅ Inicjalizacja — zapisano hash: XXXXXXXXXXXXXXXX"
+```
+
+### 12f. Checklist MOPS
+
+- [ ] PDF dostępny pod poprawnym URL (z `www.`)
+- [ ] Parser: `X rekordów z Y stron` (X > 50 dla typowego województwa)
+- [ ] CSV: wszystkie kolumny wypełnione, brak pustych `nazwa`
+- [ ] Import: 0 błędów, >95% geocodowanych
+- [ ] Baza: `mopsContact.count(where: {wojewodztwo})` > 0
+- [ ] `/mops` → wyszukaj miasto z nowego woj → wyniki się pojawiają
+- [ ] Monitor: `python3 scripts/monitor-mops-NAZWA.py` → "Brak zmian"
+- [ ] GitHub Action: ręczne uruchomienie z `workflow_dispatch` → sukces
+- [ ] Kalendarz monitorów (SCRAPER.md) zaktualizowany
 
 ---
 
@@ -759,8 +926,14 @@ Uzupełnij tabelę w sekcji "Gotowe przykłady" poniżej.
 | 15 | **near=true suwak bez efektu** | Zwiększenie suwaka do 100km nie dodaje placówek | Serwer (page.tsx) filtrował wyniki do 30km przed odesłaniem do klienta. Fix: gdy `woj≠'all'` (klik z CityCard) zwróć WSZYSTKIE placówki woj. posortowane odległościowo; klient filtruje suwakiem. Gdy `woj='all'` (GPS) — zachowaj stary filtr 30km na serwerze |
 | 12 | **FacilityTypeCards stary licznik** | DPS pokazuje tylko Małopolskę (95) zamiast łącznej (195) | Zsumuj `typeCounts + typeCountsSlaskie + ...` w HomeClient.tsx |
 | 13 | **PopularLocations brak śląskich miast** | Śląskie miasta nie pojawiają się w sekcji "Największe ośrodki" | Dodaj do `POPULAR_CITIES_CONFIG` + zaktualizuj tekst sekcji |
+| 16 | **MOPS: URL bez `www.`** | `katowice.uw.gov.pl/download/441` → 404; monitor hashuje stronę błędu | Zawsze sprawdź z `www.` — `curl -I https://www.MIASTO.uw.gov.pl/download/XXX` |
+| 17 | **MOPS: URL DPS Śląskiego zmienia się** | Po aktualizacji PDF nazwa pliku zawiera datę — stary URL zwraca 404 | Monitor wykryje zmianę Content-Length; sprawdź stronę UW ręcznie po Issue |
+| 18 | **MOPS: plain OPS bez kwalifikatora** | "Ośrodek Pomocy Społecznej w Chorzowie" — MOPS czy GOPS? | Grodzki powiat (miasto na pr. powiatu) → MOPS; ziemski → GOPS. W `map_typ()` domyślnie GOPS |
+| 19 | **MOPS: wieloliniowe telefony w PDF** | Jeden rekord rozbity na 3 linie (multi-phone) | Sklejaj linie buforem aż trafisz na email na końcu (sentinel = email) |
+| 20 | **MOPS: adresy bez ulicy (numer-only)** | "Jasienica 845" — brak `ul.`, tylko numer | Geocoding: `{miejscowosc} {numer}, Polska`; ~2-4 rekordy na województwo bez GPS |
+| 21 | **CityCard Śląskie: city=true zamiast near=true** | Klik Zabrze pokazywał placówki "w okolicy" zamiast "tylko w Zabrzu" | CityCard używa `?q=Zabrze&city=true&woj=slaskie` — identycznie jak Małopolska |
 
 ---
 
-*Ostatnia aktualizacja: 2026-05-19 (sesja #20 — finał)*  
-*Ostatni commit: 01614d6 (near=true suwak fix — pułapka 15)*
+*Ostatnia aktualizacja: 2026-05-20 (sesja #21 — MOPS Śląskie + blueprint Krok 12)*  
+*Ostatni commit: 53c0fd6 (SCRAPER.md — 8 cronów + kalendarz)*
