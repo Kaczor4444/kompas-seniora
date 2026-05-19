@@ -1,0 +1,50 @@
+name: Monitor MOPS Śląskiego
+
+on:
+  schedule:
+    # 20. każdego miesiąca o 9:00 UTC (różny dzień niż DPS = 8.)
+    - cron: '0 9 20 * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force check even if hash unchanged'
+        required: false
+        default: 'false'
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run monitor
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          FORCE_CHECK: ${{ github.event.inputs.force || 'false' }}
+        run: python scripts/monitor-mops-slaskie.py
+
+      - name: Commit sentinel update (if changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet raw_dane/slaskie/.mops_slaskie_last_hash 2>/dev/null; then
+            echo "Sentinel bez zmian — brak commita"
+          else
+            git add raw_dane/slaskie/.mops_slaskie_last_hash
+            git commit -m "chore: aktualizacja sentinela MOPS Śląskiego"
+            git push
+          fi
