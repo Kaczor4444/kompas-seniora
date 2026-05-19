@@ -1,7 +1,7 @@
 // src/components/search/FacilityCard.tsx
 // ✅ SIMPLIFIED & FLATTENED - No image, compact layout
 import React from 'react';
-import { MapPin, Heart, Navigation, ChevronRight, ArrowLeftRight, MessageCircle } from 'lucide-react';
+import { MapPin, Heart, Navigation, ChevronRight, ArrowLeftRight, MessageCircle, Car } from 'lucide-react';
 import { estimateDriveTime } from '@/src/utils/distance';
 
 interface FacilityCardProps {
@@ -196,9 +196,12 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
                     ? `${Math.round(facility.distance * 1000)} m`
                     : `${facility.distance.toFixed(1)} km`
                   }
-                  <span className="text-slate-500 font-normal">
-                    {facility.distance >= 1 && ` (${estimateDriveTime(facility.distance)})`}
-                  </span>
+                  {facility.distance >= 1 && (
+                    <span className="inline-flex items-center gap-0.5 text-slate-500 font-normal ml-1">
+                      <Car size={12} className="text-slate-400 flex-shrink-0" />
+                      {estimateDriveTime(facility.distance)}
+                    </span>
+                  )}
                 </span>
               </div>
             </>
