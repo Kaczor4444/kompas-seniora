@@ -15,8 +15,8 @@ import hashlib
 import requests
 
 # Strona z wykazem OPS śląskiego
-PDF_URL = "https://katowice.uw.gov.pl/download/441"
-PAGE_URL = "https://katowice.uw.gov.pl"
+PDF_URL = "https://www.katowice.uw.gov.pl/download/441"
+PAGE_URL = "https://www.katowice.uw.gov.pl/wydzial/wydzial-rodziny-i-polityki-spolecznej"
 SENTINEL_FILE = os.path.join(
     os.path.dirname(__file__), '..', 'raw_dane', 'slaskie', '.mops_slaskie_last_hash'
 )
