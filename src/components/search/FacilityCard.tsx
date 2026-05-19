@@ -197,9 +197,9 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
                     : `${facility.distance.toFixed(1)} km`
                   }
                   {facility.distance >= 1 && (
-                    <span className="inline-flex items-center gap-0.5 text-slate-500 font-normal ml-1">
-                      <Car size={12} className="text-slate-400 flex-shrink-0" />
+                    <span className="inline-flex items-center gap-1 text-slate-500 font-normal ml-1">
                       {estimateDriveTime(facility.distance)}
+                      <Car size={15} className="text-slate-400 flex-shrink-0" />
                     </span>
                   )}
                 </span>
