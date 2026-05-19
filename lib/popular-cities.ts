@@ -1,20 +1,20 @@
 import { getFacilityStats, type CityStats } from './facility-stats';
 
 export const POPULAR_CITIES_CONFIG = [
-  // Małopolskie
-  { name: 'Kraków', slug: 'krakow', voivodeship: 'małopolskie' },
-  { name: 'Tarnów', slug: 'tarnow', voivodeship: 'małopolskie' },
-  { name: 'Wieliczka', slug: 'wieliczka', voivodeship: 'małopolskie' },
-  { name: 'Wadowice', slug: 'wadowice', voivodeship: 'małopolskie' },
-  { name: 'Nowy Sącz', slug: 'nowy+sacz', voivodeship: 'małopolskie' },
-  { name: 'Gorlice', slug: 'gorlice', voivodeship: 'małopolskie' },
-  // Śląskie
-  { name: 'Katowice', slug: 'katowice', voivodeship: 'śląskie' },
-  { name: 'Zabrze', slug: 'zabrze', voivodeship: 'śląskie' },
-  { name: 'Gliwice', slug: 'gliwice', voivodeship: 'śląskie' },
-  { name: 'Bytom', slug: 'bytom', voivodeship: 'śląskie' },
-  { name: 'Częstochowa', slug: 'czestochowa', voivodeship: 'śląskie' },
-  { name: 'Cieszyn', slug: 'cieszyn', voivodeship: 'śląskie' },
+  // Małopolskie — city=true (szukaj tylko w tym mieście)
+  { name: 'Kraków',    slug: 'krakow',    voivodeship: 'małopolskie', lat: null, lng: null },
+  { name: 'Tarnów',   slug: 'tarnow',    voivodeship: 'małopolskie', lat: null, lng: null },
+  { name: 'Wieliczka', slug: 'wieliczka', voivodeship: 'małopolskie', lat: null, lng: null },
+  { name: 'Wadowice',  slug: 'wadowice',  voivodeship: 'małopolskie', lat: null, lng: null },
+  { name: 'Nowy Sącz', slug: 'nowy+sacz', voivodeship: 'małopolskie', lat: null, lng: null },
+  { name: 'Gorlice',   slug: 'gorlice',   voivodeship: 'małopolskie', lat: null, lng: null },
+  // Śląskie — near=true z koordynatami (szukaj wszystkich woj. śląskiego w okolicy)
+  { name: 'Katowice',    slug: 'katowice',    voivodeship: 'śląskie', lat: 50.2599, lng: 19.0216 },
+  { name: 'Zabrze',      slug: 'zabrze',      voivodeship: 'śląskie', lat: 50.3248, lng: 18.7857 },
+  { name: 'Gliwice',     slug: 'gliwice',     voivodeship: 'śląskie', lat: 50.2945, lng: 18.6714 },
+  { name: 'Bytom',       slug: 'bytom',       voivodeship: 'śląskie', lat: 50.3484, lng: 18.9162 },
+  { name: 'Częstochowa', slug: 'czestochowa', voivodeship: 'śląskie', lat: 50.8118, lng: 19.1203 },
+  { name: 'Cieszyn',     slug: 'cieszyn',     voivodeship: 'śląskie', lat: 49.7503, lng: 18.6349 },
 ] as const;
 
 export type PopularCity = CityStats;

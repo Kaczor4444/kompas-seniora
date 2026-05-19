@@ -9,15 +9,21 @@ interface CityCardProps {
   slug: string;
   count: number;
   voivodeship?: string;
+  lat?: number | null;
+  lng?: number | null;
 }
 
-const CityCard = memo(({ name, count, voivodeship }: CityCardProps) => {
+const CityCard = memo(({ name, count, voivodeship, lat, lng }: CityCardProps) => {
   const getCitySearchUrl = () => {
-    const params = new URLSearchParams({ q: name, city: 'true' });
-    if (voivodeship && voivodeship !== 'małopolskie') {
-      params.set('woj', voivodeship === 'śląskie' ? 'slaskie' : voivodeship);
+    // Jeśli mamy koordynaty (śląskie i kolejne woj.) → near=true z lat/lng
+    // Zwraca WSZYSTKIE placówki woj. posortowane odległościowo — suwak działa
+    if (lat && lng && voivodeship && voivodeship !== 'małopolskie') {
+      const woj = voivodeship.replace(/ą/g,'a').replace(/ę/g,'e').replace(/ó/g,'o')
+        .replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z').replace(/ń/g,'n').replace(/ł/g,'l');
+      return `/search?lat=${lat}&lng=${lng}&near=true&woj=${woj}`;
     }
-    return `/search?${params.toString()}`;
+    // Małopolskie → city=true (szukaj tylko w tym mieście, sprawdzone zachowanie)
+    return `/search?q=${encodeURIComponent(name)}&city=true`;
   };
 
   return (

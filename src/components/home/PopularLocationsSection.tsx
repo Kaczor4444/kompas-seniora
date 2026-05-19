@@ -11,6 +11,8 @@ interface CityData {
   slug: string;
   count: number;
   voivodeship: string;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export default function PopularLocationsSection() {
@@ -35,6 +37,8 @@ export default function PopularLocationsSection() {
               slug: config.slug,
               count: cityStats?.count || 0,
               voivodeship: config.voivodeship,
+              lat: 'lat' in config ? config.lat : null,
+              lng: 'lng' in config ? config.lng : null,
             };
           });
 
@@ -119,6 +123,8 @@ export default function PopularLocationsSection() {
                 slug={city.slug}
                 count={city.count}
                 voivodeship={city.voivodeship}
+                lat={'lat' in city ? city.lat : null}
+                lng={'lng' in city ? city.lng : null}
               />
             ))
           )}
