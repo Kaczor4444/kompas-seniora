@@ -268,71 +268,58 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     // Sortuj po odległości
     facilitiesWithDistance.sort((a, b) => a.distance - b.distance);
 
-    // Filtruj do domyślnego promienia (50km)
-    let nearbyFacilities = facilitiesWithDistance.filter(
-      f => f.distance <= DEFAULT_RADIUS_KM
-    );
-
-    // Auto-rozszerz promień jeśli za mało wyników (< 3)
-    if (nearbyFacilities.length < MIN_RESULTS) {
-      nearbyFacilities = facilitiesWithDistance.filter(
-        f => f.distance <= EXTENDED_RADIUS_KM
-      );
-
-      const countIn50km = facilitiesWithDistance.filter(f => f.distance <= DEFAULT_RADIUS_KM).length;
-
-      // Funkcja do poprawnej odmiany słowa "placówka"
-      const getPlacowkaForm = (count: number): string => {
-        if (count === 1) return 'placówkę';
-        const lastDigit = count % 10;
-        const lastTwoDigits = count % 100;
-        if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return 'placówek';
-        if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
-        return 'placówek';
+    const getCityGenitive = (city: string) => {
+      const genitiveCases: Record<string, string> = {
+        'Kraków': 'Krakowa', 'Olkusz': 'Olkusza', 'Tarnów': 'Tarnowa',
+        'Nowy Sącz': 'Nowego Sącza', 'Zakopane': 'Zakopanego',
+        'Oświęcim': 'Oświęcimia', 'Wieliczka': 'Wieliczki',
+        'Wadowice': 'Wadowic', 'Chrzanów': 'Chrzanowa',
+        // Śląskie
+        'Katowice': 'Katowic', 'Zabrze': 'Zabrza', 'Gliwice': 'Gliwic',
+        'Bytom': 'Bytomia', 'Częstochowa': 'Częstochowy', 'Cieszyn': 'Cieszyna',
+        'Sosnowiec': 'Sosnowca', 'Rybnik': 'Rybnika', 'Tychy': 'Tychów',
+        'Bielsko-Biała': 'Bielska-Białej', 'Chorzów': 'Chorzowa',
       };
+      return genitiveCases[city] || city;
+    };
 
-      if (countIn50km === 0) {
-        message = `W promieniu ${DEFAULT_RADIUS_KM} km nie znaleźliśmy żadnych placówek. Pokazujemy ${nearbyFacilities.length} ${getPlacowkaForm(nearbyFacilities.length)} w promieniu ${EXTENDED_RADIUS_KM} km.`;
-      } else {
-        message = `Znaleźliśmy tylko ${countIn50km} ${getPlacowkaForm(countIn50km)} w promieniu ${DEFAULT_RADIUS_KM} km. Pokazujemy także ${nearbyFacilities.length - countIn50km} ${getPlacowkaForm(nearbyFacilities.length - countIn50km)} w promieniu ${EXTENDED_RADIUS_KM} km.`;
-      }
+    const getPlacowkaForm = (count: number): string => {
+      if (count === 1) return 'placówkę';
+      const lastDigit = count % 10;
+      const lastTwoDigits = count % 100;
+      if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return 'placówek';
+      if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
+      return 'placówek';
+    };
+
+    // ✅ TRYB MIASTO (woj≠'all') — klik z PopularLocations / CityCard
+    // Zwracamy WSZYSTKIE placówki województwa posortowane odległościowo.
+    // Klient filtruje suwakiem (domyślnie 30km, max 100km).
+    // Dzięki temu suwak działa i liczba placówek rośnie przy zwiększaniu dystansu.
+    if (wojewodztwo !== 'all') {
+      const inDefault = facilitiesWithDistance.filter(f => f.distance <= DEFAULT_RADIUS_KM).length;
+      message = `W promieniu ${DEFAULT_RADIUS_KM} km: ${inDefault} ${getPlacowkaForm(inDefault)}. Rozszerz suwak, aby zobaczyć więcej.`;
+      results = facilitiesWithDistance; // wszystkie — klient filtruje suwakiem
     } else {
-      // Reverse geocoding - pobierz nazwę miasta użytkownika
-      const userLocationName = await reverseGeocode(userLat, userLng);
-      // Odmiana nazwy miasta w dopełniaczu (Kraków -> Krakowa, Olkusz -> Olkusza)
-      const getCityGenitive = (city: string) => {
-        const genitiveCases: Record<string, string> = {
-          'Kraków': 'Krakowa',
-          'Olkusz': 'Olkusza',
-          'Tarnów': 'Tarnowa',
-          'Nowy Sącz': 'Nowego Sącza',
-          'Zakopane': 'Zakopanego',
-          'Oświęcim': 'Oświęcimia',
-          'Wieliczka': 'Wieliczki',
-          'Wadowice': 'Wadowic',
-          'Chrzanów': 'Chrzanowa',
-        };
-        return genitiveCases[city] || city;
-      };
-      const locationInfo = userLocationName ? ` w okolicy ${getCityGenitive(userLocationName)}` : '';
+      // ✅ TRYB GEOLOKALIZACJA (woj='all') — GPS użytkownika, filtruj na serwerze
+      let nearbyFacilities = facilitiesWithDistance.filter(f => f.distance <= DEFAULT_RADIUS_KM);
 
-      // Funkcja do poprawnej odmiany słowa "placówka"
-      const getPlacowkaForm = (count: number): string => {
-        if (count === 1) return 'placówkę';
-        const lastDigit = count % 10;
-        const lastTwoDigits = count % 100;
-        // 12-14 to wyjątek (placówek, nie placówki)
-        if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return 'placówek';
-        // 2,3,4 na końcu → placówki
-        if (lastDigit >= 2 && lastDigit <= 4) return 'placówki';
-        // reszta → placówek
-        return 'placówek';
-      };
+      if (nearbyFacilities.length < MIN_RESULTS) {
+        nearbyFacilities = facilitiesWithDistance.filter(f => f.distance <= EXTENDED_RADIUS_KM);
+        const countIn30km = facilitiesWithDistance.filter(f => f.distance <= DEFAULT_RADIUS_KM).length;
+        if (countIn30km === 0) {
+          message = `W promieniu ${DEFAULT_RADIUS_KM} km nie znaleźliśmy żadnych placówek. Pokazujemy ${nearbyFacilities.length} ${getPlacowkaForm(nearbyFacilities.length)} w promieniu ${EXTENDED_RADIUS_KM} km.`;
+        } else {
+          message = `Znaleźliśmy tylko ${countIn30km} ${getPlacowkaForm(countIn30km)} w promieniu ${DEFAULT_RADIUS_KM} km. Pokazujemy także ${nearbyFacilities.length - countIn30km} więcej w promieniu ${EXTENDED_RADIUS_KM} km.`;
+        }
+      } else {
+        const userLocationName = await reverseGeocode(userLat, userLng);
+        const locationInfo = userLocationName ? ` w okolicy ${getCityGenitive(userLocationName)}` : '';
+        message = `Znaleźliśmy ${nearbyFacilities.length} ${getPlacowkaForm(nearbyFacilities.length)} w promieniu ${DEFAULT_RADIUS_KM} km${locationInfo}.`;
+      }
 
-      message = `Znaleźliśmy ${nearbyFacilities.length} ${getPlacowkaForm(nearbyFacilities.length)} w promieniu ${DEFAULT_RADIUS_KM} km${locationInfo}.`;
+      results = nearbyFacilities;
     }
-
-    results = nearbyFacilities;
   }
   // TRYB 5: POWIAT ONLY (klik z mapy Małopolski)
   else if (!query && powiatParam && wojewodztwo === 'all') {
