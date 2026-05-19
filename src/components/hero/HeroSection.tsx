@@ -148,7 +148,7 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
         <div className="mt-10 pt-8 border-t border-slate-100">
           <div className="grid grid-cols-3 gap-3 md:gap-6">
             <TrustItem icon={<ShieldCheck size={22} />} label="Źródło danych" value="Oficjalne BIP" />
-            <TrustItem icon={<Building2 size={22} />} label="Placówek w bazie" value={`${totalFacilities ?? 415} w Polsce`} />
+            <TrustItem icon={<Building2 size={22} />} label="Placówek w bazie" value={`${totalFacilities ?? 415}`} />
             <TrustItem icon={<RefreshCw size={22} />} label="Aktualizacja" value="Stale aktualizowane" />
           </div>
         </div>
