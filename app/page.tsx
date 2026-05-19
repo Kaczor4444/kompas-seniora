@@ -12,7 +12,7 @@ export default async function Home() {
     prisma.placowka.count({ where: getMainSearchFilter() }),
     prisma.placowka.findMany({
       where: getVoivodeshipFilter(),
-      select: { powiat: true, miejscowosc: true, typ_placowki: true }
+      select: { powiat: true, miejscowosc: true, typ_placowki: true, wojewodztwo: true }
     }),
     getFeaturedArticlesForHome(),
   ]);
@@ -55,23 +55,54 @@ export default async function Home() {
     powiatCounts['Tarnów'] = tarnowCity;
   }
 
+  const malopolska = allFacilities.filter(f => f.wojewodztwo === 'małopolskie');
+  const slaskie    = allFacilities.filter(f => f.wojewodztwo === 'śląskie');
+
   const typeCounts = {
-    DPS:        allFacilities.filter(f => f.typ_placowki === 'DPS').length,
-    SDS:        allFacilities.filter(f => f.typ_placowki === 'ŚDS').length,
-    KlubSenior: allFacilities.filter(f => f.typ_placowki === 'Klub Senior+').length,
-    DDSenior:   allFacilities.filter(f => f.typ_placowki === 'Dzienny Dom Senior+').length,
-    UTW:        allFacilities.filter(f => f.typ_placowki === 'UTW').length,
+    DPS:        malopolska.filter(f => f.typ_placowki === 'DPS').length,
+    SDS:        malopolska.filter(f => f.typ_placowki === 'ŚDS').length,
+    KlubSenior: malopolska.filter(f => f.typ_placowki === 'Klub Senior+').length,
+    DDSenior:   malopolska.filter(f => f.typ_placowki === 'Dzienny Dom Senior+').length,
+    UTW:        malopolska.filter(f => f.typ_placowki === 'UTW').length,
+  };
+
+  const typeCountsSlaskie = {
+    DPS:        slaskie.filter(f => f.typ_placowki === 'DPS').length,
+    SDS:        0,
+    KlubSenior: slaskie.filter(f => f.typ_placowki === 'Klub Senior+').length,
+    DDSenior:   slaskie.filter(f => f.typ_placowki === 'Dzienny Dom Senior+').length,
+    UTW:        0,
   };
 
   const powiatCountsByType: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>> = {
     DPS: {}, KlubSenior: {}, DDSenior: {}
   };
-  for (const f of allFacilities) {
+  for (const f of malopolska) {
     if (!f.powiat) continue;
     if (f.typ_placowki === 'DPS') powiatCountsByType.DPS[f.powiat] = (powiatCountsByType.DPS[f.powiat] || 0) + 1;
     else if (f.typ_placowki === 'Klub Senior+') powiatCountsByType.KlubSenior[f.powiat] = (powiatCountsByType.KlubSenior[f.powiat] || 0) + 1;
     else if (f.typ_placowki === 'Dzienny Dom Senior+') powiatCountsByType.DDSenior[f.powiat] = (powiatCountsByType.DDSenior[f.powiat] || 0) + 1;
   }
 
-  return <HomeClient totalFacilities={totalFacilities} powiatCounts={powiatCounts} featuredArticles={featuredArticles} typeCounts={typeCounts} powiatCountsByType={powiatCountsByType} />;
+  const powiatCountsByTypeSlaskie: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>> = {
+    DPS: {}, KlubSenior: {}, DDSenior: {}
+  };
+  for (const f of slaskie) {
+    if (!f.powiat) continue;
+    if (f.typ_placowki === 'DPS') powiatCountsByTypeSlaskie.DPS[f.powiat] = (powiatCountsByTypeSlaskie.DPS[f.powiat] || 0) + 1;
+    else if (f.typ_placowki === 'Klub Senior+') powiatCountsByTypeSlaskie.KlubSenior[f.powiat] = (powiatCountsByTypeSlaskie.KlubSenior[f.powiat] || 0) + 1;
+    else if (f.typ_placowki === 'Dzienny Dom Senior+') powiatCountsByTypeSlaskie.DDSenior[f.powiat] = (powiatCountsByTypeSlaskie.DDSenior[f.powiat] || 0) + 1;
+  }
+
+  return (
+    <HomeClient
+      totalFacilities={totalFacilities}
+      powiatCounts={powiatCounts}
+      featuredArticles={featuredArticles}
+      typeCounts={typeCounts}
+      typeCountsSlaskie={typeCountsSlaskie}
+      powiatCountsByType={powiatCountsByType}
+      powiatCountsByTypeSlaskie={powiatCountsByTypeSlaskie}
+    />
+  );
 }

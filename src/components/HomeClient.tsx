@@ -19,10 +19,12 @@ interface HomeClientProps {
   powiatCounts: Record<string, number>;
   featuredArticles: ArticleWithMetadata[];
   typeCounts: { DPS: number; SDS: number; KlubSenior: number; DDSenior: number; UTW: number };
+  typeCountsSlaskie: { DPS: number; SDS: number; KlubSenior: number; DDSenior: number; UTW: number };
   powiatCountsByType: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>>;
+  powiatCountsByTypeSlaskie: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>>;
 }
 
-export default function HomeClient({ totalFacilities, powiatCounts, featuredArticles, typeCounts, powiatCountsByType }: HomeClientProps) {
+export default function HomeClient({ totalFacilities, powiatCounts, featuredArticles, typeCounts, typeCountsSlaskie, powiatCountsByType, powiatCountsByTypeSlaskie }: HomeClientProps) {
   // ✅ State management for active tab
   const [activeTab, setActiveTab] = useState<'DPS' | 'SDS' | 'Wszystkie'>('Wszystkie');
 
@@ -167,6 +169,8 @@ export default function HomeClient({ totalFacilities, powiatCounts, featuredArti
         totalFacilities={totalFacilities}
         powiatCountsByType={powiatCountsByType}
         typeCounts={typeCounts}
+        typeCountsSlaskie={typeCountsSlaskie}
+        powiatCountsByTypeSlaskie={powiatCountsByTypeSlaskie}
       />
 
       {/* POPULAR LOCATIONS - Now with dynamic data */}

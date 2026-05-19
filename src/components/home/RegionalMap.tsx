@@ -4,8 +4,10 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { MapPin, ArrowRight } from 'lucide-react';
 import { MALOPOLSKIE_COUNTIES, MAP_META, DB_NAME_TO_ID, normalizePowiatName } from '@/src/components/data/malopolskie-counties';
+import { SLASKIE_COUNTIES, MAP_META_SLASKIE, DB_NAME_TO_ID_SLASKIE } from '@/src/components/data/slaskie-counties';
 
 type Layer = 'DPS' | 'KlubSenior' | 'DDSenior';
+type Voivodeship = 'małopolskie' | 'śląskie';
 
 const LAYERS: { key: Layer; label: string; sub: string; href: string; colors: string[]; stroke: string; pillActive: string; pillBase: string }[] = [
   {
@@ -53,53 +55,102 @@ interface RegionalMapProps {
   totalFacilities?: number;
   powiatCountsByType: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>>;
   typeCounts: { DPS: number; SDS: number; KlubSenior: number; DDSenior: number };
+  typeCountsSlaskie: { DPS: number; SDS: number; KlubSenior: number; DDSenior: number; UTW: number };
+  powiatCountsByTypeSlaskie: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>>;
 }
 
-export default function RegionalMap({ totalFacilities, powiatCountsByType, typeCounts }: RegionalMapProps) {
+export default function RegionalMap({ totalFacilities, powiatCountsByType, typeCounts, typeCountsSlaskie, powiatCountsByTypeSlaskie }: RegionalMapProps) {
   const router = useRouter();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [activeLayer, setActiveLayer] = useState<Layer>('DPS');
+  const [activeVoivodeship, setActiveVoivodeship] = useState<Voivodeship>('małopolskie');
 
-  const layer = LAYERS.find(l => l.key === activeLayer)!;
-  const activeCounts = powiatCountsByType[activeLayer];
+  const isSlaskie = activeVoivodeship === 'śląskie';
+  const counties = isSlaskie ? SLASKIE_COUNTIES : MALOPOLSKIE_COUNTIES;
+  const mapMeta = isSlaskie ? MAP_META_SLASKIE : MAP_META;
+  const dbToId = isSlaskie ? DB_NAME_TO_ID_SLASKIE : DB_NAME_TO_ID;
+  const activePowiatCounts = isSlaskie ? powiatCountsByTypeSlaskie : powiatCountsByType;
+  const activeTypeCounts = isSlaskie ? typeCountsSlaskie : typeCounts;
+
+  // Śląskie ma tylko DPS — jeśli przełączymy na Śląskie a aktywna jest inna warstwa, wróć do DPS
+  const effectiveLayer = isSlaskie && activeLayer !== 'DPS' ? 'DPS' : activeLayer;
+  const layer = LAYERS.find(l => l.key === effectiveLayer)!;
 
   const countById = useMemo(() => {
     const result: Record<string, number> = {};
-    for (const [dbName, count] of Object.entries(activeCounts)) {
+    for (const [dbName, count] of Object.entries(activePowiatCounts[effectiveLayer] ?? {})) {
       const normalized = normalizePowiatName(dbName);
-      const id = DB_NAME_TO_ID[normalized] ?? DB_NAME_TO_ID[dbName];
+      const id = dbToId[normalized] ?? dbToId[dbName] ?? dbToId[normalized.replace(/_/g, '-')];
       if (id) result[id] = (result[id] || 0) + count;
     }
     return result;
-  }, [activeCounts]);
+  }, [activePowiatCounts, effectiveLayer, dbToId]);
 
-  const hoveredCounty = hoveredId ? MALOPOLSKIE_COUNTIES.find(c => c.id === hoveredId) : null;
+  const hoveredCounty = hoveredId ? counties.find(c => c.id === hoveredId) : null;
 
-  const handleCountyClick = (county: typeof MALOPOLSKIE_COUNTIES[0]) => {
-    const isCityCounty = parseInt(county.id) >= 1261;
+  const handleCountyClick = (county: typeof counties[0]) => {
     const typeParam = layer.href.split('type=')[1];
-    if (isCityCounty) {
-      router.push(`/search?q=${encodeURIComponent(county.name)}&city=true&type=${typeParam}`);
+    if (isSlaskie) {
+      const isCity = parseInt(county.id) >= 2461;
+      if (isCity) {
+        router.push(`/search?q=${encodeURIComponent(county.name)}&woj=slaskie&type=${typeParam}`);
+      } else {
+        router.push(`/search?powiat=${encodeURIComponent(county.name)}&woj=slaskie&type=${typeParam}`);
+      }
     } else {
-      const normalized = normalizePowiatName(county.name);
-      router.push(`/search?powiat=${encodeURIComponent(normalized)}&type=${typeParam}`);
+      const isCityCounty = parseInt(county.id) >= 1261;
+      if (isCityCounty) {
+        router.push(`/search?q=${encodeURIComponent(county.name)}&city=true&type=${typeParam}`);
+      } else {
+        const normalized = normalizePowiatName(county.name);
+        router.push(`/search?powiat=${encodeURIComponent(normalized)}&type=${typeParam}`);
+      }
     }
   };
 
-  const layerTotal = activeLayer === 'DPS' ? typeCounts.DPS : activeLayer === 'KlubSenior' ? typeCounts.KlubSenior : typeCounts.DDSenior;
+  const layerTotal = effectiveLayer === 'DPS' ? activeTypeCounts.DPS
+    : effectiveLayer === 'KlubSenior' ? activeTypeCounts.KlubSenior
+    : activeTypeCounts.DDSenior;
+
+  const totalInVoivodeship = isSlaskie
+    ? (typeCountsSlaskie.DPS + typeCountsSlaskie.KlubSenior + typeCountsSlaskie.DDSenior)
+    : (typeCounts.DPS + typeCounts.KlubSenior + typeCounts.DDSenior);
+
+  const mapViewH = isSlaskie ? 420 : 345.66;
 
   return (
     <section className="py-12 md:py-20 bg-white relative overflow-hidden" id="regional-coverage">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-emerald-50/20 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* VOIVODESHIP TOGGLE — pills nad całą sekcją */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+            {(['małopolskie', 'śląskie'] as Voivodeship[]).map(woj => (
+              <button
+                key={woj}
+                onClick={() => { setActiveVoivodeship(woj); setHoveredId(null); }}
+                className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                  activeVoivodeship === woj
+                    ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                {woj === 'małopolskie' ? '🟢 Małopolskie' : '🔵 Śląskie'}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-12 lg:gap-20">
 
           {/* TEXT CONTENT */}
           <div className="flex-1 space-y-6 md:space-y-8 order-1 lg:order-1 relative z-10">
             <div className="space-y-4 md:space-y-6">
               <div className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-bold uppercase tracking-[0.25em] shadow-sm">
-                <MapPin size={14} className="text-emerald-700" /> Małopolska — 22 powiaty
+                <MapPin size={14} className="text-emerald-700" />
+                {isSlaskie ? 'Śląskie — 36 powiatów i miast' : 'Małopolska — 22 powiaty'}
               </div>
               <h2 className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.05] tracking-tighter">
                 Znajdź opiekę<br/>
@@ -114,9 +165,9 @@ export default function RegionalMap({ totalFacilities, powiatCountsByType, typeC
                 Kliknij na dowolny powiat, aby zobaczyć dostępne placówki.
                 Aktualnie mamy{' '}
                 <strong className="text-slate-900 font-bold">
-                  <span className="text-emerald-600 font-extrabold">{totalFacilities ?? (typeCounts.DPS + typeCounts.KlubSenior + typeCounts.DDSenior)}</span> placówek
+                  <span className="text-emerald-600 font-extrabold">{totalInVoivodeship}</span> placówek
                 </strong>{' '}
-                w całej Małopolsce.
+                w {isSlaskie ? 'Śląskiem' : 'całej Małopolsce'}.
               </p>
             </div>
 
@@ -124,16 +175,19 @@ export default function RegionalMap({ totalFacilities, powiatCountsByType, typeC
             <div className="space-y-2">
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Pokaż na mapie:</p>
               <div className="flex flex-wrap gap-2">
-                {LAYERS.map(l => (
+                {LAYERS.filter(l => !isSlaskie || l.key === 'DPS').map(l => (
                   <button
                     key={l.key}
                     onClick={() => setActiveLayer(l.key)}
-                    className={`flex flex-col items-start px-4 py-2.5 rounded-xl border font-black text-xs transition-all ${activeLayer === l.key ? l.pillActive : l.pillBase}`}
+                    className={`flex flex-col items-start px-4 py-2.5 rounded-xl border font-black text-xs transition-all ${effectiveLayer === l.key ? l.pillActive : l.pillBase}`}
                   >
                     <span className="text-xs font-black leading-tight">{l.label}</span>
-                    <span className={`text-[9px] font-bold uppercase tracking-wider leading-tight ${activeLayer === l.key ? 'opacity-70' : 'opacity-50'}`}>{l.sub}</span>
+                    <span className={`text-[9px] font-bold uppercase tracking-wider leading-tight ${effectiveLayer === l.key ? 'opacity-70' : 'opacity-50'}`}>{l.sub}</span>
                   </button>
                 ))}
+                {isSlaskie && (
+                  <p className="text-[10px] text-slate-400 self-center ml-1">Klub Senior+ i DD Senior+ — wkrótce</p>
+                )}
               </div>
             </div>
 
@@ -162,13 +216,13 @@ export default function RegionalMap({ totalFacilities, powiatCountsByType, typeC
             {/* CTA BUTTONS — DESKTOP */}
             <div className="hidden lg:flex flex-col gap-3 pt-2">
               <button
-                onClick={() => router.push('/search?woj=malopolskie&showAll=true')}
+                onClick={() => router.push(isSlaskie ? '/search?woj=slaskie&showAll=true' : '/search?woj=malopolskie&showAll=true')}
                 className="bg-slate-900 text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.15)] hover:bg-emerald-600 hover:-translate-y-1 transition-all active:scale-95 group"
               >
-                Wszystkie placówki Małopolski <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                Wszystkie placówki {isSlaskie ? 'Śląskiego' : 'Małopolski'} <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
               </button>
 
-              {activeLayer === 'DPS' && (
+              {effectiveLayer === 'DPS' && !isSlaskie && (
                 <button
                   onClick={() => router.push('/mops')}
                   className="bg-white border-2 border-slate-200 hover:border-emerald-400 text-slate-700 hover:text-emerald-700 px-10 py-5 rounded-2xl font-bold flex items-center gap-3 transition-all active:scale-95 group"
@@ -185,13 +239,13 @@ export default function RegionalMap({ totalFacilities, powiatCountsByType, typeC
             <div className="relative w-full max-w-[620px]">
 
               <svg
-                viewBox={MAP_META.viewBox}
+                viewBox={mapMeta.viewBox}
                 className="w-full h-auto drop-shadow-sm"
                 xmlns="http://www.w3.org/2000/svg"
                 role="img"
-                aria-label="Interaktywna mapa Małopolski z podziałem na powiaty"
+                aria-label={`Interaktywna mapa ${isSlaskie ? 'Śląskiego' : 'Małopolski'} z podziałem na powiaty`}
               >
-                {MALOPOLSKIE_COUNTIES.map((county) => {
+                {counties.map((county) => {
                   const count = countById[county.id] ?? 0;
                   const isHovered = hoveredId === county.id;
                   return (
@@ -215,7 +269,7 @@ export default function RegionalMap({ totalFacilities, powiatCountsByType, typeC
               {hoveredCounty && (() => {
                 const count = countById[hoveredCounty.id] ?? 0;
                 const xPct = (hoveredCounty.centroid.x / 600) * 100;
-                const yPct = (hoveredCounty.centroid.y / 345.66) * 100;
+                const yPct = (hoveredCounty.centroid.y / mapViewH) * 100;
                 return (
                   <div
                     className="absolute z-40 pointer-events-none"
@@ -243,10 +297,10 @@ export default function RegionalMap({ totalFacilities, powiatCountsByType, typeC
       {/* CTA BUTTON — MOBILE */}
       <div className="lg:hidden mt-10 px-4 flex justify-center">
         <button
-          onClick={() => router.push('/search?woj=malopolskie&showAll=true')}
+          onClick={() => router.push(isSlaskie ? '/search?woj=slaskie&showAll=true' : '/search?woj=malopolskie&showAll=true')}
           className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl hover:bg-emerald-600 transition-all active:scale-95 group text-sm w-full sm:w-auto justify-center"
         >
-          Wszystkie placówki Małopolski <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+          Wszystkie placówki {isSlaskie ? 'Śląskiego' : 'Małopolski'} <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
         </button>
       </div>
     </section>
