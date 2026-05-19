@@ -199,7 +199,7 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
                   {facility.distance >= 1 && (
                     <span className="inline-flex items-center gap-1 text-slate-500 font-normal ml-1">
                       {estimateDriveTime(facility.distance)}
-                      <Car size={15} className="text-slate-400 flex-shrink-0" />
+                      <Car size={18} className="text-slate-400 flex-shrink-0" />
                     </span>
                   )}
                 </span>
