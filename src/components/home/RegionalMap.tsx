@@ -79,8 +79,10 @@ export default function RegionalMap({ totalFacilities, powiatCountsByType, typeC
   const countById = useMemo(() => {
     const result: Record<string, number> = {};
     for (const [dbName, count] of Object.entries(activePowiatCounts[effectiveLayer] ?? {})) {
-      const normalized = normalizePowiatName(dbName);
-      const id = dbToId[normalized] ?? dbToId[dbName] ?? dbToId[normalized.replace(/_/g, '-')];
+      // Śląskie grodzkie powiaty są w DB jako "m. Katowice" — strip prefix przed lookup
+      const lookupName = dbName.startsWith('m. ') ? dbName.slice(3) : dbName;
+      const normalized = normalizePowiatName(lookupName);
+      const id = dbToId[normalized] ?? dbToId[lookupName] ?? dbToId[dbName] ?? dbToId[normalizePowiatName(dbName)];
       if (id) result[id] = (result[id] || 0) + count;
     }
     return result;
