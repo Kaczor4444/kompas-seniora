@@ -8,14 +8,16 @@ interface CityCardProps {
   name: string;
   slug: string;
   count: number;
+  voivodeship?: string;
 }
 
-const CityCard = memo(({ name, count }: CityCardProps) => {
-  // ✅ Szukaj tylko w mieście (nie w całym powiecie) - używamy parametru city=true
+const CityCard = memo(({ name, count, voivodeship }: CityCardProps) => {
   const getCitySearchUrl = () => {
-    // Przekazujemy name (z wielką literą) żeby pasowało do pola miejscowosc w bazie
-    // city=true aktywuje CITY ONLY MODE w search/page.tsx (linie 469-476)
-    return `/search?q=${encodeURIComponent(name)}&city=true`;
+    const params = new URLSearchParams({ q: name, city: 'true' });
+    if (voivodeship && voivodeship !== 'małopolskie') {
+      params.set('woj', voivodeship === 'śląskie' ? 'slaskie' : voivodeship);
+    }
+    return `/search?${params.toString()}`;
   };
 
   return (

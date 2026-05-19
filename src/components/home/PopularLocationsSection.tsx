@@ -118,6 +118,7 @@ export default function PopularLocationsSection() {
                 name={city.name}
                 slug={city.slug}
                 count={city.count}
+                voivodeship={city.voivodeship}
               />
             ))
           )}
