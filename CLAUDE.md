@@ -371,6 +371,11 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **aca7d05** (2026-05-19): fix: CityCard śląskie — near=true z lat/lng zamiast city=true
+  - `city=true` zwracał tylko 3 DPS z Katowic → suwak odległości bezużyteczny
+  - Śląskie: `?near=true&lat=50.26&lng=19.02&woj=slaskie` → 104 DPS sortowane odległościowo
+  - `POPULAR_CITIES_CONFIG`: dodano lat/lng dla 6 śląskich miast
+
 - **cffa01e** (2026-05-19): fix: CityCard — dodaje woj=slaskie do URL śląskich miast
   - Filtr województwa teraz auto-wybiera "Śląskie" gdy klik na śląskie miasto
   - CityCard otrzymuje prop `voivodeship` i dokłada `?woj=slaskie` do URL

@@ -370,11 +370,15 @@ const defaultPowiats = selectedVoivodeship === 'śląskie'
 
 ```typescript
 // lib/popular-cities.ts — POPULAR_CITIES_CONFIG
-// Dodaj po sekcji śląskiej:
-{ name: 'Wrocław',  slug: 'wroclaw',  voivodeship: 'dolnośląskie' },
-{ name: 'Legnica',  slug: 'legnica',  voivodeship: 'dolnośląskie' },
+// Dodaj po sekcji śląskiej — KONIECZNIE z lat/lng dla non-małopolskich miast!
+{ name: 'Wrocław',  slug: 'wroclaw',  voivodeship: 'dolnośląskie', lat: 51.1079, lng: 17.0385 },
+{ name: 'Legnica',  slug: 'legnica',  voivodeship: 'dolnośląskie', lat: 51.2070, lng: 16.1619 },
 // ... wybierz 4–6 największych miast nowego województwa
 ```
+
+⚠️ **Dlaczego lat/lng jest krytyczne:** Bez koordynatów CityCard używa `city=true` który filtruje backend do placówek TYLKO w tym mieście. Dla Katowic to 3 DPS. Suwak odległości działa tylko na wynikach z serwera, więc zwiększenie do 100km nic nie zmienia.
+
+Z `lat`/`lng`: CityCard generuje `?near=true&lat=X&lng=Y&woj=slaskie` → serwer zwraca WSZYSTKIE placówki województwa posortowane odległościowo → suwak działa poprawnie.
 
 Liczby placówek są pobierane **dynamicznie** z `/api/stats` — nie musisz ich hardcodować.  
 Miasta są wyświetlane posortowane malejąco wg liczby placówek, więc "puste" miasta (0 placówek) odpadają na dół.
@@ -751,6 +755,7 @@ Uzupełnij tabelę w sekcji "Gotowe przykłady" poniżej.
 | 9 | **BOM w SIMC CSV** | Pierwszy kolumn = `﻿WOJ` zamiast `WOJ` | `encoding='utf-8-sig'` w Pythonie lub `.replace(/^﻿/, '')` w Node.js |
 | 10 | **Filie DPS** | Jedna lp. ma dwa adresy | Importuj jako osobne rekordy z tym samym `oficjalne_id` |
 | 11 | **CityCard bez woj=** | Klik na miasto śląskie → filtr województwa pokazuje "Wszystkie" | Przekaż `voivodeship` prop do CityCard — doda `?woj=slaskie` do URL automatycznie |
+| 14 | **CityCard city=true dla śląskich** | Klik na Katowice → tylko 3 DPS, suwak odległości nie działa | Dodaj `lat`/`lng` do `POPULAR_CITIES_CONFIG` dla śląskich miast; CityCard użyje `?near=true&lat=X&lng=Y&woj=slaskie` zamiast `city=true` |
 | 12 | **FacilityTypeCards stary licznik** | DPS pokazuje tylko Małopolskę (95) zamiast łącznej (195) | Zsumuj `typeCounts + typeCountsSlaskie + ...` w HomeClient.tsx |
 | 13 | **PopularLocations brak śląskich miast** | Śląskie miasta nie pojawiają się w sekcji "Największe ośrodki" | Dodaj do `POPULAR_CITIES_CONFIG` + zaktualizuj tekst sekcji |
 
