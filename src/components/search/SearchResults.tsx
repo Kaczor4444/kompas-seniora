@@ -237,9 +237,10 @@ export default function SearchResults({
     ? ALL_SLASKIE_POWIATS
     : ALL_MALOPOLSKA_POWIATS;
 
-  const availablePowiats = terytPowiats && terytPowiats.length > 0
-    ? ["Wszystkie", ...Array.from(new Set(terytPowiats.map(mapCityCountyToPowiat)))]
-    : ["Wszystkie", ...defaultPowiats];
+  // Zawsze pokazuj pełną listę powiatów dla wybranego województwa.
+  // terytPowiats (z wyszukiwania po mieście) może należeć do innego województwa niż
+  // aktualnie wybrany w filtrze, więc nie używamy go do populacji dropdown.
+  const availablePowiats = ["Wszystkie", ...defaultPowiats];
 
   // Dynamiczne profile — tylko te kody które faktycznie występują w wynikach
   const availableProfiles = useMemo(() => {
