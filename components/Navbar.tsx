@@ -9,6 +9,7 @@ import QuestionnaireIcon from './icons/QuestionnaireIcon';
 import AccountingCalculatorIcon from './icons/AccountingCalculatorIcon';
 import { getFavoritesCount } from '@/src/utils/favorites';
 import { AccessibilityPanel } from './AccessibilityPanel';
+import AccessibilityToolbar from './AccessibilityToolbar';
 
 const AccessibilityIcon = ({ className }: { className?: string }) => (
   <Image
@@ -37,6 +38,7 @@ export default function Navbar() {
   const [isGuidesHovered, setIsGuidesHovered] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
+  const [isToolbarVisible, setIsToolbarVisible] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -66,12 +68,24 @@ export default function Navbar() {
         console.error('Failed to parse accessibility settings:', e);
       }
     }
+    const savedToolbar = localStorage.getItem('accessibility-toolbar-visible');
+    if (savedToolbar !== null) {
+      try {
+        setIsToolbarVisible(JSON.parse(savedToolbar));
+      } catch (e) {
+        // ignore
+      }
+    }
   }, []);
 
   // Save accessibility settings to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('accessibility-settings', JSON.stringify(accessibilitySettings));
   }, [accessibilitySettings]);
+
+  useEffect(() => {
+    localStorage.setItem('accessibility-toolbar-visible', JSON.stringify(isToolbarVisible));
+  }, [isToolbarVisible]);
 
   const pathname = usePathname();
   const lastScrollY = useRef(0);
@@ -259,8 +273,18 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Fixed header: accessibility toolbar (desktop) + navigation */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex flex-col print:hidden">
+        {isToolbarVisible && (
+          <AccessibilityToolbar
+            settings={accessibilitySettings}
+            toggleSetting={toggleSetting}
+            resetSettings={resetSettings}
+            onClose={() => setIsToolbarVisible(false)}
+          />
+        )}
       <nav
-        className={`fixed top-0 left-0 w-full z-50 backdrop-blur-md border-b shadow-sm transition-transform duration-300 ease-in-out print:hidden
+        className={`backdrop-blur-md border-b shadow-sm transition-transform duration-300 ease-in-out
         ${isHighContrast ? 'bg-black border-yellow-400' : 'bg-white/95 border-stone-100'}
         ${isNavbarVisible ? 'translate-y-0' : '-translate-y-[calc(100%-0.25rem)] md:translate-y-0'}
         `}
@@ -368,9 +392,10 @@ export default function Navbar() {
 
             {/* RIGHT: Accessibility + Mail/Kontakt (mobile i desktop) */}
             <div className="flex items-center gap-2 md:gap-3">
+              {/* Mobile: opens slide panel */}
               <button
                 onClick={() => setIsAccessibilityPanelOpen(!isAccessibilityPanelOpen)}
-                className={`flex w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center transition-all group
+                className={`md:hidden flex w-9 h-9 rounded-full items-center justify-center transition-all group
                   ${isHighContrast
                     ? 'bg-yellow-400 text-black'
                     : 'hover:bg-primary-50/30'
@@ -378,8 +403,24 @@ export default function Navbar() {
                 title="Dostępność"
                 aria-label="Otwórz panel dostępności"
               >
-                <AccessibilityIcon className="w-7 h-7 md:w-8 md:h-8 group-hover:scale-110 transition-transform" />
+                <AccessibilityIcon className="w-7 h-7 group-hover:scale-110 transition-transform" />
               </button>
+
+              {/* Desktop: reopens toolbar when closed */}
+              {!isToolbarVisible && (
+                <button
+                  onClick={() => setIsToolbarVisible(true)}
+                  className={`hidden md:flex w-10 h-10 rounded-full items-center justify-center transition-all group
+                    ${isHighContrast
+                      ? 'bg-yellow-400 text-black'
+                      : 'hover:bg-primary-50/30'
+                    }`}
+                  title="Pokaż pasek dostępności"
+                  aria-label="Pokaż pasek dostępności"
+                >
+                  <AccessibilityIcon className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                </button>
+              )}
 
               <Link
                 href="/kontakt"
@@ -516,7 +557,15 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Full Accessibility Panel */}
+      </div>{/* end fixed header wrapper */}
+
+      {/* Spacer: reserves space for fixed header (toolbar + nav) */}
+      <div
+        aria-hidden="true"
+        className={`shrink-0 print:hidden transition-[height] duration-300 h-20 ${isToolbarVisible ? 'md:h-36' : ''}`}
+      />
+
+      {/* Full Accessibility Panel (mobile) */}
       <AccessibilityPanel
         isOpen={isAccessibilityPanelOpen}
         onClose={() => setIsAccessibilityPanelOpen(false)}

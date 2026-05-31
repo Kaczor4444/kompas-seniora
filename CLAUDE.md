@@ -375,6 +375,14 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **TBD** (2026-05-31): feat: AccessibilityToolbar — belka dostępności nad navbarem (desktop)
+  - Nowy komponent `components/AccessibilityToolbar.tsx` — pozioma belka w stylu Recite Me
+  - Desktop: ciemne tło (`bg-slate-800`), 12 kolorowych kafelków, h-16, `rounded-sm` (kwadratowe rogi)
+  - Mobile: `AccessibilityPanel` bez zmian — poziomy layout h-20, kompaktowy header/footer (12 opcji bez scrollowania)
+  - HC mode: `bg-black` + żółte elementy spójnie z navbarem; CSS guards chronią layout belki przy `large-font`/`text-spacing`
+  - `Navbar.tsx`: spacer div (h-20/md:h-36) zastępuje `pt-20` w layout.tsx; `isToolbarVisible` w localStorage
+  - Kolorowe aktywne kafelki per opcja w obu trybach: amber/blue/emerald/violet/orange/red/teal/pink/indigo/lime/cyan/slate
+
 - **01e4b5a** (2026-05-20): feat: MOPS Śląskie — 167 ośrodków + monitor GitHub Action
   - PDF: Wykaz OPS woj. śląskiego (katowice.uw.gov.pl, maj 2026)
   - Typy: MOPS=42, GOPS=122, CUS=3 | GPS: 166/167 | 0 błędów importu

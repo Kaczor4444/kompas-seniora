@@ -550,6 +550,25 @@ body.accessibility-large-font * {
   font-size: inherit !important;
 }
 
+/* Toolbar has fixed h-12 — prevent large-font and text-spacing from breaking layout */
+body.accessibility-large-font [data-a11y-toolbar],
+body.accessibility-large-font [data-a11y-toolbar] * {
+  font-size: 0.875rem !important;
+}
+
+body.accessibility-text-spacing [data-a11y-toolbar],
+body.accessibility-text-spacing [data-a11y-toolbar] * {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  line-height: normal !important;
+}
+
+/* HC mode sets its own border styling on toolbar buttons — block generic 2px override */
+body.accessibility-high-contrast [data-a11y-toolbar] a,
+body.accessibility-high-contrast [data-a11y-toolbar] button {
+  border-width: 1px !important;
+}
+
 /* Links Underlined */
 body.accessibility-links-underlined a {
   text-decoration: underline !important;
