@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Wyszukiwarka placówek opieki dla seniorów — DPS, Klub Seniora, Dzienny Dom Senior+',
     start_url: '/',
     display: 'browser',
-    background_color: '#059669',
-    theme_color: '#059669',
+    background_color: '#1e293b',
+    theme_color: '#1e293b',
     icons: [
       {
         src: '/images/icon-192.png',
