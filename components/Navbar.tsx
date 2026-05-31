@@ -158,25 +158,19 @@ export default function Navbar() {
   }, []);
 
   // Block body scroll when mobile menu is open
+  // iOS Safari: NIE używamy position:fixed na body — chowa dolny pasek przeglądarki
   useEffect(() => {
     if (isOpen) {
-      // Blokada scrollu - działa na iOS Safari
       document.body.style.overflow = 'hidden';
       document.documentElement.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
     } else {
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
     }
 
     return () => {
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
     };
   }, [isOpen]);
 
@@ -450,7 +444,7 @@ export default function Navbar() {
         )}
 
         {/* Mobile Sidebar - slides from left */}
-        <div className={`fixed top-0 left-0 h-screen w-[85vw] max-w-md shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
+        <div className={`fixed top-0 left-0 h-dvh w-[85vw] max-w-md shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isHighContrast ? 'bg-black' : 'bg-white'}`}>
 
           {/* Header with close button */}
           <div className={`p-4 border-b flex justify-between items-center ${isHighContrast ? 'border-yellow-400 bg-black' : 'border-stone-200 bg-white'}`}>
