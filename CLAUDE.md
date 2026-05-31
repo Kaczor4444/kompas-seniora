@@ -375,6 +375,13 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **e7f011d** (2026-05-31): fix: MOPS search — filtr cross-województwo i cross-powiat
+  - Filtr 1: `MopsContact.wojewodztwo` musi pasować do województwa z TERYT (Śląskie MOPS nie pokazują się dla małopolskich powiatów)
+  - Filtr 2: jeśli nazwa MOPS zawiera `(pow. X)`, sprawdza że X pasuje do szukanego powiatu (naprawia Bolesław pow. dąbrowski vs pow. olkuski)
+  - `terytEntries.select`: dodano pole `wojewodztwo`
+  - `FloatingCookieButton`: widoczny przycisk 🍪 bottom-left z modalem ustawień
+  - `translations.ts`: usunięto ŚDS z wiadomości powitalnej i quick prompts chatbota
+
 - **d01e6ce** (2026-05-31): feat: nowe logo, animacja kompasu i ikonka chatbota
   - Navbar: `logo_nowe2.webp` (nowy design Kompas Seniora)
   - Footer: `logo1white.webp` (białe logo), h-16, wyrównanie `-ml-4` (kompensacja wewnętrznego paddingu obrazka)
