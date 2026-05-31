@@ -375,7 +375,18 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
-- **TBD** (2026-05-31): feat: AccessibilityToolbar — belka dostępności nad navbarem (desktop)
+- **d01e6ce** (2026-05-31): feat: nowe logo, animacja kompasu i ikonka chatbota
+  - Navbar: `logo_nowe2.webp` (nowy design Kompas Seniora)
+  - Footer: `logo1white.webp` (białe logo), h-16, wyrównanie `-ml-4` (kompensacja wewnętrznego paddingu obrazka)
+  - WelcomeWidget: `kompas.png` jako ikonka przycisku chatbota (biała na zielonym tle)
+    - Idle: delikatne kołysanie ±6° (7s, jak kompas na statku), `animate-compass-idle`
+    - Hover: jednorazowy obrót 360°, `animate-compass-spin`
+    - Ikonka kompasu w headerze modalu (zastąpiono lucide `Compass`)
+    - Ikonka `kompas.png` inline po "Kompas Seniora" w wiadomości powitalnej (zamiast emoji 🧭)
+  - `lib/translations.ts`: usunięto emoji 🧭 (zastąpione obrazkiem w JSX)
+  - `FloatingCookieButton`: brak widocznego przycisku — modal otwierany tylko przez event `open-cookie-settings`
+
+- **992f8b7** (2026-05-31): feat: AccessibilityToolbar — belka dostępności nad navbarem (desktop)
   - Nowy komponent `components/AccessibilityToolbar.tsx` — pozioma belka w stylu Recite Me
   - Desktop: ciemne tło (`bg-slate-800`), 12 kolorowych kafelków, h-16, `rounded-sm` (kwadratowe rogi)
   - Mobile: `AccessibilityPanel` bez zmian — poziomy layout h-20, kompaktowy header/footer (12 opcji bez scrollowania)
