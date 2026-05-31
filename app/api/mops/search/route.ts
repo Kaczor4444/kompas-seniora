@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
           { nazwa: { contains: query, mode: 'insensitive' } },
         ],
       },
-      select: { nazwa: true, powiat: true, rodzaj_miejscowosci: true },
+      select: { nazwa: true, powiat: true, wojewodztwo: true, rodzaj_miejscowosci: true },
     });
 
     if (terytEntries.length === 0) {
@@ -81,21 +81,43 @@ export async function GET(request: NextRequest) {
 
     // KROK 3: MOPS per każdy znaleziony powiat
     const allMops = await prisma.mopsContact.findMany({
-      select: { id: true, name: true, typ: true, city: true, cityDisplay: true, gmina: true, address: true, phone: true, email: true, website: true, verified: true },
+      select: { id: true, name: true, typ: true, city: true, cityDisplay: true, gmina: true, address: true, phone: true, email: true, website: true, verified: true, wojewodztwo: true },
     });
     const mopsCities = allMops.map(m => m.city);
 
     const mopsByPowiat: Record<string, typeof allMops> = {};
 
     for (const powiat of uniquePowiats) {
+      // Ustal województwo powiatu z danych TERYT
+      const powiatWoj = terytEntries.find(e => e.powiat === powiat)?.wojewodztwo ?? '';
+
       const terytInPowiat = await prisma.terytLocation.findMany({
         where: { powiat, nazwa_normalized: { in: mopsCities } },
         select: { nazwa_normalized: true },
       });
       const matchingCities = new Set(terytInPowiat.map(t => t.nazwa_normalized));
+
+      // Filtruj MOPS po nazwie miasta ORAZ województwie — zapobiega cross-woj błędom
       const powiatMops = allMops
-        .filter(m => matchingCities.has(m.city))
+        .filter(m => {
+          if (!matchingCities.has(m.city)) return false;
+          // Filtr 1: województwo musi się zgadzać
+          if (powiatWoj) {
+            const mojWoj = m.wojewodztwo.toLowerCase().replace('województwo ', '').trim();
+            const terytWoj = powiatWoj.toLowerCase().replace('województwo ', '').trim();
+            if (mojWoj !== terytWoj) return false;
+          }
+          // Filtr 2: jeśli nazwa MOPS zawiera "(pow. X)", powiat musi pasować do szukanego
+          const powiatInName = m.name.match(/\(pow\.\s*([^)]+)\)/i);
+          if (powiatInName) {
+            const namePowiat = normalizePolish(powiatInName[1]);
+            const targetPowiat = normalizePolish(powiat);
+            if (!namePowiat.includes(targetPowiat) && !targetPowiat.includes(namePowiat)) return false;
+          }
+          return true;
+        })
         .sort((a, b) => (b.verified ? 1 : 0) - (a.verified ? 1 : 0));
+
       if (powiatMops.length > 0) {
         mopsByPowiat[powiat] = powiatMops;
       }

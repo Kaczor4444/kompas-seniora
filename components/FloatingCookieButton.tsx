@@ -166,6 +166,22 @@ export default function FloatingCookieButton() {
 
   return (
     <div className="print:hidden">
+      {/* Floating cookie button */}
+      <button
+        onClick={() => setShowModal(true)}
+        className="fixed bottom-20 left-5 z-50 w-9 h-9 bg-emerald-600 hover:bg-emerald-500 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all"
+        aria-label="Ustawienia cookies"
+        title="Ustawienia cookies"
+      >
+        <svg viewBox="0 0 24 24" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C8.5 2 5.5 3.9 3.9 6.7c-.2.3 0 .7.3.8.6.2 1.1.6 1.4 1.1.3.5.1 1.1-.2 1.5-.2.3-.1.7.2.9.8.4 1.4 1.2 1.4 2.1 0 .4.3.7.7.7h.1c.5 0 1 .2 1.4.5.4.4.6.9.6 1.4 0 .4.3.7.7.7C13.2 22 22 17.5 22 12c0-5.5-4.5-10-10-10z" fill="white"/>
+          <circle cx="9"   cy="9"  r="1.2" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="14"  cy="8"  r="1"   fill="rgba(0,0,0,0.25)"/>
+          <circle cx="11"  cy="13" r="1.1" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="15.5" cy="13" r="0.9" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="8.5" cy="15" r="0.8" fill="rgba(0,0,0,0.25)"/>
+        </svg>
+      </button>
       {/* Modal with smooth animations */}
       {showModal && (
         <div
