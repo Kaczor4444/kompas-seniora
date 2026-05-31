@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { X, ChevronRight, ChevronLeft, Send, Bot, RotateCcw, MapPin, Building2, Search, BookOpen, ThumbsUp, ThumbsDown, Info, HelpCircle, Volume2, VolumeX, Calculator, Globe, Compass } from 'lucide-react'
 import { useChatbotAnalytics } from '@/src/hooks/useChatbotAnalytics'
@@ -97,6 +98,7 @@ export default function WelcomeWidget() {
   const [selectedLocation, setSelectedLocation] = useState<{nazwa: string, powiat: string} | null>(null)
   const [lastUserMessage, setLastUserMessage] = useState<string>('') // For retry
   const [showTooltip, setShowTooltip] = useState(false) // Onboarding tooltip
+  const [isHoveringTrigger, setIsHoveringTrigger] = useState(false)
   const [language, setLanguage] = useState<Language>('pl') // Language (pl/en)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -738,7 +740,7 @@ export default function WelcomeWidget() {
               {view === 'chat' && (
                 <div className="relative flex-shrink-0">
                   <div className="w-9 h-9 rounded-full bg-emerald-600 ring-2 ring-emerald-500 flex items-center justify-center">
-                    <Compass size={18} className="text-white" />
+                    <Image src="/images/kompas.png" alt="" width={22} height={22} className="brightness-0 invert" />
                   </div>
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-900" />
                 </div>
@@ -1044,7 +1046,20 @@ export default function WelcomeWidget() {
                         : 'bg-slate-100 text-slate-800 rounded-bl-sm'
                     }`}>
                       {/* 🔒 SECURITY: Plain text only - NO dangerouslySetInnerHTML! */}
-                      {msg.content}
+                      {i === 0 && msg.role === 'assistant' ? (() => {
+                        const marker = 'Kompas Seniora'
+                        const idx = msg.content.indexOf(marker)
+                        if (idx === -1) return msg.content
+                        const before = msg.content.slice(0, idx + marker.length)
+                        const after = msg.content.slice(idx + marker.length)
+                        return (
+                          <>
+                            {before}
+                            <Image src="/images/kompas.png" alt="" width={16} height={16} className="inline-block mx-1 mb-0.5 align-middle" />
+                            {after}
+                          </>
+                        )
+                      })() : msg.content}
                     </div>
 
                     {/* Retry button for error messages */}
@@ -1233,6 +1248,8 @@ export default function WelcomeWidget() {
 
       <button
         onClick={() => setIsOpen(!isOpen)}
+        onMouseEnter={() => setIsHoveringTrigger(true)}
+        onMouseLeave={() => setIsHoveringTrigger(false)}
         className={`w-14 h-14 rounded-full shadow-xl hover:scale-105 transition-all active:scale-95 overflow-hidden flex items-center justify-center bg-white ${
           isOpen && handWaveAnimation ? 'animate-hand-wave' : ''
         }`}
@@ -1244,7 +1261,7 @@ export default function WelcomeWidget() {
           </div>
         ) : (
           <div className="w-full h-full bg-emerald-600 flex items-center justify-center">
-            <Compass size={26} className="text-white" />
+            <Image src="/images/kompas.png" alt="Asystent" width={40} height={40} className={`brightness-0 invert ${isHoveringTrigger ? 'animate-compass-spin' : 'animate-compass-idle'}`} />
           </div>
         )}
       </button>

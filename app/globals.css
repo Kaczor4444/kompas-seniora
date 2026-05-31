@@ -671,6 +671,31 @@ body.accessibility-tooltips [title]::after {
   animation: hand-wave 0.6s ease-in-out 2;
 }
 
+/* Idle: delikatne kołysanie jak kompas na statku */
+@keyframes compass-idle {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(-6deg); }
+  55%  { transform: rotate(5deg); }
+  80%  { transform: rotate(-3deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.animate-compass-idle {
+  animation: compass-idle 7s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Hover: płynny obrót 360° */
+@keyframes compass-hover-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-compass-spin {
+  animation: compass-hover-spin 1.4s ease-in-out 1 forwards;
+  transform-origin: center;
+}
+
 /* ─── Print / PDF styles ─────────────────────────────────────────── */
 @page {
   /* Usuwa domyślny nagłówek/stopkę przeglądarki (URL, numer strony) */

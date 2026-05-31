@@ -23,11 +23,11 @@ const AccessibilityIcon = ({ className }: { className?: string }) => (
 
 const NavbarLogo = () => (
   <Image
-    src="/images/logo1.png"
+    src="/images/logo_nowe2.webp"
     alt="Kompas Seniora Logo"
     width={200}
     height={60}
-    className="h-10 w-auto"
+    className="h-16 w-auto"
   />
 );
 
