@@ -63,7 +63,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Kompas Seniora - Wyszukiwarka placówek opieki dla seniorów",
+  title: "Kompas Seniora - Opieka Senioralna w Małopolsce i Śląsku",
   description: "Znajdź publiczne placówki opieki dla seniorów (DPS, ŚDS) w swojej okolicy. Przejrzyste ceny z oficjalnych źródeł MOPS.",
   keywords: "dom opieki, senior, DPS, ŚDS, opieka nad seniorem, MOPS, Kraków, Małopolska",
   authors: [{ name: "Kompas Seniora" }],
