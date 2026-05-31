@@ -142,7 +142,7 @@ export default async function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
 
         {/* Theme color */}
-        <meta name="theme-color" content="#059669" />
+        <meta name="theme-color" content="#1e293b" />
 
         {/* Structured Data - Organization Schema */}
         <script
