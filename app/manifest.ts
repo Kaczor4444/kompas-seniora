@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'Kompas Seniora',
     description: 'Wyszukiwarka placówek opieki dla seniorów — DPS, Klub Seniora, Dzienny Dom Senior+',
     start_url: '/',
-    display: 'minimal-ui',
+    display: 'browser',
     background_color: '#059669',
     theme_color: '#059669',
     icons: [
