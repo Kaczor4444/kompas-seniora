@@ -239,7 +239,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const allFacilities = await prisma.placowka.findMany({
     where: getVoivodeshipFilter({ typ_placowki: { not: 'ŚDS' } }),
     orderBy: { nazwa: 'asc' },
-    select: PUBLIC_PLACOWKA_SELECT,
+    select: {
+      ...PUBLIC_PLACOWKA_SELECT,
+      wolneMiejsca: {
+        select: { wolne_ogolem: true, oczekujacych: true, data_stanu: true },
+        orderBy: { data_stanu: 'desc' },
+        take: 5,
+      },
+    },
   });
 
   // TRYB 3: GEOLOCATION SEARCH

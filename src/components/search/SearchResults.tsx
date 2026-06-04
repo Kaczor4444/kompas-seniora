@@ -169,6 +169,7 @@ export default function SearchResults({
 
   const [selectedPowiat, setSelectedPowiat] = useState(getInitialPowiat());
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
+  const [onlyWithFreeSpaces, setOnlyWithFreeSpaces] = useState(false);
   const [priceLimit, setPriceLimit] = useState(
     activeFilters?.maxPrice || 13000  // max w bazie: 12 400 zł (Kraków), suwak do 13 000
   );
@@ -509,6 +510,14 @@ export default function SearchResults({
       (f.koszt_pobytu || 0) <= priceLimit
     );
 
+    // Wolne miejsca filter
+    if (onlyWithFreeSpaces) {
+      filtered = filtered.filter(f => {
+        const entries: any[] = (f as any).wolneMiejsca ?? [];
+        return entries.reduce((s: number, e: any) => s + (e.wolne_ogolem ?? 0), 0) > 0;
+      });
+    }
+
     // Distance filter (only when geolocation is active)
     if (userLocation) {
       filtered = filtered.filter(f => {
@@ -629,6 +638,7 @@ export default function SearchResults({
     setPriceLimit(13000);
     setMaxDistance(maxDistanceFromServer);
     setMaxDistanceFromCity(maxDistanceFromServer);
+    setOnlyWithFreeSpaces(false);
   };
 
   const normPowiat = (s: string) =>
@@ -798,6 +808,16 @@ export default function SearchResults({
         onReset={resetFilters}
         onClose={() => setShowFilters(false)}
         onApply={handleApplyFilters}
+        onlyWithFreeSpaces={onlyWithFreeSpaces}
+        onOnlyWithFreeSpacesChange={setOnlyWithFreeSpaces}
+        wolneMiejscaDate={(() => {
+          const dates = facilities
+            .map(f => (f as any).wolneMiejsca?.[0]?.data_stanu)
+            .filter(Boolean)
+            .map((d: string) => new Date(d).getTime());
+          if (!dates.length) return null;
+          return new Date(Math.max(...dates));
+        })()}
       />
 
       {/* CONTENT + SIDEBAR LAYOUT (jak Poradniki) */}
@@ -1176,7 +1196,8 @@ export default function SearchResults({
                         image: '/images/placeholder-facility.jpg',
                         waitTime: 'Brak danych',
                         profileLabels: getShortProfileLabels(fac.profil_opieki ?? null, fac.typ_placowki),
-                        distance: fac.distance
+                        distance: fac.distance ?? fac.distanceFromCity,
+                        wolneMiejsca: (fac as any).wolneMiejsca ?? null
                       }}
                       userLocation={userLocation}
                       isHovered={hoveredId === fac.id}

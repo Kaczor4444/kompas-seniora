@@ -135,6 +135,24 @@ function incrementSessionViews(): number {
 }
 
 // Parses profil_opieki for DPS — handles both code format ("E,F") and full text
+const PROFILE_DESCRIPTIONS: Array<[RegExp, string]> = [
+  [/podeszłym wieku/i,             'Placówka przeznaczona dla seniorów, którzy ze względu na wiek wymagają całodobowej opieki i wsparcia w codziennym funkcjonowaniu.'],
+  [/przewlekle somatycznie/i,      'Placówka dla osób dotkniętych przewlekłymi chorobami fizycznymi (np. choroby serca, układu ruchu, neurologiczne), wymagających stałej opieki medycznej i pielęgnacyjnej.'],
+  [/przewlekle psychicznie/i,      'Placówka dla osób z długotrwałymi zaburzeniami psychicznymi (np. schizofrenia, choroba afektywna dwubiegunowa), zapewniająca opiekę psychiatryczną i terapeutyczną.'],
+  [/intelektualn/i,                'Placówka dla osób z niepełnosprawnością intelektualną, oferująca wsparcie w codziennych czynnościach, rehabilitację oraz terapię zajęciową.'],
+  [/niepełnospraw\w* fizycz/i,     'Placówka dla osób z niepełnosprawnością ruchową lub fizyczną, wymagających pomocy w poruszaniu się, samoobsłudze i rehabilitacji.'],
+  [/dzieci|młodzież/i,             'Placówka specjalizująca się w opiece nad dziećmi i młodzieżą z niepełnosprawnościami, oferująca edukację, rehabilitację i wsparcie rozwojowe.'],
+  [/uzależnion/i,                  'Placówka dla osób uzależnionych od alkoholu lub innych substancji, zapewniająca terapię uzależnień oraz wsparcie w powrocie do samodzielności.'],
+  [/alzheimer|demencja/i,          'Placówka specjalizująca się w opiece nad osobami z chorobą Alzheimera i innymi formami demencji, z personelem przeszkolonym w zakresie opieki otępiennej.'],
+];
+
+function getProfileDescription(profileName: string): string | null {
+  for (const [pattern, desc] of PROFILE_DESCRIPTIONS) {
+    if (pattern.test(profileName)) return desc;
+  }
+  return null;
+}
+
 function parseDpsProfile(profil_opieki: string | null): string[] {
   if (!profil_opieki) return [];
   const trimmed = profil_opieki.trim();
@@ -446,25 +464,13 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
           </div>
         )}
 
-        {/* QUICK STATS BAR - COMPACT */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 shadow-sm">
-            <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600 shrink-0">
-              <Clock size={18} />
-            </div>
+        {/* QUICK STATS BAR */}
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm mb-10 divide-y sm:divide-y-0 sm:divide-x divide-stone-100 grid grid-cols-1 sm:grid-cols-3">
+          <div className="flex items-center gap-4 px-6 py-4">
+            <Banknote size={18} className="text-slate-400 shrink-0" />
             <div>
-              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Dostępność</div>
-              <div className="font-bold text-slate-900 text-sm">{waitTime || 'Zapytaj'}</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 shadow-sm">
-            <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-700 shrink-0">
-              <Banknote size={18} />
-            </div>
-            <div>
-              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Koszt (mc)</div>
-              <div className="font-bold text-slate-900 text-sm">
+              <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Koszt miesięczny</div>
+              <div className="font-bold text-slate-900">
                 {placowka.koszt_pobytu && placowka.koszt_pobytu > 0
                   ? `${placowka.koszt_pobytu.toLocaleString('pl-PL')} zł`
                   : (placowka.typ_placowki.includes('ŚDS') || isSeniorPlus) ? 'Bezpłatne' : 'Zapytaj'}
@@ -472,23 +478,19 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 shadow-sm">
-            <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-700 shrink-0">
-              <Shield size={18} />
-            </div>
+          <div className="flex items-center gap-4 px-6 py-4">
+            <Shield size={18} className="text-slate-400 shrink-0" />
             <div>
-              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Status</div>
-              <div className="font-bold text-slate-900 text-sm">{placowka.typ_placowki.includes('DPS') ? 'Publiczna' : 'Publiczna'}</div>
+              <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Status</div>
+              <div className="font-bold text-slate-900">Publiczna</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 shadow-sm">
-            <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center text-blue-700 shrink-0">
-              <MapPin size={18} />
-            </div>
+          <div className="flex items-center gap-4 px-6 py-4">
+            <MapPin size={18} className="text-slate-400 shrink-0" />
             <div>
-              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Powiat</div>
-              <div className="font-bold text-slate-900 text-sm">{placowka.powiat}</div>
+              <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Powiat</div>
+              <div className="font-bold text-slate-900">{placowka.powiat}</div>
             </div>
           </div>
         </div>
@@ -532,25 +534,48 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                   <h3 className="text-2xl font-black text-slate-900 mb-6 pt-6 border-t border-stone-200">
                     Rodzaj placówki
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {profiles.map((profile, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-4 p-5 bg-stone-50 rounded-2xl border border-stone-100 transition-all hover:border-primary-100 hover:-translate-y-0.5"
-                      >
-                        <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 shrink-0">
-                          {getIconForFeature(profile)}
+                  <div className="grid grid-cols-1 gap-4">
+                    {profiles.map((profile, i) => {
+                      const desc = getProfileDescription(profile);
+                      return (
+                        <div
+                          key={i}
+                          className="flex items-start gap-4 p-5 bg-stone-50 rounded-2xl border border-stone-100"
+                        >
+                          <div className="w-10 h-10 bg-white border border-stone-200 rounded-xl flex items-center justify-center text-slate-500 shrink-0 mt-0.5">
+                            {getIconForFeature(profile)}
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-800 mb-1">{profile}</p>
+                            {desc && <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>}
+                          </div>
                         </div>
-                        <span className="font-bold text-slate-700">{profile}</span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </>
               )}
             </section>
 
             {/* WOLNE MIEJSCA */}
-            {placowka.wolneMiejsca && placowka.wolneMiejsca.length > 0 && (() => {
+            {placowka.typ_placowki === 'DPS' && (() => {
+              if (!placowka.wolneMiejsca || placowka.wolneMiejsca.length === 0) {
+                return (
+                  <section className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+                    <div className="px-6 md:px-8 py-5 border-b border-stone-100 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
+                        <Bed size={18} className="text-slate-400" />
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900">Dostępność miejsc</h3>
+                    </div>
+                    <div className="px-6 md:px-8 py-8 text-center">
+                      <p className="text-slate-400 text-sm">Brak aktualnych danych o wolnych miejscach.</p>
+                      <p className="text-slate-400 text-xs mt-1">Skontaktuj się bezpośrednio z placówką.</p>
+                    </div>
+                  </section>
+                );
+              }
+              return (() => {
               const latestDate = placowka.wolneMiejsca!
                 .map(w => new Date(w.data_stanu).getTime())
                 .reduce((a, b) => Math.max(a, b), 0);
@@ -573,9 +598,16 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       </div>
                       <h3 className="text-xl font-black text-slate-900">Dostępność miejsc</h3>
                     </div>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-                      stan na {miesiac}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {placowka.liczba_miejsc && (
+                        <span className="text-xs font-bold text-slate-500 bg-stone-100 border border-stone-200 px-3 py-1 rounded-full">
+                          {placowka.liczba_miejsc} miejsc ogółem
+                        </span>
+                      )}
+                      <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+                        stan na {miesiac}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Wiersze per typ opieki */}
@@ -652,7 +684,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                   </div>
                 </section>
               );
-            })()}
+            })()})()}
 
             {/* JAK DOŁĄCZYĆ / ZŁOŻYĆ WNIOSEK */}
             <section className="bg-white p-6 md:p-8 rounded-2xl border border-stone-100 shadow-sm">
@@ -1054,55 +1086,35 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
           )}
         </section>
 
-        {/* DANE ZWERYFIKOWANE - SZEROKOŚĆ SIDEBARA */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          <div className="lg:col-span-2"></div>
-
-          <div className="lg:col-span-1">
-            <div className="bg-emerald-50 border-2 border-emerald-200 p-6 rounded-2xl">
-              <div className="flex items-center gap-3 text-emerald-700 mb-4">
-                <ShieldCheck size={20} />
-                <span className="font-black text-sm uppercase tracking-wider">Dane zweryfikowane</span>
+        {/* DANE ZWERYFIKOWANE */}
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm mb-12 divide-y sm:divide-y-0 sm:divide-x divide-stone-100 grid grid-cols-1 sm:grid-cols-2">
+          {placowka.data_aktualizacji && (
+            <div className="flex items-center gap-4 px-6 py-4">
+              <CalendarCheck size={18} className="text-slate-400 shrink-0" />
+              <div>
+                <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Ostatnia aktualizacja</div>
+                <div className="font-bold text-slate-900">{formatPolishDate(new Date(placowka.data_aktualizacji))}</div>
               </div>
+            </div>
+          )}
 
-              <div className="space-y-3 text-sm">
-                {/* Źródło danych z linkiem */}
-                <div>
-                  <div className="text-emerald-600 font-medium mb-1">Źródło danych:</div>
-                  <div className="font-bold text-emerald-900">
-                    {placowka.zrodlo_dane ? (
-                      <a
-                        href={placowka.zrodlo_dane}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-emerald-700 hover:text-emerald-900 hover:underline transition-colors"
-                      >
-                        {placowka.zrodlo_dane.includes('muw.pl')
-                          ? 'Małopolski Urząd Wojewódzki'
-                          : 'Urząd Miasta/Gminy'}
-                      </a>
-                    ) : (
-                      'Urząd Miasta/Gminy'
-                    )}
-                  </div>
-                </div>
-
-                {/* Ostatnia aktualizacja */}
-                {placowka.data_aktualizacji && (
-                  <div>
-                    <div className="text-emerald-600 font-medium mb-1">Ostatnia aktualizacja:</div>
-                    <div className="font-bold text-emerald-900 flex items-center gap-2">
-                      <CalendarCheck size={16} className="text-emerald-600" />
-                      {formatPolishDate(new Date(placowka.data_aktualizacji))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Oczekiwanie */}
-                <div className="pt-3 border-t border-emerald-200">
-                  <div className="text-emerald-600 font-medium mb-1">Czas oczekiwania:</div>
-                  <div className="font-bold text-emerald-900">{waitTime || 'Zapytaj'}</div>
-                </div>
+          <div className="flex items-center gap-4 px-6 py-4">
+            <ShieldCheck size={18} className="text-emerald-500 shrink-0" />
+            <div>
+              <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Źródło danych</div>
+              <div className="font-bold text-slate-900">
+                {(() => {
+                  const z = placowka.zrodlo_dane ?? '';
+                  if (z.includes('malopolska.uw.gov.pl'))
+                    return <a href="https://www.malopolska.uw.gov.pl/" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-700 hover:underline transition-colors">Małopolski Urząd Wojewódzki</a>;
+                  if (z.includes('katowice.uw.gov.pl') || z.includes('Śląskiego'))
+                    return <a href="https://www.katowice.uw.gov.pl/" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-700 hover:underline transition-colors">Śląski Urząd Wojewódzki</a>;
+                  if (z.includes('senioralna.malopolska.pl') || z.includes('Senior+'))
+                    return <a href="https://www.malopolska.uw.gov.pl/" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-700 hover:underline transition-colors">Małopolski Urząd Wojewódzki</a>;
+                  if (z.includes('krakowcaritas.pl'))
+                    return <a href="https://krakowcaritas.pl/" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-700 hover:underline transition-colors">Caritas Archidiecezji Krakowskiej</a>;
+                  return <span>Rejestr Publiczny / BIP</span>;
+                })()}
               </div>
             </div>
           </div>

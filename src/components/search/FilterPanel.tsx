@@ -39,6 +39,9 @@ interface FilterPanelProps {
   onReset: () => void;
   onClose: () => void;
   onApply?: () => void;
+  onlyWithFreeSpaces?: boolean;
+  onOnlyWithFreeSpacesChange?: (value: boolean) => void;
+  wolneMiejscaDate?: Date | null;
 }
 
 const ALL_CARE_PROFILES = [
@@ -72,6 +75,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   onReset,
   onClose,
   onApply,
+  onlyWithFreeSpaces = false,
+  onOnlyWithFreeSpacesChange,
+  wolneMiejscaDate,
 }) => {
   const careProfiles = availableProfiles && availableProfiles.length > 0
     ? ALL_CARE_PROFILES.filter(p => availableProfiles.includes(p.value))
@@ -229,6 +235,30 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           </div>
         );
       })()}
+
+      {/* Wolne miejsca toggle */}
+      {onOnlyWithFreeSpacesChange && (
+        <div className="mb-6 pb-6 border-b border-gray-200">
+          <button
+            onClick={() => onOnlyWithFreeSpacesChange(!onlyWithFreeSpaces)}
+            className="flex items-center justify-between w-full group"
+          >
+            <div className="flex items-start gap-3">
+              <div className={`flex-shrink-0 w-10 h-6 rounded-full transition-colors duration-200 flex items-center mt-0.5 ${onlyWithFreeSpaces ? 'bg-emerald-600' : 'bg-gray-200'}`}>
+                <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${onlyWithFreeSpaces ? 'translate-x-5' : 'translate-x-1'}`} />
+              </div>
+              <div className="text-left">
+                <div className="text-sm font-semibold text-gray-900">Tylko wolne miejsca</div>
+                {onlyWithFreeSpaces && wolneMiejscaDate && (
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    stan na {wolneMiejscaDate.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </button>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex items-center justify-between">
