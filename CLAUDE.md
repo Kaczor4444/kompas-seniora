@@ -375,6 +375,15 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **3495ad3** (2026-06-04): feat: redesign kafelków wyszukiwania + wolne miejsca + profile opieki
+  - `FacilityCard`: nowy układ (like Indeed) — dominująca nazwa, kolorowy lewy border per typ (emerald/blue/amber), cena + adres + dystans w linii, chipsy profili opieki (max 4), usunięto przycisk AI
+  - `FacilityCard`: badge wolnych miejsc — zielony gdy brak kolejki, amber gdy kolejka (`X wolne · Y w kolejce`), tooltip z datą i radą "skontaktuj się"
+  - `src/lib/profileLabels.ts`: obsługa zarówno kodów literowych (A-I) jak i wolnego tekstu DPS Małopolskie (regex `FREE_TEXT_PATTERNS`)
+  - `SearchResults`: toggle "Tylko wolne miejsca", dynamiczna `wolneMiejscaDate` z max daty w bazie, reset w clearFilters
+  - `FilterPanel`: nowy przełącznik toggle z datą "stan na {miesiąc rok}"
+  - `app/search/page.tsx`: query `wolneMiejsca` z `take: 5` (wszystkie profile per placówka)
+  - `PlacowkaDetails`: `PROFILE_DESCRIPTIONS` map — opis profilu pod nazwą; stats bar `grid-cols-3 divide-x` (Cena/Miejsca/Ostatnia aktualizacja); sekcja weryfikacji z zamienioną kolejnością i linkami do stron; "Brak danych" dla DPS bez wolnych miejsc; `liczba_miejsc` w nagłówku sekcji Dostępność
+
 - **e7f011d** (2026-05-31): fix: MOPS search — filtr cross-województwo i cross-powiat
   - Filtr 1: `MopsContact.wojewodztwo` musi pasować do województwa z TERYT (Śląskie MOPS nie pokazują się dla małopolskich powiatów)
   - Filtr 2: jeśli nazwa MOPS zawiera `(pow. X)`, sprawdza że X pasuje do szukanego powiatu (naprawia Bolesław pow. dąbrowski vs pow. olkuski)
@@ -599,9 +608,13 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 2. **`app/layout.tsx:65-72`** → `robots: { index: false }` → zmienić na `index: true, follow: true`
 3. **`app/sitemap.ts`** → dodać dynamiczny sitemap (315 placówek + artykuły)
 
-### ⚠️ Senior+ GitHub Action — wymaga secretu!
-- Dodać `DATABASE_URL` jako secret w GitHub → Settings → Secrets → Actions
-- Bez tego cron `senior-plus-monitor.yml` nie zaimportuje nowych danych do bazy Neon
+### ✅ Senior+ GitHub Action — secret ustawiony (sesja #21)
+- `DATABASE_URL` dodany jako GitHub Secret → Actions → Secrets (2026-06-04)
+- `GUS_BDL_KEY` również dodany (klucz BDL API GUS)
+- `senior-plus-monitor.yml` — ✅ działa, pobrał dane Senior+ 2026-06-02 (commit febd2b5)
+- `slaskie-dps-monitor.yml` — cron 8. każdego miesiąca
+- `mddps-krakow-monitor.yml` — cron 5. każdego miesiąca
+- ⚠️ `DATABASE_URL` musi być bez trailing newline (psycopg2 failuje z `sslmode=require\n`)
 
 ### ✅ MDDPS Kraków — ZAIMPORTOWANE (sesja #18)
 - 16 placówek: 6 Domy (→ Dzienny Dom Senior+) + 10 Kluby (→ Klub Senior+)
@@ -641,4 +654,4 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ---
 
-Ostatnia aktualizacja: 2026-05-19 (sesja #20 — finał: PopularLocations + FacilityTypeCards multi-woj)
+Ostatnia aktualizacja: 2026-06-04 (sesja #21 — redesign kart wyników + wolne miejsca + profil opieki fix)
