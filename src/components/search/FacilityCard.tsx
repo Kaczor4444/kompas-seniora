@@ -32,9 +32,9 @@ interface FacilityCardProps {
 }
 
 const TYPE_STYLES = {
-  DPS:    { border: 'border-l-emerald-500', badge: 'bg-emerald-100 text-emerald-700' },
-  ŚDS:    { border: 'border-l-blue-500',    badge: 'bg-blue-100 text-blue-700'    },
-  Senior: { border: 'border-l-amber-400',   badge: 'bg-amber-100 text-amber-700'  },
+  DPS:    { border: 'border-emerald-200', hover: 'hover:border-emerald-300', badge: 'bg-emerald-100 text-emerald-700' },
+  ŚDS:    { border: 'border-blue-200',    hover: 'hover:border-blue-300',    badge: 'bg-blue-100 text-blue-700'    },
+  Senior: { border: 'border-amber-200',   hover: 'hover:border-amber-300',   badge: 'bg-amber-100 text-amber-700'  },
 };
 
 export const FacilityCard: React.FC<FacilityCardProps> = ({
@@ -62,11 +62,11 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
       onMouseLeave={() => onHover(null)}
       onClick={onClick}
       className={`
-        group relative bg-white rounded-xl cursor-pointer
-        border border-stone-200 border-l-4 ${colors.border}
+        group relative bg-white rounded-2xl cursor-pointer
+        border-[0.5px] ${colors.border} ${colors.hover}
         transition-all duration-200
         p-5
-        ${isHovered ? 'shadow-lg -translate-y-0.5 border-stone-300' : 'shadow-sm hover:shadow-md hover:border-stone-300'}
+        ${isHovered ? 'shadow-lg -translate-y-0.5' : 'shadow-sm hover:shadow-md'}
       `}
     >
       <div className="space-y-3">
@@ -105,8 +105,8 @@ export const FacilityCard: React.FC<FacilityCardProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5">
-            {/* Compare — desktop only */}
-            <div className="relative hidden sm:flex">
+            {/* Compare */}
+            <div className="relative flex">
               <button
                 onClick={onToggleCompare}
                 className={`peer p-2 rounded-lg transition-all ${isCompared ? 'bg-blue-600 text-white' : 'bg-stone-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600'}`}
