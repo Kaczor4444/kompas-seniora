@@ -1318,7 +1318,7 @@ export default function SearchResults({
           {!showLeftPanel && (
             <button
               onClick={() => setShowLeftPanel(true)}
-              className="absolute top-14 sm:top-4 left-4 sm:left-20 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
+              className="absolute top-10 sm:top-4 left-2 sm:left-20 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -1329,35 +1329,25 @@ export default function SearchResults({
 
           {/* Left Panel Container - only show when showLeftPanel is true */}
           {showLeftPanel && (
-            <div className="absolute top-[7rem] sm:top-20 left-4 z-30 w-80 space-y-3">
-              <SearchBar
-                initialQuery={cityInput}
-                initialType={(['DPS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
-                compact={true}
-                onQueryChange={setCurrentQuery}
-                disableAutocomplete={true}
-                onSearch={(params) => {
-                  // Stay in map view after search - add view=map parameter
-                  params.append('view', 'map');
-
-                  // FIX: Zawsze wysyłaj województwo (domyślnie małopolskie)
-                  // Zapobiega szukaniu miast poza obsługiwanym regionem (np. Olsztyn)
-                  if (!params.has('woj')) {
-                    params.append('woj', 'malopolskie');
-                  }
-
-                  // CRITICAL FIX: Przekaż aktualnie wybrany powiat do URL
-                  // Aby server geokodował właściwą miejscowość w wybranym powiecie
-                  if (selectedPowiat !== "Wszystkie") {
-                    params.append('powiat', selectedPowiat);
-                  }
-
-                  router.push(`/search?${params.toString()}`);
-                }}
-              />
+            <div className="absolute top-[5.5rem] sm:top-20 left-2 sm:left-4 z-30 w-[calc(100vw-1rem)] sm:w-80 space-y-3">
+              <div className="hidden sm:block">
+                <SearchBar
+                  initialQuery={cityInput}
+                  initialType={(['DPS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
+                  compact={true}
+                  onQueryChange={setCurrentQuery}
+                  disableAutocomplete={true}
+                  onSearch={(params) => {
+                    params.append('view', 'map');
+                    if (!params.has('woj')) params.append('woj', 'malopolskie');
+                    if (selectedPowiat !== "Wszystkie") params.append('powiat', selectedPowiat);
+                    router.push(`/search?${params.toString()}`);
+                  }}
+                />
+              </div>
 
               {/* Floating Filters Modal - Always Visible, below SearchBar */}
-              <div className="bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[calc(100vh-13rem)]">
+              <div className="bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[calc(100svh-6.5rem)] sm:max-h-[calc(100vh-13rem)]">
               <div className="p-6 space-y-5">
                 {/* Filters Header with Close button */}
                 <div className="flex items-center justify-between mb-4">
@@ -1610,12 +1600,12 @@ export default function SearchResults({
           {/* Back to List button - right side */}
           <button
             onClick={() => setShowMapMobile(false)}
-            className="absolute top-14 sm:top-4 right-4 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
+            className="absolute top-10 sm:top-4 right-2 sm:right-4 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
             </svg>
-            <span className="hidden md:inline">Lista</span>
+            <span>Lista</span>
           </button>
 
           {/* Content Area */}
