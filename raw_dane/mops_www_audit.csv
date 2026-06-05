@@ -1,0 +1,265 @@
+id,typ,city,name,status,old_website,new_website,action
+74,CUS,grybow,"Gminne Centrum Usług Społecznych w Grybowie",BROKEN,https://gcus.gminagrybow.pl,,VERIFY
+84,MOPS,krakow-podgorze,"Miejski Ośrodek Pomocy Społecznej w Krakowie",BROKEN,https://www.mops.krakow.pl,,VERIFY
+85,MOPS,nowy sacz,"Miejski Ośrodek Pomocy Społecznej  w Nowym Sączu",BROKEN,https://mops.nowysacz.pl/mops/kontakt/,,VERIFY
+106,GOPS,kocmyrzow-luborzyca,"Gminny Ośrodek Pomocy Społecznej w Kocmyrzowie-Luborzycy",BROKEN,https://kocmyrzow-luborzyca.gopsinfo.pl,,VERIFY
+109,GOPS,suloszowa,"Gminny Ośrodek Pomocy Społecznej w Sułoszowej",BROKEN,https://www.suloszowa.naszops.pl,,VERIFY
+138,GOPS,lipnica wielka,"Ośrodek Pomocy Społecznej w Lipnicy Wielkiej",BROKEN,https://www.lipnicawielka.pl/ops,,VERIFY
+141,GOPS,rabka-zdroj,"Ośrodek Pomocy Społecznej w Rabce-Zdroju",BROKEN,https://www.ops.rabka.pl,,VERIFY
+142,GOPS,szaflary,"Gminny Ośrodek Pomocy Społecznej w Szaflarach",BROKEN,https://www.gops.szaflary.pl,,VERIFY
+146,GOPS,bukowno,"Miejski Ośrodek Pomocy Społecznej w Bukownie",BROKEN,https://mopsbukowno.pl/,,VERIFY
+151,GOPS,zator,"Ośrodek Pomocy Społecznej w Zatorze",BROKEN,https://www.opszator.pl,,VERIFY
+153,GOPS,proszowice,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Proszowicach",BROKEN,https://www.mgops.proszowice.pl,,VERIFY
+165,GOPS,wojnicz,"Gminny Ośrodek Pomocy Społecznej w Wojniczu",BROKEN,https://www.gops.wojnicz.pl,,VERIFY
+171,GOPS,poronin,"Ośrodek Pomocy Społecznej w Poroninie",BROKEN,https://www.ops.poronin.pl,,VERIFY
+179,GOPS,klaj,"Gminny Ośrodek Pomocy Społecznej w Kłaju",BROKEN,https://gopsklaj.pl,,VERIFY
+98,GOPS,greboszow,"Gminny Ośrodek Pomocy Społecznej w Gręboszowie",HTTP_REDIRECT,http://gops.greboszow.pl/,https://gops.greboszow.pl/,UPDATE
+112,GOPS,zielonki,"Gminny Ośrodek Pomocy Społecznej w Zielonkach",HTTP_REDIRECT,http://www.gopszielonki.naszops.pl/,https://gopszielonki.naszops.pl/public/,UPDATE
+131,GOPS,muszyna,"Ośrodek Pomocy Społecznej w Muszynie",HTTP_REDIRECT,http://www.opsmuszyna.naszops.pl/,https://www.opsmuszyna.naszops.pl/,UPDATE
+147,GOPS,olkusz,"Ośrodek Pomocy Społecznej w Olkuszu",HTTP_REDIRECT,http://ops.olkusz.pl/kontakt/,https://ops.olkusz.pl/kontakt/,UPDATE
+161,GOPS,radlow,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Radłowie",HTTP_REDIRECT,http://opsradlow.pl/,http://www.opsradlow.pl/,UPDATE
+162,GOPS,szerzyny,"Gminny Ośrodek Pomocy Społecznej w Szerzynach",HTTP_REDIRECT,http://szerzyny.pl,https://szerzyny.pl/,UPDATE
+72,CUS,mogilany,"Centrum Usług Społecznych w Mogilanach",FOUND_NEW,,https://cus.mogilany.pl,INSERT
+90,GOPS,lapanow,"Gminny Ośrodek Pomocy Społecznej w Łapanowie",FOUND_NEW,,https://lapanow.naszops.pl,INSERT
+104,GOPS,czernichow,"Gminny Ośrodek Pomocy Społecznej w Czernichowie",FOUND_NEW,,https://gops.czernichow.pl,INSERT
+108,GOPS,michalowice,"Gminny Ośrodek Pomocy Społecznej w Michałowicach",FOUND_NEW,,https://gops.michalowice.pl,INSERT
+181,GOPS,rzezawa,"Gminny Ośrodek Pomocy Społecznej Rzezawa",FOUND_NEW,,https://gops.rzezawa.pl,INSERT
+182,GOPS,czchow,"Miejski Ośrodek Pomocy Społecznej i Świadczeń Rodzinnych w Czchowie",FOUND_NEW,,https://czchow.naszops.pl,INSERT
+184,GOPS,gnojnik,"Gminny Ośrodek Pomocy Społecznej Gnojnik",FOUND_NEW,,https://gnojnik.naszops.pl,INSERT
+185,GOPS,iwkowa,"GOPS Iwkowa",FOUND_NEW,,https://gops.iwkowa.pl,INSERT
+191,GOPS,olesno,"Gminny Ośrodek Pomocy Społecznej Olesno",FOUND_NEW,,https://olesno.naszops.pl,INSERT
+192,GOPS,radgoszcz,"GOPS Radgoszcz",FOUND_NEW,,https://gops.radgoszcz.pl,INSERT
+195,GOPS,luzna,"Gminny Ośrodek Pomocy Społecznej Łużna",FOUND_NEW,,https://gops.luzna.pl,INSERT
+196,GOPS,moszczenica,"Gminny Ośrodek Pomocy Społecznej Moszczenica",FOUND_NEW,,https://moszczenica.naszops.pl,INSERT
+197,GOPS,ropa,"Gminny Ośrodek Pomocy Społecznej Ropa",FOUND_NEW,,https://gopsropa.pl,INSERT
+199,GOPS,iwanowice,"GOPS Iwanowice",FOUND_NEW,,https://gops.iwanowice.pl,INSERT
+200,GOPS,skala,"Miejsko-Gminny Ośrodek Pomocy Społecznej Skała",FOUND_NEW,,https://skala.naszops.pl,INSERT
+204,GOPS,lukowica,"Gminny Ośrodek Pomocy Społecznej Łukowica",FOUND_NEW,,https://gopslukowica.pl,INSERT
+205,GOPS,tymbark,"Gminny Ośrodek Pomocy Społecznej Tymbark",FOUND_NEW,,https://gops.tymbark.pl,INSERT
+207,GOPS,golcza,"GOPS Gołcza",FOUND_NEW,,https://gops.golcza.pl,INSERT
+211,GOPS,raciechowice,"Gminny Ośrodek Pomocy Społecznej Raciechowice",FOUND_NEW,,https://gopsraciechowice.pl,INSERT
+213,GOPS,tokarnia,"Gminny Ośrodek Pomocy Społecznej Tokarnia",FOUND_NEW,,https://gopstokarnia.pl,INSERT
+215,GOPS,chelmiec,"Gminny Ośrodek Pomocy Społecznej Chełmiec",FOUND_NEW,,https://gops.chelmiec.pl,INSERT
+218,GOPS,nawojowa,"Gminny Ośrodek Pomocy Społecznej Nawojowa",FOUND_NEW,,https://gopsnawojowa.pl,INSERT
+219,GOPS,rytro,"Gminny Ośrodek Pomocy Społecznej Rytro",FOUND_NEW,,https://gops.rytro.pl,INSERT
+222,GOPS,czorsztyn,"Gminny Ośrodek Pomocy Społecznej w Maniowach",FOUND_NEW,,https://gops.czorsztyn.pl,INSERT
+225,GOPS,spytkowice,"Gminny Ośrodek Pomocy Społecznej Spytkowice",FOUND_NEW,,https://gopsspytkowice.pl,INSERT
+228,GOPS,polanka wielka,"Gminny Ośrodek Pomocy Społecznej w Polance Wielkiej",FOUND_NEW,,https://gops.polanka-wielka.pl,INSERT
+229,GOPS,przeciszow,"Gminny Ośrodek Pomocy Społecznej Przeciszów",FOUND_NEW,,https://gopsprzeciszow.pl,INSERT
+230,GOPS,koniusza,"Gminny Ośrodek Pomocy Społecznej Koniusza",FOUND_NEW,,https://gops.koniusza.pl,INSERT
+234,GOPS,bystra-sidzina,"GOPS Bystra-Sidzina",FOUND_NEW,,https://bystra-sidzina.naszops.pl,INSERT
+242,GOPS,brzeznica,"Gminny Ośrodek Pomocy Społecznej Brzeźnica",FOUND_NEW,,https://gops.brzeznica.pl,INSERT
+245,GOPS,tomice,"Gminny Ośrodek Pomocy Społecznej Tomice",FOUND_NEW,,https://gops.tomice.pl,INSERT
+247,GOPS,gdow,"Gminny Ośrodek Pomocy Społecznej w Gdowie",FOUND_NEW,,https://gops.gdow.pl,INSERT
+249,MOPS,bedzin,"Miejski Ośrodek Pomocy Społecznej w Będzinie",FOUND_NEW,,https://mops.bedzin.pl,INSERT
+250,GOPS,dobieszowice,"Ośrodek Pomocy Społecznej w Bobrownikach",FOUND_NEW,,https://ops.bobrowniki.pl,INSERT
+251,MOPS,czeladz,"Miejski Ośrodek Pomocy Społecznej w Czeladzi",FOUND_NEW,,https://mops.czeladz.pl,INSERT
+253,GOPS,psary,"Ośrodek Pomocy Społecznej w Psarach",FOUND_NEW,,https://ops.psary.pl,INSERT
+257,GOPS,bestwina,"Gminny Ośrodek Pomocy Społecznej w Bestwinie",FOUND_NEW,,https://gops.bestwina.pl,INSERT
+260,GOPS,jasienica,"Gminny Ośrodek Pomocy Społecznej w Jasienicy",FOUND_NEW,,https://gops.jasienica.pl,INSERT
+262,GOPS,kozy,"Gminny Ośrodek Pomocy Społecznej w Kozach",FOUND_NEW,,https://gops.kozy.pl,INSERT
+263,GOPS,porabka,"Gminny Ośrodek Pomocy Społecznej w Porąbce",FOUND_NEW,,https://gops.porabka.pl,INSERT
+265,GOPS,wilamowice,"Gminny Ośrodek Pomocy Społecznej w Wilamowicach",FOUND_NEW,,https://gops.wilamowice.pl,INSERT
+266,GOPS,wilkowice,"Gminny Ośrodek Pomocy Społecznej w Wilkowicach",FOUND_NEW,,https://gops.wilkowice.pl,INSERT
+272,MOPS,ledziny,"Miejski Ośrodek Pomocy Społecznej w Lędzinach",FOUND_NEW,,https://mopsledziny.pl,INSERT
+276,GOPS,chybie,"Gminny Ośrodek Pomocy Społecznej w Chybiu",FOUND_NEW,,https://chybie.naszops.pl,INSERT
+277,MOPS,cieszyn,"Miejski Ośrodek Pomocy Społecznej w Cieszynie",FOUND_NEW,,https://mops.cieszyn.pl,INSERT
+278,GOPS,debowiec,"Gminny Ośrodek Pomocy Społecznej w Dębowcu",FOUND_NEW,,https://gopsdebowiec.pl,INSERT
+279,CUS,goleszow,"Centrum Usług Społecznych w Goleszowie",FOUND_NEW,,https://cusgoleszow.pl,INSERT
+280,GOPS,hazlach,"Gminny Ośrodek Pomocy Społecznej w Hażlachu",FOUND_NEW,,https://gops.hazlach.pl,INSERT
+282,GOPS,skoczow,"Ośrodek Pomocy Społecznej w Skoczowie",FOUND_NEW,,https://ops.skoczow.pl,INSERT
+283,MOPS,strumien,"Miejski Ośrodek Pomocy Społecznej w Strumieniu",FOUND_NEW,,https://mops.strumien.pl,INSERT
+284,MOPS,ustron,"Miejski Ośrodek Pomocy Społecznej w Ustroniu",FOUND_NEW,,https://mops.ustron.pl,INSERT
+285,MOPS,wisla,"Miejski Ośrodek Pomocy Społecznej w Wiśle",FOUND_NEW,,https://mops.wisla.pl,INSERT
+286,GOPS,zebrzydowice,"Gminny Ośrodek Pomocy Społecznej w Zebrzydowicach",FOUND_NEW,,https://gops.zebrzydowice.pl,INSERT
+288,MOPS,blachownia,"Miejski Ośrodek Pomocy Społecznej w Blachowni",FOUND_NEW,,https://mopsblachownia.pl,INSERT
+290,GOPS,janow,"Gminny Ośrodek Pomocy Społecznej w Janowie",FOUND_NEW,,https://gops.janow.pl,INSERT
+295,GOPS,kruszyna,"Gminny Ośrodek Pomocy Społecznej w Kruszynie",FOUND_NEW,,https://gops.kruszyna.pl,INSERT
+297,GOPS,mstow,"Gminny Ośrodek Pomocy Społecznej w Mstowie",FOUND_NEW,,https://gops.mstow.pl,INSERT
+298,GOPS,mykanow,"Gminny Ośrodek Pomocy Społecznej w Mykanowie",FOUND_NEW,,https://gops.mykanow.pl,INSERT
+301,GOPS,przyrow,"Gminny Ośrodek Pomocy Społecznej w Przyrowie",FOUND_NEW,,https://gops.przyrow.pl,INSERT
+302,GOPS,redziny,"Gminny Ośrodek Pomocy Społecznej w Rędzinach",FOUND_NEW,,https://gops.redziny.pl,INSERT
+306,GOPS,gieraltowice,"Ośrodek Pomocy Społecznej w Gierałtowicach",FOUND_NEW,,https://www.ops.gieraltowice.pl,INSERT
+307,MOPS,knurow,"Miejski Ośrodek Pomocy Społecznej w Knurowie",FOUND_NEW,,https://mopsknurow.pl,INSERT
+308,GOPS,nieborowice,"Gminny Ośrodek Pomocy Społecznej w Pilchowicach zs. w Nieborowicach",FOUND_NEW,,https://gops.pilchowice.pl,INSERT
+310,GOPS,plawniowice,"Ośrodek Pomocy Społecznej w Rudzińcu z siedzibą w Pławniowicach",FOUND_NEW,,https://rudziniec.naszops.pl,INSERT
+312,GOPS,toszek,"Ośrodek Pomocy Społecznej w Toszku",FOUND_NEW,,https://ops.toszek.pl,INSERT
+315,MOPS,jaworzno,"Miejski Ośrodek Pomocy Społecznej w Jaworznie",FOUND_NEW,,https://mops.jaworzno.pl,INSERT
+316,MOPS,katowice,"Miejski Ośrodek Pomocy Społecznej w Katowicach",FOUND_NEW,,https://mops.katowice.pl,INSERT
+317,GOPS,klobuck,"Gminny Ośrodek Pomocy Społecznej w Kłobucku",FOUND_NEW,,https://gopsklobuck.pl,INSERT
+319,GOPS,lipie,"Gminny Ośrodek Pomocy Społecznej w Lipiu",FOUND_NEW,,https://lipie.naszops.pl,INSERT
+323,GOPS,zawady,"Gminny Ośrodek Pomocy Społecznej w Popowie",FOUND_NEW,,https://popow.naszops.pl,INSERT
+327,GOPS,ciasna,"Gminny Ośrodek Pomocy Społecznej w Ciasnej",FOUND_NEW,,https://ciasna.naszops.pl,INSERT
+328,GOPS,herby,"Gminny Ośrodek Pomocy Społecznej w Herbach",FOUND_NEW,,https://gopsherby.pl,INSERT
+329,GOPS,kochanowice,"Gminny Ośrodek Pomocy Społecznej w Kochanowicach",FOUND_NEW,,https://gops.kochanowice.pl,INSERT
+332,GOPS,pawonkow,"Gminny Ośrodek Pomocy Społecznej w Pawonkowie",FOUND_NEW,,https://pawonkow.naszops.pl,INSERT
+336,GOPS,ornontowice,"Gminny Ośrodek Pomocy Społecznej w  Ornontowicach",FOUND_NEW,,https://gops.ornontowice.pl,INSERT
+342,GOPS,niegowa,"Gminny Ośrodek Pomocy Społecznej w Niegowie",FOUND_NEW,,https://gopsniegowa.pl,INSERT
+349,GOPS,pawlowice,"Ośrodek Pomocy Społecznej w Pawłowicach",FOUND_NEW,,https://ops.pawlowice.pl,INSERT
+351,GOPS,suszec,"Gminny Ośrodek Pomocy Społecznej w Suszcu",FOUND_NEW,,https://gopssuszec.pl,INSERT
+352,GOPS,kornowac,"Ośrodek Pomocy społecznej w Kornowacu",FOUND_NEW,,https://ops.kornowac.pl,INSERT
+354,GOPS,tworkow,"Ośrodek Pomocy Społecznej Krzyżanowice zs. w Tworkowie",FOUND_NEW,,https://ops.krzyzanowice.pl,INSERT
+362,GOPS,gaszowice,"Ośrodek Pomocy Społecznej w Gaszowicach",FOUND_NEW,,https://ops.gaszowice.pl,INSERT
+363,GOPS,jejkowice,"Ośrodek Pomocy Społecznej w Jejkowicach",FOUND_NEW,,https://jejkowice.naszops.pl,INSERT
+364,GOPS,lyski,"Ośrodek Pomocy Społecznej w Lyskach",FOUND_NEW,,https://ops.lyski.pl,INSERT
+365,GOPS,swierklany,"Gminny Ośrodek Pomocy Społecznej w Świerklanach",FOUND_NEW,,https://ops.swierklany.pl,INSERT
+368,MOPS,sosnowiec,"Miejski Ośrodek Pomocy Społecznej w Sosnowcu",FOUND_NEW,,https://mopssosnowiec.pl,INSERT
+369,GOPS,swietochlowice,"Ośrodek Pomocy Społecznej w Świętochłowicach",FOUND_NEW,,https://ops.swietochlowice.pl,INSERT
+373,GOPS,ozarowice,"Ośrodek Pomocy Społecznej w Ożarowicach",FOUND_NEW,,https://ops.ozarowice.pl,INSERT
+374,GOPS,radzionkow,"Ośrodek Pomocy Społecznej w Radzionkowie",FOUND_NEW,,https://gops.radzionkow.pl,INSERT
+375,GOPS,naklo slaskie,"Ośrodek Pomocy Społecznej w Świerklańcu zs. w Nakle Śląskim",FOUND_NEW,,https://swierklaniec.naszops.pl,INSERT
+377,GOPS,tworog,"Gminny Ośrodek Pomocy Społecznej w Tworogu",FOUND_NEW,,https://gops.tworog.pl,INSERT
+380,GOPS,godow,"Gminny Ośrodek Pomocy Społecznej w Godowie",FOUND_NEW,,https://gops.godow.pl,INSERT
+381,GOPS,gorzyce,"Ośrodek Pomocy Społecznej w Gorzycach",FOUND_NEW,,https://gopsgorzyce.pl,INSERT
+383,GOPS,marklowice,"Ośrodek Pomocy Społecznej w Marklowicach",FOUND_NEW,,https://ops.marklowice.pl,INSERT
+384,GOPS,polomia,"Ośrodek Pomocy Społecznej w Mszanie",FOUND_NEW,,https://gops.mszana.pl,INSERT
+385,GOPS,pszow,"Ośrodek Pomocy Społecznej w Pszowie",FOUND_NEW,,https://ops.pszow.pl,INSERT
+386,GOPS,radlin,"Ośrodek Pomocy Społecznej w Radlinie",FOUND_NEW,,https://gops.radlin.pl,INSERT
+390,GOPS,irzadze,"Gminny Ośrodek Pomocy Społecznej w Irządzach",FOUND_NEW,,https://gops.irzadze.pl,INSERT
+391,GOPS,kroczyce,"Gminny Ośrodek Pomocy Społecznej w Kroczycach",FOUND_NEW,,https://gopskroczyce.pl,INSERT
+395,MOPS,poreba,"Miejski Ośrodek Pomocy Społecznej w Porębie",FOUND_NEW,,https://mopsporeba.pl,INSERT
+397,GOPS,wlodowice,"Gminny Ośrodek Pomocy Społecznej we Włodowicach",FOUND_NEW,,https://gopswlodowice.pl,INSERT
+398,MOPS,zawiercie,"Miejski Ośrodek Pomocy Społecznej w Zawierciu",FOUND_NEW,,https://mopszawiercie.pl,INSERT
+399,GOPS,zarnowiec,"Ośrodek Pomocy Społecznej w Żarnowcu",FOUND_NEW,,https://ops.zarnowiec.pl,INSERT
+405,GOPS,lekawica,"Gminny Ośrodek Pomocy Społecznej w Łękawicy",FOUND_NEW,,https://lekawica.naszops.pl,INSERT
+406,GOPS,lodygowice,"Gminny Ośrodek Pomocy Społecznej w Łodygowicach",FOUND_NEW,,https://gopslodygowice.pl,INSERT
+410,GOPS,las,"Gminny Ośrodek Pomocy Społecznej w Ślemieniu",FOUND_NEW,,https://slemien.naszops.pl,INSERT
+411,GOPS,pewel mala,"Gminny Ośrodek Pomocy Społecznej w Świnnej",FOUND_NEW,,https://swinna.naszops.pl,INSERT
+102,GOPS,sekowa,"Gminny Ośrodek Pomocy Społecznej w Sękowej",NOT_FOUND,,,MANUAL
+115,GOPS,jodlownik,"Gminny Ośrodek Pomocy Społecznej w Jodłowniku",NOT_FOUND,,,MANUAL
+117,GOPS,limanowa,"Gminny Ośrodek Pomocy Społecznej w Limanowej",NOT_FOUND,,,MANUAL
+119,GOPS,mszana dolna,"Gminny Ośrodek Pomocy Społecznej w Mszanie Dolnej",NOT_FOUND,,,MANUAL
+120,GOPS,niedzwiedz,"Gminny Ośrodek Pomocy Społecznej w Niedźwiedziu",NOT_FOUND,,,MANUAL
+121,GOPS,szczawa,"Gminny Ośrodek Pomocy Społecznej w Szczawie",NOT_FOUND,,,MANUAL
+123,GOPS,ksiaz wielki,"Gminny Ośrodek Pomocy Społecznej w Książu  Wielkim",NOT_FOUND,,,MANUAL
+125,GOPS,raclawice,"Gminny Ośrodek Pomocy Społecznej w Racławicach",NOT_FOUND,,,MANUAL
+136,GOPS,jablonka,"Ośrodek Pomocy Społecznej w Jabłonce",NOT_FOUND,,,MANUAL
+137,GOPS,kroscienko nad dunajcem,"Gminny Ośrodek Pomocy Społecznej w Krościenku nad Dunajcem",NOT_FOUND,,,MANUAL
+149,GOPS,chelmek,"Miejski Ośrodek Pomocy Społecznej w Chełmku",NOT_FOUND,,,MANUAL
+180,GOPS,niegowic,"Gminny Ośrodek Pomocy Społecznej Niegowić",NOT_FOUND,,,MANUAL
+183,GOPS,debno,"GOPS Dębno",NOT_FOUND,,,MANUAL
+186,GOPS,szczurowa,"Gminny Ośrodek Pomocy Społecznej Szczurowa",NOT_FOUND,,,MANUAL
+188,GOPS,trzebinia,"Miejsko-Gminny Ośrodek Pomocy Społecznej Trzebinia",NOT_FOUND,,,MANUAL
+189,GOPS,dabrowa tarnowska,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Dąbrowie Tarnowskiej",NOT_FOUND,,,MANUAL
+190,GOPS,medrzechow,"Gminny Ośrodek Pomocy Społecznej Mędrzechów",NOT_FOUND,,,MANUAL
+193,GOPS,szczucin,"MGOPS Szczucin",NOT_FOUND,,,MANUAL
+194,GOPS,lipinki,"Ośrodek Pomocy Społecznej Lipinki",NOT_FOUND,,,MANUAL
+198,GOPS,igolomia-wawrzenczyce,"Gminny Ośrodek Pomocy Społecznej w Igołomi-Wawrzeńczycach",NOT_FOUND,,,MANUAL
+201,GOPS,skawina,"Miejsko-Gminny Ośrodek Pomocy Społecznej Skawina",NOT_FOUND,,,MANUAL
+202,GOPS,wielka wies,"Gminny Ośrodek Pomocy Społecznej Wielka Wieś",NOT_FOUND,,,MANUAL
+203,GOPS,kamienica,"Gminny Ośrodek Pomocy Społecznej Kamienica",NOT_FOUND,,,MANUAL
+208,GOPS,kozlow,"GOPS Kozłów",NOT_FOUND,,,MANUAL
+209,GOPS,slaboszow,"Gminny Ośrodek Pomocy Społecznej Słaboszów",NOT_FOUND,,,MANUAL
+210,GOPS,dobczyce,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Dobczycach",NOT_FOUND,,,MANUAL
+212,GOPS,siepraw,"Gminny Ośrodek Pomocy Społecznej w Sieprawiu",NOT_FOUND,,,MANUAL
+214,GOPS,wisniowa,"GOPS Wiśniowa",NOT_FOUND,,,MANUAL
+216,GOPS,grodek nad dunajcem,"Gminny Ośrodek Pomocy Społecznej Gródek nad Dunajcem",NOT_FOUND,,,MANUAL
+217,GOPS,lososina dolna,"Gminny Ośrodek Pomocy Społecznej Łososina Dolna",NOT_FOUND,,,MANUAL
+220,GOPS,nowy targ,"Miejski Ośrodek Pomocy Społecznej w Nowym Targu",NOT_FOUND,,,MANUAL
+221,GOPS,czarny dunajec,"Gminny Ośrodek Pomocy Społecznej w Czarnym Dunajcu",NOT_FOUND,,,MANUAL
+223,GOPS,jablonka,"GOPS Jabłonka",NOT_FOUND,,,MANUAL
+224,GOPS,gmina nowy targ,"Gminny Ośrodek Pomocy Społecznej Gmina Nowy Targ",NOT_FOUND,,,MANUAL
+231,GOPS,koszyce,"Gminny Ośrodek Pomocy Społecznej Koszyce",NOT_FOUND,,,MANUAL
+232,GOPS,nowe brzesko,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Nowym Brzesku",NOT_FOUND,,,MANUAL
+233,GOPS,budzow,"Gminny Ośrodek Pomocy Społecznej w Budzowie",NOT_FOUND,,,MANUAL
+235,GOPS,makow podhalanski,"Miejski Ośrodek Pomocy Społecznej w Makowie Podhalańskim",NOT_FOUND,,,MANUAL
+236,GOPS,stryszawa,"GOPS Stryszawa",NOT_FOUND,,,MANUAL
+237,GOPS,gmina tarnow,"Gminny Ośrodek Pomocy Społecznej Tarnów",NOT_FOUND,,,MANUAL
+238,GOPS,lisia gora,"Gminny Ośrodek Pomocy Społecznej Lisia Góra",NOT_FOUND,,,MANUAL
+239,GOPS,plesna,"Gminny Ośrodek Pomocy Społecznej Pleśna",NOT_FOUND,,,MANUAL
+240,GOPS,rzepiennik strzyzewski,"Gminny Ośrodek Pomocy Społecznej w Rzepienniku Strzyżewskim",NOT_FOUND,,,MANUAL
+243,GOPS,lanckorona,"Gminny Ośrodek Pomocy Społecznej Lanckorona",NOT_FOUND,,,MANUAL
+246,GOPS,wieliczka,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Wieliczce",NOT_FOUND,,,MANUAL
+248,GOPS,trabki,"Gminny Ośrodek Pomocy Społecznej Trąbki",NOT_FOUND,,,MANUAL
+252,GOPS,mierzecice,"Ośrodek Pomocy Społecznej w Mierzęcicach",NOT_FOUND,,,MANUAL
+254,GOPS,siewierz,"Ośrodek Pomocy Społecznej w Siewierzu",NOT_FOUND,,,MANUAL
+255,MOPS,slawkow,"Miejski Ośrodek Pomocy Społecznej w Sławkowie",NOT_FOUND,,,MANUAL
+256,MOPS,wojkowice,"Miejski Ośrodek Pomocy Społecznej w Wojkowicach",NOT_FOUND,,,MANUAL
+258,GOPS,buczkowice,"Gminny Ośrodek Pomocy Społecznej w Buczkowicach",NOT_FOUND,,,MANUAL
+259,GOPS,czechowice-dziedzice,"Ośrodek Pomocy Społecznej w Czechowicach-Dziedzicach",NOT_FOUND,,,MANUAL
+261,GOPS,jaworze,"Gminny Ośrodek Pomocy Społecznej w Jaworzu",NOT_FOUND,,,MANUAL
+264,MOPS,szczyrk,"Miejski Ośrodek Pomocy Społecznej w Szczyrku",NOT_FOUND,,,MANUAL
+267,MOPS,bielsko-biala,"Miejski Ośrodek Pomocy Społecznej w Bielsku-Białej",NOT_FOUND,,,MANUAL
+268,MOPS,bierun,"Miejski Ośrodek Pomocy Społecznej w Bieruniu",NOT_FOUND,,,MANUAL
+269,CUS,swierczyniec,"Centrum Usług Społecznych w Bojszowach",NOT_FOUND,,,MANUAL
+270,GOPS,chelm slaski,"Gminny Ośrodek Pomocy Społecznej w Chełmie Śląskim",NOT_FOUND,,,MANUAL
+271,MOPS,imielin,"Miejski Ośrodek Pomocy Społecznej w Imielinie",NOT_FOUND,,,MANUAL
+273,MOPS,bytom,"Miejski Ośrodek Pomocy Rodzinie w Bytomiu",NOT_FOUND,,,MANUAL
+274,GOPS,chorzow,"Ośrodek Pomocy Społecznej w Chorzowie",NOT_FOUND,,,MANUAL
+275,GOPS,brenna,"Gminny Ośrodek Pomocy Społecznej w Brennej",NOT_FOUND,,,MANUAL
+281,GOPS,istebna,"Gminny Ośrodek Pomocy Społecznej w Istebnej",NOT_FOUND,,,MANUAL
+287,MOPS,czestochowa,"Miejski Ośrodek Pomocy Społecznej w Częstochowie",NOT_FOUND,,,MANUAL
+289,GOPS,dabrowa zielona,"Gminny Ośrodek Pomocy Społecznej w Dąbrowie Zielonej",NOT_FOUND,,,MANUAL
+291,GOPS,kamienica polska,"Gminny Ośrodek Pomocy Społecznej w Kamienicy Polskiej",NOT_FOUND,,,MANUAL
+292,GOPS,zdrowa,"Gminny Ośrodek Pomocy Społecznej w Kłomnicach",NOT_FOUND,,,MANUAL
+293,GOPS,koniecpol,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Koniecpolu",NOT_FOUND,,,MANUAL
+294,GOPS,konopiska,"Gminny Ośrodek Pomocy Społecznej w Konopiskach",NOT_FOUND,,,MANUAL
+296,GOPS,lelow,"Gminny Ośrodek Pomocy Społecznej w Lelowie",NOT_FOUND,,,MANUAL
+299,GOPS,olsztyn,"Gminny Ośrodek Pomocy Społecznej w Olsztynie",NOT_FOUND,,,MANUAL
+300,GOPS,poczesna,"Gminny Ośrodek Pomocy Społecznej w Poczesnej",NOT_FOUND,,,MANUAL
+303,GOPS,starcza,"Gminny Ośrodek Pomocy Społecznej w Starczy",NOT_FOUND,,,MANUAL
+304,MOPS,dabrowa gornicza,"Miejski Ośrodek Pomocy Społecznej w Dąbrowie Górniczej",NOT_FOUND,,,MANUAL
+305,GOPS,gliwice,"Ośrodek Pomocy Społecznej w Gliwicach",NOT_FOUND,,,MANUAL
+309,GOPS,pyskowice,"Ośrodek Pomocy Społecznej w Pyskowicach",NOT_FOUND,,,MANUAL
+311,GOPS,sosnicowice,"Ośrodek Pomocy Społecznej w Sośnicowicach",NOT_FOUND,,,MANUAL
+313,GOPS,wielowies,"Ośrodek Pomocy Społecznej w Wielowsi",NOT_FOUND,,,MANUAL
+314,GOPS,jastrzebie-zdroj,"Ośrodek Pomocy Społecznej w Jastrzębiu-Zdroju",NOT_FOUND,,,MANUAL
+318,GOPS,krzepice,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Krzepicach",NOT_FOUND,,,MANUAL
+320,GOPS,miedzno,"Gminny Ośrodek Pomocy Społecznej w Miedźnie",NOT_FOUND,,,MANUAL
+321,GOPS,opatow,"Gminny Ośrodek Pomocy Społecznej w Opatowie",NOT_FOUND,,,MANUAL
+322,GOPS,panki,"Gminny Ośrodek Pomocy Społecznej w Pankach",NOT_FOUND,,,MANUAL
+324,GOPS,przystajn,"Gminny Ośrodek Pomocy Społecznej w Przystaji",NOT_FOUND,,,MANUAL
+325,GOPS,wreczyca wielka,"Gminny Ośrodek Pomocy Społecznej we Wręczycy Wielkiej",NOT_FOUND,,,MANUAL
+326,GOPS,boronow,"Gminny Ośrodek Pomocy Społecznej w Boronowie",NOT_FOUND,,,MANUAL
+330,GOPS,koszecin,"Gminny Ośrodek Pomocy Społecznej w Koszęcinie",NOT_FOUND,,,MANUAL
+331,MOPS,lubliniec,"Miejski Ośrodek Pomocy Społecznej w Lublińcu",NOT_FOUND,,,MANUAL
+333,GOPS,wozniki,"Miejsko-Gminny Ośrodek Pomocy Społecznej w Woźnikach",NOT_FOUND,,,MANUAL
+334,CUS,laziska gorne,"Centrum Usług Społecznych w Łaziskach Górnych",NOT_FOUND,,,MANUAL
+335,MOPS,mikolow,"Miejski Ośrodek Pomocy Społecznej w Mikołowie",NOT_FOUND,,,MANUAL
+337,MOPS,orzesze,"Miejski Ośrodek Pomocy Społecznej w Orzeszu",NOT_FOUND,,,MANUAL
+338,GOPS,wyry,"Gminny Ośrodek Pomocy Społecznej w Wyrach",NOT_FOUND,,,MANUAL
+339,MOPS,myslowice,"Miejski Ośrodek Pomocy Społecznej w Mysłowicach",NOT_FOUND,,,MANUAL
+340,MOPS,kozieglowy,"Gminno-Miejski Ośrodek Pomocy Społecznej w Koziegłowach",NOT_FOUND,,,MANUAL
+341,MOPS,myszkow,"Miejski Ośrodek Pomocy Społecznej w Myszkowie",NOT_FOUND,,,MANUAL
+343,GOPS,poraj,"Gminny Ośrodek Pomocy Społecznej w Poraju",NOT_FOUND,,,MANUAL
+344,GOPS,zarki,"Gminny Ośrodek Pomocy Społecznej w Żarkach",NOT_FOUND,,,MANUAL
+345,MOPS,piekary slaskie,"Miejski Ośrodek Pomocy Rodzinie w Piekarach Śląskich",NOT_FOUND,,,MANUAL
+346,GOPS,goczalkowice-zdroj,"Ośrodek Pomocy Społecznej w Goczałkowicach-Zdroju",NOT_FOUND,,,MANUAL
+347,GOPS,kobior,"Gminny Ośrodek Pomocy Społecznej w Kobiórze",NOT_FOUND,,,MANUAL
+348,GOPS,wola,"Gminny Ośrodek Pomocy Społecznej w Miedźnej zs. w Woli",NOT_FOUND,,,MANUAL
+350,GOPS,pszczyna,"Ośrodek Pomocy Społecznej w Pszczynie",NOT_FOUND,,,MANUAL
+353,GOPS,krzanowice,"Gminny Ośrodek Pomocy Społecznej w Krzanowicach",NOT_FOUND,,,MANUAL
+355,MOPS,kuznia raciborska,"Miejski Ośrodek Pomocy Społecznej w Kuźni Raciborskiej",NOT_FOUND,,,MANUAL
+356,GOPS,nedza,"Gminny Ośrodek Pomocy Społecznej w Nędzy",NOT_FOUND,,,MANUAL
+357,GOPS,pietrowice wielkie,"Gminny Ośrodek Pomocy Społecznej w Pietrowicach Wielkich",NOT_FOUND,,,MANUAL
+358,GOPS,raciborz,"Ośrodek Pomocy Społecznej w Raciborzu",NOT_FOUND,,,MANUAL
+359,GOPS,rudnik,"Gminny Ośrodek Pomocy Społecznej w Rudniku",NOT_FOUND,,,MANUAL
+360,MOPS,ruda slaska,"Miejski Ośrodek Pomocy Społecznej w Rudzie Śląskiej",NOT_FOUND,,,MANUAL
+361,GOPS,czerwionka-leszczyny,"Ośrodek Pomocy Społecznej w Czerwionce-Leszczynach",NOT_FOUND,,,MANUAL
+366,GOPS,rybnik,"Ośrodek Pomocy Społecznej w Rybniku",NOT_FOUND,,,MANUAL
+367,MOPS,siemianowice slaskie,"Miejski Ośrodek Pomocy Społecznej Siemianowice Śląskie",NOT_FOUND,,,MANUAL
+370,MOPS,kalety,"Miejski Ośrodek Pomocy Społecznej w Kaletach",NOT_FOUND,,,MANUAL
+371,GOPS,krupski mlyn,"Gminny Ośrodek Pomocy Społecznej w Krupskim Młynie",NOT_FOUND,,,MANUAL
+372,MOPS,miasteczko slaskie,"Miejski Ośrodek Pomocy Społecznej w Miasteczku Śląskim",NOT_FOUND,,,MANUAL
+376,MOPS,tarnowskie gory,"Miejski Ośrodek Pomocy Społecznej w Tarnowskich Górach",NOT_FOUND,,,MANUAL
+378,GOPS,kamieniec,"Gminny Ośrodek Pomocy Społecznej w Zbrosławicach",NOT_FOUND,,,MANUAL
+379,MOPS,tychy,"Miejski Ośrodek Pomocy Społecznej w Tychach",NOT_FOUND,,,MANUAL
+382,GOPS,lubomia,"Ośrodek Pomocy Społecznej w Lubomi",NOT_FOUND,,,MANUAL
+387,MOPS,rydultowy,"Miejski Ośrodek Pomocy Społecznej w Rydułtowach",NOT_FOUND,,,MANUAL
+388,MOPS,wodzislaw slaski,"Miejski Ośrodek Pomocy Społecznej w Wodzisławiu Śląskim",NOT_FOUND,,,MANUAL
+389,MOPS,zabrze,"Miejski Ośrodek Pomocy Rodzinie w Zabrzu",NOT_FOUND,,,MANUAL
+392,GOPS,lazy,"Ośrodek Pomocy Społecznej w Łazach",NOT_FOUND,,,MANUAL
+393,GOPS,ogrodzieniec,"Ośrodek Pomocy Społecznej w Ogrodzieńcu",NOT_FOUND,,,MANUAL
+394,GOPS,pilica,"Ośrodek Pomocy Społecznej w Pilicy",NOT_FOUND,,,MANUAL
+396,GOPS,szczekociny,"Gminny Ośrodek Pomocy Społecznej w Szczekocinach",NOT_FOUND,,,MANUAL
+400,MOPS,zory,"Miejski Ośrodek Pomocy Społecznej w Żorach",NOT_FOUND,,,MANUAL
+401,GOPS,gilowice,"Gminny Ośrodek Pomocy Społecznej w Gilowicach",NOT_FOUND,,,MANUAL
+402,GOPS,jelesnia,"Gminny Ośrodek Pomocy Społecznej w Jeleśni",NOT_FOUND,,,MANUAL
+403,GOPS,koszarawa,"Gminny Ośrodek Pomocy Społecznej w Koszarawie",NOT_FOUND,,,MANUAL
+404,GOPS,lipowa,"Gminny Ośrodek Pomocy Społecznej w Lipowej",NOT_FOUND,,,MANUAL
+407,GOPS,milowka,"Gminny Ośrodek Pomocy Społecznej w Milówce",NOT_FOUND,,,MANUAL
+408,GOPS,wieprz,"Gminny Ośrodek Pomocy Społecznej Radziechowy-Wieprz",NOT_FOUND,,,MANUAL
+409,GOPS,rajcza,"Gminny Ośrodek Pomocy Społecznej w Rajczy",NOT_FOUND,,,MANUAL
+412,GOPS,ujsoly,"Gminny Ośrodek Pomocy Społecznej w Ujsołach",NOT_FOUND,,,MANUAL
+413,GOPS,wegierska gorka,"Gminny Ośrodek Pomocy Społecznej w Węgierskiej Górce",NOT_FOUND,,,MANUAL
+414,MOPS,zywiec,"Miejski Ośrodek Pomocy Społecznej w Żywcu",NOT_FOUND,,,MANUAL
