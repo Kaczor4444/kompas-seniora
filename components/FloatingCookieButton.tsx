@@ -169,7 +169,7 @@ export default function FloatingCookieButton() {
       {/* Floating cookie button */}
       <button
         onClick={() => setShowModal(true)}
-        className="fixed bottom-20 left-5 z-50 w-9 h-9 bg-emerald-600 hover:bg-emerald-500 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all"
+        className="fixed bottom-5 right-5 sm:bottom-20 sm:left-5 sm:right-auto z-50 w-9 h-9 bg-emerald-600 hover:bg-emerald-500 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all"
         aria-label="Ustawienia cookies"
         title="Ustawienia cookies"
       >
