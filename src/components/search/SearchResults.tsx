@@ -1053,10 +1053,10 @@ export default function SearchResults({
                  MobileBottomBar (zakomentowany poniżej) to bardziej zaawansowany bottom bar z dodatkowymi funkcjami
                  (filtry, sortuj, ulubione, geolokalizacja), ale obecnie nie jest aktywny. */}
             {facilities.length > 0 && (
-              <div className="flex items-center justify-between gap-4 mb-6">
+              <div className="flex items-center justify-between gap-2 mb-6">
                 {/* Sortowanie */}
-                <div className="flex items-center gap-2">
-                  <span className="text-slate-500 text-sm font-bold">Sortuj:</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="hidden sm:inline text-slate-500 text-sm font-bold flex-shrink-0">Sortuj:</span>
                   <select
                     value={sortParam}
                     onChange={(e) => setSortParam(e.target.value)}
@@ -1069,27 +1069,29 @@ export default function SearchResults({
                   </select>
                 </div>
 
-                {/* Filtry button - mobile only, lewo od toggle */}
-                <button
-                  onClick={() => setShowFilters(true)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition-all"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
-                  </svg>
-                  Filtry
-                  {activeChips.length > 0 && (
-                    <span className="bg-emerald-600 text-white text-xs font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
-                      {activeChips.length}
-                    </span>
-                  )}
-                </button>
+                {/* Filtry + Mapa — zgrupowane po prawej */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Filtry button - mobile only */}
+                  <button
+                    onClick={() => setShowFilters(true)}
+                    className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition-all"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
+                    </svg>
+                    Filtry
+                    {activeChips.length > 0 && (
+                      <span className="bg-emerald-600 text-white text-xs font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                        {activeChips.length}
+                      </span>
+                    )}
+                  </button>
 
-                {/* List/Map Toggle - JEDEN przycisk przełączający widok */}
-                <button
-                  onClick={() => setShowMapMobile(!showMapMobile)}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-semibold transition-all"
-                >
+                  {/* List/Map Toggle */}
+                  <button
+                    onClick={() => setShowMapMobile(!showMapMobile)}
+                    className="flex items-center gap-2 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-semibold transition-all"
+                  >
                   {showMapMobile ? (
                     <>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1105,7 +1107,8 @@ export default function SearchResults({
                       <span>Mapa</span>
                     </>
                   )}
-                </button>
+                  </button>
+                </div>
               </div>
             )}
 
