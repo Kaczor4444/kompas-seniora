@@ -1305,7 +1305,7 @@ export default function SearchResults({
 
       {/* MAP VIEW (fullscreen overlay when showMapMobile=true) */}
       {showMapMobile && (
-        <div className="fixed inset-0 z-40 top-20 bg-stone-50" style={{ willChange: 'transform' }}>
+        <div className="fixed inset-0 z-[55] sm:z-40 sm:top-20 bg-stone-50" style={{ willChange: 'transform' }}>
           {/* Backdrop - kliknięcie zamyka panel */}
           {showLeftPanel && (
             <div
@@ -1318,7 +1318,7 @@ export default function SearchResults({
           {!showLeftPanel && (
             <button
               onClick={() => setShowLeftPanel(true)}
-              className="absolute top-4 left-20 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
+              className="absolute top-14 sm:top-4 left-4 sm:left-20 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -1329,7 +1329,7 @@ export default function SearchResults({
 
           {/* Left Panel Container - only show when showLeftPanel is true */}
           {showLeftPanel && (
-            <div className="absolute top-20 left-4 z-30 w-80 space-y-3">
+            <div className="absolute top-[7rem] sm:top-20 left-4 z-30 w-80 space-y-3">
               <SearchBar
                 initialQuery={cityInput}
                 initialType={(['DPS', 'Klub Senior+', 'Dzienny Dom Senior+'].includes(selectedType) ? selectedType : 'Wszystkie') as any}
@@ -1610,7 +1610,7 @@ export default function SearchResults({
           {/* Back to List button - right side */}
           <button
             onClick={() => setShowMapMobile(false)}
-            className="absolute top-4 right-4 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
+            className="absolute top-14 sm:top-4 right-4 z-30 bg-white hover:bg-emerald-600 text-slate-900 hover:text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
