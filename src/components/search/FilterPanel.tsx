@@ -84,6 +84,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     : ALL_CARE_PROFILES;
 
   const [showProfilesMenu, setShowProfilesMenu] = useState(false);
+  const [showPriceExpanded, setShowPriceExpanded] = useState(false);
 
   const handleApply = () => {
     onApply?.();
@@ -92,68 +93,80 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   if (!show) return null;
 
   const filterContent = (
-    <>
-      {/* Filter Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <FilterSelect
-          label="Typ placówki"
-          value={selectedType}
-          onChange={onTypeChange}
-          options={[
-            { value: "all", label: "Wszystkie" },
-            { value: "DPS", label: "DPS (Całodobowe)" },
-            { value: "Klub Senior+", label: "Klub Senior+" },
-            { value: "Dzienny Dom Senior+", label: "Dzienny Dom Senior+" },
-          ]}
-        />
-        <FilterSelect
-          label="Powiat (Małopolska)"
-          value={selectedPowiat}
-          onChange={onPowiatChange}
-          options={availablePowiats.map(p => ({ value: p, label: p }))}
-        />
+    <div className="space-y-5">
+      {/* Typ placówki */}
+      <div>
+        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Typ placówki</label>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: 'all', label: 'Wszystkie' },
+            { value: 'DPS', label: 'DPS' },
+            { value: 'Klub Senior+', label: 'Klub Senior+' },
+            { value: 'Dzienny Dom Senior+', label: 'DD Senior+' },
+          ].map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => onTypeChange(value)}
+              className={`px-3 py-2 rounded-lg font-black text-[11px] uppercase tracking-wider transition-all ${
+                selectedType === value
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Profile Checkboxes */}
+      {/* Powiat */}
+      <div>
+        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Powiat</label>
+        <select
+          value={selectedPowiat}
+          onChange={(e) => onPowiatChange(e.target.value)}
+          className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 transition-colors"
+        >
+          {availablePowiats.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Profile opieki */}
       {careProfiles.length > 0 && (
-        <div className="mb-6 pb-6 border-b border-gray-200">
+        <div>
           <button
             onClick={() => setShowProfilesMenu(!showProfilesMenu)}
-            className="w-full flex items-center justify-between text-xs font-medium text-gray-500 uppercase mb-3 hover:text-gray-700 transition-colors"
+            className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
           >
             <span>Profile opieki {selectedProfiles.length > 0 && `(${selectedProfiles.length})`}</span>
-            <svg
-              className={`w-4 h-4 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <svg className={`w-4 h-4 transition-transform ${showProfilesMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
           {showProfilesMenu && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex flex-wrap gap-2">
               {careProfiles.map((profile) => {
                 const isSelected = selectedProfiles.includes(profile.value);
                 return (
-                  <label
+                  <button
                     key={profile.value}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    onClick={() => {
+                      if (isSelected) {
+                        onProfilesChange(selectedProfiles.filter(c => c !== profile.value));
+                      } else {
+                        onProfilesChange([...selectedProfiles, profile.value]);
+                      }
+                    }}
+                    className={`px-3 py-2 rounded-lg font-bold text-xs transition-all ${
+                      isSelected
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                    }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          onProfilesChange([...selectedProfiles, profile.value]);
-                        } else {
-                          onProfilesChange(selectedProfiles.filter(c => c !== profile.value));
-                        }
-                      }}
-                      className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                    />
-                    <span className="text-sm text-gray-700">{getProfileName(profile.value)}</span>
-                  </label>
+                    {profile.label}
+                  </button>
                 );
               })}
             </div>
@@ -161,121 +174,113 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
       )}
 
-      {/* Price Range */}
-      <div className="mb-6 pb-6 border-b border-gray-200">
-        <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
-          Cena miesięczna: <span className="text-gray-900 font-semibold">{priceLimit} zł</span>
-        </label>
-        <input
-          type="range"
-          min="0"
-          max="13000"
-          step="500"
-          value={priceLimit}
-          onChange={(e) => onPriceLimitChange(Number(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-        />
-      </div>
-
-      {/* Distance from Geolocation Filter */}
+      {/* Odległość (geolokalizacja) */}
       {userLocation && maxDistance !== undefined && onMaxDistanceChange && (
-        <div className="mb-6 pb-6 border-b border-gray-200">
-          <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
-            Odległość: <span className="text-gray-900 font-semibold">{maxDistance === 100 ? 'Wszystkie' : `do ${maxDistance} km`}</span>
+        <div>
+          <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+            Odległość: <span className="text-slate-900">do {maxDistance} km</span>
           </label>
           <input
-            type="range"
-            min="5"
-            max="100"
-            step="5"
+            type="range" min="5" max="100" step="5"
             value={maxDistance}
             onChange={(e) => onMaxDistanceChange(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
           />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>5 km</span>
-            <span>100 km</span>
+          <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+            <span>5 km</span><span>100 km</span>
           </div>
         </div>
       )}
 
-      {/* Distance from City Filter */}
-      {/* ✅ Ukryj dla miast na prawach powiatu (pokazujemy cały powiat) */}
+      {/* Odległość od miasta */}
       {(() => {
-        if (!searchCenter || userLocation || maxDistanceFromCity === undefined || !onMaxDistanceFromCityChange) {
-          return null;
-        }
-
+        if (!searchCenter || userLocation || maxDistanceFromCity === undefined || !onMaxDistanceFromCityChange) return null;
         const isCityCounty = ['kraków', 'krakow', 'nowy sącz', 'nowy sacz', 'tarnów', 'tarnow'].some(city =>
           searchCenter.name.toLowerCase().includes(city)
         );
-
-        if (isCityCounty) {
-          return null; // Ukryj slider dla miast na prawach powiatu
-        }
-
+        if (isCityCounty) return null;
         return (
-          <div className="mb-6 pb-6 border-b border-gray-200">
-            <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
-              Odległość od {searchCenter.name}: <span className="text-gray-900 font-semibold">{maxDistanceFromCity === 100 ? 'Wszystkie' : `do ${maxDistanceFromCity} km`}</span>
+          <div>
+            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+              Od {searchCenter.name}: <span className="text-slate-900">do {maxDistanceFromCity} km</span>
             </label>
             <input
-              type="range"
-              min="5"
-              max="100"
-              step="5"
+              type="range" min="5" max="100" step="5"
               value={maxDistanceFromCity}
               onChange={(e) => onMaxDistanceFromCityChange(Number(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
             />
-            <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>5 km</span>
-              <span>100 km</span>
+            <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+              <span>5 km</span><span>100 km</span>
             </div>
           </div>
         );
       })()}
 
-      {/* Wolne miejsca toggle */}
-      {onOnlyWithFreeSpacesChange && (
-        <div className="mb-6 pb-6 border-b border-gray-200">
+      {/* Cena — tylko DPS, zwijane */}
+      {selectedType === 'DPS' && (
+        <div>
           <button
-            onClick={() => onOnlyWithFreeSpacesChange(!onlyWithFreeSpaces)}
-            className="flex items-center justify-between w-full group"
+            onClick={() => setShowPriceExpanded(!showPriceExpanded)}
+            className="w-full flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 hover:text-slate-900 transition-colors"
           >
-            <div className="flex items-start gap-3">
-              <div className={`flex-shrink-0 w-10 h-6 rounded-full transition-colors duration-200 flex items-center mt-0.5 ${onlyWithFreeSpaces ? 'bg-emerald-600' : 'bg-gray-200'}`}>
-                <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${onlyWithFreeSpaces ? 'translate-x-5' : 'translate-x-1'}`} />
-              </div>
-              <div className="text-left">
-                <div className="text-sm font-semibold text-gray-900">Tylko wolne miejsca</div>
-                {onlyWithFreeSpaces && wolneMiejscaDate && (
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    stan na {wolneMiejscaDate.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })}
-                  </div>
-                )}
+            <span>Cena {priceLimit < 13000 && `(do ${priceLimit} zł)`}</span>
+            <svg className={`w-4 h-4 transition-transform ${showPriceExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showPriceExpanded && (
+            <div>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                Cena do: <span className="text-slate-900">{priceLimit} zł</span>
+              </label>
+              <input
+                type="range" min="0" max="13000" step="500"
+                value={priceLimit}
+                onChange={(e) => onPriceLimitChange(Number(e.target.value))}
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+              />
+              <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
+                <span>0 zł</span><span>13 000 zł</span>
               </div>
             </div>
-          </button>
+          )}
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex items-center justify-between">
+      {/* Wolne miejsca */}
+      {onOnlyWithFreeSpacesChange && (
+        <div>
+          <button
+            onClick={() => onOnlyWithFreeSpacesChange(!onlyWithFreeSpaces)}
+            className="flex items-center justify-between w-full"
+          >
+            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Tylko wolne miejsca</span>
+            <div className={`flex-shrink-0 w-10 h-6 rounded-full transition-colors duration-200 flex items-center ${onlyWithFreeSpaces ? 'bg-emerald-600' : 'bg-slate-200'}`}>
+              <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${onlyWithFreeSpaces ? 'translate-x-5' : 'translate-x-1'}`} />
+            </div>
+          </button>
+          {onlyWithFreeSpaces && wolneMiejscaDate && (
+            <div className="text-xs text-slate-400 mt-1">
+              stan na {wolneMiejscaDate.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Wyczyść */}
+      <div className="pt-4 border-t border-slate-200">
         <button
           onClick={onReset}
-          className="text-sm font-medium text-gray-500 hover:text-red-500 transition-colors"
+          className="w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2"
         >
-          Wyczyść filtry
-        </button>
-        <button
-          onClick={handleApply}
-          className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
-        >
-          Zastosuj
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Wyczyść wszystkie filtry
         </button>
       </div>
-    </>
+    </div>
   );
 
   return (
