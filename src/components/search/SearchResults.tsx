@@ -1069,6 +1069,22 @@ export default function SearchResults({
                   </select>
                 </div>
 
+                {/* Filtry button - mobile only, lewo od toggle */}
+                <button
+                  onClick={() => setShowFilters(true)}
+                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition-all"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
+                  </svg>
+                  Filtry
+                  {activeChips.length > 0 && (
+                    <span className="bg-emerald-600 text-white text-xs font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                      {activeChips.length}
+                    </span>
+                  )}
+                </button>
+
                 {/* List/Map Toggle - JEDEN przycisk przełączający widok */}
                 <button
                   onClick={() => setShowMapMobile(!showMapMobile)}
@@ -1652,21 +1668,7 @@ export default function SearchResults({
         />
       </div>
 
-      {/* Mobile floating filter button */}
-      <button
-        onClick={() => setShowFilters(true)}
-        className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 bg-slate-900 text-white px-6 py-3.5 rounded-full shadow-2xl font-bold text-sm active:scale-95 transition-transform"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
-        </svg>
-        Filtry
-        {activeChips.length > 0 && (
-          <span className="bg-emerald-500 text-white text-xs font-black px-2 py-0.5 rounded-full min-w-[20px] text-center">
-            {activeChips.length}
-          </span>
-        )}
-      </button>
+
     </section>
   );
 }
