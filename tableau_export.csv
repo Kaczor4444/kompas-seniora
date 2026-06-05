@@ -1,0 +1,374 @@
+﻿id,nazwa,typ,typ_krotki,ulica,miejscowosc,kod_pocztowy,powiat,wojewodztwo,latitude,longitude,liczba_miejsc,koszt_pobytu,profil_opieki,telefon,www
+33,Dom Pomocy Społecznej Przystań,DPS,DPS,Aleja Armii Krajowej 181,Bielsko-Biała,43-300,bielski,śląskie,49.82200000000001,19.044,25,9266,"E,F",338147145,https://dpshospicjum.pl/
+34,Dom Pomocy Społecznej dla Osób Starszych,DPS,DPS,ul. Żywiecka 15,Bielsko-Biała,43-300,bielski,śląskie,49.805,19.029,57,6567,E,334979127,https://www.dpsos-bielsko.pl/
+35,Dom Pomocy Społecznej dla Przewlekle Chorych,DPS,DPS,ul. Olimpijska 11,Bielsko-Biała,43-300,bielski,śląskie,49.821,19.046,,8655,"E,F",,
+36,Dom Pomocy Społecznej Dom Nauczyciela,DPS,DPS,ul. Pocztowa 14a,Bielsko-Biała,43-300,bielski,śląskie,49.819,19.037,,6424,E,,
+19,Dom Pomocy Społecznej w Bochni,DPS,DPS,ul. Karolina 14G,Bochnia,32-700,bocheński,małopolskie,49.9799,20.4422,157,6817,"dla osób w podeszłym wieku 90 miejsc
+dla osób przewlekle psychicznie chorych 67 miejsc",14 612 59 90,https://dpsbochnia.pl/
+22,Dom Pomocy Społecznej-Regionalne Centrum Rehabilitacji i Pomocy Społecznej w Borzęcinie,DPS,DPS,591,Borzęcin,32-825,brzeski,małopolskie,50.0652,20.7091,100,7050,"dla osób w podeszłym wieku 48 miejsc
+dla osób niepełnosprawnych fizycznie - 50 miejsc, 
+2 miejsca przeznaczone na świadczenie usług wsparcia krótkoterminowego całodobowego",14 674 05 50,https://rcrips.pl/
+20,Dom Pomocy Społecznej w Brzesku,DPS,DPS,ul. Starowiejska 6,Brzesko,32-800,brzeski,małopolskie,49.9757,20.6177,50,8052,dla dzieci i młodzieży niepełnosprawnych intelektualnie,14 663 05 84,https://brzeskodps.pl/
+21,Dom Pomocy Społecznej w Porąbce Uszewskiej,DPS,DPS,Uszewska 272,Porąbka Uszewska,32-854,brzeski,małopolskie,49.9325,20.6806,25,5775,dla osób w podeszłym wieku,14 665 68 60,https://dps-pu.pl/
+23,Powiatowy Dom Pomocy Społecznej im. Adama Starzeńskiego w Płazie ,DPS,DPS,ul. Wiosny Ludów 4,Płaza,32-552,chrzanowski,małopolskie,50.0989,19.4674,101,8134,dla osób przewlekle psychicznie chorych,60 388 81 47,https://www.dpsplaza.pl/
+25,Dom Pomocy Społecznej Św. Brata Alberta Chmielowskiego Caritas Diecezji Tarnowskiej w Dąbrowie Tarnowskiej,DPS,DPS,ul. Św. Br. A. Chmielowskiego 16,Dąbrowa Tarnowska,33-200,dąbrowski,małopolskie,50.172,20.9996,35,6550,dla osób przewlekle somatycznie chorych,14 642 44 51,https://caritas.diecezja.tarnow.pl/index.php/pl/placowki/dom-pomocy-spolecznej-sw-br-alberta-w-dabrowie-tarnowskiej
+24,Dom Radosnej Starości im. Jana Pawła II w Kupieninie,DPS,DPS,35,Kupienin,33-221,dąbrowski,małopolskie,50.3063,20.9603,70,6343,dla osób w podeszłym wieku,14 643 73 10,https://drskupienin.pl/
+27,Dom Pomocy Społecznej w Gorlicach ,DPS,DPS,ul. Sienkiewicza 30,Gorlice,38-300,gorlicki,małopolskie,49.6535,21.1681,86,6718,dla osób w podeszłym wieku,18 352 67 08,https://dpsgorlice.pl/
+26,Dom Pomocy Społecznej w Gorlicach ,DPS,DPS,ul. Michalusa 14,Gorlice,38-300,gorlicki,małopolskie,49.6691,21.1725,120,6826,dla osób przewlekle somatycznie chorych,18 353 54 08,https://www.dpsmichalusagorlice.pl/
+28,Dom Pomocy Społecznej w Klimkówce ,DPS,DPS,Klimkówka 67,Ropa,38-312,gorlicki,małopolskie,49.5566,21.0748,78,7045,dla osób przewlekle psychicznie chorych,18 351 61 72,http://www.dpsklimkowka.cba.pl/
+29,Dom Pomocy Społecznej w Wapiennem,DPS,DPS,Wapienne 70,Sękowa,38-307,gorlicki,małopolskie,49.63,21.283097,25,6344,"dla osób w podeszłym wieku - 15 miejsc 
+osób przewlekle somatycznie chorych - 10 miejsc",18 447 90 16,https://domwczasowy-maria.pl/dom-opieki-dom-spokojnej-starosci/
+48,Dom Pomocy Społecznej w Batowicach,DPS,DPS,ul. Matejki 24,Batowice,32-086,krakowski,małopolskie,50.1124,20.0183,117,8661,dla osób przewlekle somatycznie chorych,12 285 70 71,http://dpsbatowice.pl/kontakt/
+50,Dom Pomocy Społecznej w Karniowicach,DPS,DPS,ul. Osiedlowa 10,Karniowice,32-082,krakowski,małopolskie,50.1519,19.7742,90,8548,"dla osób w podeszłym wieku – 40 miejsc,
+dla osób przewlekle somatycznie chorych – 50 miejsc",12 285 21 01,http://www.dpskarniowice.pl/wp/kontakt/
+54,Dom Pomocy Społecznej w Prusach,DPS,DPS,"Prusy, ul. Kocmyrzowska 107",Kocmyrzów,32-010,krakowski,małopolskie,50.1191,20.0893,56,8200,"dla dorosłych niepełnosprawnych intelektualnie – 41 miejsc
+dla dzieci i młodzieży niepełnosprawnych intelektualnie - 15 miejsc",12 387 03 00,https://zakony-zenskie.pl/domy-pomocy-spolecznej-dps/
+30,Dom Pomocy Społecznej ul. Kluzeka 6 w Krakowie,DPS,DPS,ul. Kluzeka 6,Kraków,31-222,krakowski,małopolskie,50.0929,19.9356,90,9800,"dla osób w podeszłym wieku 40 miejsc
+dla osób przewlekle somatycznie chorych - 50 miejsc",12 415 25 92,https://www.dpskluzeka.pl/
+38,Dom Pomocy Społecznej w Krakowie,DPS,DPS,ul. Krakowska 55,Kraków,31-066,krakowski,małopolskie,50.0502,19.9526,260,9400,dla osób przewlekle psychicznie chorych ,12 430 63 17,"https://mops.krakow.pl/260002,artykul,kontakt---dom-pomocy-spolecznej---ul--krakowska-55.html"
+32,Dom Pomocy Społecznej  ul. Praska 27 w Krakowie,DPS,DPS,ul. Praska 27,Kraków,30-329,krakowski,małopolskie,50.0479,19.9119,100,11100,dla osób przewlekle somatycznie chorych,12 421 15 16,"https://mops.krakow.pl/start/259784,artykul,dps_dla_osob_przewlekle_somatycznie_chorych__ul__radziwillowska_8.html"
+47,Dom Pomocy Społecznej Zakonu Przenajświętszej Trójcy w Krakowie,DPS,DPS,ul. Łanowa 1B,Kraków,30-725,krakowski,małopolskie,50.0354,19.9865,46,7400,la osób przewlekle somatycznie chorych ,12 650 50 20,https://mops.krakow.pl/instcbi/212216/inst/35973/2444/Dom-Pomocy-Spolecznej-ul-Lanowa-1b.html
+43,Dom Pomocy Społecznej w Krakowie,DPS,DPS,ul. Łanowa 43,Kraków,30-725,krakowski,małopolskie,50.0383,19.9937,165,11300,"dla dorosłych niepełnosprawnych intelektualnie - 150
+miejsc dla dzieci i młodzieży niepełnosprawnych intelektualnie - 15",12 653 20 41,"https://mops.krakow.pl/strony-jps---zawartosc-stron-www---nie-aktywowac-/264424,artykul,kontakt-z-dps.html"
+31,Dom Pomocy Społecznej m. św. Jana Pawła II ul. Praska 25 w Krakowie,DPS,DPS,ul. Praska 25,Kraków,30-329,krakowski,małopolskie,50.0478,19.9127,100,11900,"dla osób przewlekle somatycznie chorych - 80 miejsc, 
+dorosłych niepełnosprawnych intelektualnie-18
+dzieci i młodzieży niepełnosporawnych intelektualnie - 2 miejsca ",12 266 03 64,"https://mops.krakow.pl/start/259695,artykul,dps_dla_osob_przewlekle_somatycznie_chorych__ul__praska_25.html"
+37,Dom Pomocy Społecznej w Krakowie,DPS,DPS,ul. Łanowa 41,Kraków,30-725,krakowski,małopolskie,50.0647,19.9449,378,9000,dla osób przewlekle psychicznie chorych ,12 650 56 00,"https://mops.krakow.pl/262540,artykul,kontakt---dom-pomocy-spolecznej--ul--lanowa-41.html"
+44,Dom Pomocy Społecznej w Krakowie,DPS,DPS,ul. Rozrywka 1,Kraków,31-419,krakowski,małopolskie,50.0961,19.9804,50,12400,dla osób uzależnionych od alkoholu ,12 411 94 00,"https://mops.krakow.pl/strony-jps---zawartosc-stron-www---nie-aktywowac-/267729,artykul,kontakt.html"
+39,Dom Pomocy Społecznej Nowa Huta w Krakowie,DPS,DPS,os. Hutnicze 5,Kraków,31-917,krakowski,małopolskie,50.0735,20.0466,140,9800,"55 miejsc dla osób przewlekle psychicznie chorych w budynku os. Szkolne 28
+45 miejsc dla osób przewlekle somatycznie chorych w budynku os. Sportowe 9
+40 miejsc dla dorosłych niepełnosprawnych intelektualnie w budynku os. Hutnicze 5",12 686 63 77,"https://mops.krakow.pl/instcbi/212216,inst,35972,2444,instcbi.html"
+45,Dom Pomocy Społecznej Zgromadzenia Sióstr Służebniczek Najświętszej Marii Panny Niepokalanie Poczętej w Krakowie,DPS,DPS,ul. Podgórki Tynieckie 96,Kraków,30-398,krakowski,małopolskie,50.0101,19.8415,50,7500,dla osób przewlekle somatycznie chorych ,12 267 50 55,https://dpspodgorki.pl/kontakt/
+49,Dom Pomocy Społecznej w Czernej,DPS,DPS,Czerna 110,Krzeszowice,32-065,krakowski,małopolskie,50.1624,19.6291,95,8782,dla osób przewlekle psychicznie chorych ,12 282 02 19,http://dpsczerna.pl/kontakt/
+51,Dom Pomocy Społecznej w Konarach,DPS,DPS,ul. Bonifraterska 11,Mogilany,32-031,krakowski,małopolskie,49.9504,19.9434,63,8100,dla osób przewlekle psychicznie chorych ,12 270 40 02,https://bonifundo.pl/kontakt/
+52,Dom Pomocy Społecznej im. św. Brata Alberta w Ojcowie,DPS,DPS,Ojców 64,Ojców,32-045,krakowski,małopolskie,50.1847,19.8395,75,8114,dla dorosłych niepełnosprawnych intelektualnie,12 389 20 25,http://dpsojcow.pl/?page_id=17
+53,Dom Pomocy Społecznej w Owczarach,DPS,DPS,Kasztanowa 20,Owczary,32-088,krakowski,małopolskie,50.1755,19.9133,89,8901,dla osób przewlekle psychicznie chorych ,12 419 40 86,http://dpsowczary.pl/wp/kontakt/
+55,Dom Pomocy Społecznej –Schronisko dla Niepełnosprawnych im. Brata Alberta w Radwanowicach,DPS,DPS,Radwanowice 1,Rudawa,32-064,krakowski,małopolskie,50.1503,19.7061,83,8200,dla dorosłych niepełnosprawnych intelektualnie,12 283 87 59,https://albert.krakow.pl/pl/osrodek-w-radwanowicach/
+56,Dom Pomocy Społecznej w Więckowicach,DPS,DPS,ul. Słoneczna 3,Więckowice,32-082,krakowski,małopolskie,50.1366,19.7623,149,8133,dla osób przewlekle psychicznie chorych ,12 285 16 03,http://www.dpswieckowice.pl/wp/kontakt/
+57,Małopolski Dom Pomocy Społecznej „Na Farmie Życia” w Więckowicach,DPS,DPS,"ul. Ogrodowa 17, 17A",Więckowice,32-082,krakowski,małopolskie,50.143,19.7664,10,,"dla osób dorosłych niepełnosprawnych intelektualnie
+
+brak ceny za pobyt - nie pokazuj ceny tylko trzeba napisac ze trzeba sie bezposrednio skontaktowac po cene",72 837 22 14,https://farma.org.pl/farma-zycia/mdps/
+60,Dom Pomocy Społecznej „Diana” w Kasinie Wielkiej,DPS,DPS,"448a, 448b ",Kasina Wielka,34-741,limanowski,małopolskie,49.7228,20.1393,100,7995,dla osób przewlekle psychicznie chorych ,18 331 40 97,
+58,Dom Pomocy Społecznej w Limanowej,DPS,DPS,ul. Wincentego Witosa 24/26,Limanowa,34-600,limanowski,małopolskie,49.7239,20.4038,60,8120,dla osób przewlekle somatycznie chorych ,18 337 17 07,https://dpslimanowa.pl/kontakt/
+61,Fundacja „Opiekuńczość” w Rabie Niżnej,DPS,DPS,Raba Niżna 1,Mszana Dolna,34-730,limanowski,małopolskie,49.6282,20.0142,90,7906,dla osób przewlekle psychicznie chorych ,18 268 02 42,http://www.osmola.hg.pl/
+59,Dom Pomocy Społecznej w Mszanie Dolnej,DPS,DPS,ul. Rakoczego 9,Mszana Dolna,34-730,limanowski,małopolskie,49.6807,20.0884,48,8700,dla osób przewlekle psychicznie chorych,18 331 01 54,https://dpsmszanadolna.pl/kontakt/
+197,Dom Pomocy Społecznej w Skrzydlnej ,DPS,DPS,298A,Skrzydlna,34-625,limanowski,małopolskie,49.7552,19.8968,100,,dla osób przewlekle psychicznie chorych ,18 476 14 51,https://egidadps.pl/kontakt/
+62,Dom Pomocy Społecznej w Szczyrzycu,DPS,DPS,Szczyrzyc 182,Szczyrzyc,34-623,limanowski,małopolskie,49.778,20.1912,99,8550,dla osób przewlekle psychicznie chorych ,18 332 02 66,https://dpsszczyrzyc.pl/kontakt/
+193,Dom Pomocy Społecznej im. św. Brata Alberta w Krakowie,DPS,DPS,ul. Adolfa Nowaczyńskiego 1 ,Kraków,30-336,m. Kraków,małopolskie,50.0464,19.9196,175,9700,dla osób przewlekle somatycznie choryc,12 255 41 61,"https://mops.krakow.pl/211481,artykul,kontakt.html"
+196,Środowiskowy Dom Pomocy Społecznej w Krakowie,DPS,DPS,ul. dr Józefa Babińskiego 25,Kraków,30-393,m. Kraków,małopolskie,50.0067,19.8817,87,10600,dla dorosłych niepełnosprawnych intelektualnie,12 262 02 27,
+194,Dom Pomocy Społecznej ul. Łanowa 39 w Krakowie,DPS,DPS,ul. Łanowa 39,Kraków,30-725,m. Kraków,małopolskie,50.038,19.9949,130,10400,dla osób przewlekle somatycznie chorych,12 653 22 47,"https://mops.krakow.pl/start/259790,artykul,dps_dla_osob_przewlekle_somatycznie_chorych__ul__lanowa_39.html"
+192,Dom Pomocy Społecznej im. Ludwika i Anny Helclów w Krakowie,DPS,DPS,ul. Helclów 2,Kraków,31-148,m. Kraków,małopolskie,50.0726,19.9375,387,10100,dla osób przewlekle somatycznie chorych,12 634 42 55,"https://dpshelclow.pl/nasz-dom/251311,artykul,kontakt.html"
+168,Dom Pomocy Społecznej w Nowy Sączu,DPS,DPS,ul. Emilii Plater 20,Nowy Sącz,33-300,m. Nowy Sącz,małopolskie,49.6221,20.6988,72,8096,dla osób w podeszłym wieku,18 443 77 48,
+167,Dom Pomocy Społecznej w Nowym Sączu,DPS,DPS,ul. Nawojowska 155,Nowy Sącz,33-300,m. Nowy Sącz,małopolskie,49.5976,20.722,91,7869,dla osób przewlekle psychicznie chorych ,18 444 49 96,
+71,Dom Pomocy Społecznej w Nowy Sączu,DPS,DPS,ul. Nawojowska 159,Nowy Sącz,32-300,m. Nowy Sącz,małopolskie,49.5976,20.722,170,7711,dla osób przewlekle psychicznie chorych ,18 443 93 04,https://www.facebook.com/dpsnawojowska159/?locale=pl_PL
+178,Dom Pomocy Społecznej w Tarnowie,DPS,DPS,ul. Szpitalna 53,Tarnów,33-100,m. Tarnów,małopolskie,50.0242,20.9964,164,7836,"dla osób przewlekle somatycznie chorych - 154 miejsca 
+dla osób w podeszłym wieku - 10 miejsc",14 688 86 67,http://www.dps.okay.pl/
+180,Dom Pomocy Społecznej w Tarnowie,DPS,DPS,ul. Czarna Droga 48,Tarnów,33-101,m. Tarnów,małopolskie,49.9971,20.9297,87,7132,"dla osób
+w podeszłym wieku",14 633 02 15,https://dps.itarnow.pl/kontakt/
+181,Dom Pomocy Społecznej im. Zofii Skorupy w Tarnowie,DPS,DPS,ul. Modrzejewskiej 48,Tarnów,33-100,m. Tarnów,małopolskie,50.0445,21.0012,17,6661,dla dorosłych niepełnosprawnych intelektualnie,14 625 07 15,https://dpshosteltarnow.wixsite.com/psonitarnow/kontakt
+179,"Dom Pomocy Społecznej dla Dzieci, Młodzieży i Dorosłych Niepełnosprawnych Intelektualnie w Tarnowie",DPS,DPS,ul. Robotnicza 4,Tarnów,33-100,m. Tarnów,małopolskie,50.0006,20.976,80,7227,"dla dzieci
+i młodzieży niepełnosprawnych intelektualnie – 52 miejsca,
+dla dorosłych niepełnosprawnych intelektualnie – 28 miejsc",14 621 39 95,https://dpstarnow.diecezja.tarnow.pl/index.php/kontakt
+66,Caritas Kielecka Dom Opieki w Charsznicy,DPS,DPS,ul. Młyńska 2,Charsznica,32-250,miechowski,małopolskie,50.3969,19.9444,30,5855,dla osób w podeszłym wieku  ,41 383 60 52,
+63,Dom Pomocy Społecznej w Mianocicach,DPS,DPS,Mianocice 51,Książ Wielki,32-210,miechowski,małopolskie,50.4363,20.1169,90,6330,dla dorosłych niepełnosprawnych intelektualnie,41 383 80 22,
+64,Dom Pomocy Społecznej w Miechowie,DPS,DPS,ul. Warszawska 49A,Miechów,32-200,miechowski,małopolskie,50.3689,20.0424,90,6900,dla dorosłych niepełnosprawnych intelektualnie,41 383 14 90,http://www.dps.miechow.net/kontakt/
+65,Dom Pomocy Społecznej „BETANIA” w Miechowie,DPS,DPS,ul. ks. Skorupki 19,Miechów,32-200,miechowski,małopolskie,50.3581,20.0323,71,7170,"dla osób przewlekle somatycznie chorych
+dla osób w podeszłym wieku",41 383 16 48,https://www.dpsbetania.pl/kontakt/
+67,Dom Pomocy Społecznej „Dom Kombatanta” w Miechowie,DPS,DPS,ul. Szpitalna 1B,Miechów,32-200,miechowski,małopolskie,50.3556,20.0348,50,6800,dla osób w podeszłym wieku ,41 389 06 70,https://miechow.caritas.pl/dom_kombatanta/
+68,Dom Pomocy Społecznej im. Tadeusza Piekarza w Harbutowicach,DPS,DPS,ul. Beskidzka 3,Harbutowice,32-440,myślenicki,małopolskie,49.8233,19.7888,75,8072,dla dorosłych niepełnosprawnych intelektualnie,12 273 20 02,https://dpsharbutowice.pl/kontakt/
+70,Dom Pomocy Społecznej „Biały Potok” w Trzemeśni,DPS,DPS,Trzemeśnia 377,Myślenice,32-425,myślenicki,małopolskie,49.815,20.0135,76,7801,dla osób przewlekle psychicznie chorych ,12 273 50 36,https://dpstrzemesnia.pl/index.php/kontakt/
+69,Dom Pomocy Społecznej w Pcimiu,DPS,DPS, Pcim 638,Pcim,32-432,myślenicki,małopolskie,49.7518,19.9838,60,8508,"dla osób w podeszłym wieku - 19 miejsc
+osób przewlekle somatycznie chorych - 41 miejsc",12 274 80 18,https://dpspcim.pl/index.php/kontakt/
+73,Dom Pomocy Społecznej ,DPS,DPS,Biała Niżna 640,Grybów,33-330,nowosądecki,małopolskie,49.6414,20.974,33,7500,"dla osób w podeszłym wieku - 7 miejsc
+osób przewlekle somatycznie chorych - 26 miejsc",18 447 35 02,https://dps.gminagrybow.pl/pl/633/0/kontakt.html
+72,Dom Pomocy Społecznej w Klęczanach,DPS,DPS,Klęczany 169,Klęczany,33-394,nowosądecki,małopolskie,49.6679,20.623,66,8400,dla osób przewlekle somatycznie chorych,18 443 37 57,http://dpskleczany.pl/kontakt/
+198,Dom Pomocy Społecznej im. O. Pio w Mogilnie,DPS,DPS,233,Mogilno,33-326,nowosądecki,małopolskie,49.6562,20.8366,52,,"dla osób w podeszłym wieku - 24 miejsca
+osób przewlekle somatycznie chorych - 28 miejsc",18 549 13 70,https://domopiekicalodobowej.pl/
+169,Dom Pomocy Społecznej w Muszynie,DPS,DPS,ul. Zielona 26,Muszyna,33-370,nowosądecki,małopolskie,49.3598,20.8873,65,7700,dla osób przewlekle somatycznie chorych,18 471 40 14,
+170,Dom Pomocy Społecznej w Zbyszycach,DPS,DPS,12,Zbyszyce,33-318,nowosądecki,małopolskie,49.7126,20.6629,122,8892,dla osób przewlekle psychicznie chorych,18 443 25 33,
+172,Dom Pomocy Społecznej im. św. Siostry Faustyny Kowalskiej w Rabie Wyżnej,DPS,DPS,435a,Raba Wyżna,34-721,nowotarski,małopolskie,49.5673,19.9006,38,6644,"dla osób
+w podeszłym wieku - 10 miejsc 
+osób przewlekle somatycznie chorych - 28 miejsc
+
+
+
+",18 267 15 20,https://dps-raba-wyzna.pl/kontakt/
+171,Domów Pomocy Społecznej w Zaskalu,DPS,DPS,ul. Kardynała Karola Wojtyły 136,Zaskale,34-424,nowotarski,małopolskie,49.4525,19.9916,125,7251,"76 miejsc przeznaczonych dla osób w podeszłym wieku znajduje się w budynku w Zaskalu przy
+ul. Kardynała Karola Wojtyły 136 34-424 Szaflary
+dla osób przewlekle somatycznie chorych oraz osób niepełnosprawnych fizycznie (łącznie 49 miejsc) w budynku w Rabce-Zdroju
+ul. Parkowa 4, 34-700 Rabka-Zdrój (tel./fax 18 26 80434).",18 265 55 92,https://dpssmrek.nowotarski.org.pl/kontakt/
+74,Dom Pomocy Społecznej ,DPS,DPS,ul. Jana Kantego 4,Olkusz,32-300,olkuski,małopolskie,50.2786,19.5562,98,8600,dla osób przewlekle somatycznie chorych,32 643 37 39,https://www.dpsolkusz.pl/kategorie/kontakt
+75,Dom Pomocy Społecznej ,DPS,DPS,ul. Księżnej Ogińskiej 2,Bobrek,32-661,oświęcimski,małopolskie,50.0671,19.2625,190,8720,dla dorosłych niepełnosprawnych intelektualnie,33 846 44 04,https://dpsbobrek.pl/kontakt/
+76,Dom Pomocy Społecznej Braci Albertynów,DPS,DPS,ul. Bł. Faustyny 4,Bulowice,32-652,oświęcimski,małopolskie,49.8837,19.2997,81,6820,dla osób przewlekle psychicznie chorych ,33 843 60 50,https://www.dps-bulowice.pl/kontakt/
+173,Dom Pomocy Społecznej Caritas Archidiecezji Krakowskiej w Zatorze,DPS,DPS,ul. Jana Pawła II 3,Zator,32-640,oświęcimski,małopolskie,49.9929,19.4363,52,7538,dla dorosłych niepełnosprawnych intelektualnie,33 841 22 39,http://www.zator.caritas.pl/index_kontakt.html
+175,Dom Pomocy Społecznej im. Św. Matki Teresy z Kalkuty w Pieczonogach,DPS,DPS,54,Pieczonogi,32-109,proszowicki,małopolskie,50.2551,20.2975,30,6267,dla osób przewlekle somatycznie chorych,41 384 82 63,https://kielce.caritas.pl/kontakt/
+174,Dom Pomocy Społecznej im. Adama Chmielowskiego w Łyszkowicach,DPS,DPS,64,Łyszkowice,32-104,proszowicki,małopolskie,50.178,20.2105,145,8005,dla osób przewlekle psychicznie chorych,12 386 95 25,"http://www.dpslyszkowice.pl/kontakt,22.html"
+177,Dom Pomocy Społecznej w Makowie Podhalańskim,DPS,DPS,ul. Żeromskiego 17,Maków Podhalański,34-220,suski,małopolskie,49.7252,19.6951,75,6948,dla osób przewlekle psychicznie chorych,33 877 14 94,https://dpsmakow.naszdps.pl/dps/kontakt-1
+176,Dom Pomocy Społecznej w Łętowni,DPS,DPS,353,Łętownia,34-242,suski,małopolskie,49.7003,19.8654,100,6528,"dla osób w podeszłym wieku - 51 miejsc, 
+osób niepełnosprawnych fizyczne - 15 miejsc 
+dzieci i młodzieży niepełnosprawnych intelektualnie - 34 miejsca",18 277 30 10,http://www.dpsletownia.pl/kontakt.html
+188,Dom Pomocy Społecznej w Jadownikach Mokrych,DPS,DPS,340,Jadowniki Mokre,33-271,tarnowski,małopolskie,50.1667,20.7339,16,7280,"dla dorosłych niepełnosprawnych intelektualnie - 8 miejsc
+dla dzieci i młodzieży niepełnosprawnych intelektualnie - 8 miejsc",14 641 75 01,https://www.jadowniki.caritas.pl/kontakt
+189,Dom Pomocy Społecznej w Nowodworzu,DPS,DPS,64,Nowodworze,33-112,tarnowski,małopolskie,49.9726,20.98,142,7630,dla osób przewlekle psychicznie chorych,14 679 53 12,"https://www.dpsnowodworze.pl/?pl_kontakt,2"
+183,Dom Pomocy Społecznej w Sieradzy,DPS,DPS,208,Sieradza,33-240,tarnowski,małopolskie,50.1415,20.9047,85,7800,dla osób przewlekle psychicznie chorych,14 645 61 05,https://dpssieradza.pl/web/
+184,Dom Pomocy Społecznej w Stróżach,DPS,DPS,1,Stróże,32-840,tarnowski,małopolskie,49.8376,20.7603,108,7800,dla osób przewlekle psychicznie chorych,14 665 52 77,https://www.dpsstroze.pl/kontakt/
+185,Dom Pogodnej Jesieni w Tuchowie,DPS,DPS,ul. św. Józefa 9,Tuchów,33-170,tarnowski,małopolskie,49.9027,21.0604,52,6170,dla osób przewlekle somatycznie chorych,14 652 54 59,https://dpjtuchow.pl/kontakt/
+182,Dom Pomocy Społecznej w Tuchowie,DPS,DPS,Karwodrza 116,Tuchów,33-170,tarnowski,małopolskie,49.9194,21.063,80,7700,dla dorosłych niepełnosprawnych intelektualnie,14 652 55 62,https://www.dpskarwodrza.pl/index.php?option=com_content&view=article&id=13&Itemid=133
+186,Dom Pomocy Społecznej w Wietrzychowicach,DPS,DPS,9,Wietrzychowice,33-270,tarnowski,małopolskie,50.1897,20.7537,75,7700,dla osób przewlekle somatycznie chorych,14 641 80 29,https://dpswietrzychowice.pl/?page_id=38
+187,Dom Pomocy Społecznej w Zakliczynie,DPS,DPS,ul. Grabina 11,Zakliczyn,32-840,tarnowski,małopolskie,49.8504,20.7957,57,6650,dla osób przewlekle somatycznie chorych,14 665 36 31,https://www.samarytanie.org.pl/kontakt/
+191,Dom Pomocy Społecznej dla Dzieci i Młodzieży Niepełnosprawnych Intelektualnie w Białce Tatrzańskiej,DPS,DPS,ul. Środkowa 186,Białka Tatrzańska,34-405,tatrzański,małopolskie,49.3901,20.1043,70,7334,dla dzieci i młodzieży niepełnosprawnych intelektualnie,18 265 41 24,http://www.dpsserafitki.pl/kontakt-i-dojazd-dps
+190,Dom Pomocy Społecznej im. Jana Pawła II w Zakopanem,DPS,DPS,ul. Szpitalna 21,Zakopane,34-500,tatrzański,małopolskie,49.3104,19.9594,70,8216,"dla osób w podeszłym wieku - 25 miejsc
+dla osób przewlekle somatycznie chorych - 45 miejsc",18 206 83 10,https://dpszakopane.pl/kontakt/
+80,Dom Pomocy Społecznej im. św. Brata Alberta,DPS,DPS,ul. Dworska 150,Izdebnik,34-144,wadowicki,małopolskie,49.8748,19.7852,78,8908,dla dorosłych niepełnosprawnych intelektualnie,33 876 32 22,https://dpsizdebnik.com.pl/kontakt/
+81,Dom Pomocy Społecznej w Zebrzydowicach,DPS,DPS,Zebrzydowice 1,Kalwaria Zebrzydowska,34-130,wadowicki,małopolskie,49.8828,19.6774,67,7500,dla osób przewlekle psychicznie chorych ,33 876 65 08,https://bonifratrzy.pl/dps-zebrzydowice/kontakt/
+79,Dom Pomocy Społecznej im. św. O. Rafała Kalinowskiego,DPS,DPS,ul. Pułaskiego 5,Wadowice,34-100,wadowicki,małopolskie,49.8842,19.4868,111,7855,dla osób przewlekle psychicznie chorych,33 873 10 11,https://www.dps-wadowice.pl/kontakt/
+78,Dom Pomocy Społecznej w Wadowicach,DPS,DPS,ul. Lwowska 31,Wadowice,34-100,wadowicki,małopolskie,49.8815,19.4987,70,7845,"dla dzieci i młodzieży niepełnosprawnych intelektualnie - 60 miejsc
+dla dorosłych niepełnosprawnych - 10 miejsc",33 873 85 98,https://dpswadowice.pl/kontakt/
+77,Dom Pomocy Społecznej ,DPS,DPS,ul. Parkowa 1,Wadowice,34-100,wadowicki,małopolskie,49.8735,19.4866,70,8090,dla osób w podeszłym wieku,33 823 34 91,https://dpswadowiceparkowa.pl/kontakt
+86,Dom Pomocy Społecznej w Staniątkach,DPS,DPS,Staniątki 287,Niepołomice,32-005,wielicki,małopolskie,50.0084,20.1943,24,7990,dla osób przewlekle somatycznie chorych ,12 385 80 95,https://pomocblizniemu.org/dom-pomocy-spolecznej-staniatki/
+82,Dom Pomocy Społecznej w Biskupicach,DPS,DPS,Biskupice 5,Wieliczka,32-020,wielicki,małopolskie,49.9658,20.1184,75,6909,"dla osób w podeszłym wieku - 60 miejsc
+dla osób przewlekle somatycznie chorych - 15 miejsc",12 250 76 77,https://krakowcaritas.pl/placowki/dom-pomocy-spolecznej/
+85,Dom Pomocy Społecznej w Sułkowie ,DPS,DPS,Sułków 278,Wieliczka,32-020,wielicki,małopolskie,49.9807,20.1047,60,8085,dla osób przewlekle psychicznie chorych ,12 250 03 61,https://pomocblizniemu.org/dom-pomocy-spolecznej-w-sulkowie/
+83,Dom Pomocy Społecznej w Śledziejowicach,DPS,DPS,Śledziejowice 83,Wieliczka,32-020,wielicki,małopolskie,50.0045,20.0841,12,9988,dla dorosłych niepełnosprawnych intelektualnie ,12 288 24 70,https://www.larche.org.pl/sledziejowice/kontakt/
+84,Dom Pomocy Społecznej w Grabiu,DPS,DPS,Grabie 28,Węgrzce Wielkie,32-002,wielicki,małopolskie,50.0417,20.1391,39,7554,dla osób przewlekle somatycznie chorych ,12 278 55 65,https://gaudiumetspes.pl/dps-grabie/
+307,Dzienny Dom Senior+ — Bocheński,Dzienny Dom Senior+,DD Senior+,ul. Karolina 14 D,Bochnia,32-700,bocheński,małopolskie,49.9693563,20.430541,30,,,506639373,
+224,Dzienny Dom Senior+ — Drwinia,Dzienny Dom Senior+,DD Senior+,Wola Drwińska 21,Drwinia,32-709,bocheński,małopolskie,50.0975447,20.4685687,15,,,"782 484 363, 12 281 76 02",
+212,Dzienny Dom Senior+ — Brzesko,Dzienny Dom Senior+,DD Senior+,ul. Okocimska 44,Brzesko,32-800,brzeski,małopolskie,49.9678396,20.6068496,20,,,"507 820 899, 14 68 48 595",
+254,Dzienny Dom Senior+ — Libiąż,Dzienny Dom Senior+,DD Senior+,ul. Piłsudskiego 22,Libiąż,32-590,chrzanowski,małopolskie,50.1030516,19.3147486,20,,,"531 389 386, 32 672 50 31",
+219,Dzienny Dom Senior+ — Dąbrowa Tarnowska,Dzienny Dom Senior+,DD Senior+,ul. Berka Joselewicza 8,Dąbrowa Tarnowska,33-200,dąbrowski,małopolskie,50.1743495,20.9850707,20,,,"14 657 81 74, 696 182 753",
+238,Dzienny Dom Senior+ — Iwanowice,Dzienny Dom Senior+,DD Senior+,Grzegorzowice Wielkie 31,Iwanowice Włościańskie,32-095,krakowski,małopolskie,50.2222622,19.9786383,30,,,603334633,
+222,Dzienny Dom Senior+ — Dobra,Dzienny Dom Senior+,DD Senior+,Dobra 545,Dobra,34-642,limanowski,małopolskie,49.7159366,20.2483768,15,,,699877155,
+255,Dzienny Dom Senior+ — Limanowa (miasto),Dzienny Dom Senior+,DD Senior+,ul. Spacerowa 8,Limanowa,34-600,limanowski,małopolskie,49.7061713,20.4217266,25,,,18 541 50 08,
+308,"Miejski Dzienny Dom Pomocy Społecznej nr 1 ""Socius""",Dzienny Dom Senior+,DD Senior+,ul. Jana Sas-Zubrzyckiego 10,Kraków,,m. Kraków,małopolskie,50.0169654,19.9487329,,,,12 655 21 76,
+313,Miejski Dzienny Dom Pomocy Społecznej nr 6 Centrum Kultury i Rekreacji Seniorów,Dzienny Dom Senior+,DD Senior+,os. Szkolne 20,Kraków,,m. Kraków,małopolskie,50.0790189,20.046592,,,,12 644 20 52,
+311,Miejski Dzienny Dom Pomocy Społecznej nr 4,Dzienny Dom Senior+,DD Senior+,ul. Sudolska 7a,Kraków,,m. Kraków,małopolskie,50.0915076,19.9676934,,,,12 412 62 34,
+312,Miejski Dzienny Dom Pomocy Społecznej nr 5,Dzienny Dom Senior+,DD Senior+,ul. Nad Sudołem 32,Kraków,,m. Kraków,małopolskie,50.0924728,19.9341499,,,,12 415 54 14,
+310,Miejski Dzienny Dom Pomocy Społecznej nr 3,Dzienny Dom Senior+,DD Senior+,ul. Korczaka 4,Kraków,,m. Kraków,małopolskie,50.0905288,19.9403139,,,,12 416 15 60,
+309,Miejski Dzienny Dom Pomocy Społecznej nr 2,Dzienny Dom Senior+,DD Senior+,ul. Ks. Gurgacza 5,Kraków,,m. Kraków,małopolskie,50.0564092,19.9514671,,,,12 411 00 50,
+253,Dzienny Dom Senior+ — Książ Wielki,Dzienny Dom Senior+,DD Senior+,Rzędowice 46,Książ Wielki,32-210,miechowski,małopolskie,50.4396495,20.0911692,15,,,786496778,
+262,Dzienny Dom Senior+ — Miechów,Dzienny Dom Senior+,DD Senior+,ul. Jagiellońska 15/17,Miechów,32-200,miechowski,małopolskie,50.3566016,20.0276912,15,,,666933548,
+269,Dzienny Dom Senior+ — Myślenice,Dzienny Dom Senior+,DD Senior+,ul. Średniawskiego 35 A,Myślenice,32-400,myślenicki,małopolskie,49.834608,19.9384283,30,,,537553435,
+279,Dzienny Dom Senior+ — Raciechowice,Dzienny Dom Senior+,DD Senior+,Raciechowice 197,Raciechowice,32-415,myślenicki,małopolskie,49.8444432,20.1375198,20,,,12 372 52 11,
+264,Dzienny Dom Senior+ — Korzenna,Dzienny Dom Senior+,DD Senior+,Mogilno 14,Mogilno,33-326,nowosądecki,małopolskie,49.6541845,20.8291757,15,,,18 440 66 24,
+276,Dzienny Dom Senior+ — Podegrodzie,Dzienny Dom Senior+,DD Senior+,Podegrodzie 170,Podegrodzie,33-386,nowosądecki,małopolskie,49.5761014,20.5889551,22,,,"18 355 19 09, 537 773 537",
+244,Dzienny Dom Senior+ — Klucze,Dzienny Dom Senior+,DD Senior+,"ul. Leśna 1, Chechło",Klucze,32-310,olkuski,małopolskie,50.3351358,19.5608326,25,,,"32 642 84 67, 723 25 81",
+275,Dzienny Dom Senior+ — Olkusz,Dzienny Dom Senior+,DD Senior+,ul. Żuradzka 16,Olkusz,32-300,olkuski,małopolskie,50.2788158,19.5596307,30,,,32 643 08 20,
+213,Dzienny Dom Senior+ — Brzeszcze,Dzienny Dom Senior+,DD Senior+,ul. Bielska 2,Jawiszowice,32-626,oświęcimski,małopolskie,49.96214,19.1394723,15,,,"32 666 10 03, 510 872 701",
+243,Dzienny Dom Senior+ — Kęty,Dzienny Dom Senior+,DD Senior+,ul. Sobieskiego 36,Kęty,32-650,oświęcimski,małopolskie,49.882908,19.2239362,20,,,"33 432 26 82, 790 700 458",
+248,Dzienny Dom Senior+ — Koszyce,Dzienny Dom Senior+,DD Senior+,Książnice Małe 45,Koszyce,32-130,proszowicki,małopolskie,50.17385,20.5337054,25,,,697584667,
+277,Dzienny Dom Senior+ — Proszowice,Dzienny Dom Senior+,DD Senior+,ul. Kolejowa 4,Proszowice,32-100,proszowicki,małopolskie,50.1926479,20.2917555,30,,,12 654 15 90,
+259,Dzienny Dom Senior+ — Maków Podhalański,Dzienny Dom Senior+,DD Senior+,ul. Kolejowa 11,Maków Podhalański,34-220,suski,małopolskie,49.7298971,19.6768803,15,,,33 822 59 99,
+216,Dzienny Dom Senior+ — Ciężkowice,Dzienny Dom Senior+,DD Senior+,Ostrusza 28,Ciężkowice,33-190,tarnowski,małopolskie,49.7682167,21.0054411,20,,,"728 956 743, 728 956 743",
+217,Dzienny Dom Senior+ — Ciężkowice,Dzienny Dom Senior+,DD Senior+,Ciężkowice 36,Ciężkowice,33-192,tarnowski,małopolskie,49.786464,20.9737542,15,,,728956435,
+294,Dzienny Dom Senior+ — Szerzyny,Dzienny Dom Senior+,DD Senior+,Ołpiny 368,Ołpiny,38-247,tarnowski,małopolskie,49.8065566,21.2033305,15,,,14 692 01 20,
+296,Dzienny Dom Senior+ — Tarnów,Dzienny Dom Senior+,DD Senior+,Nowodworze 70 B,Tarnowiec,33-112,tarnowski,małopolskie,49.9822697,20.9857897,15,,,"575 615 355, 14 688 01 52",
+214,Dzienny Dom Senior+ — Brzeźnica,Dzienny Dom Senior+,DD Senior+,ul. Św. Jana Pawła II 2,Marcyporęba,34-114,wadowicki,małopolskie,49.94122,19.6176543,15,,,500154836,
+268,Dzienny Dom Senior+ — Mucharz,Dzienny Dom Senior+,DD Senior+,Świnna Poręba 111,Mucharz,34-106,wadowicki,małopolskie,49.8336855,19.5168922,15,,,33 47 66 296,
+301,Dzienny Dom Senior+ — Wieprz,Dzienny Dom Senior+,DD Senior+,Podgórze 18,Wieprz,34-122,wadowicki,małopolskie,49.8837396,19.3564277,20,,,"33 432 26 30, 509 597 149",
+210,Klub Senior+ — Bochnia,Klub Senior+,Klub Senior+,Brzeźnica 168,Bochnia,32-700,bocheński,małopolskie,49.9579439,20.4906451,15,,,14 611 67 76,
+251,Klub Senior+ — Rzezawa,Klub Senior+,Klub Senior+,ul. Św. Floriana 12,Krzeczów,32-700,bocheński,małopolskie,49.9890717,20.4866304,7,,,14 648 48 02,
+283,Klub Senior+ — Rzezawa,Klub Senior+,Klub Senior+,ul. Kościelna 6,Rzezawa,32-765,bocheński,małopolskie,49.9900045,20.513614,15,,,14 648 48 02,
+211,Klub Senior+ — Borzęcin,Klub Senior+,Klub Senior+,Borzęcin 562,Borzęcin,32-862,brzeski,małopolskie,50.0670841,20.706069,15,,,"14 684 60 32,  607 504 122",
+220,Klub Senior+ — Dębno,Klub Senior+,Klub Senior+,Sufczyn 300,Dębno,32-852,brzeski,małopolskie,49.9563683,20.752161,15,,,"14 665 87 49, 731 135 581",
+221,Klub Senior+ — Dębno,Klub Senior+,Klub Senior+,Dębno 69,Dębno,32-852,brzeski,małopolskie,49.9608262,20.7181789,15,,,"14 665 87 49, 607 682 051",
+226,Klub Senior+ — Gnojnik,Klub Senior+,Klub Senior+,Gnojnik 430,Gnojnik,32-864,brzeski,małopolskie,49.8951381,20.6068853,15,,,503726386,
+225,Klub Senior+ — Gnojnik,Klub Senior+,Klub Senior+,Lewniowa 249,Gnojnik,32-864,brzeski,małopolskie,49.8801224,20.6466735,20,,,"665 77 5751, 512 721 941",
+292,Klub Senior+ — Szczurowa,Klub Senior+,Klub Senior+,Rudy Rysie 118,Szczurowa,32-820,brzeski,małopolskie,50.0609564,20.6376126,15,,,14 632 09 20,
+291,Klub Senior+ — Szczurowa,Klub Senior+,Klub Senior+,Rynek 4,Szczurowa,32-820,brzeski,małopolskie,50.1192273,20.6368954,18,,,14 632 09 20,
+293,Klub Senior+ — Szczurowa,Klub Senior+,Klub Senior+,Zaborów 63,Zaborów,32-820,brzeski,małopolskie,49.9140683,21.8278128,13,,,15 632 09 20,
+230,Klub Senior+ — Gręboszów,Klub Senior+,Klub Senior+,Hubenice 2,Gręboszów,33-260,dąbrowski,małopolskie,50.2717143,20.8145021,17,,,14 641 60 27,
+239,Klub Senior+ — Wietrzychowice,Klub Senior+,Klub Senior+,Jadowniki Mokre 105,Jadowniki Mokre,33-271,dąbrowski,małopolskie,50.165235,20.7287915,15,,,"14 641 81 50, 579 470 731",
+281,Klub Senior+ — Radgoszcz,Klub Senior+,Klub Senior+,"ul. Jeziorańska 1, Smyków,",Luszowice,33-206,dąbrowski,małopolskie,50.1733961,19.402906,20,,,14 687 42 08,
+290,Klub Senior+ — Szczucin,Klub Senior+,Klub Senior+,ul. Piłsudskiego 7,Szczucin,33-230,dąbrowski,małopolskie,50.3090256,21.075161,20,,,"18 266 25 93, 693 142 744",
+303,Klub Senior+ — Wietrzychowice,Klub Senior+,Klub Senior+,Miechowice Wielkie 38,Wietrzychowice,33-270,dąbrowski,małopolskie,50.1892494,20.7431378,20,,,"14 641 81 50, 579 470 731",
+205,Klub Senior+ — Biecz,Klub Senior+,Klub Senior+,Grudna Kępska 163,Biecz,38-340,gorlicki,małopolskie,49.7357877,21.2965438,20,,,781784956,
+206,Klub Senior+ — Biecz,Klub Senior+,Klub Senior+,Binarowa 457,Biecz,38-340,gorlicki,małopolskie,49.7574429,21.2253924,20,,,781784956,
+204,Klub Senior+ — Biecz,Klub Senior+,Klub Senior+,ul. Korczyna 213,Biecz,38-340,gorlicki,małopolskie,49.7305351,21.249421,20,,,781784956,
+203,Klub Senior+ — Biecz,Klub Senior+,Klub Senior+,ul.Kazimierza Wielkiego 31,Biecz,38-340,gorlicki,małopolskie,49.7305351,21.249421,20,,,781784956,
+209,Klub Senior+ — Bobowa,Klub Senior+,Klub Senior+,"Wilczyska 29, filia Siedliska 298",Bobowa,38-350,gorlicki,małopolskie,49.7081074,20.942002,70,,,18 353 75 74,
+228,Klub Senior+ — Gorlice,Klub Senior+,Klub Senior+,Bystra 155,Gorlice,38-300,gorlicki,małopolskie,49.6543479,21.0946965,15,,,18 353 75 74,
+229,Klub Senior+ — Gorlice (miasto),Klub Senior+,Klub Senior+,ul. 3 Maja 20,Gorlice,38-300,gorlicki,małopolskie,49.65829,21.1593832,20,,,666602146,
+266,Klub Senior+ — Moszczenica,Klub Senior+,Klub Senior+,Św. Jana Pawła II 3,Moszczenica,38-321,gorlicki,małopolskie,49.7558078,21.0212837,20,,,18 354 12 40,
+265,Klub Senior+ — Moszczenica,Klub Senior+,Klub Senior+,ul. Samorządowa 1,Moszczenica,38-321,gorlicki,małopolskie,49.9661,20.34681,13,,,"18 354 12 40, 515 850 720",
+207,Klub Senior+ — Biecz,Klub Senior+,Klub Senior+,Racławice 219,Racławice,38-323,gorlicki,małopolskie,49.7490724,21.1930496,20,,,781784956,
+208,Klub Senior+ — Biecz,Klub Senior+,Klub Senior+,Rożnowice 356,Rożnowice,38-323,gorlicki,małopolskie,49.7575304,21.1633007,20,,,781784956,
+258,Klub Senior+ — Łużna,Klub Senior+,Klub Senior+,Łużna 597,Łużna,38-322,gorlicki,małopolskie,49.711794,21.0519517,25,,,603655166,
+284,Klub Senior+ — Skała,Klub Senior+,Klub Senior+,Barbarka 16,Barbarka,32-046,krakowski,małopolskie,50.26248,19.89246,25,,,"509 597 149, 12 445 95 79 wew. 2",
+235,Klub Senior+ — Igołomia-Wawrzeńczyce,Klub Senior+,Klub Senior+,Koźlica 37A,Igołomia  Wawrzeńczyce,32-125,krakowski,małopolskie,50.0738211,20.2432254,20,,,12 287 40 03 wew.202,
+236,Klub Senior+ — Iwanowice,Klub Senior+,Klub Senior+,"Władysław 47, filia Klubu: Poskwitów 6C",Iwanowice,32-095,krakowski,małopolskie,50.2222622,19.9786383,50,,,12 388 40 03,
+237,Klub Senior+ — Iwanowice,Klub Senior+,Klub Senior+,Damice 47,Iwanowice,32-095,krakowski,małopolskie,50.1991099,19.9499402,25,,,12 388 40 03,
+246,Klub Senior+ — Kocmyrzów-Luborzyca,Klub Senior+,Klub Senior+,"ul. T. Kościuszki 103, Zastów",Kocmyrzów,32-010,krakowski,małopolskie,50.1316347,20.129335,20,,,12 382 11 10  788 170 851,
+245,Klub Senior+ — Kocmyrzów-Luborzyca,Klub Senior+,Klub Senior+,ul. Centralna 115,Kocmyrzów,32-010,krakowski,małopolskie,50.1316347,20.129335,20,,,668804894,
+249,Klub Senior+ — Kraków (miasto),Klub Senior+,Klub Senior+,Krowoderskich Zuchów 6,Kraków,31-272,krakowski,małopolskie,50.0861195,19.9314171,30,,,12 634 24 74,
+252,Klub Senior+ — Krzeszowice,Klub Senior+,Klub Senior+,ul. Floriana 3,Krzeszowice,32-065,krakowski,małopolskie,50.1350246,19.6320164,30,,,511755944,
+260,Klub Senior+ — Michałowice,Klub Senior+,Klub Senior+,"ul. Tadeusza Kościuszki 11, Masłomiąca",Michałowice,32-091,krakowski,małopolskie,50.1603193,19.9801697,25,,,12 388 87 70,
+261,Klub Senior+ — Michałowice,Klub Senior+,Klub Senior+,"ul. Kadrowa 27, Młodziejowice",Michałowice,32-091,krakowski,małopolskie,50.1603193,19.9801697,20,,,12 388 87 70,
+263,Klub Senior+ — Mogilany,Klub Senior+,Klub Senior+,ul. Krakowska 5,Mogilany,32-031,krakowski,małopolskie,49.9413293,19.8877676,20,,,533347719,
+289,Klub Senior+ — Sułoszowa,Klub Senior+,Klub Senior+,ul. Krakowska 8,Sułoszowa,32-045,krakowski,małopolskie,50.2672276,19.7330471,30,,,531389386,
+305,Klub Senior+ — Zabierzów,Klub Senior+,Klub Senior+,ul. Kolejowa 11,Zabierzów,32-080,krakowski,małopolskie,50.1146386,19.7993814,30,,,696836747,
+295,Klub Senior+ — Świątniki Górne,Klub Senior+,Klub Senior+,"ul. Jagiellońska 11, Ochojno",Świątniki Górne,32-040,krakowski,małopolskie,49.9346365,19.9524965,25,,,573055501,
+223,Klub Senior+ — Dobra,Klub Senior+,Klub Senior+,Porąbka 112,Dobra,34-642,limanowski,małopolskie,49.7264957,20.2126041,15,,,698877155,
+240,Klub Senior+ — Jodłownik,Klub Senior+,Klub Senior+,Mstów 92,Jodłownik,34-620,limanowski,małopolskie,49.79251,20.24176,20,,,18 334 70 70,
+267,Klub Senior+ — Mszana Dolna (miasto),Klub Senior+,Klub Senior+,ul. Piłsudskiego 58a,Mszana Dolna,34-730,limanowski,małopolskie,49.6810782,20.0764991,24,,,535130748,
+285,Klub Senior+ — Dobra,Klub Senior+,Klub Senior+,Skrzydlna 355,Skrzydlna,34-625,limanowski,małopolskie,49.7543487,20.1774423,15,,,698877155,
+257,Klub Senior+ — Łukowica,Klub Senior+,Klub Senior+,Roztoka 189,Łukowica,34-606,limanowski,małopolskie,49.623693,20.4589756,30,,,"18 333 50 66, 504 120 379",
+321,MDDPS Klub Samopomocy Aktywizacyjny,Klub Senior+,Klub Senior+,ul. Bronowicka 19,Kraków,,m. Kraków,małopolskie,50.0770741,19.9036119,,,,,
+316,MDDPS Klub Samopomocy,Klub Senior+,Klub Senior+,al. Marszałka Focha 39,Kraków,,m. Kraków,małopolskie,50.0569309,19.9121879,,,,,
+322,MDDPS Klub Samopomocy Aktywizacyjny,Klub Senior+,Klub Senior+,ul. Gdańska 5,Kraków,,m. Kraków,małopolskie,50.0813139,19.9574121,,,,,
+323,MDDPS Klub Samopomocy Specjalistyczny,Klub Senior+,Klub Senior+,os. Krakowiaków 2,Kraków,,m. Kraków,małopolskie,50.0815576,20.0348548,,,,,
+314,MDDPS Klub Samopomocy,Klub Senior+,Klub Senior+,ul. Zapolskiej 15,Kraków,,m. Kraków,małopolskie,50.0772817,19.898019,,,,,
+315,MDDPS Klub Samopomocy,Klub Senior+,Klub Senior+,ul. Zapolskiej 42,Kraków,,m. Kraków,małopolskie,50.0800998,19.8931266,,,,,
+317,MDDPS Klub Samopomocy,Klub Senior+,Klub Senior+,ul. Św. Jana 18,Kraków,,m. Kraków,małopolskie,50.063776,19.9387785,,,,,
+318,MDDPS Klub Samopomocy,Klub Senior+,Klub Senior+,ul. Facimiech 16,Kraków,,m. Kraków,małopolskie,50.0155485,19.9867306,,,,,
+319,MDDPS Klub Samopomocy Aktywizacyjny,Klub Senior+,Klub Senior+,ul. Grzegórzecka 19,Kraków,,m. Kraków,małopolskie,50.0584722,19.9524289,,,,,
+320,MDDPS Klub Samopomocy Aktywizacyjny,Klub Senior+,Klub Senior+,ul. Generała Okulickiego 51,Kraków,,m. Kraków,małopolskie,50.0932519,20.0217729,,,,,
+273,Klub Senior+ — Nowy Sącz (miasto),Klub Senior+,Klub Senior+,ul. Szwedzka 2,Nowy Sącz,33-300,m. Nowy Sącz,małopolskie,49.6249173,20.691346,30,,,18 44 86 690,
+297,Klub Senior+ — Tarnów (miasto),Klub Senior+,Klub Senior+,ul. Gumniska 25,Tarnów,33-100,m. Tarnów,małopolskie,50.0259883,20.9640584,27,,,14 688 20 80,
+227,Klub Senior+ — Gołcza,Klub Senior+,Klub Senior+,Mostek 21,Gołcza,32-075,miechowski,małopolskie,50.3366806,19.8431765,30,,,12 38 86 411,
+280,Klub Senior+ — Racławice,Klub Senior+,Klub Senior+,Miroszów 18,Racławice,32-222,miechowski,małopolskie,50.35082,20.27831,15,,,788874208,
+270,Klub Senior+ — Myślenice,Klub Senior+,Klub Senior+,ul. Piłsudskiego 14,Myślenice,32-400,myślenicki,małopolskie,49.834608,19.9384283,30,,,881551517,
+288,Klub Senior+ — Sułkowice,Klub Senior+,Klub Senior+,os. Zielona 51,Sułkowice,32-440,myślenicki,małopolskie,49.8548136,19.7957326,15,,,"12 273 20 02, 603 120 044",
+304,Klub Senior+ — Wiśniowa,Klub Senior+,Klub Senior+,Wiśniowa 474,Wiśniowa,32-412,myślenicki,małopolskie,49.7864463,20.1183126,20,,,"721 018 835, 661 953 483",
+234,Klub Senior+ — Grybów,Klub Senior+,Klub Senior+,Grybów 431,Grybów,33-330,nowosądecki,małopolskie,49.6262482,20.9583392,20,,,19 448 42 40,
+233,Klub Senior+ — Grybów,Klub Senior+,Klub Senior+,Cieniawa 196,Grybów,33-330,nowosądecki,małopolskie,49.61596,20.8420528,20,,,18 448 42 40,
+232,Klub Senior+ — Gródek nad Dunajcem,Klub Senior+,Klub Senior+,Gródek nad Dunajcem 28,Gródek nad Dunajcem,33-318,nowosądecki,małopolskie,49.7466783,20.73336,30,,,18 440 10 96,
+242,Klub Senior+ — Kamionka Wielka,Klub Senior+,Klub Senior+,Kamionka Wielka 253,Kamionka Wielka,33-334,nowosądecki,małopolskie,49.5772435,20.782484,23,,,"18 44 907 63, 508 331 839",
+247,Klub Senior+ — Korzenna,Klub Senior+,Klub Senior+,Siedlce 167,Korzenna,33-322,nowosądecki,małopolskie,49.6876669,20.7750957,20,,,18 440 66 26,
+250,Klub Senior+ — Krynica-Zdrój,Klub Senior+,Klub Senior+,ul. Szkolna 3,Krynica-Zdrój,33-380,nowosądecki,małopolskie,49.4206138,20.9594176,30,,,"18 471 07 74, 502 980 528",
+271,Klub Senior+ — Nawojowa,Klub Senior+,Klub Senior+,ul. Ogrodowa 6,Nawojowa,33-335,nowosądecki,małopolskie,49.55912,20.74119,18,,,18 445 79 14,
+231,Klub Senior+ — Gródek nad Dunajcem,Klub Senior+,Klub Senior+,Rożnów 325,Rożnów,33-316,nowosądecki,małopolskie,49.765,20.6683333,30,,,18 440 10 96,
+256,Klub Senior+ — Łącko,Klub Senior+,Klub Senior+,Łącko 662,Łącko,33-390,nowosądecki,małopolskie,49.5571674,20.4369759,50,,,"517 577 892, 18 414 07 34",
+274,Klub Senior+ — Nowy Targ (miasto),Klub Senior+,Klub Senior+,Al. Tysiąclecia 42,Nowy Targ,34-400,nowotarski,małopolskie,49.4770292,20.0297169,30,,,"513 457 902, 18 26 11 700",
+298,Klub Senior+ — Trzyciąż,Klub Senior+,Klub Senior+,Imbramowice 119,Trzyciąż,32-353,olkuski,małopolskie,50.3016845,19.849629,20,,,12 389 40 01 wew. 35,
+278,Klub Senior+ — Przeciszów,Klub Senior+,Klub Senior+,ul. Długa 6,Przeciszów,32-641,oświęcimski,małopolskie,50.0047374,19.3744959,30,,,33 841 11 94,
+272,Klub Senior+ — Nowe Brzesko,Klub Senior+,Klub Senior+,Rudno Dolne 31,Nowe Brzesko,32-120,proszowicki,małopolskie,50.1286934,20.3346426,15,,,12 385 26 55,
+218,Klub Senior+ — Ciężkowice,Klub Senior+,Klub Senior+,Siekierczyna 67e,Bruśnik,33-192,tarnowski,małopolskie,49.7484324,20.9065506,52,,,14 696 51 05,
+282,Klub Senior+ — Radłów,Klub Senior+,Klub Senior+,Plac Kościuszki 5,Radłów,33-130,tarnowski,małopolskie,50.0839635,20.8473865,50,,,14 691 93 99,
+286,Klub Senior+ — Skrzyszów,Klub Senior+,Klub Senior+,Skrzyszów 629,Skrzyszów,33-156,tarnowski,małopolskie,49.9958783,21.0578903,25,,,14 674 23 46,
+302,Klub Senior+ — Wierzchosławice,Klub Senior+,Klub Senior+,Wierzchosławice 696,Wierzchosławice,33-122,tarnowski,małopolskie,50.0204535,20.8538564,20,,,14 631 90 61,
+306,Klub Senior+ — Żabno,Klub Senior+,Klub Senior+,ul. Świetego Jana 1A,Żabno,33-240,tarnowski,małopolskie,50.1335155,20.8859257,23,,,14 645 64 33,
+202,Klub Senior+ — Biały Dunajec,Klub Senior+,Klub Senior+,ul. Jana Pawła II 310,Biały Dunajec,34-425,tatrzański,małopolskie,49.3805921,20.0122858,30,,,"601 866 870, 18 206 67 74",
+201,Klub Senior+ — Andrychów,Klub Senior+,Klub Senior+,ul. Metalowców 10,Andrychów,34-120,wadowicki,małopolskie,49.8555791,19.3436756,15,,,33 432 27 23,
+215,Klub Senior+ — Brzeźnica,Klub Senior+,Klub Senior+,ul. Wiślana 22,Brzeźnica,34-114,wadowicki,małopolskie,49.9583939,20.4765671,15,,,500154836,
+241,Klub Senior+ — Kalwaria Zebrzydowska,Klub Senior+,Klub Senior+,ul. Partyzantów 2,Kalwaria Zebrzydowska,34-130,wadowicki,małopolskie,49.8669482,19.6763089,30,,,33 876 51 66,
+287,Klub Senior+ — Stryszów,Klub Senior+,Klub Senior+,Stryszów 542,Stryszów,34-146,wadowicki,małopolskie,49.8247044,19.6235113,64,,,"18 333 50 66, 500 720 065",
+299,Klub Senior+ — Wadowice,Klub Senior+,Klub Senior+,ul.Mickiewicza 19,Wadowice,34-100,wadowicki,małopolskie,49.8834484,19.4925345,15,,,579490711,
+300,Klub Senior+ — Wieprz,Klub Senior+,Klub Senior+,ul. Centralna 7,Wieprz,34-122,wadowicki,małopolskie,49.8990234,19.3658222,150,,,33 875 54 15,
+134,Środowiskowy Dom Pomocy Społecznej w Bochni,ŚDS,ŚDS,ul. Karolina 14f,Bochnia,32-700,bocheński,małopolskie,49.9799,20.4431,27,,"A,B",14 611 16 02,https://sds.powiatbochenski.pl/kontakt
+135,Środowiskowy Dom Pomocy Społecznej w Cerekwi,ŚDS,ŚDS,Cerkiew 48,Bogucice,32-711,bocheński,małopolskie,50.0913,20.5025,36,,"A,B",50 511 35 09,
+111,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Muchówka 157,Królówka,32-722,bocheński,małopolskie,49.8581,20.4513,35,,"A,B,C",14 685 92 00,https://muchowka.naszsds.pl/http
+127,Środowiskowy Dom Pomocy Społecznej w Rdzawie,ŚDS,ŚDS,1,Rdzawa,32-732,bocheński,małopolskie,49.8215,20.3555,47,,"A,B,C",14 611 69 11,"https://bip.malopolska.pl/ugtrzciana,a,1302307,srodowiskowy-dom-samopomocy-w-rdzawie.html"
+133,Środowiskowy Dom Pomocy Społecznej w Żegocinie,ŚDS,ŚDS,232 a,Żegocina,32-731,bocheński,małopolskie,49.8031505,20.4206322,35,,"A,B,C",14 613 27 05,https://www.sds-zegocina.pl/
+136,Środowiskowy Dom Pomocy Społecznej w Łysej Górze ,ŚDS,ŚDS,251,Łysa Góra,32-853,brzeski,małopolskie,49.7191,20.4525,60,,"A,B,C",14 663 34 86,"https://sds.brzesko.pl/?pl_kontakt,2"
+6,Środowiskowy Dom Samopomocy Chrzanów,ŚDS,ŚDS,ul. Kolonia Stella 11,Chrzanów,32-500,chrzanowski,małopolskie,50.4426617,19.87777259,44,,"A,B",32 623 52 60 wew.21,TBC
+112,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Oleśnica 73,Dąbrowa Tarnowska,33-200,dąbrowski,małopolskie,50.1761,20.9459,36,,"A,B",14 641 00 42,http://www.sdsolesnica.pl/index.php?option=com_contact&view=contact&id=1&Itemid=120
+126,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,161,Dąbrowica,33-230,dąbrowski,małopolskie,50.2948,21.1398,44,,"A,B,C",14 657 51 23,http://www.sdsdabrowica.pl/
+1,Środowiskowy Dom Samopomocy Biecz (Nadzieja),ŚDS,ŚDS,ul. Parkowa 1,Biecz,38-340,gorlicki,małopolskie,49.73398118,21.25609674,41,,"B,C",18 440 61 22,https://nadziejabiecz.pl/sds-w-bieczu-z-filia-w-gorlicach/
+139,Środowiskowy Dom Pomocy Społecznej w Bobowej (Filia SDS w Gorlicach),ŚDS,ŚDS,ul. Węgierska 28,Bobowa,38-350,gorlicki,małopolskie,49.7059,20.9378,65,,"A,B to jest Fila ŚDS Gorlice
+ul. Michalusa 18,
+38-300 Gorlice",18 351 42 26,https://dow.bobowa.pl/kontakt/
+138,Środowiskowy Dom Pomocy Społecznej w Gorlicach,ŚDS,ŚDS,ul. Michalusa 18,Gorlice,38-300,gorlicki,małopolskie,49.669,21.1723,65,,"A,B",18 352 12 65,https://dow.gorlice.pl/dow/kontakt/
+2,Środowiskowy Dom Samopomocy Biecz - Filia w Gorlicach (Nadzieja),ŚDS,ŚDS,ul.Wyszynskiego 18,Gorlice,38-300,gorlicki,małopolskie,49.67731845,21.16822015,41,,"B,C",18 53461 01,https://nadziejabiecz.pl/sds-w-bieczu-z-filia-w-gorlicach/
+200,Środowiskowy Dom Samopomocy w Wysowej-Zdroju,ŚDS,ŚDS,98,Wysowa-Zdrój,38-316,gorlicki,małopolskie,49.4354584,21.1781165,15,,"A,C",662 633 847,
+10,Środowiskowy Dom Samopomocy - Ognisko Terapeutyczne Jerzmanowice ,ŚDS,ŚDS,ul. Rajska 26,Jerzmanowice,32-048,krakowski,małopolskie,50.21534994,19.74559207,25,,"A,B,C",12 389 50 98,http://ognisko.jerzmanowice-przeginia.pl/index.html
+141,Środowiskowy Dom Pomocy Społecznej w Konarach,ŚDS,ŚDS,ul. Bonifraterska 11,Konary,32-031,krakowski,małopolskie,49.9504,19.9433,35,,"A,B,C",12 256 10 58,https://bonifundo.pl/nasza-dzialalnosc/sds/
+97,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. Pasteura 1,Kraków,31-222,krakowski,małopolskie,50.097,19.9322,58,,"A,B",12 415 31 21,https://krakowcaritas.pl/placowki/srodowiskowy-dom-samopomocy-3/
+90,Środowiskowy Dom Pomocy Społecznej Kraków,ŚDS,ŚDS,Józefa 1,Kraków,31-056,krakowski,małopolskie,50.0502,19.9429,22,,A,12 430 68 31,https://www.hamlet.org.pl/sds
+94,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Pokoju 7,Kraków,30-002,krakowski,małopolskie,50.0591226,19.9646566,21,,B,12 633 23 01,https://mops.krakow.pl/instcbi/212217/inst/35984/2445/Srodowiskowy-Dom-Samopomocy.html
+93,Środowiskowy Dom Samopomocy - Filia ul. Teligi,ŚDS,ŚDS,ul. Teligi 26b,Kraków,30-805,krakowski,małopolskie,50.0149,20.0091,60,,"B.  ; FiliaŚDS ul. Aleksandry 1
+30-837 Kraków  - 60 miejsc z czego 30 za zyciem",12 311 42 36,https://ognisko.org.pl/sds-filia-ul-teligi-krakow/
+91,Środowiskowy Dom Pomocy Społecznej Kraków,ŚDS,ŚDS,Olszańska 5,Kraków,31-126,krakowski,małopolskie,50.0725,19.957,49,,A,51 745 68 10,https://stowarzyszenie-rozwoju.eu/kontakt/
+96,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,os. Tysiąclecia 86,Kraków,31-610,krakowski,małopolskie,50.0941,19.996,29,,B,12 647 51 31,https://przystanekbetlejem.pl/kontakt
+95,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,os. Szkolne 30,Kraków,31-978,krakowski,małopolskie,50.0767003,20.0486897,30,,"B,C",12 643 18 01,https://gaudiumetspes.pl/sds-os-szkolne/
+92,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Aleksandry 1,Kraków,30-837,krakowski,małopolskie,50.0156,20.0184,60,,B,12 658 54 94,https://ognisko.org.pl/sds-ul-aleksandry-krakow/
+99,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. Piekarska 3,Kraków,31-067,krakowski,małopolskie,50.0488,19.941299,48,,B,12 430 63 13,https://fundacja-leonardo.pl/srodowiskowy-dom-samopomocy-krakow/
+98,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. Komandosów 18,Kraków,30-334,krakowski,małopolskie,50.0411,19.9307,58,,"A,B. Filia ŚDS ul. Pasteura 1,
+31-222 Kraków",12 415 31 21,http://www.sds.komandosow.caritas.pl/
+100,Środowiskowy Dom Samopomocy dla osób z chorobą Alzheimera,ŚDS,ŚDS,ul. Żywiecka 16,Kraków,30-427,krakowski,małopolskie,50.0157,19.9198,21,,C,579 996 898,https://krakowcaritas.pl/placowki/srodowiskowy-dom-samopomocy-dla-osob-z-choroba-alzheimera/
+15,Środowiskowy Dom Samopomocy  Kraków os. Wandy 23,ŚDS,ŚDS,os. Wandy 23,Kraków,31-907,krakowski,małopolskie,50.07097602,20.05115109,15,,"B,C",887 131 288,https://stowarzyszenietecza.org/nasze-dzialania/srodowiskowy-dom-samopomocy/
+17,"Środowiskowy Dom Samopomocy  Kraków ""Vita"" filia os. Słoneczne 15",ŚDS,ŚDS,os. Słoneczne 15,Kraków,31-958,krakowski,małopolskie,50.07769688,20.03983407,102,,C,12 359 29 00,http://sdsvita.pl/
+16,"Środowiskowy Dom Samopomocy  Kraków ""Vita"" os. Młodości 8",ŚDS,ŚDS,os. Młodości 8,Kraków,31-908,krakowski,małopolskie,50.06745303,20.05013027,102,,A,12 686 91 21,http://sdsvita.pl/
+18,"Środowiskowy Dom Samopomocy  Kraków ""Vita"" filia al. Grottgera 3",ŚDS,ŚDS,al. Grottgera 3,Kraków,30-035,krakowski,małopolskie,50.07236878,19.9292494,102,,B,12 686 91 21,http://sdsvita.pl/
+102,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Wola Filipowska ul. ks. Mądrzyka 32,Krzeszowice,32-065,krakowski,małopolskie,50.1344,19.5774,35,,"A,B,C",12 282 26 63,https://krakowcaritas.pl/placowki/srodowiskowy-dom-samopomocy/
+123,"Środowiskowy Dom Pomocy Społecznej ""Świt""",ŚDS,ŚDS,58A,Miłocice,32-090,krakowski,małopolskie,50.2327,20.041294,33,,B,12 388 32 41,
+131,Środowiskowy Dom Pomocy Społecznej w Radwanowicach ,ŚDS,ŚDS,1a,Radwanowice,32-064,krakowski,małopolskie,50.1507482,19.7054452,35,,"A,B ",12 283 93 14,https://albert.krakow.pl/pl/56/Radwanowice
+140,Środowiskowy Dom Pomocy Społecznej w Skawinie,ŚDS,ŚDS,ul. Węgierska 5,Skawina,32-050,krakowski,małopolskie,49.9772,19.8266,36,,"A,B,C ",12 276 85 29,https://sds-skawina.pl/
+142,Środowiskowy Dom Pomocy Społecznej w Woli Kalinowskiej,ŚDS,ŚDS,ul. Szkolna 12,Wola Kalinowska,32-045,krakowski,małopolskie,50.2249145,19.8098162,30,,"A,B",12 389 29 79,https://fundacja-leonardo.pl/srodowiskowy-dom-samopomocy-wola-kalinowska/
+132,Środowiskowy Dom Pomocy Społecznej w Woli Zachariaszowskiej,ŚDS,ŚDS,ul. Świętego Floriana 19,Wola Zachariaszowska,32-087,krakowski,małopolskie,50.1499,19.9339,29,,"A,B,C",12 419 40 33,https://zielonki.pl/srodowiskowy-dom-samopomocy/
+103,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Ujanowice 180,Laskowa,34-603,limanowski,małopolskie,49.7466,20.5557,30,,"A,B",18 333 43 80,https://www.sdsujanowice.pl/strona-glowna
+104,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. Kilińskiego 11,Limanowa,34-600,limanowski,małopolskie,49.7075,20.4239,33,,"A,B",18 337 50 85,https://sds.wlimanowej.pl/kontakt/
+107,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,401,Mszana Dolna,34-733,limanowski,małopolskie,49.6585,20.1037,40,,"A,B",73 598 27 10,"https://bip.malopolska.pl/sdsmszanagorna,m,415133,o-jednostce.html"
+5,Środowiskowy Dom Samopomocy Jelcza,ŚDS,ŚDS,Jelcza 219,Charsznica,32-250,miechowski,małopolskie,50.44262754,19.8777404,30,,"A,B,C",41 382 74 05,http://www.sdsjelcza.charsznica.pl/
+14,Środowiskowy Dom Samopomocy Kozłów,ŚDS,ŚDS,Kępie 16,Kozłów,32-241,miechowski,małopolskie,50.45614942,19.93535377,25,,"A,B,C",41 230 72 39,https://www.facebook.com/sds.kozlow/
+118,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Marchocicach 13,Marchocice,32-222,miechowski,małopolskie,50.3245841,20.1846801,61,,"A,B,C to jest filia osrodka ŚDS Kościejów 52, 32-222 Racławice",41 384 41 22,
+106,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. Szpitalna 1,Miechów,32-200,miechowski,małopolskie,50.3552,20.0345,40,,"A,B,C",41 230 81 86,https://miechow.caritas.pl/srodowiskowy_dom_samopomocy/
+117,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Kościejów 52,Racławice,32-222,miechowski,małopolskie,50.3298,20.2656,61,,"A,B,C z filia ww Marchocicach 13, 32-222 Racławice",41 384 41 22,
+7,Środowiskowy Dom Samopomocy Dobroczyce,ŚDS,ŚDS,ul. Jagiellońska 2,Dobczyce,32-410,myślenicki,małopolskie,49.88023629,20.09146985,42,,"A,B,C",501 814 113,https://sds.dobczyce.pl/
+144,Środowiskowy Dom Pomocy Społecznej w Lubniu,ŚDS,ŚDS,475,Lubień,32-433,myślenicki,małopolskie,49.7150431,19.9763495,55,,"A,B",50 960 21 08,
+145,"Środowiskowy Dom Pomocy Społecznej ""Magiczny Dom"" w Myślenicach",ŚDS,ŚDS,Osieczany 545,Myślenice,32-400,myślenicki,małopolskie,49.8470526,19.9938687,28,,B,50 960 24 67,https://psonimyslenice.pl/
+116,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Komorniki 98,Raciechowice,32-415,myślenicki,małopolskie,49.8404,20.1555,64,,"to jest filia ŚDS Zegartowice 114, 32-415 Raciechowice",12 444 73 39,
+115,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Zegartowice 114,Raciechowice,32-415,myślenicki,małopolskie,49.831,20.1905,64,,"A,B.   - z filią
+w Komornikach 98,
+32-415 Raciechowice   ",12 444 79 40,
+143,Środowiskowy Dom Pomocy Społecznej w Sułkowicach,ŚDS,ŚDS,ul. 1-ego Maja 66,Sułkowice,32-440,myślenicki,małopolskie,49.8435,19.8014,55,,"A,B 
+Filia w Lubniu 475,
+32-433 Lubień",12 312 71 79,
+101,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Źródlana 59,Krynica-Zdrój,33-380,nowosądecki,małopolskie,49.4075182,20.9582768,40,,"A,B,C",18 534 91 89,https://www.sds-krynicazdroj.pl/kontakt/
+146,Powiatowy Ośrodek Wsparcia ŚDS Muszyna,ŚDS,ŚDS,ul. Piłsudskiego 119,Muszyna,33-370,nowosądecki,małopolskie,49.3465,20.8935,41,,"A,B",18 471 91 07,http://www.pow.muszyna.pl/www.pow.muszyna.pl/pl/31401/0/KONTAKT.html
+164,Środowiskowy Dom Pomocy Społecznej w Nowy Sączu,ŚDS,ŚDS,ul. Nawojowska 159a,Nowy Sącz,33-300,nowosądecki,małopolskie,49.5954,20.7225,60,,"A,B",18 547 59 90,https://www.sds-nowysacz.pl/kontakt.html
+124,Środowiskowy Dom Pomocy Społecznej w Starym Sączu,ŚDS,ŚDS,ul. Cyganowice 95,Stary Sącz,33-340,nowosądecki,małopolskie,49.5402,20.6555,41,,"A,B",18 446 04 88,https://gniazdo.sacz.pl/archiwum/www.gniazdo.sacz.pl/artykul/41%2cdane-teleadresowe.html
+147,Powiatowy Ośrodek Wsparcia ŚDS Zbyszyce,ŚDS,ŚDS,12,Zbyszyce,33-318,nowosądecki,małopolskie,49.7125,20.6635,32,,"A,B",18 548 50 60,https://bip.malopolska.pl/powzbyszyce
+148,Środowiskowy Dom Pomocy Społecznej w Czerwiennem,ŚDS,ŚDS,341,Czerwienne,34-407,nowotarski,małopolskie,19.9199,49.376,24,,"B,C",66 814 93 95,
+9,Środowiskowy Dom Samopomocy Jabłonka (Barka) ,ŚDS,ŚDS,"ul. Tetmajera 4,",Jabłonka,34-480,nowotarski,małopolskie,49.4813996,19.6976874,26,,A,18 265 24 90,http://www.barka.jablonka.pl/www/sdsonas.html
+110,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. Podtatrzańska 47a,Nowy Targ,34-400,nowotarski,małopolskie,49.4714,20.0263,30,,"B,C",50 890 53 00,https://sds.psoni.eu/
+125,"Środowiskowy Dom Pomocy Społecznej ""Perła"" w Szczawnicy",ŚDS,ŚDS,ul. Park Dolny 6,Szczawnica,34-460,nowotarski,małopolskie,49.4267,20.4816,33,,B,18 262 15 18,http://www.psoni-szczawnica.pl/index.php?option=com_content&view=article&id=20&Itemid=123
+13,Środowiskowy Dom Samopomocy Klucze,ŚDS,ŚDS,Osada 15,Klucze,32-310,olkuski,małopolskie,50.35342983,19.56257442,28,,"B,D",32 706 50 77,https://psoni-wolbrom.pl/
+12,Środowiskowy Dom Samopomocy Kolbark,ŚDS,ŚDS,"ul. Źródlana 3,",Kolbark,32-310,olkuski,małopolskie,50.36672487,19.6419282,35,,"A,B,C",32 647 80 50,https://www.stowarzyszenie-klucz.pl/
+149,Środowiskowy Dom Pomocy Społecznej  w Olkuszu,ŚDS,ŚDS,ul. Korczaka 7,Olkusz,32-300,olkuski,małopolskie,50.2755,19.5789,47,,"A,B,C",32 706 54 50,https://progres.olkusz.pl/
+130,Środowiskowy Dom Pomocy Społecznej w Wolbromiu,ŚDS,ŚDS,Skalska 20,Wolbrom,32-340,olkuski,małopolskie,50.3768217,19.7566502,39,,"A,B ",32 646 45 68,https://sdswolbrom.pl/contact/
+137,Środowiskowy Dom Pomocy Społecznej w Babicach,ŚDS,ŚDS,ul. dr. Jana Gołąba 2,Babice,32-551,oświęcimski,małopolskie,50.0714,19.4507,25,,"A,B",32 622 93 52,
+150,Środowiskowy Dom Pomocy Społecznej w Brzeszczach,ŚDS,ŚDS,ul. Nosala 7,Brzeszcze,32-620,oświęcimski,małopolskie,49.9838,19.1561,15,,"D
+
+Filia ŚDS Kęty
+ul. Żwirki i Wigury 27a,
+32-650 Kęty",50 189 99 23,
+4,Środowiskowy Dom Samopomocy Chełmek,ŚDS,ŚDS,ul. Kochanowskiego 1,Chełmek,32-660,oświęcimski,małopolskie,50.10290056,19.25058491,30,,A,33 84614 72,https://sds.chelmek.pl/
+151,Środowiskowy Dom Pomocy Społecznej w Kętach,ŚDS,ŚDS,ul. Żwirki i Wigury 27a,Kęty,32-650,oświęcimski,małopolskie,49.8748,19.2201,43,,"A,B",33 845 01 73,https://kety.naszsds.pl/kontakt
+113,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS, ul. Słowackiego 1a,Oświęcim,32-600,oświęcimski,małopolskie,50.0283,19.2406,60,,"A,B,C",33 842 45 35,
+109,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Gruszów 28,Nowe Brzesko,32-120,proszowicki,małopolskie,50.15998,20.41828,30,,"A,B,C",12 385 20 57,https://nowe-brzesko.pl/instytucje/srodowiskowy-dom-samopomocy/
+114,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Winiary 63,Pałecznica,32-109,proszowicki,małopolskie,50.2852027,20.3305498,20,,"A,B,C",41 365 69 66,
+152,Środowiskowy Dom Pomocy Społecznej w Proszowicach,ŚDS,ŚDS,ul. 3 Maja 2,Proszowice,32-100,proszowicki,małopolskie,50.1914,20.289,63,,"A,B,C",12 386 10 53,https://proszowice.caritas.pl/srodowiskowy-dom-samopomocy/
+153,Środowiskowy Dom Pomocy Społecznej w Proszowicach (Filia),ŚDS,ŚDS,ul. Kolejowej 4,Proszowice,32-100,proszowicki,małopolskie,50.1902,20.2951,63,,"A,B,C
+filiaŚDS Proszowice
+ul. 3 Maja 2
+32-100 Proszowice",12 654 15 90,https://proszowice.caritas.pl/kontakt/
+120,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Wrocimowice 4,Radziemice,32-107,proszowicki,małopolskie,50.2961,20.2417,25,,"A,B,C",12 386 06 63,https://radziemice.gmina.pl/srodowiskowy-dom-samopomocy-we-wrocimowicach/
+154,Środowiskowy Dom Pomocy Społecznejw w Winiarach,ŚDS,ŚDS,63,Winiary,32-109,proszowicki,małopolskie,50.2851,20.330295,30,,"A,B,C",41 384 85 13,
+155,Środowiskowy Dom Pomocy Społecznej w Jordanowie,ŚDS,ŚDS,ul. Banacha 1,Jordanów,34-240,suski,małopolskie,49.6467,19.8277,30,,"A,B",18 267 47 74,https://st-dom.pl/%C5%9Arodowiskowy%20Dom%20Samopomocy.html
+156,Środowiskowy Dom Pomocy Społecznej w Karwodrzy,ŚDS,ŚDS,116,Karwodrza,33-170,tarnowski,małopolskie,49.9197308,21.0616556,30,,"A,B",14 651 32 87,https://sdskarwodrza.pl/kontakt/
+105,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. Sucharskiego 3a,Lisia Góra,33-140,tarnowski,małopolskie,50.0835,21.025,32,,"A,B",78 378 34 30,https://sds-lg.pl/kontakt/
+157,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,116,Nowodworze,33-112,tarnowski,małopolskie,49.9691137,20.9915078,25,,"A,B",14 679 45 05,https://sdsnowodworze.wixsite.com/sdsnowodworze
+119,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Siedlec 72,Radłów,33-130,tarnowski,małopolskie,50.0786,20.8878,32,,"A,B",14 691 93 99,
+121,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. ks. J. Wyrwy 4,Ryglice,33-160,tarnowski,małopolskie,49.8789,21.1395,25,,"A,B",14 654 12 39,"https://bip.malopolska.pl/sdsryglice,m,210999,o-jednostce.html"
+122,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,293,Rzepiennik Strzyżewski,33-163,tarnowski,małopolskie,49.793,21.0661,27,,"A,B,C",14 657 18 16,
+166,"Środowiskowy Dom Pomocy Społecznej ""Zielona Przystań"" w Tarnowie",ŚDS,ŚDS,ul. Piotra Skargi 29a,Tarnów,33-100,tarnowski,małopolskie,50.0209,20.9828,60,,"A,C",57 090 29 19,https://sdszp.pl/kontakt/
+165,Środowiskowy Dom Pomocy Społecznej w Tarnowie,ŚDS,ŚDS,al. MB Fatimskiej 6,Tarnów,33-100,tarnowski,małopolskie,50.0189,20.9926,60,,B,14 622 41 49,https://www.sds.tarnow.pl/kontakt/
+158,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,ul. Piłsudskiego 14a,Poronin,34-520,tatrzański,małopolskie,49.3385,20.006493,30,,"B,D",60 235 23 85,https://psoni-zakopane.pl/kontakt/
+161,Środowiskowy Dom Pomocy Społecznej w Andychowie (Filia ŚDS Wadowice ul. E. K. Wojtyłów 16),ŚDS,ŚDS,ul. Daszyńskiego 12,Andrychów,34-120,wadowicki,małopolskie,49.8505,19.3434,85,,"A,B
+Filia ŚDS Wadowice
+ul. E. K. Wojtyłów 16,
+34-100 Wadowice",33 873 00 88,https://sdswadowice.pl/kontakt-3/
+11,Środowiskowy Dom Samopomocy - Kalwaria Zebrzydowska,ŚDS,ŚDS,Al. Jana Pawła II 7a,Kalwaria Zebrzydowska,34 -130,wadowicki,małopolskie,49.86952462999999,19.68574604,30,,"A,B,C,D",798 818 317,https://www.facebook.com/sdskalwaria
+199,Środowiskowy Dom Samopomocy w Kossowej,ŚDS,ŚDS,ul. Zygmunta Jaworskiego 13,Kossowa,34-114,wadowicki,małopolskie,49.96595,19.60077,30,,"A,B,C,D",784 624 796,
+160,Środowiskowy Dom Pomocy Społecznej w Wadowicach (Filia ŚDS Wadowice ul. E. K. Wojtyłów 16),ŚDS,ŚDS,ul. Sienkiewicza 16,Wadowice,34-100,wadowicki,małopolskie,49.8847,19.4955,85,,"A,B
+Filia ŚDS Wadowice
+ul. E. K. Wojtyłów 16,
+34-100 Wadowice",57 947 09 31,https://sdswadowice.pl/kontakt-3/
+159,Środowiskowy Dom Pomocy Społecznej w Wadowicach,ŚDS,ŚDS,"ul. E. K. Wojtyłów 16,",Wadowice,34-100,wadowicki,małopolskie,49.8854,19.4942,85,,"A,B",33 873 23 63,https://sdswadowice.pl/
+129,Gminny Środowiskowy Dom Samopomocy w Wieprzu,ŚDS,ŚDS,ul. Podgórze 18 ,Wieprz,34-122,wadowicki,małopolskie,49.8838,19.3564,25,,B ,33 875 52 90,https://ddow.pl/kontakt
+163,Środowiskowy Dom Pomocy Społecznej w Brzeziu,ŚDS,ŚDS,338,Brzezie,32-014,wielicki,małopolskie,49.9981,20.2352,37,,"A,B,C",12 284 11 98,
+8,Środowiskowy Dom Samopomocy Zagórzany,ŚDS,ŚDS,Zagórzany 109,Gdów,32-420,wielicki,małopolskie,49.87565351,20.23367658,41,,"A,B,C",12 251 40 41,https://www.sdszagorzany.pl/
+108,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,Targowa 8,Niepołomice,32-005,wielicki,małopolskie,50.0366,20.2195,39,,"A,B ",12 284 80 55,https://www.sdsniepolomice.pl/
+3,Środowiskowy Dom Samopomocy Tomaszkowice,ŚDS,ŚDS,Tomaszowice 455,Wieliczka,32-020,wielicki,małopolskie,49.97663214,20.0986488,38,,"A,B",12 250 79 00,https://sdstomaszkowice.pl/
+128,Środowiskowy Dom Pomocy Społecznej ,ŚDS,ŚDS,os. Sienkiewicza 24,Wieliczka,32-020,wielicki,małopolskie,49.9851,20.0663,44,,A,12 288 32 28,https://fundacja-leonardo.pl/srodowiskowy-dom-samopomocy-wieliczka/
+162,Środowiskowy Dom Pomocy Społecznej w Śledziejowicach,ŚDS,ŚDS,336,Śledziejowice,32-020,wielicki,małopolskie,50.0056,20.08,24,,"B,C",12 288 24 70,https://www.larche.org.pl/sledziejowice/kontakt/
