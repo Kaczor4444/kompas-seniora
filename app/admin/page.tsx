@@ -41,6 +41,7 @@ export default async function AdminDashboardPage() {
     { href: '/admin/placowki', label: 'Lista placówek', desc: 'Przeglądaj i edytuj', icon: List, color: 'hover:border-slate-400' },
     { href: '/admin/mops', label: 'MOPS / GOPS', desc: `${totalMops} ośrodków w bazie`, icon: MapPin, color: 'hover:border-slate-400' },
     { href: '/admin/analytics', label: 'Analytics', desc: 'Aktywność użytkowników', icon: BarChart3, color: 'hover:border-slate-400' },
+    { href: '/admin/wolne-miejsca', label: 'Wolne miejsca DPS', desc: 'Tracker zmian — Małopolska', icon: Activity, color: 'hover:border-emerald-400' },
     { href: '/admin/scrapers', label: 'Monitory danych', desc: '8 GitHub Actions scraperów', icon: Radio, color: 'hover:border-emerald-400' },
     { href: '/admin/security-log', label: 'Security Log', desc: 'Logi logowań i blokad', icon: ShieldAlert, color: 'hover:border-slate-400' },
   ];
