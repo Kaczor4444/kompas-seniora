@@ -3,6 +3,7 @@ import path from 'path'
 import { parse } from 'papaparse'
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 import RaportCharts from './RaportCharts'
 import KpiHero from './KpiHero'
 
@@ -289,6 +290,19 @@ export default function RaportPage() {
             dpsRatioBrutto={dpsRatioBrutto}
             dpsRatioNetto={dpsRatioNetto}
           />
+
+          {/* Link do rejestru wolnych miejsc */}
+          <Link
+            href="/raport/wolne-miejsca"
+            className="mt-8 flex items-center justify-between gap-4 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors rounded-2xl px-5 py-4 group"
+          >
+            <div>
+              <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Aktualizowany co miesiąc</div>
+              <div className="text-white font-bold text-sm">Rejestr wolnych miejsc w DPS — Małopolska</div>
+              <div className="text-slate-400 text-xs mt-0.5">Wolne miejsca i kolejki według powiatów · dane MUW</div>
+            </div>
+            <ChevronRight size={18} className="text-emerald-400 shrink-0 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </section>
 
