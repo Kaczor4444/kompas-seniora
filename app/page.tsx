@@ -109,7 +109,16 @@ export default async function Home() {
     <HomeClient
       totalFacilities={totalFacilities}
       totalWolne={totalWolne}
-      wolneMonth={latestWolneDate ? latestWolneDate.data_stanu.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' }) : undefined}
+      wolneMonth={latestWolneDate ? (() => {
+        const LOCATIVE: Record<string, string> = {
+          'stycznia':'styczniu','lutego':'lutym','marca':'marcu','kwietnia':'kwietniu',
+          'maja':'maju','czerwca':'czerwcu','lipca':'lipcu','sierpnia':'sierpniu',
+          'września':'wrześniu','października':'październiku','listopada':'listopadzie','grudnia':'grudniu',
+        };
+        const nom = latestWolneDate.data_stanu.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+        const [month, year] = nom.split(' ');
+        return `${LOCATIVE[month] ?? month} ${year}`;
+      })() : undefined}
       powiatCounts={powiatCounts}
       featuredArticles={featuredArticles}
       typeCounts={typeCounts}
