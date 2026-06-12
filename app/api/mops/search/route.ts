@@ -65,15 +65,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results: [], mode: 'direct' });
     }
 
-    // Unikalne powiaty (deduplikacja), RM=01 (wieś) przed RM=00 (część)
+    // Unikalne powiaty (deduplikacja), RM=01/96/98 przed RM=00 (część wsi)
+    // Jeśli są wyniki "główne" (RM≠00), pomijamy powiaty wchodzące wyłącznie przez RM=00
     const seenPowiats = new Set<string>();
     const uniquePowiats: string[] = [];
     const sorted = [...terytEntries].sort((a, b) => {
       const rmOrder = (rm: string | null) => rm === '01' ? 0 : rm === '98' || rm === '96' ? 1 : 2;
       return rmOrder(a.rodzaj_miejscowosci) - rmOrder(b.rodzaj_miejscowosci);
     });
+    const hasMainEntries = sorted.some(e => e.rodzaj_miejscowosci !== '00');
     for (const e of sorted) {
-      if (e.powiat && !seenPowiats.has(e.powiat)) {
+      if (!e.powiat) continue;
+      // Pomiń RM=00 jeśli mamy lepsze wyniki
+      if (hasMainEntries && e.rodzaj_miejscowosci === '00') continue;
+      if (!seenPowiats.has(e.powiat)) {
         seenPowiats.add(e.powiat);
         uniquePowiats.push(e.powiat);
       }
@@ -134,7 +139,7 @@ export async function GET(request: NextRequest) {
         results: mopsByPowiat[powiatKeys[0]],
         mode: 'powiat_fallback',
         powiat: powiatKeys[0],
-        localityName: terytEntries[0].nazwa,
+        localityName: sorted[0].nazwa,
       });
     }
 
@@ -144,7 +149,7 @@ export async function GET(request: NextRequest) {
       mode: 'ambiguous',
       powiaty: powiatKeys,
       mopsByPowiat,
-      localityName: terytEntries[0].nazwa,
+      localityName: sorted[0].nazwa,
     });
 
   } catch (error) {
