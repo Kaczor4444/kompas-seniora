@@ -67,7 +67,7 @@ const Hero = ({ totalFacilities, totalWolne, wolneMonth }: { totalFacilities?: n
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                 <span>
-                  W {wolneMonth ?? 'ostatnim miesiącu'} było <strong className="text-slate-900">{totalWolne} wolnych miejsc</strong> w DPS Małopolska — sprawdź mapę
+                  W {wolneMonth ?? 'ostatnim miesiącu'} <strong className="text-slate-900">{totalWolne} wolnych miejsc</strong> w DPS w Małopolsce — zobacz na mapie
                 </span>
                 <ChevronRight size={14} className="text-slate-300 group-hover:text-emerald-500 transition-colors" />
               </Link>
