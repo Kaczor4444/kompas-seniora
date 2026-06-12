@@ -45,6 +45,7 @@ MANUAL_MAPPINGS_BY_ID = {
     "gmina sękowa":            29,   # DPS w Wapiennem
     "gmina grybów":            73,   # DPS Biała Niżna 640
     "miasto i gmina niepołomice": 86, # DPS w Staniątkach
+    "w olkuszu":               74,   # DB nazwa generyczna "Dom Pomocy Społecznej" — bez miasta
 }
 
 # Powiaty obsługiwane przez matching po adresie (Kraków) lub pojemności (Nowy Sącz, Tarnów)
