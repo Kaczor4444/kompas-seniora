@@ -11,7 +11,7 @@ import AccountingCalculatorIcon from '@/components/icons/AccountingCalculatorIco
 import { SearchBar } from '@/src/components/search/SearchBar';
 
 
-const Hero = ({ totalFacilities, totalWolne }: { totalFacilities?: number; totalWolne?: number; onTabChange?: unknown; selectedProfiles?: unknown; activeTab?: unknown }) => {
+const Hero = ({ totalFacilities, totalWolne, wolneMonth }: { totalFacilities?: number; totalWolne?: number; wolneMonth?: string; onTabChange?: unknown; selectedProfiles?: unknown; activeTab?: unknown }) => {
   // Inline kalkulator state
   const [calcIncome, setCalcIncome] = useState('');
 
@@ -67,7 +67,7 @@ const Hero = ({ totalFacilities, totalWolne }: { totalFacilities?: number; total
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                 <span>
-                  <strong className="text-slate-900">{totalWolne} wolnych miejsc</strong> w DPS Małopolska — sprawdź mapę
+                  W {wolneMonth ?? 'ostatnim miesiącu'} było <strong className="text-slate-900">{totalWolne} wolnych miejsc</strong> w DPS Małopolska — sprawdź mapę
                 </span>
                 <ChevronRight size={14} className="text-slate-300 group-hover:text-emerald-500 transition-colors" />
               </Link>

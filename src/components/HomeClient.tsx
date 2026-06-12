@@ -17,6 +17,7 @@ import type { ArticleWithMetadata } from '@/lib/articleHelpers';
 interface HomeClientProps {
   totalFacilities: number;
   totalWolne?: number;
+  wolneMonth?: string;
   powiatCounts: Record<string, number>;
   featuredArticles: ArticleWithMetadata[];
   typeCounts: { DPS: number; SDS: number; KlubSenior: number; DDSenior: number; UTW: number };
@@ -25,7 +26,7 @@ interface HomeClientProps {
   powiatCountsByTypeSlaskie: Record<'DPS' | 'KlubSenior' | 'DDSenior', Record<string, number>>;
 }
 
-export default function HomeClient({ totalFacilities, totalWolne, powiatCounts, featuredArticles, typeCounts, typeCountsSlaskie, powiatCountsByType, powiatCountsByTypeSlaskie }: HomeClientProps) {
+export default function HomeClient({ totalFacilities, totalWolne, wolneMonth, powiatCounts, featuredArticles, typeCounts, typeCountsSlaskie, powiatCountsByType, powiatCountsByTypeSlaskie }: HomeClientProps) {
   // ✅ State management for active tab
   const [activeTab, setActiveTab] = useState<'DPS' | 'SDS' | 'Wszystkie'>('Wszystkie');
 
@@ -41,6 +42,7 @@ export default function HomeClient({ totalFacilities, totalWolne, powiatCounts, 
         activeTab={activeTab}
         totalFacilities={totalFacilities}
         totalWolne={totalWolne}
+        wolneMonth={wolneMonth}
       />
 
       {/* Facility Type Cards — łączna liczba ze wszystkich województw */}

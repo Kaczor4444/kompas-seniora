@@ -109,6 +109,7 @@ export default async function Home() {
     <HomeClient
       totalFacilities={totalFacilities}
       totalWolne={totalWolne}
+      wolneMonth={latestWolneDate ? latestWolneDate.data_stanu.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' }) : undefined}
       powiatCounts={powiatCounts}
       featuredArticles={featuredArticles}
       typeCounts={typeCounts}
