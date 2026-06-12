@@ -36,7 +36,7 @@ function getPowiatKey(powiat: string): string {
 }
 
 function getColor(wolne: number, maxWolne: number): string {
-  if (wolne === 0) return '#fca5a5'; // no free spots — red-300
+  if (wolne === 0) return '#cbd5e1'; // no free spots — slate-300
   const ratio = Math.sqrt(wolne / Math.max(maxWolne, 1)); // sqrt scale
   // Use CSS emerald palette steps
   if (ratio >= 0.85) return '#059669'; // emerald-600
@@ -162,7 +162,7 @@ export default function WolneMiejscaMap({ data }: Props) {
           <span>Kilka miejsc</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-red-300" />
+          <div className="w-3 h-3 rounded-sm bg-slate-300" />
           <span>Brak miejsc</span>
         </div>
       </div>
