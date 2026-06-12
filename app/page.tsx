@@ -111,9 +111,12 @@ export default async function Home() {
       totalWolne={totalWolne}
       wolneMonth={latestWolneDate ? (() => {
         const LOCATIVE: Record<string, string> = {
+          'styczeń':'styczniu','luty':'lutym','marzec':'marcu','kwiecień':'kwietniu',
+          'maj':'maju','czerwiec':'czerwcu','lipiec':'lipcu','sierpień':'sierpniu',
+          'wrzesień':'wrześniu','październik':'październiku','listopad':'listopadzie','grudzień':'grudniu',
+          // genitive fallbacks (some Node versions)
           'stycznia':'styczniu','lutego':'lutym','marca':'marcu','kwietnia':'kwietniu',
           'maja':'maju','czerwca':'czerwcu','lipca':'lipcu','sierpnia':'sierpniu',
-          'września':'wrześniu','października':'październiku','listopada':'listopadzie','grudnia':'grudniu',
         };
         const nom = latestWolneDate.data_stanu.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
         const [month, year] = nom.split(' ');
