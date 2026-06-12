@@ -96,6 +96,21 @@ const GROUPS: { label: string; color: string; accent: string; scrapers: Scraper[
     ],
   },
   {
+    label: 'Podkarpackie',
+    color: 'bg-orange-50 border-orange-200',
+    accent: 'bg-orange-600',
+    scrapers: [
+      {
+        workflow: 'podkarpackie-wolne-miejsca-monitor.yml',
+        name: 'Wolne miejsca DPS',
+        description: 'Aktualne wolne miejsca w DPS (~53 placówki)',
+        source: 'UW Rzeszów (XLS)',
+        cron: '5. i 20. każdego mies.',
+        hasForce: true,
+      },
+    ],
+  },
+  {
     label: 'GUS / Dane zewnętrzne',
     color: 'bg-slate-50 border-slate-200',
     accent: 'bg-slate-600',

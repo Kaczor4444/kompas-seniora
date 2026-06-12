@@ -1,0 +1,19 @@
+# Wolne miejsca w DPS — Podkarpackie
+
+Strona BIP (link do aktualnego pliku XLS):
+https://rzeszow.uw.gov.pl/dla-instytucji/pomoc-spoleczna/wykaz-jednostek-udzielajacych-wsparcia-potrzebujacym/wykaz-domow-pomocy-spolecznej-ktore-uzyskaly-zezwolenie-wojewody-prowadzonych-przez-jednostki-samorzadu-terytorialnego-lub-na-zlecenie-jst-dzialajacych-na-terenie-wojewodztwa-podkarpackieg
+
+Wzorzec URL pliku (zmienia się rok/miesiąc):
+https://rzeszow.uw.gov.pl/wp-content/uploads/2026/06/frekwencja-DPS-2026.xls
+https://rzeszow.uw.gov.pl/wp-content/uploads/2025/09/frekwencja-DPS-2025.xls
+
+Inne rejestry:
+https://rzeszow.uw.gov.pl/wp-content/uploads/2025/04/Rejestr-domow-pomocy-spolecznej-wojewodztwa-podkarpackiego.doc
+https://rzeszow.uw.gov.pl/wp-content/uploads/2024/10/Wykaz-SDS.doc
+
+Podkarpacki Urząd Wojewódzki w Rzeszowie
+Wydział Polityki Społecznej
+
+Format: XLS (xlrd), jeden snapshot na plik, kolumny:
+  Lp | Nazwa i siedziba | Powiat | Ilość miejsc | Wolne wg. {data} | Typ domu | Tel | Kierownik
+Dane: ~53 DPS, data stanu w nagłówku kolumny 4
