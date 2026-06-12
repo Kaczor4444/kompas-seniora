@@ -151,10 +151,10 @@ export default async function WolneMiejscaPage() {
             Dane łączne dla wszystkich DPS w powiecie. Kolumna <em>Trend</em> pokazuje zmianę liczby wolnych miejsc względem poprzedniego miesiąca.
           </p>
 
-          <div className="grid md:grid-cols-[1fr_1fr] gap-8 items-start">
-            <WolneMiejscaMap
-              data={rows.map(r => ({ powiat: r.powiat, wolne: r.wolne, oczek: r.oczek }))}
-            />
+          <WolneMiejscaMap
+            data={rows.map(r => ({ powiat: r.powiat, wolne: r.wolne, oczek: r.oczek }))}
+          />
+          <div className="mt-8">
             <PowiatTable rows={rows} dataStanu={dataStanuLabel} />
           </div>
         </section>

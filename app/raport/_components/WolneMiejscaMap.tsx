@@ -64,7 +64,7 @@ export default function WolneMiejscaMap({ data }: Props) {
   const maxWolne = Math.max(...data.map(d => d.wolne), 1);
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full max-w-3xl mx-auto">
       <svg
         viewBox={MAP_META.viewBox}
         className="w-full h-auto"
