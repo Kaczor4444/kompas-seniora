@@ -190,6 +190,7 @@ interface SearchPageProps {
     near?: string;
     city?: string;  // true when searching for city-only (miasta na prawach powiatu)
     cn?: string;    // city name (from CityCard near=true click, for dynamic distance message)
+    spaces?: string; // true = pre-select "only with free spots" filter
   }>;
 }
 
@@ -639,6 +640,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const minPrice = params.min ? parseInt(params.min) : undefined;
   const maxPrice = params.max ? parseInt(params.max) : undefined;
   const showFree = params.free === 'true';
+  const onlyFreeSpaces = params.spaces === 'true';
 
   let filteredResults = results;
 
@@ -844,6 +846,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         minPrice,
         maxPrice,
         showFree: showFree || undefined,
+        onlyFreeSpaces: onlyFreeSpaces || undefined,
       }}
       initialView={initialView}
     />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { MALOPOLSKIE_COUNTIES, MAP_META } from '@/data/malopolskie-counties';
 
 export type MapPowiatData = {
@@ -16,6 +17,13 @@ type Props = {
 // Normalize powiat names to match SVG county names
 function normalizePowiat(p: string): string {
   return p.toLowerCase().trim();
+}
+
+// Convert SVG county name → search URL powiat param (matches DB powiat field)
+function countyToSearchUrl(name: string): string {
+  const isCityCounty = ['Kraków', 'Nowy Sącz', 'Tarnów'].includes(name);
+  const powiat = isCityCounty ? `m. ${name}` : name;
+  return `/search?powiat=${encodeURIComponent(powiat)}&type=dps&spaces=true`;
 }
 
 function getCountyKey(name: string): string {
@@ -47,6 +55,7 @@ function getColor(wolne: number, maxWolne: number): string {
 }
 
 export default function WolneMiejscaMap({ data }: Props) {
+  const router = useRouter();
   const [tooltip, setTooltip] = useState<{
     name: string;
     wolne: number;
@@ -105,6 +114,7 @@ export default function WolneMiejscaMap({ data }: Props) {
                 }
               }}
               onMouseLeave={() => setTooltip(null)}
+              onClick={() => router.push(countyToSearchUrl(county.name))}
             />
           );
         })}

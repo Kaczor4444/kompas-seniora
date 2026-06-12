@@ -122,8 +122,13 @@ export default function PowiatTable({ rows, dataStanu }: { rows: PowiatStat[]; d
             {sorted.map((row, i) => (
               <tr key={row.powiat}
                 className={`border-b border-stone-50 last:border-0 hover:bg-slate-50 transition-colors ${i % 2 === 1 ? 'bg-stone-50/40' : ''}`}>
-                <td className="px-4 py-3 font-semibold text-slate-800">
-                  {formatPowiat(row.powiat)}
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/search?powiat=${encodeURIComponent(row.powiat)}&type=dps&spaces=true`}
+                    className="font-semibold text-slate-800 hover:text-emerald-700 hover:underline transition-colors"
+                  >
+                    {formatPowiat(row.powiat)}
+                  </Link>
                 </td>
                 <td className="text-center px-3 py-3 tabular-nums">
                   <span className={row.wolne > 0 ? 'text-xl font-black text-emerald-600' : 'text-xl font-black text-slate-300'}>

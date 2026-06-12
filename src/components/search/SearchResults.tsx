@@ -89,6 +89,7 @@ interface ActiveFilters {
   minPrice?: number;
   maxPrice?: number;
   showFree?: boolean;
+  onlyFreeSpaces?: boolean;
 }
 
 interface SearchResultsProps {
@@ -169,7 +170,7 @@ export default function SearchResults({
 
   const [selectedPowiat, setSelectedPowiat] = useState(getInitialPowiat());
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
-  const [onlyWithFreeSpaces, setOnlyWithFreeSpaces] = useState(false);
+  const [onlyWithFreeSpaces, setOnlyWithFreeSpaces] = useState(activeFilters?.onlyFreeSpaces ?? false);
   const [priceLimit, setPriceLimit] = useState(
     activeFilters?.maxPrice || 13000  // max w bazie: 12 400 zł (Kraków), suwak do 13 000
   );
