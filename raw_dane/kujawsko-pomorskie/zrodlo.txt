@@ -1,0 +1,16 @@
+# Wolne miejsca w DPS — Kujawsko-Pomorskie
+
+Strona BIP (link do aktualnego pliku):
+https://bip.bydgoszcz.uw.gov.pl/67/rejestr-domow-pomocy-spolecznej.html
+
+Aktualny plik XLS (aktualizowany rok do roku):
+https://bip.bydgoszcz.uw.gov.pl/download/attachment/1810/dps_wolne_miejsca_2026.xls
+
+Wydział Polityki Społecznej
+Kujawsko-Pomorski Urząd Wojewódzki w Bydgoszczy
+ul. Konarskiego 1-3, 85-950 Bydgoszcz
+tel. 52 34 97 678
+kontakt: Ewa Andrykowska
+
+Format: XLS (xlrd), jeden roczny plik z kolumnami miesięcznymi I–XII
+Dane: ~48 DPS, 5 profili opieki, wolne miejsca + oczekujący per miesiąc

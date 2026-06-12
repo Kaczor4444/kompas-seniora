@@ -81,6 +81,21 @@ const GROUPS: { label: string; color: string; accent: string; scrapers: Scraper[
     ],
   },
   {
+    label: 'Kujawsko-Pomorskie',
+    color: 'bg-violet-50 border-violet-200',
+    accent: 'bg-violet-600',
+    scrapers: [
+      {
+        workflow: 'kp-wolne-miejsca-monitor.yml',
+        name: 'Wolne miejsca DPS',
+        description: 'Aktualne wolne miejsca w DPS (~48 placówek)',
+        source: 'UW Bydgoszcz (XLS)',
+        cron: '5. i 20. każdego mies.',
+        hasForce: true,
+      },
+    ],
+  },
+  {
     label: 'GUS / Dane zewnętrzne',
     color: 'bg-slate-50 border-slate-200',
     accent: 'bg-slate-600',
