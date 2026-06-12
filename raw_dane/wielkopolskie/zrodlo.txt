@@ -1,0 +1,17 @@
+# Wolne miejsca w DPS — Wielkopolskie
+
+Strona z linkiem do PDF:
+https://poznan.uw.gov.pl/domy-pomocy-spolecznej
+
+Wzorzec URL pliku:
+https://poznan.uw.gov.pl/system/files/zalaczniki/wolne_miejsca_w_dps_{miesiąc}_{rok}.pdf
+
+Przykład (czerwiec 2026):
+https://poznan.uw.gov.pl/system/files/zalaczniki/wolne_miejsca_w_dps_czerwiec_2026.pdf
+
+Wielkopolski Urząd Wojewódzki w Poznaniu
+
+Format: PDF (7 stron), tabela:
+  Lp. | Jednostka | Typ | Adres | Liczba miejsc | Powiat | Organ prowadzący | Liczba wolnych miejsc
+Dane: 63 DPS, brak wiersza SUMA (sumujemy z wierszy)
+Publikacja: ~10. dnia miesiąca za bieżący miesiąc

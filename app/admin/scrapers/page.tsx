@@ -126,6 +126,21 @@ const GROUPS: { label: string; color: string; accent: string; scrapers: Scraper[
     ],
   },
   {
+    label: 'Wielkopolskie',
+    color: 'bg-yellow-50 border-yellow-200',
+    accent: 'bg-yellow-600',
+    scrapers: [
+      {
+        workflow: 'wielkopolskie-wolne-miejsca-monitor.yml',
+        name: 'Wolne miejsca DPS',
+        description: 'Aktualne wolne miejsca w DPS (~63 placówki, PDF)',
+        source: 'UW Poznań (PDF)',
+        cron: '12. i 22. każdego mies.',
+        hasForce: true,
+      },
+    ],
+  },
+  {
     label: 'GUS / Dane zewnętrzne',
     color: 'bg-slate-50 border-slate-200',
     accent: 'bg-slate-600',
