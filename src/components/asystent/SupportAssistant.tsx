@@ -88,6 +88,9 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
   const [showGeoSuggestion, setShowGeoSuggestion] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState('');
+  // Autocomplete suggestions
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{ nazwa: string; powiat: string; rodzaj_miejscowosci?: string }>>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     if (prefilledLocation) {
@@ -117,16 +120,19 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
 
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/teryt/suggest?q=${answers.location}`);
+        const res = await fetch(`/api/teryt/suggest?q=${encodeURIComponent(answers.location)}`);
         const data = await res.json();
-        const found = data.suggestions?.length > 0;
+        const suggestions = data.suggestions ?? [];
+        const found = suggestions.length > 0;
         setValidationState(found ? 'valid' : 'invalid');
-        // Store the TERYT powiat (adjective form, e.g. "olkuski") for API queries
-        setResolvedPowiat(found ? (data.suggestions[0].powiat ?? '') : '');
+        setResolvedPowiat(found ? (suggestions[0].powiat ?? '') : '');
+        setLocationSuggestions(suggestions.slice(0, 6));
+        setShowSuggestions(found && suggestions.length > 1);
       } catch (error) {
         console.error('Validation error:', error);
         setValidationState('idle');
         setResolvedPowiat('');
+        setLocationSuggestions([]);
       }
     }, 300);
 
@@ -513,15 +519,45 @@ export const SupportAssistant: React.FC<SupportAssistantProps> = ({ onFacilityCl
                       <input
                         type="text"
                         value={answers.location}
-                        onChange={e => { setAnswers({...answers, location: e.target.value}); if (e.target.value) setShowGeoSuggestion(false); }}
+                        onChange={e => {
+                          setAnswers({...answers, location: e.target.value});
+                          if (e.target.value) setShowGeoSuggestion(false);
+                          setShowSuggestions(false);
+                        }}
                         onFocus={() => { if (!answers.location.trim()) setShowGeoSuggestion(true); }}
-                        onBlur={() => setTimeout(() => setShowGeoSuggestion(false), 150)}
+                        onBlur={() => setTimeout(() => { setShowGeoSuggestion(false); setShowSuggestions(false); }, 150)}
                         placeholder="Wpisz miasto lub powiat..."
                         autoComplete="off"
                         spellCheck="false"
                         className="flex-1 py-5 pr-8 bg-transparent text-lg font-bold outline-none placeholder:text-stone-300 placeholder:font-medium"
                       />
                     </div>
+
+                    {/* Autocomplete suggestions */}
+                    {showSuggestions && locationSuggestions.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                        {locationSuggestions.map((s, i) => (
+                          <button
+                            key={i}
+                            onMouseDown={e => {
+                              e.preventDefault();
+                              setAnswers({...answers, location: s.nazwa});
+                              setResolvedPowiat(s.powiat);
+                              setValidationState('valid');
+                              setShowSuggestions(false);
+                              setLocationSuggestions([]);
+                            }}
+                            className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-50 last:border-0"
+                          >
+                            <MapPin size={14} className="text-slate-300 flex-shrink-0" />
+                            <div>
+                              <span className="text-sm font-bold text-slate-800">{s.nazwa}</span>
+                              <span className="text-xs text-slate-400 ml-2">pow. {s.powiat}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
 
                     {showGeoSuggestion && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 overflow-hidden">
