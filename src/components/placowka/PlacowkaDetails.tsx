@@ -814,7 +814,7 @@ export default function PlacowkaDetails({ placowka }: { placowka: Placowka }) {
                       <div className="text-sm text-slate-700 leading-relaxed">
                         <p className="font-bold text-amber-900 mb-2">Ważne: Wniosek składasz według miejsca zamieszkania</p>
                         <p>
-                          Nawet jeśli szukasz miejsca w {placowka.miejscowosc}, musisz złożyć wniosek w MOPS/GOPS właściwym dla
+                          Nawet jeśli placówka znajduje się w miejscowości {placowka.miejscowosc}, musisz złożyć wniosek w MOPS/GOPS właściwym dla
                           <strong> miejsca zameldowania seniora</strong>, a nie lokalizacji placówki.
                         </p>
                       </div>
