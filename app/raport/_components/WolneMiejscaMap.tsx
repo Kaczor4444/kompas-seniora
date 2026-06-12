@@ -139,7 +139,7 @@ export default function WolneMiejscaMap({ data }: Props) {
                 fill="#0f172a" opacity="0.92"
               />
               <text x={tx + 8} y={ty + 14} fontSize="8.5" fontWeight="700" fill="#f8fafc">
-                {tooltip.name}
+                {['Kraków','Nowy Sącz','Tarnów'].includes(tooltip.name) ? tooltip.name : `powiat ${tooltip.name}`}
               </text>
               <text x={tx + 8} y={ty + 27} fontSize="8" fill="#34d399">
                 {tooltip.wolne > 0
