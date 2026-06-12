@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { ChevronRight, Clock, AlertTriangle, ArrowRight } from 'lucide-react';
 import PowiatTable, { type PowiatStat } from './_components/PowiatTable';
 import KpiHeroWolne from './_components/KpiHeroWolne';
+import WolneMiejscaMap from './_components/WolneMiejscaMap';
 
 export const dynamic = 'force-dynamic';
 
@@ -143,13 +144,19 @@ export default async function WolneMiejscaPage() {
       {/* Treść */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-16">
 
-        {/* Tabela */}
+        {/* Mapa + Tabela */}
         <section>
           <h2 className="text-2xl font-black text-slate-900 mb-2">Wolne miejsca według powiatu</h2>
           <p className="text-slate-500 text-sm mb-6">
             Dane łączne dla wszystkich DPS w powiecie. Kolumna <em>Trend</em> pokazuje zmianę liczby wolnych miejsc względem poprzedniego miesiąca.
           </p>
-          <PowiatTable rows={rows} dataStanu={dataStanuLabel} />
+
+          <div className="grid md:grid-cols-[1fr_1fr] gap-8 items-start">
+            <WolneMiejscaMap
+              data={rows.map(r => ({ powiat: r.powiat, wolne: r.wolne, oczek: r.oczek }))}
+            />
+            <PowiatTable rows={rows} dataStanu={dataStanuLabel} />
+          </div>
         </section>
 
         {/* Sekcja edukacyjna: profil opieki */}
