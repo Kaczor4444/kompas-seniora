@@ -1,673 +1,257 @@
-import fs from 'fs'
-import path from 'path'
-import { parse } from 'papaparse'
-import { Metadata } from 'next'
-import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
-import RaportCharts from './RaportCharts'
-import KpiHero from './KpiHero'
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import { ChevronRight, TrendingDown, TrendingUp, Clock, AlertTriangle, ArrowRight } from 'lucide-react';
+import PowiatTable, { type PowiatStat } from './_components/PowiatTable';
 
-const PUBLISHED = '2026-05-11'
-const DATA_DATE = 'marzec 2026'
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Raport: Dostępność DPS w Małopolsce 2026 | Kompas Seniora',
-  description: 'Kompleksowa analiza dostępności i kosztów Domów Pomocy Społecznej w 22 powiatach Małopolski. Wskaźniki nasycenia, luka finansowa, trendy cenowe 2020–2026.',
-  openGraph: {
-    title: 'Raport: Dostępność DPS w Małopolsce 2026',
-    description: 'Analiza 22 powiatów — wskaźniki nasycenia, luka finansowa i trendy cenowe DPS. Dane: GUS BDL 2024, MUW Małopolska 2026.',
-    url: 'https://kompas-seniora.pl/raport',
-    siteName: 'Kompas Seniora',
-    type: 'article',
-    publishedTime: PUBLISHED,
-    locale: 'pl_PL',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Dostępność DPS w Małopolsce 2026 | Kompas Seniora',
-    description: 'Analiza 22 powiatów — wskaźniki nasycenia, luka finansowa i trendy cenowe DPS.',
-  },
+  title: 'Wolne miejsca w DPS Małopolska — aktualny rejestr | Kompas Seniora',
+  description: 'Aktualne wolne miejsca w domach pomocy społecznej w Małopolsce z podziałem na powiaty. Dane z oficjalnego rejestru MUW Małopolska, aktualizowane co miesiąc.',
+};
+
+// Profile specjalistyczne — skrajnie długie kolejki, nie dotyczą seniora "standardowego"
+const SPEC_PROFILES = [
+  'dla dorosłych niepełnosprawnych intelektualnie',
+  'dla dzieci i młodzieży niepełnosprawnych intelektualnie',
+  'dla osób przewlekle psychicznie chorych',
+];
+
+function isSpecProfile(typ: string | null): boolean {
+  if (!typ) return false;
+  const t = typ.toLowerCase();
+  return SPEC_PROFILES.some(p => t.includes(p.split(' ').slice(2).join(' ')));
 }
 
-export type PowiatRow = {
-  powiat: string
-  dps_placowki: number
-  dps_miejsca: number
-  pop_80plus_2024: number
-  pop_80plus_prog2035: number
-  dostepnosc_2024: number
-  dostepnosc_2035: number
-  cena_dps_mediana: number | null
-  n_placowek_z_cena: number
-  emerytura_malopolska: number
-  luka_miesieczna_zl: number | null
-  luka_roczna_zl: number | null
+function formatDate(d: Date): string {
+  return d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-export type EmeryRow = {
-  rok: number
-  wartosc_zl: number
-}
+export default async function WolneMiejscaPage() {
+  // Ostatnie 2 snapshoty
+  const latestDates = await prisma.placowkaWolneMiejsca.findMany({
+    where: { placowka: { typ_placowki: 'DPS', wojewodztwo: 'małopolskie' } },
+    distinct: ['data_stanu'],
+    orderBy: { data_stanu: 'desc' },
+    take: 2,
+    select: { data_stanu: true },
+  });
 
-export type CenaDpsRow = {
-  rok:          number
-  min_cena_dps: number | null
-  emerytura:    number | null
-}
+  const dateFilter = latestDates.map(r => r.data_stanu);
+  const lastDate = latestDates[0]?.data_stanu;
+  const prevDate = latestDates[1]?.data_stanu;
 
-export type WojRow = {
-  wojewodztwo:          string
-  miejsca_stacjonarne:  number
-  liczba_dps:           number
-  pop_80plus:           number
-  wskaznik_10k:         number
-}
+  const records = await prisma.placowkaWolneMiejsca.findMany({
+    where: {
+      placowka: { typ_placowki: 'DPS', wojewodztwo: 'małopolskie' },
+      data_stanu: { in: dateFilter },
+    },
+    select: {
+      data_stanu: true,
+      typ_opieki: true,
+      wolne_ogolem: true,
+      oczekujacych: true,
+      czas_oczekiwania_dni: true,
+      placowka: { select: { powiat: true } },
+    },
+  });
 
-function loadWojewodztwa(): WojRow[] {
-  const file = path.join(process.cwd(), 'data', 'gus_stacjonarne_wojewodztwa.csv')
-  const content = fs.readFileSync(file, 'utf-8')
-  const { data } = parse(content, { header: true, skipEmptyLines: true })
-  return (data as Record<string, string>[]).map(r => ({
-    wojewodztwo:         r.wojewodztwo,
-    miejsca_stacjonarne: Number(r.miejsca_stacjonarne),
-    liczba_dps:          Number(r.liczba_dps),
-    pop_80plus:          Number(r.pop_80plus),
-    wskaznik_10k:        Number(r.wskaznik_10k),
-  }))
-}
+  // Agreguj per (powiat, data_stanu)
+  type Agg = { wolne: number; oczek: number; maxCzas: number; maxCzasSpec: number };
+  const agg = new Map<string, Agg>();
 
-function loadSaturation(): PowiatRow[] {
-  const file = path.join(process.cwd(), 'data', 'wskaznik_nasycenia_malopolska.csv')
-  const content = fs.readFileSync(file, 'utf-8')
-  const { data } = parse(content, { header: true, skipEmptyLines: true })
-  return (data as Record<string, string>[])
-    .map(r => ({
-      powiat:               r.powiat,
-      dps_placowki:         Number(r.dps_placowki) || 0,
-      dps_miejsca:          Number(r.dps_miejsca),
-      pop_80plus_2024:      Number(r.pop_80plus_2024),
-      pop_80plus_prog2035:  Number(r.pop_80plus_prog2035) || 0,
-      dostepnosc_2024:      Number(r.dostepnosc_2024) || 0,
-      dostepnosc_2035:      Number(r.dostepnosc_2035) || 0,
-      cena_dps_mediana:     r.cena_dps_mediana ? Number(r.cena_dps_mediana) : null,
-      n_placowek_z_cena:    Number(r.n_placowek_z_cena) || 0,
-      emerytura_malopolska: Number(r.emerytura_malopolska),
-      luka_miesieczna_zl:   r.luka_miesieczna_zl ? Number(r.luka_miesieczna_zl) : null,
-      luka_roczna_zl:       r.luka_roczna_zl ? Number(r.luka_roczna_zl) : null,
-    }))
-    .filter(r => r.dostepnosc_2024 > 0)
-    .sort((a, b) => a.dostepnosc_2024 - b.dostepnosc_2024)
-}
-
-function loadCenaDps(): CenaDpsRow[] {
-  // Łączy min ceny DPS per rok z emeryturami — dla wykresu porównawczego
-  const cenyFile = path.join(process.cwd(), 'data', 'gus_min_cena_dps.csv')
-  const emeryFile = path.join(process.cwd(), 'data', 'gus_emerytury_wojewodztwa.csv')
-
-  const cenyCsv = parse(fs.readFileSync(cenyFile, 'utf-8'), { header: true, skipEmptyLines: true })
-  const emeryCsv = parse(fs.readFileSync(emeryFile, 'utf-8'), { header: true, skipEmptyLines: true })
-
-  const emeryByRok: Record<number, number> = {}
-  for (const r of emeryCsv.data as Record<string, string>[]) {
-    if (r.wojewodztwo?.includes('MAŁOPOL') && r.wskaznik === 'emerytura_zus') {
-      emeryByRok[Number(r.rok)] = Number(r.wartosc_zl)
-    }
+  for (const r of records) {
+    const d = r.data_stanu.toISOString().split('T')[0];
+    const key = `${r.placowka.powiat}|${d}`;
+    const prev = agg.get(key) ?? { wolne: 0, oczek: 0, maxCzas: 0, maxCzasSpec: 0 };
+    const spec = isSpecProfile(r.typ_opieki);
+    agg.set(key, {
+      wolne: prev.wolne + (r.wolne_ogolem ?? 0),
+      oczek: prev.oczek + (r.oczekujacych ?? 0),
+      maxCzas: spec ? prev.maxCzas : Math.max(prev.maxCzas, r.czas_oczekiwania_dni ?? 0),
+      maxCzasSpec: spec ? Math.max(prev.maxCzasSpec, r.czas_oczekiwania_dni ?? 0) : prev.maxCzasSpec,
+    });
   }
 
-  const lata = new Set<number>()
-  const cenyByRok: Record<number, number> = {}
-  for (const r of cenyCsv.data as Record<string, string>[]) {
-    const rok = Number(r.rok)
-    lata.add(rok)
-    cenyByRok[rok] = Number(r.min_cena_dps)
-  }
-  Object.keys(emeryByRok).forEach(r => lata.add(Number(r)))
+  // Zbuduj listę powiatów dla ostatniego snapshotu
+  const lastDateStr = lastDate?.toISOString().split('T')[0] ?? '';
+  const prevDateStr = prevDate?.toISOString().split('T')[0] ?? '';
 
-  return [...lata]
-    .filter(rok => rok >= 2023)
-    .sort()
-    .map(rok => ({
-      rok,
-      min_cena_dps: cenyByRok[rok] ?? null,
-      emerytura:    emeryByRok[rok] ?? null,
-    }))
-}
+  const powiaty = new Set(records.map(r => r.placowka.powiat));
+  const rows: PowiatStat[] = Array.from(powiaty).map(powiat => {
+    const curr = agg.get(`${powiat}|${lastDateStr}`) ?? { wolne: 0, oczek: 0, maxCzas: 0, maxCzasSpec: 0 };
+    const prev = agg.get(`${powiat}|${prevDateStr}`);
+    return {
+      powiat,
+      wolne: curr.wolne,
+      wolnePrev: prev?.wolne ?? null,
+      oczek: curr.oczek,
+      maxCzasDni: curr.maxCzas > 0 ? curr.maxCzas : null,
+      maxCzasSpecDni: curr.maxCzasSpec > 0 ? curr.maxCzasSpec : null,
+    };
+  });
 
-function loadEmerytury(): EmeryRow[] {
-  const file = path.join(process.cwd(), 'data', 'gus_emerytury_wojewodztwa.csv')
-  const content = fs.readFileSync(file, 'utf-8')
-  const { data } = parse(content, { header: true, skipEmptyLines: true })
-  return (data as Record<string, string>[])
-    .filter(r => r.wojewodztwo.includes('MAŁOPOL') && r.wskaznik === 'emerytura_zus')
-    .map(r => ({ rok: Number(r.rok), wartosc_zl: Number(r.wartosc_zl) }))
-    .filter(r => r.rok >= 2020)
-    .sort((a, b) => a.rok - b.rok)
-}
+  // Statystyki podsumowania
+  const totalWolne = rows.reduce((s, r) => s + r.wolne, 0);
+  const totalOczek = rows.reduce((s, r) => s + r.oczek, 0);
+  const totalWolnePrev = rows.reduce((s, r) => s + (r.wolnePrev ?? 0), 0);
+  const diffWolne = prevDate ? totalWolne - totalWolnePrev : null;
+  const withWolne = rows.filter(r => r.wolne > 0).length;
 
-function formatPowiat(s: string) {
-  if (s.startsWith('m. ')) return s
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
-
-export default function RaportPage() {
-  const powiaty      = loadSaturation()
-  const emerytury    = loadEmerytury()
-  const cenaDps      = loadCenaDps()
-  const wojewodztwa  = loadWojewodztwa()
-
-  const emerytura2025 = emerytury.find(e => e.rok === 2025)?.wartosc_zl ?? 0
-  const totalMiejsc = powiaty.reduce((s, r) => s + r.dps_miejsca, 0)
-  const totalPop80  = powiaty.reduce((s, r) => s + r.pop_80plus_2024, 0)
-  const avgDost = Math.round(totalMiejsc / totalPop80 * 10000)
-  const totalPlacowek = powiaty.reduce((s, r) => s + r.dps_placowki, 0)
-  const totalZCena = powiaty.reduce((s, r) => s + r.n_placowek_z_cena, 0)
-
-  // Outlierzy — powiaty zaburzające statystyki (porównanie case-insensitive)
-  const OUTLIERS = ['krakowski', 'm. kraków', 'm. tarnów', 'm. nowy sącz']
-  const isOutlier = (p: string) => OUTLIERS.includes(p.toLowerCase())
-  const powiatyZiemskie = powiaty.filter(r => !isOutlier(r.powiat))
-
-  // Dysproporcja: tylko powiaty ziemskie (bez miast i krakowskiego)
-  const worst = powiaty[0]                                    // chrzanowski (171)
-  const bestZiemski = powiatyZiemskie[powiatyZiemskie.length - 1] // miechowski (1365)
-  const disparity = bestZiemski && worst
-    ? Math.round(bestZiemski.dostepnosc_2024 / worst.dostepnosc_2024)
-    : null
-
-  // KPI luka — najgorszy WIARYGODNY powiat ziemski (N≥3, nie outlier)
-  const powiatyRzetelneLuka = powiatyZiemskie
-    .filter(r => !isOutlier(r.powiat) && r.n_placowek_z_cena >= 3 && r.cena_dps_mediana !== null)
-    .map(r => ({
-      ...r,
-      luka_systemowa_rok: Math.round(((r.cena_dps_mediana ?? 0) - 0.7 * r.emerytura_malopolska) * 12),
-    }))
-    .sort((a, b) => b.luka_systemowa_rok - a.luka_systemowa_rok)
-  const worstLukaKPI = powiatyRzetelneLuka[0]
-
-  // KPI 4 — stosunek kosztu najtańszego DPS do przeciętnej emerytury (brutto i netto)
-  const cena2025 = cenaDps.find(r => r.rok === 2025)
-  const dpsRatioBrutto = cena2025?.min_cena_dps && emerytura2025 > 0
-    ? Math.round(cena2025.min_cena_dps / emerytura2025 * 100)
-    : 0
-  const dpsRatioNetto = cena2025?.min_cena_dps && emerytura2025 > 0
-    ? Math.round(cena2025.min_cena_dps / (emerytura2025 * 0.871) * 100)
-    : 0
-
-  // Top 3 najgorsze / najlepsze — powiaty ziemskie (bez outlierów w zestawieniu)
-  const top3Najgorsze = powiatyZiemskie.slice(0, 3)
-  const top3Najlepsze = [...powiatyZiemskie].reverse().slice(0, 3)
-
-  const powiatyForChart = powiaty.map(r => ({
-    ...r,
-    powiat: formatPowiat(r.powiat),
-  }))
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Dataset',
-    name: 'Dostępność DPS w Małopolsce 2026',
-    description: 'Wskaźniki dostępności Domów Pomocy Społecznej w 22 powiatach Małopolski: miejsca DPS na 10 000 mieszkańców 80+, luka finansowa, trend cen 2023–2026.',
-    url: 'https://kompas-seniora.pl/raport',
-    creator: { '@type': 'Organization', name: 'Kompas Seniora', url: 'https://kompas-seniora.pl' },
-    datePublished: PUBLISHED,
-    temporalCoverage: '2024/2026',
-    spatialCoverage: 'Małopolska, Polska',
-    license: 'https://creativecommons.org/licenses/by/4.0/',
-    distribution: [{
-      '@type': 'DataDownload',
-      encodingFormat: 'text/csv',
-      contentUrl: 'https://kompas-seniora.pl/data/wskaznik_nasycenia_malopolska.csv',
-    }],
-    variableMeasured: [
-      'Wskaźnik dostępności DPS (miejsca/10k seniorów 80+)',
-      'Luka finansowa (mediana kosztu DPS − emerytura ZUS)',
-      'Populacja 80+ per powiat (GUS BDL 2024)',
-    ],
-  }
+  const dataStanuLabel = lastDate ? formatDate(lastDate) : '';
+  const prevLabel = prevDate ? formatDate(prevDate) : '';
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+    <div className="min-h-screen bg-white">
 
-      {/* Hero — ciemny, raportowy */}
-      <section className="relative bg-slate-900 overflow-hidden">
-        {/* Subtelny pattern w tle */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-            backgroundSize: '24px 24px',
-          }}
-        />
-        {/* Emerald accent bar na górze */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-600" />
+      {/* Hero */}
+      <div className="bg-slate-900 text-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-20">
 
-        <div className="relative max-w-5xl mx-auto px-4 pt-10 pb-12">
-
-          {/* Breadcrumb + tag */}
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            <nav className="flex items-center gap-2 text-sm text-slate-400">
-              <Link href="/" className="hover:text-emerald-400 transition-colors">Kompas Seniora</Link>
-              <span>/</span>
-              <span className="text-slate-300">Raport</span>
-            </nav>
-            <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide uppercase">
-              Raport #1 · Edycja 2026
-            </span>
-            <span className="text-slate-500 text-xs">
-              Opublikowano: 11 maja 2026 · Dane: {DATA_DATE}
-            </span>
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-1 text-xs text-slate-400 mb-8">
+            <Link href="/" className="hover:text-slate-200 transition-colors">Kompas Seniora</Link>
+            <ChevronRight size={12} />
+            <span className="text-slate-300">Raporty</span>
           </div>
 
-          {/* Headline */}
-          <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-4">
-            Dostępność DPS<br className="hidden md:block" />
-            <span className="text-emerald-400"> w Małopolsce</span>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
+            Rejestr MUW Małopolska · aktualizowany co miesiąc
+          </p>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+            Wolne miejsca w DPS<br />
+            <span className="text-emerald-400">Małopolska</span>
           </h1>
-
-          <p className="text-slate-300 text-lg max-w-2xl mb-2">
-            Analiza publicznej sieci DPS w 22 powiatach — wskaźniki nasycenia, luka finansowa
-            i trendy cenowe Domów Pomocy Społecznej.
-          </p>
-          <p className="text-amber-400/80 text-xs max-w-2xl mb-1">
-            ⚠ Raport obejmuje wyłącznie publiczne DPS z rejestru MUW. Nie uwzględnia prywatnych domów opieki, ZOL/ZPO ani opieki domowej.
-          </p>
-          <p className="text-slate-400 text-xs max-w-2xl mb-1 italic">
-            Raport pokazuje rozmieszczenie publicznej infrastruktury DPS względem liczby mieszkańców 80+ — nie mierzy całkowitego zapotrzebowania na opiekę senioralną.
-          </p>
-          <p className="text-slate-500 text-sm mb-10">
-            Metodologia: liczba miejsc DPS (MUW Małopolska, marzec 2026) na 10 000 mieszkańców
-            w wieku 80+ (GUS BDL 2024). Ceny i luka finansowa dla {totalZCena} z {totalPlacowek} placówek
-            posiadających dane cenowe.
+          <p className="text-slate-300 text-base max-w-xl mb-10">
+            Oficjalny rejestr Małopolskiego Urzędu Wojewódzkiego. Stan na <strong className="text-white">{dataStanuLabel}</strong>.
+            {prevDate && <span className="text-slate-400"> Poprzedni okres: {prevLabel}.</span>}
           </p>
 
-          {/* KPI grid */}
-          <KpiHero
-            avgDost={avgDost}
-            worstValue={Math.round(worst?.dostepnosc_2024 ?? 0)}
-            worstPowiat={formatPowiat(worst?.powiat ?? '')}
-            emerytura2025={Math.round(emerytura2025)}
-            dpsRatioBrutto={dpsRatioBrutto}
-            dpsRatioNetto={dpsRatioNetto}
-          />
-
-          {/* Link do rejestru wolnych miejsc */}
-          <Link
-            href="/raport/wolne-miejsca"
-            className="mt-8 flex items-center justify-between gap-4 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors rounded-2xl px-5 py-4 group"
-          >
-            <div>
-              <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Aktualizowany co miesiąc</div>
-              <div className="text-white font-bold text-sm">Rejestr wolnych miejsc w DPS — Małopolska</div>
-              <div className="text-slate-400 text-xs mt-0.5">Wolne miejsca i kolejki według powiatów · dane MUW</div>
+          {/* KPI */}
+          <div className="grid grid-cols-3 gap-3 md:gap-5 max-w-xl">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 md:p-5">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Wolne miejsca</div>
+              <div className="text-4xl font-black text-emerald-400">{totalWolne}</div>
+              {diffWolne !== null && diffWolne !== 0 && (
+                <div className={`flex items-center gap-1 mt-1 text-xs font-semibold ${diffWolne > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {diffWolne > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                  {diffWolne > 0 ? '+' : ''}{diffWolne} vs poprzedni miesiąc
+                </div>
+              )}
             </div>
-            <ChevronRight size={18} className="text-emerald-400 shrink-0 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Top 3 / Bottom 3 */}
-      <div className="bg-slate-800 border-t border-slate-600">
-        <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-2 gap-8">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
-              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">Najgorszy dostęp</span>
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 md:p-5">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Oczekujących</div>
+              <div className="text-4xl font-black text-amber-400">{totalOczek}</div>
+              <div className="text-xs text-slate-500 mt-1">na miejsce w DPS</div>
             </div>
-            {top3Najgorsze.map((r, i) => (
-              <div key={r.powiat} className="flex items-center gap-3 py-2 border-b border-slate-600 last:border-0">
-                <span className="text-slate-400 text-xs w-4 flex-shrink-0">{i + 1}.</span>
-                <span className="capitalize text-white text-sm font-semibold">{formatPowiat(r.powiat)}</span>
-                <span className="ml-auto bg-slate-700 text-white font-bold text-xs px-2 py-1 rounded-lg tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
-              </div>
-            ))}
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
-              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">Najlepszy dostęp</span>
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 md:p-5">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Powiaty z miejscami</div>
+              <div className="text-4xl font-black text-white">{withWolne}<span className="text-2xl text-slate-500">/{rows.length}</span></div>
+              <div className="text-xs text-slate-500 mt-1">powiatów Małopolski</div>
             </div>
-            {top3Najlepsze.map((r, i) => (
-              <div key={r.powiat} className="flex items-center gap-3 py-2 border-b border-slate-600 last:border-0">
-                <span className="text-slate-400 text-xs w-4 flex-shrink-0">{i + 1}.</span>
-                <span className="capitalize text-white text-sm font-semibold">{formatPowiat(r.powiat)}</span>
-                <span className="ml-auto bg-slate-700 text-white font-bold text-xs px-2 py-1 rounded-lg tabular-nums">{r.dostepnosc_2024.toFixed(0)}</span>
-              </div>
-            ))}
           </div>
         </div>
-        <p className="text-center text-xs text-slate-400 pb-4 px-4">Powiaty ziemskie — bez miast na prawach powiatu i powiatu krakowskiego</p>
       </div>
 
-      {/* Gradient przejście hero → jasna treść */}
-      <div className="h-8 bg-gradient-to-b from-slate-900 to-slate-50" />
+      {/* Treść */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-16">
 
-      {/* Wykresy (Client Component) */}
-      <RaportCharts powiaty={powiatyForChart} emerytury={emerytury} avgDost={avgDost} cenaDps={cenaDps} wojewodztwa={wojewodztwa} />
-
-      {/* Metodologia */}
-      <section className="bg-slate-100 border-t border-slate-200 mt-4">
-        <div className="max-w-5xl mx-auto px-4 py-12">
-
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 bg-slate-400 rounded-full" />
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-              Źródła i metodologia
-            </h2>
-          </div>
-
-          {/* Dla mediów */}
-          <div className="bg-slate-800 rounded-xl p-5 text-sm mb-6">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Dla mediów — fakty weryfikowalne</div>
-            <ul className="space-y-2 text-slate-200">
-              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>W powiecie chrzanowskim na 10 tys. seniorów 80+ przypada <strong>171 miejsc w DPS</strong> — najmniej w Małopolsce. Źródło: MUW Małopolska, marzec 2026; GUS BDL 2024.</li>
-              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>Najniższy oficjalny koszt utrzymania w DPS w Małopolsce w 2025 r. wyniósł <strong>5 391 zł/mies.</strong> — o 28% więcej niż w 2023 r. Źródło: PDF MUW (art. 60 ups).</li>
-              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>Przeciętna emerytura ZUS brutto w Małopolsce w 2025 r.: <strong>4 085 zł</strong> — wzrost o 23% od 2023 r. Źródło: GUS BDL P2860.</li>
-              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>W 8 z 22 powiatów Małopolski wskaźnik dostępności DPS wynosi poniżej 400 miejsc / 10 tys. seniorów 80+ (kategoria „niedobór"). Źródło: obliczenia własne na danych MUW + GUS.</li>
-              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>Polska ma ok. 214 łóżek opieki długoterminowej / 100 tys. mieszkańców — wobec mediany UE ~500 (Eurostat 2022). Źródło: Eurostat hlth_rs_bdsns.</li>
-              <li className="flex gap-2"><span className="text-emerald-400 flex-shrink-0">✓</span>W kwietniu 2026 r. w Małopolsce wolnych było <strong>101 z 6 013 miejsc DPS</strong> (obłożenie ~98,3%) — 167 osób oczekiwało na umieszczenie. Źródło: Rejestr wolnych miejsc MUW Małopolska, 30.04.2026.</li>
-            </ul>
-            <p className="text-xs text-slate-500 mt-3">Dane do weryfikacji dostępne w CSV poniżej. Metodologia i zastrzeżenia — sekcja poniżej.</p>
-          </div>
-
-          {/* Benchmark międzynarodowy */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-sm text-slate-700 mb-6">
-            <div className="font-semibold text-emerald-800 mb-2">📊 Kontekst: Polska na tle OECD i Eurostatu</div>
-            <p className="text-slate-600 leading-relaxed mb-2">
-              Według danych Eurostatu (hlth_rs_bdsns, 2022) Polska ma <strong>214 łóżek opieki długoterminowej na 100 tys. mieszkańców</strong> —
-              wobec 1 420 w Holandii, ~600 w Niemczech i mediany UE ~500.
-              Wg OECD Health Statistics przeciętna krajów OECD to ok. 50 miejsc / 1 000 seniorów w wieku 65+;
-              Polska osiąga ok. 12 — czterokrotnie poniżej średniej.
-            </p>
-            <p className="text-amber-700 text-xs bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              <strong>Uwaga metodologiczna:</strong> porównania nie są bezpośrednio równoważne — wskaźniki Eurostatu, OECD i niniejszego raportu
-              używają różnych mianowników (wszyscy mieszkańcy / seniorzy 65+ / seniorzy 80+) i różnych definicji opieki długoterminowej.
-              Dane traktować jako <em>ilustrację kierunku</em>, nie jako precyzyjne zestawienie. Polska konsekwentnie plasuje się
-              w dolnej ćwiartce krajów UE niezależnie od zastosowanego wskaźnika.
-            </p>
-            <p className="text-xs text-slate-400 mt-2">
-              Źródła: Eurostat hlth_rs_bdsns; OECD Health Statistics 2024; Raport BGK i KIDO (2024) — deficyt 124 tys. miejsc do 2040 r.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6 text-sm text-slate-600 mb-8">
-            <div className="bg-white rounded-xl p-5 border border-slate-200">
-              <div className="font-semibold text-slate-800 mb-2">Liczba miejsc DPS</div>
-              <p className="leading-relaxed">
-                Baza Kompas Seniora — dane z oficjalnego wykazu DPS Małopolskiego Urzędu
-                Wojewódzkiego (marzec 2026). Uwzględniono wyłącznie placówki typu DPS
-                (Domy Pomocy Społecznej), bez Środowiskowych Domów Samopomocy.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-5 border border-slate-200">
-              <div className="font-semibold text-slate-800 mb-2">Koszty pobytu w DPS</div>
-              <p className="leading-relaxed">
-                Oficjalny miesięczny koszt utrzymania ogłaszany przez Małopolski Urząd Wojewódzki
-                na podstawie art. 60 ust. 2 ustawy o pomocy społecznej — publikowany corocznie
-                do 31 marca, obowiązujący od 1 kwietnia danego roku. Dane za lata 2023–2026
-                z PDF-ów MUW. Nie są to ceny rynkowe ani self-reported — wyłącznie stawki
-                z oficjalnego rejestru.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-5 border border-slate-200">
-              <div className="font-semibold text-slate-800 mb-2">Populacja 80+</div>
-              <p className="leading-relaxed">
-                GUS Bank Danych Lokalnych, zmienne 76024 + 76025 (grupy wiekowe 80–84 oraz
-                85+ ogółem), poziom powiatowy, dane za rok 2024.{' '}
-                <a
-                  href="https://bdl.stat.gov.pl/BDL/metadane/podgrup-opis/2137"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-700 underline underline-offset-2 hover:text-emerald-600"
-                >
-                  Źródło GUS BDL
-                </a>
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-5 border border-slate-200">
-              <div className="font-semibold text-slate-800 mb-2">Emerytura ZUS</div>
-              <p className="leading-relaxed mb-2">
-                GUS BDL, P2860 — przeciętna miesięczna emerytura brutto z pozarolniczego
-                systemu ZUS, Małopolskie 2025.{' '}
-                <a
-                  href="https://bdl.stat.gov.pl/BDL/dane/podgrup/tablica?rok=0&id=P2860"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-700 underline underline-offset-2 hover:text-emerald-600"
-                >
-                  Źródło GUS BDL
-                </a>
-              </p>
-              <p className="text-xs text-slate-500 leading-relaxed mb-1">
-                <strong className="text-slate-600">Ograniczenie:</strong> Raport operuje przeciętną emeryturą brutto.
-                Mediana byłaby statystycznie trafniejsza — rozkład świadczeń jest prawostronnie skośny,
-                co powoduje że średnia zawyża typowe świadczenie. Mediana emerytur ZUS per województwo
-                nie jest publikowana w dostępnych zbiorach GUS BDL.
-              </p>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                <strong className="text-slate-600">KRUS:</strong> Dane dotyczą wyłącznie systemu ZUS.
-                W powiatach wiejskich (limanowski, nowotarski, gorlicki) emerytury rolnicze KRUS są
-                przeciętnie o 30–40% niższe niż ZUS — realna luka finansowa w tych powiatach
-                jest wyższa niż wykazana.
-              </p>
-            </div>
-          </div>
-
-          {/* Uwagi interpretacyjne */}
-          <div className="bg-white rounded-xl p-5 border border-slate-200 text-sm text-slate-600 mb-4">
-            <div className="font-semibold text-slate-700 mb-2">Uwagi interpretacyjne</div>
-            <ul className="space-y-2 list-disc list-inside text-slate-500">
-              <li>
-                Wskaźnik dostępności może być zawyżony dla powiatu krakowskiego — część
-                tamtejszych DPS przyjmuje mieszkańców z całego województwa (efekt ponadlokalny).
-                Powiat krakowski jest wyłączony z KPI dysproporcji.
-              </li>
-              <li>
-                <strong className="text-slate-600">„Koszt ponad emeryturę" to różnica finansowania systemu</strong>,
-                nie kwota którą zawsze płaci rodzina. Na podstawie art. 61 ustawy o pomocy społecznej
-                pensjonariusz wnosi max 70% dochodu, a <em>pozostałą część pokrywa gmina</em> (jeśli rodzina
-                nie ma możliwości finansowych). Faktyczna dopłata rodziny zależy od jej sytuacji majątkowej
-                i decyzji MOPS. Raport pokazuje skalę obciążenia systemu, nie indywidualny rachunek.
-                * Wskaźnik KPI oparty na powiecie z N≥3 placówkami z ceną (limanowski, N=5).
-              </li>
-              <li>
-                Emerytura podana jest w kwocie <strong className="text-slate-600">brutto</strong>.
-                Kwota netto jest niższa o podatek i składki — luka finansowa netto jest zatem
-                większa niż wykazana.
-              </li>
-              <li>
-                Prognoza 2035 to <strong className="text-slate-600">scenariusz braku
-                inwestycji</strong> — zakłada stałą liczbę miejsc DPS przy rosnącej populacji
-                80+. Nie uwzględnia planowanych inwestycji samorządowych.
-              </li>
-              <li>
-                Dane o cenach dotyczą {totalZCena} z {totalPlacowek} placówek posiadających
-                publicznie dostępną informację o koszcie pobytu. Przy N=1 mediana = cena
-                jedynej placówki w powiecie.
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-white rounded-xl p-5 border border-slate-200 text-sm text-slate-600 mb-4">
-            <div className="font-semibold text-slate-700 mb-2">Skala kolorystyczna wskaźnika dostępności</div>
-            <p className="text-slate-500 text-xs mb-2">
-              Progi nie są normami prawnymi ani standardami OECD/WHO — odzwierciedlają rozkład wskaźnika w 22 powiatach Małopolski.
-              Wartość referencyjna to obecna średnia regionalna: <strong>556 miejsc / 10 tys. seniorów 80+</strong>.
-            </p>
-            <div className="flex flex-wrap gap-3 text-xs">
-              {[
-                { color: '#dc2626', label: 'Krytyczny', range: '< 250', desc: 'poniżej 45% średniej' },
-                { color: '#f97316', label: 'Niedobór', range: '250–400', desc: '45–72% średniej' },
-                { color: '#f59e0b', label: 'Umiarkowany', range: '400–600', desc: 'ok. średniej ±10%' },
-                { color: '#22c55e', label: 'Dobry', range: '600–900', desc: '108–162% średniej' },
-                { color: '#10b981', label: 'Bardzo dobry', range: '> 900', desc: 'powyżej 162% średniej' },
-              ].map(({ color, label, range, desc }) => (
-                <div key={label} className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: color }} />
-                  <span className="font-medium text-slate-700">{label}</span>
-                  <span className="text-slate-400">{range} ({desc})</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <p className="text-xs text-slate-400">
-            Dane pobrano: maj 2026. Kompas Seniora nie ponosi odpowiedzialności za decyzje
-            podjęte wyłącznie na podstawie tych danych. Przed wyborem placówki zalecamy
-            bezpośredni kontakt z DPS i weryfikację aktualnych kosztów.
+        {/* Tabela */}
+        <section>
+          <h2 className="text-2xl font-black text-slate-900 mb-2">Wolne miejsca według powiatu</h2>
+          <p className="text-slate-500 text-sm mb-6">
+            Dane łączne dla wszystkich DPS w powiecie. Kolumna <em>Trend</em> pokazuje zmianę liczby wolnych miejsc względem poprzedniego miesiąca.
           </p>
-        </div>
-      </section>
+          <PowiatTable rows={rows} dataStanu={dataStanuLabel} />
+        </section>
 
-      {/* Tabela surowych danych */}
-      <section className="bg-white border-t border-slate-200">
-        <div className="max-w-5xl mx-auto px-4 py-10">
-          <h2 className="text-lg font-bold text-slate-800 mb-1">Surowe dane — wszystkie powiaty</h2>
-          <p className="text-sm text-slate-500 mb-5">Małopolska 2024. Kliknij nagłówek kolumny żeby posortować.</p>
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="text-left px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Powiat</th>
-                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Miejsc DPS</th>
-                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Seniorów 80+</th>
-                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Dost. 2024</th>
-                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Dost. 2035*</th>
-                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Med. cena DPS</th>
-                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">% emerytury</th>
-                  <th className="text-right px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">N cen</th>
-                </tr>
-              </thead>
-              <tbody>
-                {powiaty.map((r, i) => (
-                  <tr key={r.powiat} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
-                    <td className="px-4 py-2.5 font-medium text-slate-800 capitalize">{r.powiat}</td>
-                    <td className="px-4 py-2.5 text-right text-slate-600">{r.dps_miejsca.toLocaleString('pl-PL')}</td>
-                    <td className="px-4 py-2.5 text-right text-slate-600">{r.pop_80plus_2024.toLocaleString('pl-PL')}</td>
-                    <td className="px-4 py-2.5 text-right font-bold"
-                      style={{ color: r.dostepnosc_2024 < 250 ? '#ef4444' : r.dostepnosc_2024 < 500 ? '#f97316' : '#10b981' }}>
-                      {r.dostepnosc_2024.toFixed(0)}
-                    </td>
-                    <td className="px-4 py-2.5 text-right text-slate-500">{r.dostepnosc_2035.toFixed(0)}</td>
-                    <td className={`px-4 py-2.5 text-right ${r.cena_dps_mediana && (r.n_placowek_z_cena ?? 0) < 3 ? 'text-amber-600' : 'text-slate-600'}`}>
-                      {r.cena_dps_mediana
-                        ? `${r.cena_dps_mediana.toLocaleString('pl-PL')} zł${(r.n_placowek_z_cena ?? 0) === 1 ? ' (jedyna)' : ''}`
-                        : '—'
-                      }
-                    </td>
-                    <td className={`px-4 py-2.5 text-right font-medium ${
-                      r.cena_dps_mediana
-                        ? r.cena_dps_mediana / r.emerytura_malopolska > 1.5 ? 'text-red-600'
-                        : r.cena_dps_mediana / r.emerytura_malopolska > 1.2 ? 'text-orange-500'
-                        : 'text-slate-600'
-                        : 'text-slate-400'
-                    }`}>
-                      {r.cena_dps_mediana
-                        ? `${Math.round(r.cena_dps_mediana / r.emerytura_malopolska * 100)}%`
-                        : '—'
-                      }
-                    </td>
-                    <td className="px-4 py-2.5 text-right">
-                      <span className={`text-xs font-medium ${(r.n_placowek_z_cena ?? 0) < 3 ? 'text-amber-600' : 'text-slate-500'}`}>
-                        {r.n_placowek_z_cena ?? 0}
-                        {(r.n_placowek_z_cena ?? 0) < 3 ? ' ⚠' : ''}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Sekcja edukacyjna: profil opieki */}
+        <section className="bg-amber-50 border border-amber-200 rounded-2xl p-6 md:p-8">
+          <div className="flex items-start gap-3 mb-4">
+            <AlertTriangle size={20} className="text-amber-500 shrink-0 mt-0.5" />
+            <h2 className="text-lg font-black text-slate-900">Profil opieki ma znaczenie</h2>
           </div>
-          <p className="text-xs text-slate-400 mt-3">
-            *Prognoza 2035 = scenariusz braku inwestycji (stała liczba miejsc, rosnąca populacja GUS).
-            ⚠ = mniej niż 3 placówki z danymi cenowymi — mediana mało wiarygodna.
+          <div className="space-y-3 text-sm text-slate-700 leading-relaxed">
+            <p>
+              Ekstremalnie długie kolejki (powyżej 2–3 lat) dotyczą prawie wyłącznie <strong>profili specjalistycznych</strong> — osób z niepełnosprawnością intelektualną lub przewlekłymi chorobami psychicznymi. Dla tych profili liczba miejsc w całej Polsce jest bardzo ograniczona.
+            </p>
+            <p>
+              Jeśli szukasz miejsca dla seniora w podeszłym wieku lub osoby przewlekle somatycznie chorej, rzeczywisty czas oczekiwania jest zwykle <strong>znacznie krótszy</strong> — w wielu powiatach Małopolski miejsca są dostępne od ręki.
+            </p>
+            <p className="text-slate-500 text-xs">
+              Przy sprawdzaniu konkretnego DPS zawsze zapytaj, do jakiego profilu opieki są aktualnie wolne miejsca.
+            </p>
+          </div>
+        </section>
+
+        {/* Sekcja praktyczna */}
+        <section>
+          <div className="flex items-start gap-3 mb-5">
+            <Clock size={20} className="text-slate-400 shrink-0 mt-0.5" />
+            <h2 className="text-2xl font-black text-slate-900">Co zrobić, gdy w Twoim powiecie nie ma miejsc?</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              {
+                n: '1',
+                title: 'Złóż wniosek do kilku DPS jednocześnie',
+                desc: 'Prawo pozwala być na liście oczekujących w wielu placówkach równocześnie. Nie czekaj na odpowiedź z jednego miejsca.',
+              },
+              {
+                n: '2',
+                title: 'Rozważ powiaty sąsiednie',
+                desc: 'Tabela powyżej pokazuje, że dostępność różni się istotnie między powiatami. Dąbrowski, Nowotarski czy Brzeski mają często wolne miejsca.',
+              },
+              {
+                n: '3',
+                title: 'Zapytaj o konkretny profil',
+                desc: 'DPS może mieć wolne miejsca w jednym profilu (np. somatyczny), ale nie w innym. Zawsze pytaj wprost — rejestr to dane zbiorcze.',
+              },
+            ].map(({ n, title, desc }) => (
+              <div key={n} className="bg-slate-50 rounded-2xl p-5 border border-stone-100">
+                <div className="w-7 h-7 rounded-full bg-slate-900 text-white text-xs font-black flex items-center justify-center mb-3">{n}</div>
+                <h3 className="font-bold text-slate-900 text-sm mb-2">{title}</h3>
+                <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="bg-emerald-600 rounded-2xl p-8 text-center text-white">
+          <h2 className="text-2xl font-black mb-2">Szukasz konkretnego DPS?</h2>
+          <p className="text-emerald-100 text-sm mb-6 max-w-md mx-auto">
+            Wyszukiwarka Kompas Seniora pokazuje wszystkie placówki z filtrem "tylko wolne miejsca" — z telefonami, adresami i cennikami.
           </p>
-        </div>
-      </section>
+          <Link
+            href="/search?wolneMiejsca=true"
+            className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold px-6 py-3 rounded-xl hover:bg-emerald-50 transition-colors text-sm"
+          >
+            Znajdź DPS z wolnym miejscem <ArrowRight size={15} />
+          </Link>
+        </section>
 
-      {/* Czy więcej DPS to jedyne rozwiązanie? */}
-      <section className="bg-slate-50 border-t border-slate-200">
-        <div className="max-w-5xl mx-auto px-4 py-10">
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-1 h-6 bg-amber-400 rounded-full" />
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-              Kontekst strategiczny
-            </h2>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-200 p-6 text-sm text-slate-600 leading-relaxed">
-            <div className="font-semibold text-slate-800 text-base mb-3">Czy budowa nowych DPS to jedyne rozwiązanie?</div>
-            <p className="mb-3">
-              Raport mierzy dostępność <strong>publicznej infrastruktury DPS</strong> — i pokazuje realny deficyt miejsc względem rosnącej populacji 80+.
-              Nie jest to jednak jedyna możliwa odpowiedź na wyzwanie starzejącego się społeczeństwa.
-            </p>
-            <p className="mb-3">
-              Nowoczesna polityka senioralna w Europie coraz częściej stawia na <strong>deinstytucjonalizację</strong> — czyli przenoszenie opieki z dużych placówek do środowiska lokalnego:
-              usługi opiekuńcze w domu, mieszkania wspomagane, dzienne centra aktywności, teleopieka.
-              Małopolska realizuje ten kierunek przez <strong>Regionalny Plan Deinstytucjonalizacji 2026–2028</strong> (ROPS Małopolska).
-            </p>
-            <p className="text-slate-500">
-              Dane z niniejszego raportu pokazują skalę wyzwania infrastrukturalnego — bez przesądzania, jaka kombinacja odpowiedzi (nowe DPS, opieka domowa, sektor prywatny, polityka mieszkaniowa)
-              będzie właściwa dla każdego powiatu. To decyzja samorządów, nie statystyki.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Pobierz dane */}
-      <section className="bg-emerald-950 border-t border-emerald-900">
-        <div className="max-w-5xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        {/* Link do raportu dostępności */}
+        <section className="border border-stone-200 rounded-2xl p-5 flex items-center justify-between gap-4 group hover:border-slate-400 transition-colors">
           <div>
-            <div className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">Otwarte dane · CC BY 4.0</div>
-            <div className="font-bold text-white mb-1">Pobierz surowe dane</div>
-            <p className="text-emerald-300/70 text-sm">
-              Pliki CSV do dalszej analizy. Cytując, podaj źródło: <span className="text-emerald-400">Kompas Seniora, kompas-seniora.pl/raport</span>
-            </p>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Raport analityczny · Edycja 2026</div>
+            <div className="font-bold text-slate-900 text-sm">Dostępność DPS w Małopolsce — analiza 22 powiatów</div>
+            <div className="text-slate-500 text-xs mt-0.5">Wskaźniki nasycenia, luka finansowa, trendy cenowe · dane GUS BDL 2024</div>
           </div>
-          <div className="flex flex-wrap gap-3 flex-shrink-0">
-            <a
-              href="/data/wskaznik_nasycenia_malopolska.csv"
-              download
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl transition-colors"
-            >
-              ↓ Wskaźnik nasycenia (CSV)
-            </a>
-            <a
-              href="/data/gus_populacja_malopolska.csv"
-              download
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl transition-colors"
-            >
-              ↓ Populacja 80+ GUS (CSV)
-            </a>
-          </div>
-        </div>
-      </section>
+          <Link href="/raport/dostepnosc-2026" className="shrink-0 text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors">
+            Czytaj <ArrowRight size={13} />
+          </Link>
+        </section>
 
-      {/* Footer CTA */}
-      <section className="bg-white border-t border-slate-200">
-        <div className="max-w-5xl mx-auto px-4 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div>
-            <div className="font-semibold text-slate-800 mb-1">Masz pytania do danych?</div>
-            <p className="text-sm text-slate-500">
-              Jeśli zauważysz nieścisłość lub chcesz zgłosić aktualizację danych — napisz do nas.
-            </p>
-          </div>
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <a
-              href="mailto:kontakt@kompas-seniora.pl?subject=Pytanie do raportu DPS Małopolska"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-colors"
-            >
-              Napisz do nas
-            </a>
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-200 transition-colors"
-            >
-              Szukaj placówki
-            </Link>
-          </div>
+        {/* Stopka źródła */}
+        <div className="text-xs text-slate-400 border-t border-stone-100 pt-6 space-y-1">
+          <p><strong>Źródło danych:</strong> Rejestr wolnych miejsc w DPS — Małopolski Urząd Wojewódzki w Krakowie.</p>
+          <p>Dane aktualizowane co miesiąc na podstawie sprawozdań dyrektorów placówek. Kompas Seniora pobiera plik automatycznie i importuje do bazy.</p>
+          <p>Masz pytania lub znalazłeś błąd? <Link href="/" className="underline hover:text-slate-700">Napisz do nas</Link>.</p>
         </div>
-      </section>
 
-    </main>
-  )
+      </div>
+    </div>
+  );
 }
