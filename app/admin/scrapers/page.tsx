@@ -111,6 +111,21 @@ const GROUPS: { label: string; color: string; accent: string; scrapers: Scraper[
     ],
   },
   {
+    label: 'Lubuskie',
+    color: 'bg-teal-50 border-teal-200',
+    accent: 'bg-teal-600',
+    scrapers: [
+      {
+        workflow: 'lubuskie-wolne-miejsca-monitor.yml',
+        name: 'Wolne miejsca DPS',
+        description: 'Aktualne wolne miejsca w DPS (23 placówki, PDF)',
+        source: 'UW Gorzów Wlkp. (PDF)',
+        cron: '12. i 22. każdego mies.',
+        hasForce: true,
+      },
+    ],
+  },
+  {
     label: 'GUS / Dane zewnętrzne',
     color: 'bg-slate-50 border-slate-200',
     accent: 'bg-slate-600',

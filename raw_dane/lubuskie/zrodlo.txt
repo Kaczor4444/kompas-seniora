@@ -1,0 +1,17 @@
+# Wolne miejsca w DPS — Lubuskie
+
+Strona BIP (lista plików, link zmienia się każdy miesiąc):
+https://bip.lubuskie.uw.gov.pl/polityka_spoleczna/pliki_polityka_spoleczna
+
+Wzorzec URL pliku:
+https://bip.lubuskie.uw.gov.pl/download/Wykaz-wolnych-miejsc-w-domach-pomocy-spolecznej-stan-na-{DD.MM.YYYY}-r,{ID}.pdf
+
+Przykład (maj 2026, id=30471):
+https://bip.lubuskie.uw.gov.pl/download/Wykaz-wolnych-miejsc-w-domach-pomocy-spolecznej-stan-na-31.05.2026-r,30471.pdf
+
+Lubuski Urząd Wojewódzki w Gorzowie Wielkopolskim
+
+Format: PDF (1 strona), tabela bez nagłówka powiatu:
+  Nazwa DPS (miejscowość) | Profil | Ogólna liczba miejsc | Liczba miejsc wolnych
+Dane: 23 DPS, suma wolnych w ostatniej linii "SUMA"
+Publikacja: ~10. dnia miesiąca za poprzedni miesiąc
