@@ -8,6 +8,17 @@ export const revalidate = 3600;
 
 export default async function Home() {
   // 📊 Fetch real-time facility count, per-powiat breakdown, and featured articles
+  // Wolne miejsca — najnowszy snapshot
+  const latestWolneDate = await prisma.placowkaWolneMiejsca.findFirst({
+    where: { placowka: { typ_placowki: 'DPS', wojewodztwo: 'małopolskie' } },
+    orderBy: { data_stanu: 'desc' },
+    select: { data_stanu: true },
+  });
+  const totalWolne = latestWolneDate ? await prisma.placowkaWolneMiejsca.aggregate({
+    where: { placowka: { typ_placowki: 'DPS', wojewodztwo: 'małopolskie' }, data_stanu: latestWolneDate.data_stanu },
+    _sum: { wolne_ogolem: true },
+  }).then(r => r._sum.wolne_ogolem ?? 0) : 0;
+
   const [totalFacilities, allFacilities, featuredArticles] = await Promise.all([
     prisma.placowka.count({ where: getMainSearchFilter() }),
     prisma.placowka.findMany({
@@ -97,6 +108,7 @@ export default async function Home() {
   return (
     <HomeClient
       totalFacilities={totalFacilities}
+      totalWolne={totalWolne}
       powiatCounts={powiatCounts}
       featuredArticles={featuredArticles}
       typeCounts={typeCounts}

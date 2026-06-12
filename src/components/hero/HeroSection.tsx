@@ -5,12 +5,13 @@ import {
   ArrowRight, ShieldCheck, Building2, ChevronRight,
   RefreshCw
 } from 'lucide-react';
+import Link from 'next/link';
 import QuestionnaireIcon from '@/components/icons/QuestionnaireIcon';
 import AccountingCalculatorIcon from '@/components/icons/AccountingCalculatorIcon';
 import { SearchBar } from '@/src/components/search/SearchBar';
 
 
-const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unknown; selectedProfiles?: unknown; activeTab?: unknown }) => {
+const Hero = ({ totalFacilities, totalWolne }: { totalFacilities?: number; totalWolne?: number; onTabChange?: unknown; selectedProfiles?: unknown; activeTab?: unknown }) => {
   // Inline kalkulator state
   const [calcIncome, setCalcIncome] = useState('');
 
@@ -57,6 +58,20 @@ const Hero = ({ totalFacilities }: { totalFacilities?: number; onTabChange?: unk
 
             {/* Search block */}
             <SearchBar />
+
+            {/* Wolne miejsca link */}
+            {totalWolne !== undefined && totalWolne > 0 && (
+              <Link
+                href="/raport"
+                className="inline-flex items-center gap-2.5 text-sm text-slate-600 hover:text-emerald-700 transition-colors group"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                <span>
+                  <strong className="text-slate-900">{totalWolne} wolnych miejsc</strong> w DPS Małopolska — sprawdź mapę
+                </span>
+                <ChevronRight size={14} className="text-slate-300 group-hover:text-emerald-500 transition-colors" />
+              </Link>
+            )}
           </div>
 
           {/* ── RIGHT: Tool cards ── */}
