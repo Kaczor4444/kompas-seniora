@@ -375,6 +375,25 @@ npx prisma studio
 
 ## 📌 COMMIT HISTORY (ostatnie)
 
+- **89da75b** (2026-06-12): fix: import wolnych miejsc — nazwy 4 placówek uzupełnione w DB, usunięto 4 mapowania
+  - id 74 → `Dom Pomocy Społecznej w Olkuszu`, id 75 → w Bobrku, id 80 → im. Brata Alberta w Izdebniku, id 82 → Caritas w Biskupicach
+  - `MANUAL_MAPPINGS_BY_ID`: zostaje tylko `"w rabie niżnej": 61` (XLSX i DB mają różne nazwy org.)
+  - Re-import obu snapshotów — wszystkie 88 placówek trafiają poprawnie
+
+- **faac075** (2026-06-12): fix: import wolnych miejsc — 5 ręcznych mapowań (olkusz + 4 kolejne)
+  - Fuzzy match trafiał na złe powiaty gdy DB nazwa generyczna lub podobna do innej placówki
+
+- **d31ce53** (2026-06-12): feat: /raport/wolne-miejsca — publiczna strona dostępności DPS Małopolska
+  - Hero z 3 KPI (wolne/oczekujący/powiaty z miejscami) + trend vs poprzedni miesiąc
+  - Tabela per powiat: wolne, trend, kolejka, max oczekiwanie, badge Dostępne/Kolejka/Brak
+  - Sekcja edukacyjna: profil opieki a czas oczekiwania (spec vs podeszły wiek)
+  - Sekcja "Co zrobić gdy brak miejsc" + CTA → /search?wolneMiejsca=true
+  - `app/raport/page.tsx`: baner z linkiem do nowej strony
+
+- **0a42672** (2026-06-12): feat: panel admina — /admin/wolne-miejsca tracker zmian
+  - Tabela per powiat: 2 ostatnie snapshoty, trend strzałkami, filtr, sortowanie
+  - Zawsze pobiera 2 ostatnie daty z DB — automatycznie aktualizuje się po każdym imporcie
+
 - **3495ad3** (2026-06-04): feat: redesign kafelków wyszukiwania + wolne miejsca + profile opieki
   - `FacilityCard`: nowy układ (like Indeed) — dominująca nazwa, kolorowy lewy border per typ (emerald/blue/amber), cena + adres + dystans w linii, chipsy profili opieki (max 4), usunięto przycisk AI
   - `FacilityCard`: badge wolnych miejsc — zielony gdy brak kolejki, amber gdy kolejka (`X wolne · Y w kolejce`), tooltip z datą i radą "skontaktuj się"
@@ -654,4 +673,4 @@ Artykuły używają **systemu badge + featuredOrder + isActive**:
 
 ---
 
-Ostatnia aktualizacja: 2026-06-04 (sesja #21 — redesign kart wyników + wolne miejsca + profil opieki fix)
+Ostatnia aktualizacja: 2026-06-12 (sesja #22 — tracker wolnych miejsc admin + strona publiczna /raport/wolne-miejsca + fix importu)
