@@ -45,7 +45,11 @@ MANUAL_MAPPINGS_BY_ID = {
     "gmina sękowa":            29,   # DPS w Wapiennem
     "gmina grybów":            73,   # DPS Biała Niżna 640
     "miasto i gmina niepołomice": 86, # DPS w Staniątkach
-    "w olkuszu":               74,   # DB nazwa generyczna "Dom Pomocy Społecznej" — bez miasta
+    "w olkuszu":               74,   # DB nazwa generyczna bez miasta — fuzzy trafiał na Nowy Sącz
+    "w rabie niżnej":          61,   # DB: Fundacja Opiekuńczość — fuzzy trafiał na DPS Wapienne
+    "w bobrku":                75,   # DB nazwa generyczna bez miasta — fuzzy trafiał na DPS Brzesko
+    "w izdebniku":             80,   # DB: DPS im. Brata Alberta wadowicki — fuzzy trafiał na krakowski
+    "w biskupicach":           82,   # DB: DPS w Biskupicach — fuzzy trafiał na DPS Zator
 }
 
 # Powiaty obsługiwane przez matching po adresie (Kraków) lub pojemności (Nowy Sącz, Tarnów)
