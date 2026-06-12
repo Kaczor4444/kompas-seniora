@@ -603,7 +603,7 @@ export default function SearchResults({
     }
   }, [
     results, selectedType, cityInput, selectedVoivodeship, selectedPowiat,
-    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, powiatSearchCenters, sortParam, trackEmptyResults, trackFilterApplied, showAll
+    selectedProfiles, priceLimit, maxDistance, maxDistanceFromCity, userLocation, searchCenter, powiatSearchCenters, sortParam, trackEmptyResults, trackFilterApplied, showAll, onlyWithFreeSpaces
   ]);
 
   // Scroll depth tracking
