@@ -511,11 +511,15 @@ export default function SearchResults({
       (f.koszt_pobytu || 0) <= priceLimit
     );
 
-    // Wolne miejsca filter
+    // Wolne miejsca filter — tylko najnowsza data (entries posortowane desc)
     if (onlyWithFreeSpaces) {
       filtered = filtered.filter(f => {
         const entries: any[] = (f as any).wolneMiejsca ?? [];
-        return entries.reduce((s: number, e: any) => s + (e.wolne_ogolem ?? 0), 0) > 0;
+        if (entries.length === 0) return false;
+        const latestDate = String(entries[0].data_stanu);
+        return entries
+          .filter((e: any) => String(e.data_stanu) === latestDate)
+          .reduce((s: number, e: any) => s + (e.wolne_ogolem ?? 0), 0) > 0;
       });
     }
 
