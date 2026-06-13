@@ -141,6 +141,21 @@ const GROUPS: { label: string; color: string; accent: string; scrapers: Scraper[
     ],
   },
   {
+    label: 'Łódzkie',
+    color: 'bg-rose-50 border-rose-200',
+    accent: 'bg-rose-600',
+    scrapers: [
+      {
+        workflow: 'lodzkie-wolne-miejsca-monitor.yml',
+        name: 'Wolne miejsca DPS',
+        description: 'Aktualne wolne miejsca w DPS (~57 placówek, XLS)',
+        source: 'UW Łódź / gov.pl (XLS)',
+        cron: '12. i 22. każdego mies.',
+        hasForce: true,
+      },
+    ],
+  },
+  {
     label: 'GUS / Dane zewnętrzne',
     color: 'bg-slate-50 border-slate-200',
     accent: 'bg-slate-600',

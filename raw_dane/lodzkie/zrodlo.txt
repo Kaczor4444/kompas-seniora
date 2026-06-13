@@ -1,0 +1,5 @@
+Źródło: Urząd Wojewódzki Łódź / gov.pl
+Strona: https://www.gov.pl/web/uw-lodzki/wolne-miejsca-w-domach-pomocy-spolecznej
+Format: XLS (4 kolumny: Lp. | Powiat | Nazwa i adres | Liczba wolnych miejsc)
+Harmonogram aktualizacji: nieregularny (~kwartalnie)
+Monitoring: .github/workflows/lodzkie-wolne-miejsca-monitor.yml (12. i 22. każdego miesiąca)
