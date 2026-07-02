@@ -541,18 +541,28 @@ body.accessibility-high-contrast nav span[class*="absolute"] {
   font-weight: 900 !important;
 }
 
-/* Large Font */
-body.accessibility-large-font {
-  font-size: 125% !important;
-}
+/* Font Size Levels (replaces single accessibility-large-font) */
+body.accessibility-font-size-1 { font-size: 108% !important; }
+body.accessibility-font-size-2 { font-size: 116% !important; }
+body.accessibility-font-size-3 { font-size: 125% !important; }
+body.accessibility-font-size-4 { font-size: 137% !important; }
 
-body.accessibility-large-font * {
+body.accessibility-font-size-1 *,
+body.accessibility-font-size-2 *,
+body.accessibility-font-size-3 *,
+body.accessibility-font-size-4 * {
   font-size: inherit !important;
 }
 
-/* Toolbar has fixed h-12 — prevent large-font and text-spacing from breaking layout */
-body.accessibility-large-font [data-a11y-toolbar],
-body.accessibility-large-font [data-a11y-toolbar] * {
+/* Toolbar stays fixed size regardless of font level */
+body.accessibility-font-size-1 [data-a11y-toolbar],
+body.accessibility-font-size-2 [data-a11y-toolbar],
+body.accessibility-font-size-3 [data-a11y-toolbar],
+body.accessibility-font-size-4 [data-a11y-toolbar],
+body.accessibility-font-size-1 [data-a11y-toolbar] *,
+body.accessibility-font-size-2 [data-a11y-toolbar] *,
+body.accessibility-font-size-3 [data-a11y-toolbar] *,
+body.accessibility-font-size-4 [data-a11y-toolbar] * {
   font-size: 0.875rem !important;
 }
 
@@ -585,13 +595,61 @@ body.accessibility-reduce-motion * {
   scroll-behavior: auto !important;
 }
 
-/* Dyslexia Friendly Font */
-body.accessibility-dyslexia-friendly,
-body.accessibility-dyslexia-friendly * {
-  font-family: 'Arial', 'Comic Sans MS', sans-serif !important;
-  letter-spacing: 0.12em !important;
-  word-spacing: 0.16em !important;
+/* Font Types (replaces single accessibility-dyslexia-friendly) */
+body.accessibility-font-sans,
+body.accessibility-font-sans *:not([data-a11y-toolbar] *) {
+  font-family: Arial, Helvetica, sans-serif !important;
 }
+body.accessibility-font-serif,
+body.accessibility-font-serif *:not([data-a11y-toolbar] *) {
+  font-family: Georgia, 'Times New Roman', serif !important;
+}
+body.accessibility-font-dyslexia,
+body.accessibility-font-dyslexia *:not([data-a11y-toolbar] *) {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive !important;
+  letter-spacing: 0.1em !important;
+  word-spacing: 0.14em !important;
+}
+
+/* Dark Mode */
+body.accessibility-dark-mode {
+  background-color: #111827 !important;
+  color: #f3f4f6 !important;
+}
+body.accessibility-dark-mode p,
+body.accessibility-dark-mode h1, body.accessibility-dark-mode h2,
+body.accessibility-dark-mode h3, body.accessibility-dark-mode h4,
+body.accessibility-dark-mode h5, body.accessibility-dark-mode h6,
+body.accessibility-dark-mode li, body.accessibility-dark-mode td,
+body.accessibility-dark-mode th, body.accessibility-dark-mode label,
+body.accessibility-dark-mode figcaption {
+  color: #e5e7eb !important;
+}
+body.accessibility-dark-mode a { color: #93c5fd !important; }
+body.accessibility-dark-mode main,
+body.accessibility-dark-mode article,
+body.accessibility-dark-mode section,
+body.accessibility-dark-mode [class*="bg-white"],
+body.accessibility-dark-mode [class*="bg-gray-50"],
+body.accessibility-dark-mode [class*="bg-gray-100"],
+body.accessibility-dark-mode [class*="bg-stone-50"],
+body.accessibility-dark-mode [class*="bg-stone-100"],
+body.accessibility-dark-mode [class*="bg-slate-50"] {
+  background-color: #1f2937 !important;
+}
+body.accessibility-dark-mode [class*="border-gray"],
+body.accessibility-dark-mode [class*="border-stone"] {
+  border-color: #374151 !important;
+}
+body.accessibility-dark-mode input,
+body.accessibility-dark-mode select,
+body.accessibility-dark-mode textarea {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
+  border-color: #4b5563 !important;
+}
+/* Toolbar keeps its own styling in dark mode */
+body.accessibility-dark-mode [data-a11y-toolbar] { background-color: revert !important; }
 
 /* Text Spacing */
 body.accessibility-text-spacing {
@@ -611,6 +669,13 @@ body.accessibility-hide-images svg[role="img"],
 body.accessibility-hide-images [style*="background-image"] {
   opacity: 0 !important;
   visibility: hidden !important;
+}
+/* Toolbar icons are UI, not content — always visible */
+body.accessibility-hide-images [data-a11y-toolbar] img,
+body.accessibility-hide-images [data-a11y-toolbar] picture,
+body.accessibility-hide-images [data-a11y-toolbar] svg[role="img"] {
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* Big Cursor */
@@ -766,11 +831,24 @@ body.accessibility-tooltips [title]::after {
   }
 }
 
-/* TTS hover-to-read highlight */
-.tts-reading {
-  background-color: rgba(250, 220, 0, 0.35) !important;
-  outline: 2px solid rgba(250, 200, 0, 0.6) !important;
+/* TTS hover highlight (przed rozpoczęciem czytania) */
+.tts-hover {
+  background-color: rgba(250, 220, 0, 0.2) !important;
+  outline: 2px dashed rgba(250, 200, 0, 0.5) !important;
   border-radius: 4px !important;
   transition: background-color 0.15s ease !important;
-  cursor: default !important;
 }
+
+/* TTS reading highlight (podczas czytania — zostaje aż mowa się skończy) */
+.tts-speaking {
+  background-color: rgba(250, 220, 0, 0.45) !important;
+  outline: 2px solid rgba(220, 170, 0, 0.8) !important;
+  border-radius: 4px !important;
+  animation: tts-pulse 1.2s ease-in-out infinite !important;
+}
+
+@keyframes tts-pulse {
+  0%, 100% { outline-color: rgba(220, 170, 0, 0.8); }
+  50%       { outline-color: rgba(220, 170, 0, 0.3); }
+}
+

@@ -48,10 +48,8 @@ export default function Navbar() {
   // Accessibility settings
   const [accessibilitySettings, setAccessibilitySettings] = useState({
     isHighContrast: false,
-    isLargeFont: false,
     linksUnderlined: false,
     reduceMotion: false,
-    dyslexiaFriendly: false,
     textSpacing: false,
     hideImages: false,
     bigCursor: false,
@@ -59,7 +57,14 @@ export default function Navbar() {
     textAlignLeft: false,
     saturation: false,
     tooltips: false,
+    darkMode: false,
+    readingRuler: false,
+    screenMask: false,
   });
+  const [fontSizeLevel, setFontSizeLevelState] = useState(0);   // 0=normal, 1–4
+  const [fontType, setFontTypeState] = useState<'normal'|'sans'|'serif'|'dyslexia'>('normal');
+  const [rulerY, setRulerY] = useState(200);
+  const [maskY,  setMaskY]  = useState(200);
 
   // Load accessibility settings from localStorage on mount
   useEffect(() => {
@@ -207,13 +212,14 @@ export default function Navbar() {
     }));
   };
 
+  const setFontSizeLevel = (level: number) => setFontSizeLevelState(Math.max(0, Math.min(4, level)));
+  const setFontType = (type: 'normal'|'sans'|'serif'|'dyslexia') => setFontTypeState(type);
+
   const resetSettings = () => {
     setAccessibilitySettings({
       isHighContrast: false,
-      isLargeFont: false,
       linksUnderlined: false,
       reduceMotion: false,
-      dyslexiaFriendly: false,
       textSpacing: false,
       hideImages: false,
       bigCursor: false,
@@ -221,7 +227,12 @@ export default function Navbar() {
       textAlignLeft: false,
       saturation: false,
       tooltips: false,
+      darkMode: false,
+      readingRuler: false,
+      screenMask: false,
     });
+    setFontSizeLevelState(0);
+    setFontTypeState('normal');
   };
 
   // Alias for backward compatibility with existing code
@@ -229,44 +240,45 @@ export default function Navbar() {
 
   // Apply accessibility settings globally to body element
   useEffect(() => {
-    const body = document.body;
-
-    // High Contrast
-    body.classList.toggle('accessibility-high-contrast', accessibilitySettings.isHighContrast);
-
-    // Large Font
-    body.classList.toggle('accessibility-large-font', accessibilitySettings.isLargeFont);
-
-    // Links Underlined
-    body.classList.toggle('accessibility-links-underlined', accessibilitySettings.linksUnderlined);
-
-    // Reduce Motion
-    body.classList.toggle('accessibility-reduce-motion', accessibilitySettings.reduceMotion);
-
-    // Dyslexia Friendly
-    body.classList.toggle('accessibility-dyslexia-friendly', accessibilitySettings.dyslexiaFriendly);
-
-    // Text Spacing
-    body.classList.toggle('accessibility-text-spacing', accessibilitySettings.textSpacing);
-
-    // Hide Images
-    body.classList.toggle('accessibility-hide-images', accessibilitySettings.hideImages);
-
-    // Big Cursor
-    body.classList.toggle('accessibility-big-cursor', accessibilitySettings.bigCursor);
-
-    // Line Height
-    body.classList.toggle('accessibility-line-height', accessibilitySettings.lineHeight);
-
-    // Text Align Left
-    body.classList.toggle('accessibility-text-align-left', accessibilitySettings.textAlignLeft);
-
-    // Saturation (Monochrome)
-    body.classList.toggle('accessibility-saturation', accessibilitySettings.saturation);
-
-    // Tooltips
-    body.classList.toggle('accessibility-tooltips', accessibilitySettings.tooltips);
+    const b = document.body;
+    b.classList.toggle('accessibility-high-contrast',  accessibilitySettings.isHighContrast);
+    b.classList.toggle('accessibility-links-underlined', accessibilitySettings.linksUnderlined);
+    b.classList.toggle('accessibility-reduce-motion',  accessibilitySettings.reduceMotion);
+    b.classList.toggle('accessibility-text-spacing',   accessibilitySettings.textSpacing);
+    b.classList.toggle('accessibility-hide-images',    accessibilitySettings.hideImages);
+    b.classList.toggle('accessibility-big-cursor',     accessibilitySettings.bigCursor);
+    b.classList.toggle('accessibility-line-height',    accessibilitySettings.lineHeight);
+    b.classList.toggle('accessibility-text-align-left',accessibilitySettings.textAlignLeft);
+    b.classList.toggle('accessibility-saturation',     accessibilitySettings.saturation);
+    b.classList.toggle('accessibility-tooltips',       accessibilitySettings.tooltips);
+    b.classList.toggle('accessibility-dark-mode',      accessibilitySettings.darkMode);
   }, [accessibilitySettings]);
+
+  useEffect(() => {
+    const b = document.body;
+    b.classList.toggle('accessibility-font-size-1', fontSizeLevel === 1);
+    b.classList.toggle('accessibility-font-size-2', fontSizeLevel === 2);
+    b.classList.toggle('accessibility-font-size-3', fontSizeLevel === 3);
+    b.classList.toggle('accessibility-font-size-4', fontSizeLevel === 4);
+  }, [fontSizeLevel]);
+
+  useEffect(() => {
+    const b = document.body;
+    b.classList.toggle('accessibility-font-sans',    fontType === 'sans');
+    b.classList.toggle('accessibility-font-serif',   fontType === 'serif');
+    b.classList.toggle('accessibility-font-dyslexia',fontType === 'dyslexia');
+  }, [fontType]);
+
+  // Reading ruler / screen mask mouse tracking
+  useEffect(() => {
+    if (!accessibilitySettings.readingRuler && !accessibilitySettings.screenMask) return;
+    const handler = (e: MouseEvent) => {
+      if (accessibilitySettings.readingRuler) setRulerY(e.clientY);
+      if (accessibilitySettings.screenMask)  setMaskY(e.clientY);
+    };
+    window.addEventListener('mousemove', handler, { passive: true });
+    return () => window.removeEventListener('mousemove', handler);
+  }, [accessibilitySettings.readingRuler, accessibilitySettings.screenMask]);
 
   return (
     <>
@@ -279,6 +291,10 @@ export default function Navbar() {
             resetSettings={resetSettings}
             onClose={() => setIsToolbarVisible(false)}
             tts={tts}
+            fontSizeLevel={fontSizeLevel}
+            setFontSizeLevel={setFontSizeLevel}
+            fontType={fontType}
+            setFontType={setFontType}
           />
         )}
       <nav
@@ -556,6 +572,23 @@ export default function Navbar() {
       </nav>
 
       </div>{/* end fixed header wrapper */}
+
+      {/* Reading Ruler overlay */}
+      {accessibilitySettings.readingRuler && (
+        <div className="fixed inset-0 pointer-events-none z-[9980]" aria-hidden="true">
+          <div className="absolute top-0 left-0 right-0 bg-black/20" style={{ height: Math.max(0, rulerY - 30) }} />
+          <div className="absolute left-0 right-0 border-y-2 border-yellow-400/70 bg-yellow-100/10" style={{ top: Math.max(0, rulerY - 30), height: 60 }} />
+          <div className="absolute left-0 right-0 bottom-0 bg-black/20" style={{ top: rulerY + 30 }} />
+        </div>
+      )}
+
+      {/* Screen Mask overlay */}
+      {accessibilitySettings.screenMask && (
+        <div className="fixed inset-0 pointer-events-none z-[9981]" aria-hidden="true">
+          <div className="absolute top-0 left-0 right-0 bg-black/65" style={{ height: Math.max(0, maskY - 18) }} />
+          <div className="absolute left-0 right-0 bottom-0 bg-black/65" style={{ top: maskY + 18 }} />
+        </div>
+      )}
 
       {/* Spacer: reserves space for fixed header (toolbar + nav) */}
       <div

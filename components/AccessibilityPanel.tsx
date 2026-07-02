@@ -20,10 +20,8 @@ const AccessibilityIcon = ({ className, size = 24 }: { className?: string; size?
 
 interface AccessibilitySettings {
   isHighContrast: boolean;
-  isLargeFont: boolean;
   linksUnderlined: boolean;
   reduceMotion: boolean;
-  dyslexiaFriendly: boolean;
   textSpacing: boolean;
   hideImages: boolean;
   bigCursor: boolean;
@@ -31,6 +29,9 @@ interface AccessibilitySettings {
   textAlignLeft: boolean;
   saturation: boolean;
   tooltips: boolean;
+  darkMode: boolean;
+  readingRuler: boolean;
+  screenMask: boolean;
 }
 
 interface AccessibilityPanelProps {
@@ -97,11 +98,11 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                 />
 
                 <GridToggle
-                    label="Większy tekst"
+                    label="Tryb ciemny"
                     icon={<Type size={24} />}
-                    isActive={settings.isLargeFont}
-                    onClick={() => toggleSetting('isLargeFont')}
-                    activeClass="bg-blue-500 border-blue-600"
+                    isActive={settings.darkMode}
+                    onClick={() => toggleSetting('darkMode')}
+                    activeClass="bg-slate-700 border-slate-800"
                 />
 
                 <GridToggle
@@ -129,11 +130,11 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                 />
 
                 <GridToggle
-                    label="Dla dyslektyków"
+                    label="Linijka"
                     icon={<MoveVertical size={24} />}
-                    isActive={settings.dyslexiaFriendly}
-                    onClick={() => toggleSetting('dyslexiaFriendly')}
-                    activeClass="bg-teal-500 border-teal-600"
+                    isActive={settings.readingRuler}
+                    onClick={() => toggleSetting('readingRuler')}
+                    activeClass="bg-orange-500 border-orange-600"
                 />
 
                 <GridToggle
