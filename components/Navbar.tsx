@@ -10,6 +10,7 @@ import AccountingCalculatorIcon from './icons/AccountingCalculatorIcon';
 import { getFavoritesCount } from '@/src/utils/favorites';
 import { AccessibilityPanel } from './AccessibilityPanel';
 import AccessibilityToolbar from './AccessibilityToolbar';
+import { useTTS } from '@/src/hooks/useTTS';
 
 const AccessibilityIcon = ({ className }: { className?: string }) => (
   <Image
@@ -41,6 +42,8 @@ export default function Navbar() {
   const [isToolbarVisible, setIsToolbarVisible] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const tts = useTTS();
 
   // Accessibility settings
   const [accessibilitySettings, setAccessibilitySettings] = useState({
@@ -275,6 +278,7 @@ export default function Navbar() {
             toggleSetting={toggleSetting}
             resetSettings={resetSettings}
             onClose={() => setIsToolbarVisible(false)}
+            tts={tts}
           />
         )}
       <nav
@@ -556,7 +560,7 @@ export default function Navbar() {
       {/* Spacer: reserves space for fixed header (toolbar + nav) */}
       <div
         aria-hidden="true"
-        className={`shrink-0 print:hidden transition-[height] duration-300 h-20 ${isToolbarVisible ? 'md:h-36' : ''}`}
+        className={`shrink-0 print:hidden transition-[height] duration-300 h-20 ${isToolbarVisible ? 'md:h-[128px]' : ''}`}
       />
 
       {/* Full Accessibility Panel (mobile) */}

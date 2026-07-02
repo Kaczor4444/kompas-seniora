@@ -765,3 +765,12 @@ body.accessibility-tooltips [title]::after {
     print-color-adjust: exact !important;
   }
 }
+
+/* TTS hover-to-read highlight */
+.tts-reading {
+  background-color: rgba(250, 220, 0, 0.35) !important;
+  outline: 2px solid rgba(250, 200, 0, 0.6) !important;
+  border-radius: 4px !important;
+  transition: background-color 0.15s ease !important;
+  cursor: default !important;
+}
