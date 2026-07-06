@@ -42,9 +42,24 @@ def last_known_hash() -> str | None:
     return p.read_text().strip() if p.exists() else None
 
 
+def extract_doc_date(data: bytes) -> str | None:
+    """Wyciąga datę stanu z nagłówka PDF (np. 'wg stanu na 24.06. 2026 r.')."""
+    import io as _io
+    try:
+        with pdfplumber.open(_io.BytesIO(data)) as pdf:
+            text = pdf.pages[0].extract_text() or ""
+        m = re.search(r"wg stanu na\s+(\d{1,2})\.(\d{2})\.\s*(\d{4})", text, re.IGNORECASE)
+        if m:
+            day, month, year = m.group(1).zfill(2), m.group(2), m.group(3)
+            return f"{year}-{month}-{day}"
+    except Exception:
+        pass
+    return None
+
+
 def save_pdf(data: bytes, h: str) -> Path:
-    today = datetime.date.today().strftime("%Y-%m-%d")
-    path = RAW_DANE_DIR / f"wykaz dps malopolska {today}.pdf"
+    doc_date = extract_doc_date(data) or datetime.date.today().strftime("%Y-%m-%d")
+    path = RAW_DANE_DIR / f"wykaz dps malopolska {doc_date}.pdf"
     path.write_bytes(data)
     (RAW_DANE_DIR / ".pdf_hash").write_text(h)
     return path
