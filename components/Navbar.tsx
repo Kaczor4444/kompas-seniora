@@ -56,10 +56,11 @@ export default function Navbar() {
     lineHeight: false,
     textAlignLeft: false,
     saturation: false,
-    tooltips: false,
     darkMode: false,
     readingRuler: false,
     screenMask: false,
+    highlightHeadings: false,
+    highlightLinks: false,
   });
   const [fontSizeLevel, setFontSizeLevelState] = useState(0);   // 0=normal, 1–4
   const [fontType, setFontTypeState] = useState<'normal'|'sans'|'serif'|'dyslexia'>('normal');
@@ -213,13 +214,26 @@ export default function Navbar() {
       lineHeight: false,
       textAlignLeft: false,
       saturation: false,
-      tooltips: false,
       darkMode: false,
       readingRuler: false,
       screenMask: false,
+      highlightHeadings: false,
+      highlightLinks: false,
     });
     setFontSizeLevelState(0);
     setFontTypeState('normal');
+  };
+
+  const applyVisionProfile = () => {
+    setAccessibilitySettings(prev => ({
+      ...prev,
+      bigCursor: true,
+      linksUnderlined: true,
+      highlightLinks: true,
+      textSpacing: true,
+      lineHeight: true,
+    }));
+    setFontSizeLevelState(2);
   };
 
   // Alias for backward compatibility with existing code
@@ -237,8 +251,9 @@ export default function Navbar() {
     b.classList.toggle('accessibility-line-height',    accessibilitySettings.lineHeight);
     b.classList.toggle('accessibility-text-align-left',accessibilitySettings.textAlignLeft);
     b.classList.toggle('accessibility-saturation',     accessibilitySettings.saturation);
-    b.classList.toggle('accessibility-tooltips',       accessibilitySettings.tooltips);
     b.classList.toggle('accessibility-dark-mode',      accessibilitySettings.darkMode);
+    b.classList.toggle('accessibility-highlight-headings', accessibilitySettings.highlightHeadings);
+    b.classList.toggle('accessibility-highlight-links',    accessibilitySettings.highlightLinks);
   }, [accessibilitySettings]);
 
   useEffect(() => {
@@ -282,6 +297,7 @@ export default function Navbar() {
             setFontSizeLevel={setFontSizeLevel}
             fontType={fontType}
             setFontType={setFontType}
+            onVisionProfile={applyVisionProfile}
           />
         )}
       <nav
@@ -590,6 +606,7 @@ export default function Navbar() {
         settings={accessibilitySettings}
         toggleSetting={toggleSetting}
         resetSettings={resetSettings}
+        onVisionProfile={applyVisionProfile}
       />
     </>
   );

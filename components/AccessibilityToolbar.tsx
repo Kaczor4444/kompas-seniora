@@ -7,8 +7,8 @@ import {
   ChevronLeft, ChevronRight, RotateCcw,
   Type, Link2, ZapOff, MoveVertical, MoveHorizontal,
   MousePointer2, ImageOff, AlignLeft, Droplet,
-  ArrowUpFromLine, MessageSquare, X, Volume2, ChevronDown, ChevronUp,
-  Moon, Ruler, EyeOff, SkipBack, SkipForward,
+  ArrowUpFromLine, X, Volume2, ChevronDown, ChevronUp,
+  Moon, Ruler, EyeOff, SkipBack, SkipForward, Heading, Highlighter, Eye,
 } from 'lucide-react';
 import type { TTSState } from '@/src/hooks/useTTS';
 
@@ -21,13 +21,14 @@ interface AccessibilitySettings {
   reduceMotion: boolean;
   hideImages: boolean;
   bigCursor: boolean;
-  tooltips: boolean;
   lineHeight: boolean;
   textAlignLeft: boolean;
   saturation: boolean;
   darkMode: boolean;
   readingRuler: boolean;
   screenMask: boolean;
+  highlightHeadings: boolean;
+  highlightLinks: boolean;
 }
 
 interface Props {
@@ -40,6 +41,7 @@ interface Props {
   setFontSizeLevel: (level: number) => void;
   fontType: FontType;
   setFontType: (type: FontType) => void;
+  onVisionProfile: () => void;
 }
 
 const TILES: Array<{ key: keyof AccessibilitySettings; label: string; description: string; icon: React.ReactNode; color: string }> = [
@@ -52,7 +54,8 @@ const TILES: Array<{ key: keyof AccessibilitySettings; label: string; descriptio
   { key: 'readingRuler',   label: 'Linijka',            description: 'Poziomy pasek śledzący kursor — ułatwia śledzenie linii tekstu',      icon: <Ruler size={21} />,          color: 'bg-orange-600' },
   { key: 'screenMask',     label: 'Maska ekranu',       description: 'Przyciemnia stronę poza aktualnie czytaną linią',                     icon: <EyeOff size={21} />,         color: 'bg-gray-600' },
   { key: 'bigCursor',       label: 'Duży kursor',       description: 'Powiększa wskaźnik myszy dla łatwiejszego śledzenia',                  icon: <MousePointer2 size={21} />,  color: 'bg-slate-700' },
-  { key: 'tooltips',        label: 'Podpowiedzi',       description: 'Wyświetla opisy elementów strony po najechaniu kursorem',             icon: <MessageSquare size={21} />,  color: 'bg-indigo-600' },
+  { key: 'highlightHeadings', label: 'Nagłówki',         description: 'Podświetla nagłówki kolorowym akcentem — łatwiejsza nawigacja wzrokowa', icon: <Heading size={21} />,        color: 'bg-indigo-600' },
+  { key: 'highlightLinks',    label: 'Podświetl linki',  description: 'Dodaje żółte tło pod linkami — łatwiej je znaleźć na stronie',          icon: <Highlighter size={21} />,    color: 'bg-yellow-500' },
   { key: 'lineHeight',      label: 'Interlinia',        description: 'Zwiększa odstępy między wierszami tekstu',                            icon: <ArrowUpFromLine size={21} />,color: 'bg-lime-600' },
   { key: 'textAlignLeft',   label: 'Wyrównaj do lewej', description: 'Wyrównuje tekst do lewej zamiast justowania',                         icon: <AlignLeft size={21} />,      color: 'bg-cyan-600' },
   { key: 'saturation',      label: 'Monochromatyczny',  description: 'Usuwa kolory — wyświetla stronę w skali szarości',                    icon: <Droplet size={21} />,        color: 'bg-gray-500' },
@@ -347,7 +350,7 @@ function FontPanel({ fontSizeLevel, setFontSizeLevel, fontType, setFontType, onC
 }
 
 /* ── Main Toolbar ──────────────────────────────────────────────────── */
-export default function AccessibilityToolbar({ settings, toggleSetting, resetSettings, onClose, tts, fontSizeLevel, setFontSizeLevel, fontType, setFontType }: Props) {
+export default function AccessibilityToolbar({ settings, toggleSetting, resetSettings, onClose, tts, fontSizeLevel, setFontSizeLevel, fontType, setFontType, onVisionProfile }: Props) {
   const scrollRef    = useRef<HTMLDivElement>(null);
   const ttsPanelRef  = useRef<HTMLDivElement>(null);
   const fontPanelRef = useRef<HTMLDivElement>(null);
@@ -481,6 +484,19 @@ export default function AccessibilityToolbar({ settings, toggleSetting, resetSet
 
       {/* Tiles */}
       <div ref={scrollRef} className="flex gap-1 overflow-x-auto flex-1 items-center" style={{ scrollbarWidth: 'none' }}>
+        {/* Profil: Słabowzroczny */}
+        <div className="relative group shrink-0">
+          <button
+            onClick={onVisionProfile}
+            className={`flex items-center gap-1.5 px-2.5 h-9 rounded-lg text-xs font-bold whitespace-nowrap transition-all border
+              ${hc ? 'border-yellow-400 text-yellow-400 hover:bg-gray-900' : 'border-violet-300 text-violet-700 bg-violet-50 hover:bg-violet-100'}`}
+          >
+            <Eye size={15} />
+            Słabowzroczny
+          </button>
+          <Tip label="Profil: Słabowzroczny" description="Włącza większą czcionkę, duży kursor, podświetlone linki i zwiększone odstępy" />
+        </div>
+        <div className={`w-px h-6 shrink-0 ${hc ? 'bg-yellow-400' : 'bg-gray-200'}`} />
         {TILES.map(({ key, label, description, icon, color }) => (
           <Tile key={key} onClick={() => toggleSetting(key)} label={label} description={description} icon={icon}
             color={color} isActive={settings[key]} hc={hc} />

@@ -694,12 +694,22 @@ body.accessibility-saturation {
   filter: grayscale(100%) !important;
 }
 
-/* Tooltips - Enhanced visible tooltips */
-body.accessibility-tooltips [title]::after {
-  content: " [" attr(title) "]";
-  font-size: 0.85em;
-  color: var(--color-primary-600);
-  font-weight: bold;
+/* Highlight headings */
+body.accessibility-highlight-headings h1,
+body.accessibility-highlight-headings h2,
+body.accessibility-highlight-headings h3 {
+  border-left: 4px solid #059669 !important;
+  padding-left: 10px !important;
+  margin-left: -14px !important;
+}
+
+/* Highlight links */
+body.accessibility-highlight-links a:not([class*="bg-"]):not(nav a):not(button) {
+  background-color: #fef08a !important;
+  color: #1a1a1a !important;
+  padding: 1px 3px !important;
+  border-radius: 2px !important;
+  text-decoration: underline !important;
 }
 
 /* Bounce animation for chatbot button */

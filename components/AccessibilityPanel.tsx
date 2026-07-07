@@ -5,7 +5,7 @@ import Image from 'next/image';
 import {
   X, Type, Link2, ZapOff, Check, MoveVertical,
   MousePointer2, ImageOff, AlignLeft, MoveHorizontal, Droplet, ArrowUpFromLine,
-  MessageSquare, RotateCcw
+  RotateCcw, Heading, Highlighter, Eye
 } from 'lucide-react';
 
 const AccessibilityIcon = ({ className, size = 24 }: { className?: string; size?: number }) => (
@@ -28,10 +28,11 @@ interface AccessibilitySettings {
   lineHeight: boolean;
   textAlignLeft: boolean;
   saturation: boolean;
-  tooltips: boolean;
   darkMode: boolean;
   readingRuler: boolean;
   screenMask: boolean;
+  highlightHeadings: boolean;
+  highlightLinks: boolean;
 }
 
 interface AccessibilityPanelProps {
@@ -40,6 +41,7 @@ interface AccessibilityPanelProps {
   settings: AccessibilitySettings;
   toggleSetting: (key: keyof AccessibilitySettings) => void;
   resetSettings: () => void;
+  onVisionProfile: () => void;
 }
 
 export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
@@ -47,7 +49,8 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
   onClose,
   settings,
   toggleSetting,
-  resetSettings
+  resetSettings,
+  onVisionProfile
 }) => {
   return (
     <>
@@ -146,11 +149,19 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                 />
 
                 <GridToggle
-                    label="Podpowiedzi"
-                    icon={<MessageSquare size={24} />}
-                    isActive={settings.tooltips}
-                    onClick={() => toggleSetting('tooltips')}
+                    label="Nagłówki"
+                    icon={<Heading size={24} />}
+                    isActive={settings.highlightHeadings}
+                    onClick={() => toggleSetting('highlightHeadings')}
                     activeClass="bg-indigo-500 border-indigo-600"
+                />
+
+                <GridToggle
+                    label="Podśw. linki"
+                    icon={<Highlighter size={24} />}
+                    isActive={settings.highlightLinks}
+                    onClick={() => toggleSetting('highlightLinks')}
+                    activeClass="bg-yellow-500 border-yellow-600"
                 />
 
                 <GridToggle
@@ -180,7 +191,13 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
         </div>
 
         {/* Footer Area */}
-        <div className="p-3 bg-white border-t border-stone-100">
+        <div className="p-3 bg-white border-t border-stone-100 flex flex-col gap-2">
+            <button
+              onClick={onVisionProfile}
+              className="w-full py-2 bg-violet-600 text-white rounded-xl font-bold hover:bg-violet-700 transition-colors flex items-center justify-center gap-2 text-sm"
+            >
+              <Eye size={15} /> Profil: Słabowzroczny
+            </button>
             <button
               onClick={resetSettings}
               className="w-full py-2 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-colors flex items-center justify-center gap-2 text-sm"
