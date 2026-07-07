@@ -5,34 +5,28 @@ import { useEffect, useState } from 'react'
 export default function ReadingProgressBar() {
   const [progress, setProgress] = useState(0)
   const [isHighContrast, setIsHighContrast] = useState(false)
+  const [toolbarVisible, setToolbarVisible] = useState(false)
 
   useEffect(() => {
     const updateProgress = () => {
       const windowHeight = window.innerHeight
       const documentHeight = document.documentElement.scrollHeight
       const scrollTop = window.scrollY
-
-      // Calculate percentage
       const totalScroll = documentHeight - windowHeight
       const currentProgress = (scrollTop / totalScroll) * 100
-
       setProgress(Math.min(currentProgress, 100))
     }
 
-    // Check high contrast mode
-    const checkHighContrast = () => {
+    const checkBodyClasses = () => {
       setIsHighContrast(document.body.classList.contains('accessibility-high-contrast'))
+      setToolbarVisible(document.body.classList.contains('accessibility-toolbar-visible'))
     }
 
-    // Update on scroll
     window.addEventListener('scroll', updateProgress)
-
-    // Initial calculations
     updateProgress()
-    checkHighContrast()
+    checkBodyClasses()
 
-    // Observer for body class changes
-    const observer = new MutationObserver(checkHighContrast)
+    const observer = new MutationObserver(checkBodyClasses)
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
 
     return () => {
@@ -43,9 +37,10 @@ export default function ReadingProgressBar() {
 
   return (
     <div
-      className={`fixed top-20 left-0 right-0 h-1.5 z-[51] pointer-events-none shadow-sm hidden md:block ${
+      className={`fixed left-0 right-0 h-1.5 z-[51] pointer-events-none shadow-sm hidden md:block transition-[top] duration-300 ${
         isHighContrast ? 'bg-slate-800' : 'bg-stone-100'
       }`}
+      style={{ top: toolbarVisible ? '128px' : '80px' }}
       role="progressbar"
       aria-valuenow={Math.round(progress)}
       aria-valuemin={0}

@@ -81,6 +81,7 @@ export default function Navbar() {
 
   useEffect(() => {
     localStorage.setItem('accessibility-toolbar-visible', JSON.stringify(isToolbarVisible));
+    document.body.classList.toggle('accessibility-toolbar-visible', isToolbarVisible);
   }, [isToolbarVisible]);
 
   const pathname = usePathname();
