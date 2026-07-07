@@ -81,7 +81,6 @@ export default function Navbar() {
 
   useEffect(() => {
     localStorage.setItem('accessibility-toolbar-visible', JSON.stringify(isToolbarVisible));
-    document.body.classList.toggle('accessibility-toolbar-visible', isToolbarVisible);
   }, [isToolbarVisible]);
 
   const pathname = usePathname();
@@ -557,7 +556,6 @@ export default function Navbar() {
         </div>
 
         {/* Progress Bar - wewnątrz navbara, podróżuje razem z nim */}
-        {/* Desktop: UKRYTY (w artykułach jest ReadingProgressBar) */}
         {/* Mobile: Widoczny podczas scrollu WSZĘDZIE (jeden uniwersalny pasek) */}
         <div
           className={`absolute bottom-0 left-0 w-full h-1
