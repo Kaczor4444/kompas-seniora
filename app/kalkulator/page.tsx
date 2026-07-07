@@ -446,14 +446,19 @@ function KalkulatorContent() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl">
             {[
               { step: '1', title: 'Senior płaci z emerytury', desc: 'Maksymalnie 70% dochodu — ustawowa granica, której MOPS nie może przekroczyć.' },
-              { step: '2', title: 'Rodzina dopłaca nadwyżkę', desc: 'Tylko jeśli dochód przekracza 3 030 zł (singiel) lub 2 469 zł/os. w rodzinie.' },
+              { step: '2', title: 'Rodzina dopłaca nadwyżkę', desc: 'Tylko jeśli dochód przekracza 3 030 zł (singiel) lub 2 469 zł/os. w rodzinie.', link: '/poradniki/finanse-prawne/koszty-opieki' },
               { step: '3', title: 'Gmina pokrywa resztę', desc: 'Jeśli suma seniora i rodziny nie pokrywa kosztu — gmina dopłaca z urzędu.' },
-            ].map(({ step, title, desc }) => (
+            ].map(({ step, title, desc, link }) => (
               <div key={step} className="flex gap-3">
                 <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">{step}</div>
                 <div>
                   <p className="text-sm font-black text-slate-900 mb-0.5">{title}</p>
                   <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+                  {link && (
+                    <Link href={link} className="inline-flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium mt-1">
+                      Skąd ta kwota? <ArrowRight size={11} />
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}
