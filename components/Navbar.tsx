@@ -66,16 +66,8 @@ export default function Navbar() {
   const [rulerY, setRulerY] = useState(200);
   const [maskY,  setMaskY]  = useState(200);
 
-  // Load accessibility settings from localStorage on mount
+  // Toolbar visibility persists (nie ustawienia dostępności — resetują się przy każdym otwarciu)
   useEffect(() => {
-    const savedSettings = localStorage.getItem('accessibility-settings');
-    if (savedSettings) {
-      try {
-        setAccessibilitySettings(JSON.parse(savedSettings));
-      } catch (e) {
-        console.error('Failed to parse accessibility settings:', e);
-      }
-    }
     const savedToolbar = localStorage.getItem('accessibility-toolbar-visible');
     if (savedToolbar !== null) {
       try {
@@ -85,11 +77,6 @@ export default function Navbar() {
       }
     }
   }, []);
-
-  // Save accessibility settings to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('accessibility-settings', JSON.stringify(accessibilitySettings));
-  }, [accessibilitySettings]);
 
   useEffect(() => {
     localStorage.setItem('accessibility-toolbar-visible', JSON.stringify(isToolbarVisible));
