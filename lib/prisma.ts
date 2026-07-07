@@ -10,4 +10,7 @@ export const prisma =
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   });
 
+// Eagerly connect so Turbopack doesn't hit "Engine is not yet connected" on first request
+void prisma.$connect();
+
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
