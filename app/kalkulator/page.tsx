@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense } from 'react';
-import { ArrowLeft, AlertCircle, Phone, MapPin, CheckCircle2, Search, Heart, ArrowLeftRight, ChevronRight, X, Zap } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Phone, MapPin, CheckCircle2, Search, Heart, ArrowLeftRight, ChevronRight, X, Zap, BookOpen, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
@@ -458,6 +458,15 @@ function KalkulatorContent() {
               </div>
             ))}
           </div>
+
+          <Link
+            href="/poradniki/finanse-prawne/koszty-opieki"
+            className="inline-flex items-center gap-2 mt-6 text-sm text-emerald-700 hover:text-emerald-800 font-medium group"
+          >
+            <BookOpen size={15} className="shrink-0" />
+            Jak działa system finansowania DPS? Przeczytaj poradnik
+            <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
         </div>
 
         {/* ── 2-column layout: form + sticky results ── */}
