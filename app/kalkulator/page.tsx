@@ -436,7 +436,7 @@ function KalkulatorContent() {
             Ile naprawdę zapłaci Twoja rodzina?
           </h1>
           <p className="text-slate-500 text-base max-w-2xl leading-relaxed mb-8">
-            Cena widoczna na karcie DPS to koszt utrzymania placówki — nie kwota z Twojego konta.
+            Całkowity koszt pobytu seniora w DPS — dzielony między seniora, rodzinę i gminę.
             Senior płaci najwyżej <strong className="text-slate-700">70% swojej emerytury</strong>.
             Rodzina dopłaca tylko wtedy, gdy jej dochód przekracza ustawowy próg —
             w przeciwnym razie brakującą kwotę <strong className="text-slate-700">pokrywa gmina</strong>.
@@ -468,7 +468,7 @@ function KalkulatorContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <CalcField
-                label="Miesięczny koszt utrzymania w DPS (zł)"
+                label="Miesięczny koszt pobytu mieszkańca DPS (zł)"
                 help="Ustala wójt/burmistrz. W 2026 r. średnio 5 000–7 500 zł. Możesz pobrać z wyszukiwarki poniżej."
               >
                 <NumInput value={dpsCost} onChange={interact(setDpsCost)} placeholder="6000" min="0" max="20000" />
