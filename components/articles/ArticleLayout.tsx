@@ -51,7 +51,7 @@ export default function ArticleLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-clip">
-      {/* Mobile reading progress bar */}
+      {/* Reading progress bar — desktop obsługuje Navbar, mobile poniżej */}
       <ReadingProgressBar />
 
       {/* Breadcrumbs */}

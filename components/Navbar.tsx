@@ -575,6 +575,24 @@ export default function Navbar() {
         </div>
       </nav>
 
+        {/* Desktop reading progress bar — wewnątrz wrappera, zawsze na dole headera */}
+        {pathname.startsWith('/poradniki/') && pathname.split('/').length > 3 && (
+          <div
+            className={`hidden md:block h-1.5 w-full pointer-events-none shadow-sm
+              ${isHighContrast ? 'bg-slate-800' : 'bg-stone-100'}`}
+            role="progressbar"
+            aria-valuenow={Math.round(scrollProgress * 100)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className={`h-full transition-all duration-150 ease-linear shadow-[0_0_12px_rgba(5,150,105,0.4)]
+                ${isHighContrast ? 'bg-yellow-400' : 'bg-primary-600'}`}
+              style={{ width: `${scrollProgress * 100}%` }}
+            />
+          </div>
+        )}
+
       </div>{/* end fixed header wrapper */}
 
       {/* Reading Ruler overlay */}
