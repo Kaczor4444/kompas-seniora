@@ -464,8 +464,7 @@ function KalkulatorContent() {
     {
       step: '2',
       title: 'Rodzina dopłaca nadwyżkę',
-      desc: <>Tylko jeśli dochód przekracza <InfoTooltip text="300% kryterium dochodowego dla osoby samotnej (art. 8 ust. 1 pkt 1 ups). Kryterium w 2024 r. = 1 010 zł × 3 = 3 030 zł." link={ARTICLE}>3 030 zł</InfoTooltip> (singiel) lub <InfoTooltip text="300% kryterium dochodowego na osobę w rodzinie (art. 8 ust. 1 pkt 2 ups). Kryterium w 2024 r. = 823 zł × 3 = 2 469 zł." link={ARTICLE}>2 469 zł/os.</InfoTooltip> w rodzinie.</>,
-      link: ARTICLE,
+      desc: <>Tylko jeśli dochód przekracza <InfoTooltip text="300% kryterium dochodowego dla osoby samotnej (art. 8 ust. 1 pkt 1 ups). Aktualne kryterium = 1 010 zł × 3 = 3 030 zł." link={ARTICLE}>3 030 zł</InfoTooltip> (singiel) lub <InfoTooltip text="300% kryterium dochodowego na osobę w rodzinie (art. 8 ust. 1 pkt 2 ups). Aktualne kryterium = 823 zł × 3 = 2 469 zł." link={ARTICLE}>2 469 zł/os.</InfoTooltip> w rodzinie.</>,
     },
     {
       step: '3',
