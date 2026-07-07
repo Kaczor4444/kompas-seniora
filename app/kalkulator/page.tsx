@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
-import { ArrowLeft, AlertCircle, Phone, MapPin, CheckCircle2, Search, Heart, ArrowLeftRight, ChevronRight, X, Zap, BookOpen, ArrowRight } from 'lucide-react';
+import { useState, useEffect, useRef, Suspense, ReactNode } from 'react';
+import { ArrowLeft, AlertCircle, Phone, MapPin, CheckCircle2, Search, Heart, ArrowLeftRight, ChevronRight, X, Zap, BookOpen, ArrowRight, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { mapPowiatToCity } from '@/lib/powiat-to-city';
@@ -117,6 +117,42 @@ async function trackAppEvent(eventType: string, metadata: Record<string, unknown
       body: JSON.stringify({ eventType, metadata, language: navigator?.language }),
     });
   } catch { /* silent */ }
+}
+
+// ─── InfoTooltip ─────────────────────────────────────────────────────────────
+
+function InfoTooltip({ children, text, link }: { children?: ReactNode; text: string; link?: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span className="relative inline-flex items-baseline">
+      {children && <span className="font-semibold">{children}</span>}
+      <button
+        onClick={e => { e.stopPropagation(); setOpen(v => !v); }}
+        className="inline-flex items-center text-emerald-500 hover:text-emerald-700 ml-0.5 align-middle focus:outline-none"
+        aria-label="Podstawa prawna"
+      >
+        <Info size={11} />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-900 text-white text-[11px] rounded-xl p-3 z-50 shadow-xl leading-relaxed">
+            {text}
+            {link && (
+              <a
+                href={link}
+                className="block mt-2 text-emerald-400 hover:text-emerald-300 font-semibold"
+                onClick={() => setOpen(false)}
+              >
+                Czytaj w poradniku →
+              </a>
+            )}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900" />
+          </div>
+        </>
+      )}
+    </span>
+  );
 }
 
 // ─── Field sub-components ────────────────────────────────────────────────────
@@ -418,6 +454,26 @@ function KalkulatorContent() {
 
   // ── Render ────────────────────────────────────────────────────────────────
 
+  const ARTICLE = '/poradniki/finanse-prawne/koszty-opieki';
+  const calSteps: { step: string; title: string; desc: ReactNode; link?: string }[] = [
+    {
+      step: '1',
+      title: 'Senior płaci z emerytury',
+      desc: <>Maksymalnie <InfoTooltip text="Art. 61 ust. 2d ustawy o pomocy społecznej — mieszkaniec DPS płaci nie więcej niż 70% miesięcznego dochodu netto." link={ARTICLE}>70% dochodu</InfoTooltip> — ustawowa granica, której MOPS nie może przekroczyć.</>,
+    },
+    {
+      step: '2',
+      title: 'Rodzina dopłaca nadwyżkę',
+      desc: <>Tylko jeśli dochód przekracza <InfoTooltip text="300% kryterium dochodowego dla osoby samotnej (art. 8 ust. 1 pkt 1 ups). Kryterium w 2024 r. = 1 010 zł × 3 = 3 030 zł." link={ARTICLE}>3 030 zł</InfoTooltip> (singiel) lub <InfoTooltip text="300% kryterium dochodowego na osobę w rodzinie (art. 8 ust. 1 pkt 2 ups). Kryterium w 2024 r. = 823 zł × 3 = 2 469 zł." link={ARTICLE}>2 469 zł/os.</InfoTooltip> w rodzinie.</>,
+      link: ARTICLE,
+    },
+    {
+      step: '3',
+      title: 'Gmina pokrywa resztę',
+      desc: 'Jeśli suma seniora i rodziny nie pokrywa kosztu — gmina dopłaca z urzędu.',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-stone-50 pb-24">
       <div className="max-w-[1100px] mx-auto px-6 py-12">
@@ -444,11 +500,7 @@ function KalkulatorContent() {
 
           {/* 3-step explainer */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl">
-            {[
-              { step: '1', title: 'Senior płaci z emerytury', desc: 'Maksymalnie 70% dochodu — ustawowa granica, której MOPS nie może przekroczyć.' },
-              { step: '2', title: 'Rodzina dopłaca nadwyżkę', desc: 'Tylko jeśli dochód przekracza 3 030 zł (singiel) lub 2 469 zł/os. w rodzinie.', link: '/poradniki/finanse-prawne/koszty-opieki' },
-              { step: '3', title: 'Gmina pokrywa resztę', desc: 'Jeśli suma seniora i rodziny nie pokrywa kosztu — gmina dopłaca z urzędu.' },
-            ].map(({ step, title, desc, link }) => (
+            {calSteps.map(({ step, title, desc, link }) => (
               <div key={step} className="flex gap-3">
                 <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">{step}</div>
                 <div>
