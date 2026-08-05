@@ -4,3 +4,4 @@
 |---|---|---|---|
 | 2026-06-20 10:25 | [dps_wolne_miejsca_2026-06-20.xls](dps_wolne_miejsca_2026-06-20.xls) | `2b2a9a9b5cbd` | [Issue](https://github.com/Kaczor4444/kompas-seniora/issues/27) |
 | 2026-07-05 10:02 | [dps_wolne_miejsca_2026-07-05.xls](dps_wolne_miejsca_2026-07-05.xls) | `b4aeab15016b` | [Issue](https://github.com/Kaczor4444/kompas-seniora/issues/35) |
+| 2026-08-05 10:23 | [dps_wolne_miejsca_2026-08-05.xls](dps_wolne_miejsca_2026-08-05.xls) | `7f2001950535` | [Issue](https://github.com/Kaczor4444/kompas-seniora/issues/52) |
