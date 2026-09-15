@@ -14,3 +14,5 @@
 | 2026-05-31 13:19 | [wykaz dps malopolska 2026-05-31.pdf](wykaz dps malopolska 2026-05-31.pdf) | `1c62c3d82498` | [źródło PDF](https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf) | [Issue](https://github.com/Kaczor4444/kompas-seniora/issues/14) |
 | 2026-07-01 11:17 | [wykaz dps malopolska 2026-07-01.pdf](wykaz dps malopolska 2026-07-01.pdf) | `b471eee53a9c` | [źródło PDF](https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf) |
 | 2026-07-01 11:17 | [wykaz dps malopolska 2026-07-01.pdf](wykaz dps malopolska 2026-07-01.pdf) | `b471eee53a9c` | [źródło PDF](https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf) | [Issue](https://github.com/Kaczor4444/kompas-seniora/issues/33) |
+| 2026-09-15 12:59 | [wykaz dps malopolska 2026-09-07.pdf](wykaz dps malopolska 2026-09-07.pdf) | `bf7d0c0f5169` | [źródło PDF](https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf) |
+| 2026-09-15 12:59 | [wykaz dps malopolska 2026-09-07.pdf](wykaz dps malopolska 2026-09-07.pdf) | `bf7d0c0f5169` | [źródło PDF](https://www.malopolska.uw.gov.pl/doc/wykaz%20dps.pdf) | [Issue](https://github.com/Kaczor4444/kompas-seniora/issues/73) |
